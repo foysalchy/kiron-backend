@@ -12,15 +12,16 @@
         <div class="flex items-center justify-between gap-4 lg:gap-8">
 
             <!-- Mobile Menu Toggle (Visible only on Mobile) -->
-            <button onclick="toggleMobileMenu()" aria-label="Open mobile menu" class="md:hidden text-header text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" aria-label="Open mobile menu"
+                class="md:hidden text-header text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
 
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
-                        class="h-8 sm:h-10 md:h-14 w-auto">
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160"
+                        height="56" class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
                 @endif
@@ -162,7 +163,8 @@
                         </div>
                     @else
                         <!-- Guest User Icon -->
-                        <a href="{{ route('user.login') }}" aria-label="Login" class="flex items-center gap-2 text-header group/login">
+                        <a href="{{ route('user.login') }}" aria-label="Login"
+                            class="flex items-center gap-2 text-header group/login">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -318,7 +320,7 @@
                                 <div class="nav-dropdown-menu absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
                                     <ul
                                         class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2 rounded-b-md text-gray-700 text-sm font-medium">
-                                       @foreach ($mega->subCategories->sortBy(fn($sub) => strtolower($sub->name)) as $sub)
+                                        @foreach ($mega->subCategories->sortBy(fn($sub) => strtolower($sub->name)) as $sub)
                                             @php
                                                 $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
                                             @endphp
@@ -336,7 +338,7 @@
                                                 @if ($hasMini)
                                                     <ul
                                                         class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
-                                                       @foreach ($sub->miniCategories->sortBy(fn($mini) => strtolower($mini->name)) as $mini)
+                                                        @foreach ($sub->miniCategories->sortBy(fn($mini) => strtolower($mini->name)) as $mini)
                                                             <li class=" hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
                                                                     class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900  text-[14px] font-medium transition-colors">
@@ -370,12 +372,13 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
-                    class="h-8 w-auto">
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160"
+                    height="56" class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-black">{{ $setup->shop_name ?? 'Shop Name' }}</span>
             @endif
-            <button onclick="toggleMobileMenu()" aria-label="Close mobile menu" class="text-black text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" aria-label="Close mobile menu"
+                class="text-black text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -454,8 +457,7 @@
                         @endphp
                         <div class="border-b border-gray-100 last:border-0">
                             <div class="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg">
-                                <a href="{{ url($mega->slug ?? $mega->id) }}"
-                                    class="text-sm font-semibold  text-black flex-1">
+                                <a href="{{ url($mega->slug ?? $mega->id) }}" class="text-sm font-semibold  text-black flex-1">
                                     {{ $mega->name }}
                                 </a>
                                 @if ($hasSub)
@@ -551,7 +553,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
         <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
-        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer" class="text-gray-500 hover:text-red-500 text-2xl">
+        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer"
+            class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
     </div>
@@ -563,10 +566,12 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer" style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
+    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer"
+        style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
         <div class="flex justify-between items-center mb-4">
             <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-            <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val" data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
+            <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val"
+                data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
             </span>
         </div>
@@ -631,7 +636,7 @@
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                         link.innerHTML = `
-                                            <img src="${item.thumbnail_95_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/cover.webp') }}'" loading="lazy" width="800" height="800">
+                                            <img src="${item.thumbnail_95_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'" loading="lazy" width="800" height="800">
                                             <span class="truncate">${item.title}</span>
                                         `;
                                         liveResults.appendChild(link);

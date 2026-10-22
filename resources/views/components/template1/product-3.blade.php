@@ -26,7 +26,7 @@
     $hexColor = ltrim($secondaryColor, '#');
     if (preg_match('/^[a-f0-9]{3}$|^[a-f0-9]{6}$/i', $hexColor)) {
         if (strlen($hexColor) === 3) {
-            $hexColor = implode('', array_map(fn ($digit) => $digit . $digit, str_split($hexColor)));
+            $hexColor = implode('', array_map(fn($digit) => $digit . $digit, str_split($hexColor)));
         }
 
         $rgb = array_map('hexdec', str_split($hexColor, 2));
@@ -50,13 +50,14 @@
         <a href="{{ url($product->slug ?? $product->id) }}"
             class="hover:border-2 hover:border-[var(--primary-color)]   relative block  border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
             <div class="w-full h-full  flex items-center justify-center">
-                <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
+                <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                     alt="{{ $product->title }}" loading="lazy"
                     class="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110" />
             </div>
             <!-- Free Delivery Badge -->
             @if ($product->is_free_delivery)
-                <div class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                <div
+                    class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                     Free Shipping
                 </div>
             @endif
@@ -104,13 +105,12 @@
 
             <div class="basis-full h-0 sm:hidden"></div>
 
-           @if ($discountLabel)
-            <span
-                class="secondary-bg text-xs md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
-                    max-md:absolute max-md:top-1 max-md:left-1" style="color: {{ $badgeTextColor }} !important;">
-                -{{ $discountLabel }} OFF
-            </span>
-        @endif
+            @if ($discountLabel)
+                <span class="secondary-bg text-xs md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                        max-md:absolute max-md:top-1 max-md:left-1" style="color: {{ $badgeTextColor }} !important;">
+                    -{{ $discountLabel }} OFF
+                </span>
+            @endif
         </div>
 
         <button {{ $isOutOfStock ? 'disabled' : '' }}
@@ -121,7 +121,8 @@
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out
             @else
-                <i class="fas fa-shopping-cart text-xs"></i> {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Cart' }}
+                <i class="fas fa-shopping-cart text-xs"></i>
+                {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Cart' }}
             @endif
         </button>
     </div>

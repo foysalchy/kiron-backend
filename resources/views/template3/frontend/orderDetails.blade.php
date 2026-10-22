@@ -15,7 +15,7 @@
             </div>
             <div class="flex flex-col items-start md:items-end">
                 <span class="px-4 py-1 {{ $order->status_color }} text-md font-bold rounded-lg mb-1">
-                     {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
+                    {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
@@ -39,9 +39,8 @@
                                 {{-- 1. Safe Image Check --}}
                                 <div
                                     class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
-                                    <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
-                                        alt="{{ $item->product->title ?? 'Product image' }}"
-                                        class="w-full h-full object-cover">
+                                    <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                        alt="{{ $item->product->title ?? 'Product image' }}" class="w-full h-full object-cover">
                                 </div>
 
                                 <div class="flex-1 text-center sm:text-left">
@@ -63,11 +62,15 @@
 
                                     <p class="text-gray-900 font-medium">
                                         <span class="text-sm">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($item->unit_price) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                            {{ number_format($item->unit_price) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                             × {{ $item->quantity }}
                                         </span>
                                         <span class="text-lg font-bold text-[var(--primary-color)] ml-3">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($item->total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                            {{ number_format($item->total) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                         </span>
                                     </p>
                                 </div>
@@ -118,14 +121,16 @@
                             }
                         @endphp
 
-                        {{-- // Special case: If order is cancelled, we only show steps up to the cancellation point or just the flow
-                            $isCancelled = $currentStatusValue === \App\Enums\Status::Cancelled->value;
+                        {{-- // Special case: If order is cancelled, we only show steps up to the cancellation point or just
+                        the flow
+                        $isCancelled = $currentStatusValue === \App\Enums\Status::Cancelled->value;
                         @endphp --}}
 
                         @foreach ($flow as $index => $status)
                             {{-- Skip Return/Cancel steps if they haven't happened yet to keep the UI clean --}}
-                            {{-- @if (($status == \App\Enums\Status::Cancelled || $status == \App\Enums\Status::ReturntoCourier || $status == \App\Enums\Status::ReturnReceived) && $index > $currentIndex)
-                                @continue
+                            {{-- @if (($status == \App\Enums\Status::Cancelled || $status == \App\Enums\Status::ReturntoCourier
+                            || $status == \App\Enums\Status::ReturnReceived) && $index > $currentIndex)
+                            @continue
                             @endif --}}
 
                             @php
@@ -137,17 +142,15 @@
                                 <!-- Dot -->
                                 <div
                                     class="absolute -left-8 top-2 w-4 h-4 rounded-full border-2 border-white z-10
-                    {{ $isCurrent ? 'bg-orange-500 shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
+                            {{ $isCurrent ? 'bg-orange-500 shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
                                     @if ($isCompleted && !$isCurrent)
-                                        <i
-                                            class="fas fa-check text-[8px] text-primary flex items-center justify-center h-full"></i>
+                                        <i class="fas fa-check text-[8px] text-primary flex items-center justify-center h-full"></i>
                                     @endif
                                 </div>
 
                                 <!-- Label -->
-                                <p
-                                    class="font-bold text-md leading-none mb-1
-                    {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
+                                <p class="font-bold text-md leading-none mb-1
+                            {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
                                     {{ $status->label() }}
                                 </p>
 
@@ -247,7 +250,8 @@
                             <div>
                                 <p class="text-gray-900 text-md">{{ $order->customer->name ?? '' }}</p>
                                 <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                    {{ $order->customer->address ?? '' }}</p>
+                                    {{ $order->customer->address ?? '' }}
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-center ">
@@ -273,29 +277,39 @@
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
                             <span class="text-gray-900 font-bold">
-                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->subtotal) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                {{ number_format($order->subtotal) }}
+                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                             </span>
                         </div>
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Shipping Charge:</span>
                             <span class="text-gray-900 font-bold">
-                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->other_charges) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                {{ number_format($order->other_charges) }}
+                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                             </span>
                         </div>
                         @if ($order->coupon_discount > 0)
                             <div class="flex justify-between text-md text-green-600 font-medium">
                                 <span>Discount:</span>
-                                <span class="font-bold">- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->coupon_discount) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span class="font-bold">-
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    {{ number_format($order->coupon_discount) }}
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-[var(--primary-color)] text-2xl font-bold">Total:</span>
                             <span class="text-2xl font-bold text-[var(--primary-color)]">
-                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                {{ number_format($order->grand_total) }}
+                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                             </span>
                         </div>
                         <p class="text-[11px] text-gray-600 font-bold uppercase mt-2">Method:
-                            {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
+                            {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}
+                        </p>
                     </div>
                 </div>
 
@@ -305,9 +319,9 @@
                     <div class="space-y-3">
                         <a href="{{ route('invoice.download', $order->id) }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-download h-4 w-4 mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-download h-4 w-4 mr-2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" x2="12" y1="15" y2="3"></line>
@@ -316,9 +330,9 @@
                         </a>
                         <a href="{{ route('faq.index') }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-message-square h-4 w-4 mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-message-square h-4 w-4 mr-2">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
                             Support
@@ -392,7 +406,8 @@
 
                 <!-- Product Info -->
                 <div class="flex gap-4 mb-6">
-                    <img id="modal-product-img" src="" alt="Product image" class="w-16 h-16 rounded-lg border object-cover" loading="lazy" width="800" height="800">
+                    <img id="modal-product-img" src="" alt="Product image" class="w-16 h-16 rounded-lg border object-cover"
+                        loading="lazy" width="800" height="800">
                     <div>
                         <h3 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h3>
                         <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
@@ -497,17 +512,17 @@
                     reviewFilesContainer.items.add(file);
 
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         const div = document.createElement('div');
                         div.className =
                             'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                         div.innerHTML = `
-                    <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-                    <button type="button" onclick="removeReviewImage(this, '${file.name}')"
-                        class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
-                        <i class="fas fa-times text-[10px]"></i>
-                    </button>
-                `;
+                        <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
+                        <button type="button" onclick="removeReviewImage(this, '${file.name}')"
+                            class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </button>
+                    `;
                         container.insertBefore(div, addButton);
                     }
                     reader.readAsDataURL(file);
@@ -569,7 +584,7 @@
         const stars = document.querySelectorAll('.star-btn');
         const ratingInput = document.getElementById('modal-rating-value');
         stars.forEach(star => {
-            star.addEventListener('click', function() {
+            star.addEventListener('click', function () {
                 const index = this.getAttribute('data-index');
                 ratingInput.value = index;
                 stars.forEach(s => {

@@ -214,10 +214,10 @@
                                                     @if($item->product && $item->product->thumbnail_95)
                                                         <img src="{{ $item->product->thumbnail_95_url }}"
                                                             alt="{{ $item->product->title }}"
-                                                            onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
+                                                            onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                                             class="w-full h-full object-cover">
                                                     @else
-                                                        <img src="{{ asset('./images/template1/frontend/cover.webp') }}"
+                                                        <img src="{{ asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                                             class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                                                     @endif
                                                 </div>

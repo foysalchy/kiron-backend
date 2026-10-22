@@ -214,10 +214,10 @@
                                                     class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
                                                     @if ($item->product && $item->product->thumbnail_95)
                                                         <img src="{{ $item->product->thumbnail_95_url }}" alt="{{ $item->product->title ?? 'Product Image' }}"
-                                                            onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
+                                                            onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                                             class="w-full h-full object-cover">
                                                     @else
-                                                        <img src="{{ asset('./images/template1/frontend/cover.webp') }}" alt="{{ $item->product->title ?? 'Product Image' }}"
+                                                        <img src="{{ asset('./images/template1/frontend/product-thumbnail.webp') }}" alt="{{ $item->product->title ?? 'Product Image' }}"
                                                             class="w-full h-full object-cover">
                                                     @endif
                                                 </div>

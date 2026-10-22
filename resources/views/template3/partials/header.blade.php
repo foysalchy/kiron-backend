@@ -11,7 +11,8 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-10">
 
         <!-- Mobile Menu Toggle -->
-        <button onclick="toggleMobileMenu()" aria-label="Open menu" class="md:hidden text-gray-700 text-2xl focus:outline-none">
+        <button onclick="toggleMobileMenu()" aria-label="Open menu"
+            class="md:hidden text-gray-700 text-2xl focus:outline-none">
             <i class="fas fa-bars"></i>
         </button>
 
@@ -510,7 +511,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
         <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
-        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer" class="text-gray-500 hover:text-red-500 text-2xl">
+        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer"
+            class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
     </div>
@@ -522,10 +524,12 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer" style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
+    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer"
+        style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
         <div class="flex justify-between items-center mb-4">
             <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-            <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val" data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
+            <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val"
+                data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
             </span>
         </div>
@@ -590,7 +594,7 @@
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                         link.innerHTML = `
-                                            <img src="${item.thumbnail_95_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/cover.webp') }}'" loading="lazy" width="800" height="800">
+                                            <img src="${item.thumbnail_95_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'" loading="lazy" width="800" height="800">
                                             <span class="truncate">${item.title}</span>
                                         `;
                                         liveResults.appendChild(link);

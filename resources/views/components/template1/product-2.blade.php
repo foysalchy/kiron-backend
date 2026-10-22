@@ -38,8 +38,9 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
         <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350"
-                width="300" loading="lazy" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+            <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                height="350" width="300" loading="lazy"
+                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
         </a>
 
@@ -64,7 +65,8 @@
             </div>
         @endif
         @if ($product->is_free_delivery)
-            <div class="absolute bottom-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
+            <div
+                class="absolute bottom-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
                 Free Shipping
             </div>
         @endif
@@ -127,7 +129,8 @@
         </button>
 
         <!-- Cart Icon Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart' }}"
+        <button {{ $isOutOfStock ? 'disabled' : '' }}
+            aria-label="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id, false)" }}"
             class="primary-bg text-primary p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center
             {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">
@@ -222,7 +225,7 @@
                 }
             }
 
-             function openVariationModal(id) {
+            function openVariationModal(id) {
                 modalSelectedIds = []; // শুরুতে ক্লিয়ার
                 const modal = document.getElementById('variation-modal');
                 const contentArea = document.getElementById('modal-content-area');

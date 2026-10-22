@@ -33,7 +33,7 @@
                                         <a href="{{ url($item->options->slug ?? $item->id) }}"
                                             class="shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
                                             <img src="{{ $item->options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy"
-                                                onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
+                                                onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                                 class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl border border-gray-100" />
                                         </a>
 

@@ -3,8 +3,12 @@
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
     @if(isset($mainSliders) && $mainSliders->isNotEmpty())
         @php $firstSlider = $mainSliders->first(); @endphp
-        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)" fetchpriority="high">
-        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)" fetchpriority="high">
+        <link rel="preload" as="image"
+            href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+            media="(max-width: 767px)" fetchpriority="high">
+        <link rel="preload" as="image"
+            href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+            media="(min-width: 768px)" fetchpriority="high">
     @endif
 @endsection
 @section('content')
@@ -23,17 +27,20 @@
                         <div class="min-w-full h-full">
                             <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
                                 <picture class="block w-full h-full">
-                                    <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
-                                    <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
+                                    <source media="(max-width: 767px)"
+                                        srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
+                                    <source media="(min-width: 768px)"
+                                        srcset="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
                                     <img src="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
-                                     height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                                        height="" width="" class="w-full h-full object-cover" alt="{{ $slider->title }}"
+                                        @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                 </picture>
                             </a>
                         </div>
                     @empty
                         <div class="min-w-full h-full">
-                            <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
-                              height="" width=""   class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image" height=""
+                                width="" class="w-full h-full object-cover" loading="lazy">
                         </div>
                     @endforelse
                 </div>
@@ -53,103 +60,114 @@
     </section>
     <!-- 2. SHOP BY CATEGORY (Sub-Category Grid Layout) -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <!-- Section Heading -->
-        <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
-            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
-            <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
-                {{ $featureCategory['name'] ?? 'SHOP BY CATEGORY' }}
-            </h2>
-            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
-        </div>
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <!-- Section Heading -->
+            <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
+                <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+                <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
+                    {{ $featureCategory['name'] ?? 'SHOP BY CATEGORY' }}
+                </h2>
+                <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+            </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @php
-                $bgColors = [
-                    'bg-orange-50', 'bg-blue-50', 'bg-green-50', 'bg-slate-50',
-                    'bg-red-50', 'bg-indigo-50', 'bg-yellow-50', 'bg-teal-50',
-                ];
-            @endphp
-            @foreach (collect($featureCategory['items'])->take(8) as $index => $tItem)
-                @if (data_get($tItem, 'visible') === true)
-                <div class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
-                    <div class="p-6">
-                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
-                            {{ $tItem['label'] }}
-                        </h3>
-                    </div>
-                    <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $tItem['image'] ?? asset('images/cover.webp') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
-                            alt="{{ $tItem['label'] }}">
-                    </div>
-                    <a href="{{ url($tItem['link'] ?? '#') }}"
-                        class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
-                        SHOP NOW
-                    </a>
-                </div>
-                @endif
-            @endforeach
-        </div>
-    </section>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $bgColors = [
+                        'bg-orange-50',
+                        'bg-blue-50',
+                        'bg-green-50',
+                        'bg-slate-50',
+                        'bg-red-50',
+                        'bg-indigo-50',
+                        'bg-yellow-50',
+                        'bg-teal-50',
+                    ];
+                @endphp
+                @foreach (collect($featureCategory['items'])->take(8) as $index => $tItem)
+                    @if (data_get($tItem, 'visible') === true)
+                        <div
+                            class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="p-6">
+                                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
+                                    {{ $tItem['label'] }}
+                                </h3>
+                            </div>
+                            <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
+                                <img src="{{ $tItem['image'] ?? asset('images/product-thumbnail.webp') }}" loading="lazy" width="250"
+                                    height="250"
+                                    class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                                    alt="{{ $tItem['label'] }}">
+                            </div>
+                            <a href="{{ url($tItem['link'] ?? '#') }}"
+                                class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
+                                SHOP NOW
+                            </a>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </section>
     @elseif ($categories->isNotEmpty())
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <!-- Section Heading -->
-        <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
-            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
-            <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
-                SHOP BY CATEGORY
-            </h2>
-            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
-        </div>
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <!-- Section Heading -->
+            <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
+                <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+                <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
+                    SHOP BY CATEGORY
+                </h2>
+                <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+            </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @php
-                $allSubCategories = $categories->flatMap->subCategories->take(8);
-                $bgColors = [
-                    'bg-orange-50',
-                    'bg-blue-50',
-                    'bg-green-50',
-                    'bg-slate-50',
-                    'bg-red-50',
-                    'bg-indigo-50',
-                    'bg-yellow-50',
-                    'bg-teal-50',
-                ];
-            @endphp
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $allSubCategories = $categories->flatMap->subCategories->take(8);
+                    $bgColors = [
+                        'bg-orange-50',
+                        'bg-blue-50',
+                        'bg-green-50',
+                        'bg-slate-50',
+                        'bg-red-50',
+                        'bg-indigo-50',
+                        'bg-yellow-50',
+                        'bg-teal-50',
+                    ];
+                @endphp
 
-            @foreach ($allSubCategories as $index => $subCat)
-                <div
-                    class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
-                    <div class="p-6">
-                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
-                            {{ $subCat->name }}
-                        </h3>
+                @foreach ($allSubCategories as $index => $subCat)
+                    <div
+                        class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
+                        <div class="p-6">
+                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
+                                {{ $subCat->name }}
+                            </h3>
+                        </div>
+                        <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
+                            <img src="{{ $subCat->image_url ?? asset('images/product-thumbnail.webp') }}" loading="lazy" width="250"
+                                height="250"
+                                class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                                alt="{{ $subCat->name }}">
+                        </div>
+                        <a href="{{ url($subCat->slug) }}"
+                            class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
+                            SHOP NOW
+                        </a>
                     </div>
-                    <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $subCat->image_url ?? asset('images/cover.webp') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
-                            alt="{{ $subCat->name }}">
-                    </div>
-                    <a href="{{ url($subCat->slug) }}"
-                        class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
-                        SHOP NOW
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
+                @endforeach
+            </div>
+        </section>
     @endif
     <!-- CATEGORY WISE PRODUCT FILTER SECTION -->
     @foreach ($categories->take(3) as $megaCat)
         @php
-        // ১. প্রোডাক্ট আছে এমন প্রথম সাব-ক্যাটাগরি খুঁজে বের করা
-        $activeSub = $megaCat->subCategories->filter(function($sub) {
-            return \App\Models\Product::where('status', 1)
-                ->whereJsonContains('sub_category_ids', (int) $sub->id)
-                ->exists();
-                })->first();
-            @endphp
+            // ১. প্রোডাক্ট আছে এমন প্রথম সাব-ক্যাটাগরি খুঁজে বের করা
+            $activeSub = $megaCat->subCategories->filter(function ($sub) {
+                return \App\Models\Product::where('status', 1)
+                    ->whereJsonContains('sub_category_ids', (int) $sub->id)
+                    ->exists();
+            })->first();
+        @endphp
 
         @if ($activeSub)
             <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0" id="mega-section-{{ $megaCat->id }}">
@@ -167,7 +185,7 @@
                         @foreach ($megaCat->subCategories->take(6) as $index => $sub)
                             <button onclick="categoryFilter({{ $megaCat->id }}, {{ $sub->id }}, this)"
                                 class="px-4 py-1.5 rounded-sm text-xs md:text-sm font-bold uppercase cursor-pointer transition-all
-                            {{ $index == 0 ? 'primary-bg text-white active-tab' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                            {{ $index == 0 ? 'primary-bg text-white active-tab' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                 {{ $sub->name }}
                             </button>
                         @endforeach
@@ -286,8 +304,10 @@
                             <div
                                 class="aspect-[641/320] rounded-md w-full border border-[var(--primary-color)] overflow-hidden bg-gray-100">
                                 <picture class="block w-full h-full">
-                                    <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
-                                    <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                    <source media="(max-width: 767px)"
+                                        srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                    <source media="(min-width: 768px)"
+                                        srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
                                     <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
                                         alt="{{ $slider->title }}" loading="lazy" width="641" height="320"
                                         class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
@@ -339,8 +359,7 @@
                             <div>
                                 <!-- Quote Icon -->
                                 <div class="mb-4">
-                                    <svg class="w-10 h-10 text-gray-200" fill="currentColor" viewBox="0 0 32 32"
-                                        aria-hidden="true">
+                                    <svg class="w-10 h-10 text-gray-200" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
                                         <path
                                             d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                                     </svg>
@@ -360,7 +379,8 @@
                                             src="{{ asset('storage/' . $review->customer->image) ?? asset('images/template1/frontend/default.webp') }}"
                                             alt="{{ $review->customer->name }}">
                                     @else
-                                        <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" height="" width=""
+                                        <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" height=""
+                                            width=""
                                             src="https://ui-avatars.com/api/?name={{ urlencode($review->customer->name ?? 'User') }}&background=random"
                                             alt="User">
                                     @endif
@@ -468,7 +488,7 @@
 
                 // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
                 const needsScroll = track.scrollWidth > track.clientWidth + 4;
-                buttons.forEach(function(btn) {
+                buttons.forEach(function (btn) {
                     if (needsScroll) {
                         btn.classList.remove('hidden');
                         btn.classList.add('flex');
@@ -479,7 +499,7 @@
                 });
             }
 
-            document.querySelectorAll('.group-track').forEach(function(track) {
+            document.querySelectorAll('.group-track').forEach(function (track) {
                 const trackId = track.id;
                 const buttons = document.querySelectorAll('.group-nav-btn[data-track="' + trackId + '"]');
                 toggleBtns(track, buttons);

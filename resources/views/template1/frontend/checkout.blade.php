@@ -112,17 +112,20 @@
                         @endphp
                         @if(!empty($setup->free_shipping_text))
                             @if(!empty($is_product_free_delivery))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $freeProductText }}</span>
                                 </div>
                             @elseif(!empty($is_rule_free_shipping))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
                             @elseif(!empty($setup->active_free_shipping_rule))
-                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
+                                <div
+                                    class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                     <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
@@ -131,28 +134,28 @@
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
-                        <div class="mb-8">
-                            <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
-                                Method</h2>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="radio" name="delivery_area" value="inside"
-                                        onchange="updateCheckoutShipping(this.value)"
-                                        {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 2) : number_format($setup->inside_charge, 2) . ' ' . $setup->currency }})
-                                    </span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="radio" name="delivery_area" value="outside"
-                                        onchange="updateCheckoutShipping(this.value)"
-                                        {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 2) : number_format($setup->outside_charge, 2) . ' ' . $setup->currency }})
-                                    </span>
-                                </label>
+                            <div class="mb-8">
+                                <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
+                                    Method</h2>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="delivery_area" value="inside"
+                                            onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
+                                        <span class="text-sm font-medium text-gray-700 group-hover:text-black">
+                                            Inside Dhaka
+                                            ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 2) : number_format($setup->inside_charge, 2) . ' ' . $setup->currency }})
+                                        </span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="delivery_area" value="outside"
+                                            onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
+                                        <span class="text-sm font-medium text-gray-700 group-hover:text-black">
+                                            Outside Dhaka
+                                            ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 2) : number_format($setup->outside_charge, 2) . ' ' . $setup->currency }})
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
                         @endif
 
                         <!-- Product Row in Summary -->
@@ -160,9 +163,8 @@
                             @foreach ($cartContent as $item)
                                 <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
                                     <!-- Actual Product Image -->
-                                    <div
-                                        class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/cover.webp') }}"
+                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
 
@@ -233,8 +235,10 @@
                                 </span>
                             </div>
 
-                            <div id="discount-row" class="flex justify-between items-center text-green-600 {{ $discount > 0 ? '' : 'hidden' }}">
-                                <span class="text-md font-medium">Discount <span id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span>:</span>
+                            <div id="discount-row"
+                                class="flex justify-between items-center text-green-600 {{ $discount > 0 ? '' : 'hidden' }}">
+                                <span class="text-md font-medium">Discount <span
+                                        id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span>:</span>
                                 <span class="text-md font-bold">-
                                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                     <span id="discount-display">{{ number_format($discount) }}</span>
@@ -257,10 +261,10 @@
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-bold text-gray-900">Total to Pay:</span>
                                 <span class="text-xl font-bold text-[var(--primary-color)]">
-                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                <span id="total-display">{{ number_format($total) }}</span>
-                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                            </span>
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="total-display">{{ number_format($total) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                </span>
                             </div>
                         </div>
 
@@ -292,7 +296,7 @@
 
 
         // ── Page load: auto-select first method ──
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const firstRadio = document.querySelector('input[name="payment_method"]');
             if (firstRadio) {
                 firstRadio.checked = true;
@@ -300,7 +304,7 @@
                 handlePaymentSelection(
                     firstRadio.value,
                     firstRadio.closest('label')?.querySelector('span.text-md')?.innerText?.trim() ?? firstRadio
-                    .value
+                        .value
                 );
             }
         });
@@ -371,17 +375,17 @@
             btn.disabled = true;
 
             fetch("{{ route('coupon.apply') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        coupon_code: code
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    coupon_code: code
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -419,22 +423,22 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
-                    document.getElementById('discount-row').classList.add('hidden');
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
+                        document.getElementById('discount-row').classList.add('hidden');
 
-                    const codeInput = document.getElementById('coupon-code-input');
-                    codeInput.removeAttribute('readonly');
-                    codeInput.value = '';
+                        const codeInput = document.getElementById('coupon-code-input');
+                        codeInput.removeAttribute('readonly');
+                        codeInput.value = '';
 
-                    document.getElementById('apply-coupon-btn').classList.remove('hidden');
-                    document.getElementById('remove-coupon-btn').classList.add('hidden');
+                        document.getElementById('apply-coupon-btn').classList.remove('hidden');
+                        document.getElementById('remove-coupon-btn').classList.add('hidden');
 
-                    toastr.success(data.message);
-                }
-            });
+                        toastr.success(data.message);
+                    }
+                });
         }
     </script>
     <script>
@@ -472,7 +476,7 @@
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const phoneInput = document.querySelector('input[name="phone"]');
             const nameInput = document.querySelector('input[name="name"]');
             const addressInput = document.querySelector('textarea[name="address"]');
@@ -486,17 +490,17 @@
                 if (phone.length >= 11) {
                     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     fetch("{{ route('order.partial') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': token
-                            },
-                            body: JSON.stringify({
-                                phone: phone,
-                                name: nameInput.value,
-                                address: addressInput.value
-                            })
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            phone: phone,
+                            name: nameInput.value,
+                            address: addressInput.value
                         })
+                    })
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
@@ -514,27 +518,27 @@
             @auth('customer')
                 saveDraft();
             @endauth
-        });
+            });
     </script>
     <script>
         function updateCheckoutShipping(value) {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             fetch("{{ route('cart.shipping') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        area: value
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    area: value
                 })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                         document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toFixed(2);
+                        document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toFixed(2);
                         document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
                         toastr.success(data.message);
                     }
@@ -555,10 +559,10 @@
 
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-            </div>`;
+                    <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
+                </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);
 
@@ -573,7 +577,7 @@
             }
         }
         document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit',
-            function(e) {
+            function (e) {
                 const btn = this.querySelector('button[type="submit"]');
 
                 const name = this.querySelector('input[name="name"]').value;

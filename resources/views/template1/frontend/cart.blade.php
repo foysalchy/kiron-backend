@@ -32,14 +32,13 @@
                                     <!-- Image -->
                                     <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
                                         <img src="{{ $item->options->thumbnail }}"
-                                            onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
+                                            onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
 
                                     <!-- Details -->
                                     <div class="flex-1">
-                                        <a href="{{ url($item->options->slug ?? $item->id) }}"
-                                            class="group/title">
+                                        <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
                                             <h3
                                                 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
                                                 {{ $item->name ?? '' }}
@@ -67,16 +66,20 @@
                                     <!-- Qty Controls -->
                                     <div
                                         class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }}, {{ $item->price }})"
+                                        <button
+                                            onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }}, {{ $item->price }})"
                                             class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-                                        <span id="qty-{{ $item->rowId }}" class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }}, {{ $item->price }})"
+                                        <span id="qty-{{ $item->rowId }}"
+                                            class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
+                                        <button
+                                            onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }}, {{ $item->price }})"
                                             class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                     </div>
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p id="item-subtotal-{{ $item->rowId }}" class="font-black text-base md:text-xl text-[var(--primary-color)]">
+                                        <p id="item-subtotal-{{ $item->rowId }}"
+                                            class="font-black text-base md:text-xl text-[var(--primary-color)]">
                                             {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal, 0) : number_format($item->subtotal, 0) . ' ' . $setup->currency }}
                                         </p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
@@ -101,17 +104,20 @@
                         @endphp
                         @if(!empty($setup->free_shipping_text))
                             @if(!empty($is_product_free_delivery))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $freeProductText }}</span>
                                 </div>
                             @elseif(!empty($is_rule_free_shipping))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
                             @elseif(!empty($setup->active_free_shipping_rule))
-                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
+                                <div
+                                    class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                     <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
@@ -119,36 +125,34 @@
                         @endif
 
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
-                        <!-- selection shipping area -->
-                        <div class="mb-6">
-                            <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
-                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
-                                @csrf
-                                <div class="space-y-2">
-                                    {{--   . Inside Charge (Dynamic) --}}
-                                    <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="inside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'inside' ? 'checked' : '' }}
-                                            class="accent-[var(--primary-color)]">
-                                        <span class="text-sm font-bold text-gray-700">
-                                            Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 0) : number_format($setup->inside_charge, 0) . ' ' . $setup->currency }})
-                                        </span>
-                                    </label>
+                            <!-- selection shipping area -->
+                            <div class="mb-6">
+                                <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
+                                <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
+                                    @csrf
+                                    <div class="space-y-2">
+                                        {{-- . Inside Charge (Dynamic) --}}
+                                        <label
+                                            class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
+                                            <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)]">
+                                            <span class="text-sm font-bold text-gray-700">
+                                                Inside Dhaka
+                                                ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 0) : number_format($setup->inside_charge, 0) . ' ' . $setup->currency }})
+                                            </span>
+                                        </label>
 
-                                    {{--  ". Outside Charge (Dynamic) --}}
-                                    <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="outside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'outside' ? 'checked' : '' }}
-                                            class="accent-[var(--primary-color)]">
-                                        <span class="text-sm font-bold text-gray-700">
-                                            Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 0) : number_format($setup->outside_charge, 0) . ' ' . $setup->currency }})
-                                        </span>
-                                    </label>
-                                </div>
-                            </form>
-                        </div>
+                                        {{-- ". Outside Charge (Dynamic) --}}
+                                        <label
+                                            class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
+                                            <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)]">
+                                            <span class="text-sm font-bold text-gray-700">
+                                                Outside Dhaka
+                                                ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 0) : number_format($setup->outside_charge, 0) . ' ' . $setup->currency }})
+                                            </span>
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
                         @endif
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
@@ -184,7 +188,8 @@
                             @if ($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
                                     <span>Discount ({{ session('coupon')['coupon_code'] }}):</span>
-                                    <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($discount, 0) : number_format($discount, 0) . ' ' . $setup->currency }}</span>
+                                    <span>-
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($discount, 0) : number_format($discount, 0) . ' ' . $setup->currency }}</span>
                                 </div>
                             @endif
 
@@ -214,9 +219,9 @@
                         </a>
 
                         <p class="text-center text-gray-500 text-sm font-medium flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-truck h-4 w-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-truck h-4 w-4">
                                 <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
                                 <path d="M15 18H9"></path>
                                 <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14">
@@ -268,50 +273,50 @@
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
-                        badge.innerText = data.cart_count;
-                    });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                            badge.innerText = data.cart_count;
+                        });
 
-                    // Update qty display
-                    const qtySpan = document.getElementById('qty-' + rowId);
-                    if(qtySpan) qtySpan.innerText = newQty;
+                        // Update qty display
+                        const qtySpan = document.getElementById('qty-' + rowId);
+                        if (qtySpan) qtySpan.innerText = newQty;
 
-                    // Update item subtotal
-                    const itemSubSpan = document.getElementById('item-subtotal-' + rowId);
-                    if(itemSubSpan && price) {
-                        const newSub = (newQty * price).toLocaleString();
-                        itemSubSpan.innerText = '{{ $setup->currency_position ?? "left" == "left" ? $setup->currency." " : "" }}' + newSub + '{{ $setup->currency_position ?? "left" == "right" ? " ".$setup->currency : "" }}';
-                    }
-
-                    // Fetch current page to silently update all global totals without manual math
-                    fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-
-                        // Just swap the calculation section if we want, or easier:
-                        // Just reload but without visual refresh by replacing the body
-                        // Actually, replacing innerHTML of a specific container is safest.
-                        // For cart.blade.php, we can just replace the whole main container!
-                        const newMain = doc.querySelector('main') || doc.body;
-                        const currentMain = document.querySelector('main') || document.body;
-                        if(newMain && currentMain) {
-                            currentMain.innerHTML = newMain.innerHTML;
+                        // Update item subtotal
+                        const itemSubSpan = document.getElementById('item-subtotal-' + rowId);
+                        if (itemSubSpan && price) {
+                            const newSub = (newQty * price).toLocaleString();
+                            itemSubSpan.innerText = '{{ $setup->currency_position ?? "left" == "left" ? $setup->currency . " " : "" }}' + newSub + '{{ $setup->currency_position ?? "left" == "right" ? " " . $setup->currency : "" }}';
                         }
-                    });
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(data.message || 'Unable to update cart.');
-                }
-            })
-            .catch(() => {
-                if (typeof toastr !== 'undefined') {
-                    toastr.error('Unable to update cart. Please try again.');
-                }
-            });
+
+                        // Fetch current page to silently update all global totals without manual math
+                        fetch(window.location.href)
+                            .then(r => r.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+
+                                // Just swap the calculation section if we want, or easier:
+                                // Just reload but without visual refresh by replacing the body
+                                // Actually, replacing innerHTML of a specific container is safest.
+                                // For cart.blade.php, we can just replace the whole main container!
+                                const newMain = doc.querySelector('main') || doc.body;
+                                const currentMain = document.querySelector('main') || document.body;
+                                if (newMain && currentMain) {
+                                    currentMain.innerHTML = newMain.innerHTML;
+                                }
+                            });
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Unable to update cart.');
+                    }
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Unable to update cart. Please try again.');
+                    }
+                });
         }
     </script>
 @endpush

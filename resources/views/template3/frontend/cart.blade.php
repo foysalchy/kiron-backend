@@ -27,77 +27,85 @@
 
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
-                               <div class="flex flex-col sm:flex-row items-start md:items-center gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
+                                <div
+                                    class="flex flex-col sm:flex-row items-start md:items-center gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
 
-    <!-- ইমেজ এবং ডিটেইলস সেকশন (মোবাইলে এটি এক লাইনে থাকবে) -->
-    <div class="flex flex-row items-start gap-3 md:gap-6 flex-1 w-full">
-        <!-- Image -->
-        <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0">
-            <img src="{{ $item->options->thumbnail }}"
-                onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
-                alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
-        </div>
+                                    <!-- ইমেজ এবং ডিটেইলস সেকশন (মোবাইলে এটি এক লাইনে থাকবে) -->
+                                    <div class="flex flex-row items-start gap-3 md:gap-6 flex-1 w-full">
+                                        <!-- Image -->
+                                        <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0">
+                                            <img src="{{ $item->options->thumbnail }}"
+                                                onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                                alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
+                                        </div>
 
-        <!-- Details -->
-        <div class="flex-1 min-w-0">
-            <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
-                <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors line-clamp-2">
-                    {{ $item->name ?? '' }}
-                </h3>
-            </a>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-[var(--primary-color)] text-[10px] md:text-xs font-bold px-2 py-0.5 rounded uppercase border border-[var(--primary-color)]/20">
-                    {{ $item->options->variant ?? 'Product' }}
-                </span>
-            </div>
+                                        <!-- Details -->
+                                        <div class="flex-1 min-w-0">
+                                            <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
+                                                <h3
+                                                    class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors line-clamp-2">
+                                                    {{ $item->name ?? '' }}
+                                                </h3>
+                                            </a>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span
+                                                    class="text-[var(--primary-color)] text-[10px] md:text-xs font-bold px-2 py-0.5 rounded uppercase border border-[var(--primary-color)]/20">
+                                                    {{ $item->options->variant ?? 'Product' }}
+                                                </span>
+                                            </div>
 
-            <!-- Price Section (আপনার অরিজনাল লজিক অপরিবর্তিত) -->
-            <div class="flex items-baseline flex-wrap gap-2">
-                <p class="font-bold text-gray-700 text-base md:text-lg">
-                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                    {{ number_format($item->price, 0) }}
-                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                </p>
+                                            <!-- Price Section (আপনার অরিজনাল লজিক অপরিবর্তিত) -->
+                                            <div class="flex items-baseline flex-wrap gap-2">
+                                                <p class="font-bold text-gray-700 text-base md:text-lg">
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                    {{ number_format($item->price, 0) }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                </p>
 
-                @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                    <span class="text-xs md:text-sm text-gray-600 line-through font-normal">
-                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                        {{ number_format($item->options['regular_price'], 0) }}
-                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                    </span>
-                @endif
-            </div>
-        </div>
-    </div>
+                                                @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
+                                                    <span class="text-xs md:text-sm text-gray-600 line-through font-normal">
+                                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                        {{ number_format($item->options['regular_price'], 0) }}
+                                                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
 
-    <!-- কিউটিওয়াই এবং টোটাল প্রাইস (মোবাইলে এটি নিচে একটি লাইনে আসবে) -->
-    <div class="flex flex-row items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-0 border-gray-100">
+                                    <!-- কিউটিওয়াই এবং টোটাল প্রাইস (মোবাইলে এটি নিচে একটি লাইনে আসবে) -->
+                                    <div
+                                        class="flex flex-row items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-0 border-gray-100">
 
-        <!-- Qty Controls -->
-        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
-            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-            <span class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
-            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
-        </div>
+                                        <!-- Qty Controls -->
+                                        <div
+                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
+                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                                                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
+                                            <span
+                                                class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
+                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                                                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
+                                        </div>
 
-        <!-- Subtotal & Delete -->
-        <div class="flex items-center gap-3 md:gap-4 min-w-fit">
-            <div class="text-right">
-                <p class="font-black text-base md:text-xl text-[var(--primary-color)] whitespace-nowrap">
-                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                    {{ number_format($item->subtotal, 0) }}
-                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                </p>
-            </div>
-            <button onclick="removeCartPageItem('{{ $item->rowId }}')" aria-label="Remove {{ $item->name ?? 'item' }} from cart"
-                class="text-red-400 hover:text-red-600 transition-colors p-1">
-                <i class="far fa-trash-alt text-lg"></i>
-            </button>
-        </div>
-    </div>
-</div>
+                                        <!-- Subtotal & Delete -->
+                                        <div class="flex items-center gap-3 md:gap-4 min-w-fit">
+                                            <div class="text-right">
+                                                <p
+                                                    class="font-black text-base md:text-xl text-[var(--primary-color)] whitespace-nowrap">
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                    {{ number_format($item->subtotal, 0) }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                </p>
+                                            </div>
+                                            <button onclick="removeCartPageItem('{{ $item->rowId }}')"
+                                                aria-label="Remove {{ $item->name ?? 'item' }} from cart"
+                                                class="text-red-400 hover:text-red-600 transition-colors p-1">
+                                                <i class="far fa-trash-alt text-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     </div>
@@ -113,17 +121,20 @@
                         @endphp
                         @if(!empty($setup->free_shipping_text))
                             @if(!empty($is_product_free_delivery))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $freeProductText }}</span>
                                 </div>
                             @elseif(!empty($is_rule_free_shipping))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
                             @elseif(!empty($setup->active_free_shipping_rule))
-                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
+                                <div
+                                    class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                     <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
@@ -132,37 +143,39 @@
 
                         <!-- selection shipping area -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
-                        <div class="mb-6">
-                            <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
-                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form" onsubmit="event.preventDefault();">
-                                @csrf
-                                <div class="space-y-2">
-                                    {{-- ১. Inside Charge (Dynamic) --}}
-                                    <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="inside" onchange="updateCartShipping(this.value)"
-                                            {{ $shipping_area == 'inside' ? 'checked' : '' }}
-                                            class="accent-[var(--primary-color)]">
-                                        <span class="text-sm font-bold text-gray-700">
-                                            Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                            {{ number_format($setup->inside_charge, 0) }})
-                                        </span>
-                                    </label>
+                            <div class="mb-6">
+                                <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
+                                <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form"
+                                    onsubmit="event.preventDefault();">
+                                    @csrf
+                                    <div class="space-y-2">
+                                        {{-- ১. Inside Charge (Dynamic) --}}
+                                        <label
+                                            class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
+                                            <input type="radio" name="area" value="inside" onchange="updateCartShipping(this.value)"
+                                                {{ $shipping_area == 'inside' ? 'checked' : '' }}
+                                                class="accent-[var(--primary-color)]">
+                                            <span class="text-sm font-bold text-gray-700">
+                                                Inside Dhaka
+                                                ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($setup->inside_charge, 0) }})
+                                            </span>
+                                        </label>
 
-                                    {{-- ২. Outside Charge (Dynamic) --}}
-                                    <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="outside" onchange="updateCartShipping(this.value)"
-                                            {{ $shipping_area == 'outside' ? 'checked' : '' }}
-                                            class="accent-[var(--primary-color)]">
-                                        <span class="text-sm font-bold text-gray-700">
-                                            Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                            {{ number_format($setup->outside_charge, 0) }})
-                                        </span>
-                                    </label>
-                                </div>
-                            </form>
-                        </div>
+                                        {{-- ২. Outside Charge (Dynamic) --}}
+                                        <label
+                                            class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
+                                            <input type="radio" name="area" value="outside"
+                                                onchange="updateCartShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)]">
+                                            <span class="text-sm font-bold text-gray-700">
+                                                Outside Dhaka
+                                                ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($setup->outside_charge, 0) }})
+                                            </span>
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
                         @endif
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
@@ -192,13 +205,15 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6 mb-6">
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Subtotal:</span>
-                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    {{ number_format($subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
                                     <span>Discount ({{ session('coupon')['coupon_code'] }}):</span>
-                                    <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($discount, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                    <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                        {{ number_format($discount, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                                 </div>
                             @endif
 
@@ -208,7 +223,8 @@
                                     @if(isset($is_free_delivery) && $is_free_delivery)
                                         Free
                                     @else
-                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                        {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                     @endif
                                 </span>
                             </div>
@@ -216,7 +232,8 @@
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
                             <span class="text-2xl font-bold text-gray-800">Total:</span>
-                            <span class="text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                            <span
+                                class="text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                 {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 
@@ -227,9 +244,9 @@
                         </a>
 
                         <p class="text-center text-gray-500 text-sm font-medium flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-truck h-4 w-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-truck h-4 w-4">
                                 <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
                                 <path d="M15 18H9"></path>
                                 <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14">
@@ -301,38 +318,38 @@
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
-                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                    refreshCartUI();
-                } else {
-                    if (typeof toastr !== 'undefined') toastr.error(data.message);
-                }
-            })
-            .catch(() => {
-                if (typeof toastr !== 'undefined') toastr.error('Unable to update cart.');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        refreshCartUI();
+                    } else {
+                        if (typeof toastr !== 'undefined') toastr.error(data.message);
+                    }
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') toastr.error('Unable to update cart.');
+                });
         }
 
         function removeCartPageItem(rowId) {
             fetch(`{{ url('cart/remove') }}/${rowId}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
             })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
-                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                    refreshCartUI();
-                } else {
-                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Error removing item');
-                }
-            })
-            .catch(() => {
-                if (typeof toastr !== 'undefined') toastr.error('Unable to remove item.');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        refreshCartUI();
+                    } else {
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Error removing item');
+                    }
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') toastr.error('Unable to remove item.');
+                });
         }
 
         function updateCartShipping(value) {
@@ -346,17 +363,17 @@
                 },
                 body: JSON.stringify({ area: value })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    refreshCartUI();
-                    if (typeof toastr !== 'undefined') toastr.success(data.message);
-                }
-            })
-            .catch(err => {
-                console.error('Error updating shipping:', err);
-                if (typeof toastr !== 'undefined') toastr.error('Failed to update delivery charge.');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        refreshCartUI();
+                        if (typeof toastr !== 'undefined') toastr.success(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error updating shipping:', err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to update delivery charge.');
+                });
         }
     </script>
 @endpush
