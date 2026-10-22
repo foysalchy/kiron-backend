@@ -622,6 +622,7 @@ Route::prefix('v1')->group(function () {
                     Route::post('/import', [App\Http\Controllers\Api\ProductImportController::class, 'importData']);
                     
                     Route::get('/', [ProductController::class, 'index']);
+                    Route::get('/bulk-get', [ProductController::class, 'bulkGet']);
                     Route::post('/', [ProductController::class, 'store']);
                     Route::get('/{id}', [ProductController::class, 'show']);
                     Route::post('/update/{id}', [ProductController::class, 'update']);
