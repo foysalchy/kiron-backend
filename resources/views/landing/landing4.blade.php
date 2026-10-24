@@ -663,14 +663,17 @@
         @if(!empty($reviewImgs) && count($reviewImgs) > 0)
             {{-- ══ SECTION 8: REVIEW SLIDER ══ --}}
             <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
-                <div class="container mx-auto {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                    @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Review Images</span>@endif
-                    <h2
-                        class="text-xl sm:text-2xl md:text-4xl font-bold text-center mb-12 text-[#0D2601] leading-normal md:leading-relaxed">
-                        সম্মানিত কাস্টমারদের মতামত
-                    </h2>
+                <div class="container mx-auto">
+                    <div class="text-center mb-12">
+                        <h2
+                            class="inline-block text-xl sm:text-2xl md:text-4xl font-bold text-[#0D2601] leading-normal md:leading-relaxed relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" data-field="review_title" style="top: -16px; left: 50%; transform: translateX(-50%);">Review Title</span>@endif
+                            {{ !empty($landing->extras['review_title']) ? $landing->extras['review_title'] : 'সম্মানিত কাস্টমারদের মতামত' }}
+                        </h2>
+                    </div>
 
-                    <div class="relative px-4 md:px-10">
+                    <div class="relative px-4 md:px-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" data-field="img_paths" style="top: -12px; z-index: 50;">Review Images</span>@endif
                         <!-- Swiper Container -->
                         <div class="swiper rv-swiper landing4-swiper">
                             <div class="swiper-wrapper">
@@ -955,50 +958,53 @@
                     if (!badgeEl) return;
                     e.preventDefault();
 
-                    // Normalize whitespace and newlines so multi-line text matches single-space strings
-                    const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
-                    let field = null;
+                    let field = targetEl.getAttribute('data-field') || (badgeEl ? badgeEl.getAttribute('data-field') : null);
 
-                    if (text.includes('call text') || text === 'call text' || text.includes('call')) {
-                        field = 'call_text';
-                    } else if (text.includes('pricing subtitle') || text.includes('subtitle')) {
-                        field = 'pricing_subtitle';
-                    } else if (text.includes('regular price')) {
-                        field = 'regular_price';
-                    } else if (text.includes('discount price')) {
-                        field = 'discount_price';
-                    } else if (text.includes('selected products') || text.includes('product')) {
-                        field = 'product_ids';
-                    } else if (text === 'title') {
-                        field = 'title';
-                    } else if (text.includes('short description')) {
-                        field = 'short_description';
-                    } else if (text.includes('thumbnail') || text.includes('video')) {
-                        field = 'thumbnail';
-                    } else if (text.includes('review')) {
-                        field = 'img_paths';
-                    } else if (text.includes('details') || text.includes('description')) {
-                        field = 'description';
-                    } else if (text.includes('phone')) {
-                        field = 'phone_number';
-                    } else if (text.includes('button text')) {
-                        field = 'button_text';
-                    } else if (text.includes('features 6') || text.includes('feature 6')) {
-                        field = 'features6';
-                    } else if (text.includes('features 5') || text.includes('feature 5')) {
-                        field = 'features5';
-                    } else if (text.includes('features 4') || text.includes('feature 4')) {
-                        field = 'features4';
-                    } else if (text.includes('features 3') || text.includes('feature 3')) {
-                        field = 'features3';
-                    } else if (text.includes('features 2') || text.includes('feature 2')) {
-                        field = 'features2';
-                    } else if (text.includes('features') || text.includes('feature')) {
-                        field = 'features';
-                    } else if (text.includes('content 2')) {
-                        field = 'content2';
-                    } else if (text.includes('content')) {
-                        field = 'content';
+                    if (!field) {
+                        const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
+                        if (text.includes('call text') || text === 'call text' || text.includes('call')) {
+                            field = 'call_text';
+                        } else if (text.includes('pricing subtitle') || text.includes('subtitle')) {
+                            field = 'pricing_subtitle';
+                        } else if (text.includes('regular price')) {
+                            field = 'regular_price';
+                        } else if (text.includes('discount price')) {
+                            field = 'discount_price';
+                        } else if (text.includes('selected products') || text.includes('product')) {
+                            field = 'product_ids';
+                        } else if (text === 'title') {
+                            field = 'title';
+                        } else if (text.includes('short description')) {
+                            field = 'short_description';
+                        } else if (text.includes('thumbnail') || text.includes('video')) {
+                            field = 'thumbnail';
+                        } else if (text.includes('review title') || text.includes('review_title')) {
+                            field = 'review_title';
+                        } else if (text.includes('review')) {
+                            field = 'img_paths';
+                        } else if (text.includes('details') || text.includes('description')) {
+                            field = 'description';
+                        } else if (text.includes('phone')) {
+                            field = 'phone_number';
+                        } else if (text.includes('button text')) {
+                            field = 'button_text';
+                        } else if (text.includes('features 6') || text.includes('feature 6')) {
+                            field = 'features6';
+                        } else if (text.includes('features 5') || text.includes('feature 5')) {
+                            field = 'features5';
+                        } else if (text.includes('features 4') || text.includes('feature 4')) {
+                            field = 'features4';
+                        } else if (text.includes('features 3') || text.includes('feature 3')) {
+                            field = 'features3';
+                        } else if (text.includes('features 2') || text.includes('feature 2')) {
+                            field = 'features2';
+                        } else if (text.includes('features') || text.includes('feature')) {
+                            field = 'features';
+                        } else if (text.includes('content 2')) {
+                            field = 'content2';
+                        } else if (text.includes('content')) {
+                            field = 'content';
+                        }
                     }
 
                     if (field) {

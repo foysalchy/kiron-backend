@@ -821,8 +821,9 @@
             @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 0; z-index: 50;">Review</span>@endif
             <div class="max-w-6xl mx-auto space-y-8">
                 <div class="text-center">
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-white">
-                        আমাদের সন্তুষ্ট ক্রেতাদের মতামত
+                    <h3 class="inline-block text-2xl sm:text-3xl md:text-4xl font-black text-white relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" data-field="review_title" style="top: -16px; left: 50%; transform: translateX(-50%);">Review Title</span>@endif
+                        {{ !empty($landing->extras['review_title']) ? $landing->extras['review_title'] : 'আমাদের সন্তুষ্ট ক্রেতাদের মতামত' }}
                     </h3>
                 </div>
 
@@ -1287,6 +1288,8 @@
                         field = 'short_description';
                     } else if (text.includes('thumbnail')) {
                         field = 'thumbnail';
+                    } else if (text.includes('review title') || text.includes('review_title')) {
+                        field = 'review_title';
                     } else if (text.includes('review')) {
                         field = 'img_paths';
                     } else if (text.includes('details') || text.includes('description')) {
