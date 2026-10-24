@@ -447,12 +447,16 @@
             <section id="landing-products-section"
                 class="w-full py-12 md:py-16 px-4 bg-[#f1f8f3] border-b border-emerald-900/10 scroll-mt-20">
                 <div class="max-w-6xl mx-auto">
+                    @php
+                        $productsSectionLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
+                        $isProductsSectionEn = ($productsSectionLang === 'en');
+                    @endphp
                     <div class="text-center mb-8 md:mb-12">
                         <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#00703c] leading-tight mb-2">
-                            আমাদের জনপ্রিয় পণ্যসমূহ
+                            {{ $isProductsSectionEn ? 'Our Popular Products' : 'আমাদের জনপ্রিয় পণ্যসমূহ' }}
                         </h2>
                         <p class="text-sm sm:text-base text-gray-600">
-                            আপনার পছন্দের পণ্যটি বেছে নিন এবং সরাসরি অর্ডার করুন
+                            {{ $isProductsSectionEn ? 'Choose your desired product and place your order directly' : 'আপনার পছন্দের পণ্যটি বেছে নিন এবং সরাসরি অর্ডার করুন' }}
                         </p>
                     </div>
 
@@ -720,40 +724,31 @@
                 </div>
 
                 {{-- Offer Card: Relative in document flow on ALL devices with -mb overlap so it perfectly overlaps the green bottom edge without breaking into next sections --}}
-                <div class="max-w-4xl mx-auto relative z-20 -mb-28 sm:-mb-32 md:-mb-36">
+                {{-- <div class="max-w-4xl mx-auto relative z-20 -mb-28 sm:-mb-32 md:-mb-36">
                     <div class="bg-white rounded-xl p-5 sm:p-7 md:p-9 shadow-xl border-2 border-[#b5e0c8] w-full mx-auto">
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8 md:gap-12">
 
-                            {{-- Rosette Starburst Badge with % and Sparkle matching reference --}}
                             <div class="relative flex-shrink-0">
-                                {{-- Sparkle / Star at top right --}}
                                 <div class="absolute -top-3 -right-2 text-[#f59e0b] text-2xl font-bold">
                                     ✦
                                 </div>
 
-                                {{-- Rosette Ribbon SVG Badge --}}
                                 <div class="w-20 h-24 sm:w-24 sm:h-28 md:w-28 md:h-32 flex items-center justify-center">
                                     <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow">
-                                        <!-- Ribbons at bottom -->
                                         <path d="M34 70 L24 116 L44 106 L47 70 Z" fill="#e05333" />
                                         <path d="M66 70 L76 116 L56 106 L53 70 Z" fill="#c0391b" />
-                                        <!-- 16-point Scalloped Starburst Rosette -->
                                         <path
                                             d="M50 4 L58 13 L70 10 L74 22 L85 25 L84 37 L93 44 L88 55 L93 66 L83 72 L83 84 L71 86 L66 97 L54 93 L46 99 L40 90 L28 91 L26 79 L15 76 L18 64 L9 57 L16 46 L11 35 L21 30 L23 18 L35 18 L41 8 Z"
                                             fill="#fbb024" />
-                                        <!-- Inner Circle for contrast -->
                                         <circle cx="50" cy="52" r="26" fill="#fcd34d" />
-                                        <!-- Inner subtle border -->
                                         <circle cx="50" cy="52" r="23" fill="none" stroke="#f59e0b" stroke-width="2"
                                             stroke-dasharray="3,2" />
-                                        <!-- Percentage Icon -->
                                         <text x="50" y="63" font-size="30" font-family="'Arial', sans-serif"
                                             font-weight="900" fill="#ffffff" text-anchor="middle">%</text>
                                     </svg>
                                 </div>
                             </div>
 
-                            {{-- Price & Action Button matching screenshot exactly --}}
                             <div class="space-y-2 text-center sm:text-left flex-1 min-w-0 w-full">
                                 @if($regularPrice)
                                     <div
@@ -800,7 +795,7 @@
 
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </section>
         @endif
 

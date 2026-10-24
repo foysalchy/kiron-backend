@@ -12,11 +12,7 @@
 
     <style>
         body {
-            font-family: {
-                ! ! $setup->lang ==='bn' ? "'Hind Siliguri', sans-serif": "'Manrope', sans-serif" ! !
-            }
-
-            ;
+            font-family: {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!};
             scroll-behavior: smooth;
         }
 
@@ -661,10 +657,14 @@
 
         {{-- ══ SECTION 7: ORDER FORM (Dynamic Component) ══ --}}
         <section id="order" class="py-20 px-4 bg-white border-t border-gray-100">
+            @php
+                $orderFormLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
+                $isFormEn = ($orderFormLang === 'en');
+            @endphp
             <div class="text-center mb-12">
                 <h2
                     class="text-xl sm:text-2xl md:text-4xl font-bold text-red-600 italic leading-normal md:leading-relaxed">
-                    তাই আর দেরি না করে আজই অর্ডার করুন</h2>
+                    {{ $isFormEn ? "Don't delay, order today!" : 'তাই আর দেরি না করে আজই অর্ডার করুন' }}</h2>
             </div>
             <x-landing.order-form :landing="$landing" :isPreview="$isPreviewMode" />
         </section>
