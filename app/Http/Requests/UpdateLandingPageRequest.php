@@ -48,7 +48,7 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'regular_price' => ['nullable', 'string', 'max:255'],
                 'discount_price' => ['nullable', 'string', 'max:255'],
-                'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+                'slug' => ['nullable', 'string', 'max:255'],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
                 'header_code' => ['nullable', 'string'],
@@ -83,7 +83,6 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'pricing.numeric' => 'Pricing must be a valid number.',
                 'pricing.min' => 'Pricing cannot be negative.',
                 'slug.unique' => 'This slug is already taken.',
-                'slug.regex' => 'Slug must contain only lowercase letters, numbers, and hyphens.',
                 'template_id.exists' => 'Selected template does not exist.',
                 'product_id.exists' => 'Selected product does not exist.',
             ]
