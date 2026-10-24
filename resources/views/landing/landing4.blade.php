@@ -275,33 +275,33 @@
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';
         $previewContent1 = '<h2>সজিনা পাতার উপকারিতা</h2>
-                                                                    <ul>
-                                                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
-                                                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
-                                                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
-                                                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
-                                                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
-                                                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
-                                                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
-                                                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
-                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                                    </ul>';
+                                                                                    <ul>
+                                                                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
+                                                                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
+                                                                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
+                                                                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
+                                                                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
+                                                                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
+                                                                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
+                                                                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
+                                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                                                    </ul>';
 
         $previewContent2 = '<h2>সেবনে সঠিক নিয়ম</h2>
-                                                                    <ul>
-                                                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
-                                                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
-                                                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                                    </ul>';
+                                                                                    <ul>
+                                                                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
+                                                                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
+                                                                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                                                    </ul>';
         $previewDescription = '<p class="text-lg sm:text-xl md:text-[24px] font-normal text-[#0d2601] leading-relaxed m-0">গ্রাম থেকে সংগ্রহ করা শতভাগ ন্যাচারাল সজিনা পাতা নিজেদের তত্বাবধানে স্বাস্থ্য সম্মত পরিবেশে রোদে শুকিয়ে গুড়া করা হয়।প্রোডাক্ট হাতে পেয়ে, দেখে, কোয়ালিটি চেক করে পেমেন্টে করার সুবিধা ।</p>';
 
         $previewFeatures2 = [
@@ -461,29 +461,7 @@
                             @endif
                         </div>
 
-                        <!-- White Price Box -->
-                        <div class="bg-white rounded-xl overflow-hidden shadow-inner border border-white">
-                            <!-- Regular Price -->
-                            <div class="py-6 px-8 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Regular
-                                Price</span>@endif
-                                <p class="text-[#2e8c03] line-through text-2xl md:text-3xl font-normal decoration-2">
-                                    {{ $regularPrice ?? '' }}
-                                </p>
-                            </div>
 
-                            <!-- Dotted Divider (Matches the image) -->
-                            <div class="border-t-2 border-dotted border-[#2e8c03] mx-6"></div>
-
-                            <!-- Offer Price -->
-                            <div class="py-6 px-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Discount
-                                Price</span>@endif
-                                <p class="text-[#2e8c03] font-medium text-2xl md:text-4xl">
-                                    {{ $discountPrice ?? '' }}
-                                </p>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Overlapping 3D CTA Button -->
@@ -671,24 +649,7 @@
                         Subtitle</span>@endif
                         {{ $pricingSubtitle }}
                     </p>
-                    <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">
-                        @if($regularPrice)
-                            <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Regular
-                                Price</span>@endif
-                                <p class="text-base md:text-2xl font-medium mb-3 line-through text-white">
-                                    {{ $regularPrice }}
-                                </p>
-                            </div>
-                        @endif
-                        <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount
-                            Price</span>@endif
-                            <h3 class="text-xl sm:text-2xl md:text-4xl font-semibold leading-snug">
-                                {{ $discountPrice ?: $regularPrice }}
-                            </h3>
-                        </div>
-                    </div>
+
                 </div>
             </section>
         @endif
