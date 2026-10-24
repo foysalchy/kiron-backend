@@ -713,7 +713,7 @@
 
         {{-- ══ SECTION 4: SPECIAL DISCOUNT & OFFER BOX ══ --}}
         @if($regularPrice || $discountPrice || $isPreviewMode)
-            <section class="w-full bg-[#00703c] pt-8 sm:pt-12 md:pt-14 pb-16 sm:pb-20 md:pb-24 px-4 text-center relative mb-16 sm:mb-20 md:mb-24">
+            <section class="w-full bg-[#00703c] py-10 px-4 text-center relative">
                 <div class="max-w-4xl mx-auto mb-6 md:mb-4">
                     <h2
                         class="text-xl sm:text-2xl md:text-4xl font-black text-white tracking-wide leading-snug {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
