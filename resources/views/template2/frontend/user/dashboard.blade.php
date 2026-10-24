@@ -1,6 +1,6 @@
 @extends('template2.layouts.front')
 @section('meta')
-    <title>Dashboard - {{ $setup->shop_name ?? 'Shop' }}</title>
+    @include('components.meta-info.ecommerce-meta.dashboard-meta', ['setup' => $setup])
 @endsection
 
 @section('content')
@@ -131,31 +131,44 @@
 
                     <!-- Recent Orders Table -->
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
-                        <div class="p-6">
-                            <h2 class="text-xl md:text-2xl font-bold text-gray-900">
+                        <div class="p-4 md:p-6 border-b border-gray-100">
+                            <h2 class="text-lg md:text-2xl font-bold text-gray-900">
                                 Recent Order
                             </h2>
                         </div>
-                        <div class="p-6 space-y-4">
+                        <div class="p-4 md:p-6 space-y-3 md:space-y-4">
                             @forelse($recentOrders ?? [] as $order)
                                 <div
-                                    class="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all gap-4">
-                                    <div class="text-left">
-                                        <p class="font-medium text-gray-900">{{ $order->order_number }}</p>
-                                        <p class="text-sm text-gray-500">{{ $order->created_at->format('Y-m-d') }}</p>
+                                    class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                                    <!-- Order Info & Status for Mobile -->
+                                    <div class="flex items-start justify-between w-full md:w-auto md:gap-4">
+                                        <div class="text-left">
+                                            <p class="font-bold text-gray-900 text-sm md:base">{{ $order->order_number ?? $order->order_no }}</p>
+                                            <p class="text-xs md:text-sm text-gray-500">{{ $order->created_at->format('d M, Y') }}</p>
+                                        </div>
+                                        <span class="md:hidden px-2.5 py-0.5 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
+                                            {{ $order->status_label }}
+                                        </span>
                                     </div>
+
+                                    <!-- Desktop Status Badge -->
                                     <span
-                                        class="px-3 py-1 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
+                                        class="hidden md:inline-block px-3 py-1 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
                                         {{ $order->status_label }}
                                     </span>
-                                    <div class="flex items-center gap-6">
-                                        <p class="font-semibold text-gray-900">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                            {{ number_format($order->grand_total) }}
-                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                        </p>
+
+                                    <!-- Price and Action -->
+                                    <div class="flex items-center justify-between md:justify-end w-full md:w-auto pt-2.5 md:pt-0 border-t md:border-t-0 border-gray-100 gap-4 md:gap-6">
+                                        <div>
+                                            <span class="text-[11px] text-gray-400 block md:hidden">Total Amount</span>
+                                            <p class="font-bold text-gray-900 text-sm md:text-base">
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($order->grand_total) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                            </p>
+                                        </div>
                                         <a href="{{ route('user.order.details', $order->id) }}"
-                                            class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">View</a>
+                                            class="px-3.5 py-1.5 md:px-4 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm font-semibold text-gray-600 hover:text-[#FF6A00] transition-colors">View</a>
                                     </div>
                                 </div>
                             @empty
@@ -168,26 +181,41 @@
                 <!-- 2. SECTION: ALL MY ORDERS  -->
                 <div id="orders-section" class="dashboard-content hidden space-y-6">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
-                        <div class="p-6">
-                            <h2 class="text-xl md:text-2xl font-bold text-gray-900">
+                        <div class="p-4 md:p-6 border-b border-gray-100">
+                            <h2 class="text-lg md:text-2xl font-bold text-gray-900">
                                 My Orders
                             </h2>
                         </div>
-                        <div class="p-6 space-y-8">
+                        <div class="p-4 md:p-6 space-y-4 md:space-y-6">
                             @forelse($allOrders as $order)
-                                <div class="border border-gray-200 rounded-lg p-6 space-y-6">
+                                <div class="border border-gray-200 rounded-lg p-4 md:p-6 space-y-4 md:space-y-6">
                                     <div
-                                        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                        <div>
-                                            <h4 class="font-semibold text-md text-gray-900">
-                                                #{{ $order->order_no ?? $order->id }}
-                                            </h4>
-                                            <p class="text-sm text-gray-700 font-medium">
+                                        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
+                                        <!-- Order info & mobile badges -->
+                                        <div class="w-full md:w-auto">
+                                            <div class="flex items-center justify-between md:block">
+                                                <h4 class="font-bold text-base md:text-md text-gray-900">
+                                                    #{{ $order->order_no ?? $order->id }}
+                                                </h4>
+                                                <!-- Badges visible on mobile beside order # -->
+                                                <div class="flex md:hidden items-center gap-1.5 flex-wrap justify-end">
+                                                    <span
+                                                        class="px-2 py-0.5 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
+                                                        {{ $order->status_label }}
+                                                    </span>
+                                                    <span
+                                                        class="px-2 py-0.5 {{ $order->payment_status_color }} text-[10px] font-bold rounded-full uppercase border border-current/10">
+                                                        {{ $order->payment_status_label }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs md:text-sm text-gray-500 font-medium mt-0.5">
                                                 Order Date: {{ $order->created_at->format('d M, Y') }}
                                             </p>
                                         </div>
 
-                                        <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
+                                        <!-- Desktop Badges & Price -->
+                                        <div class="hidden md:flex flex-col md:items-end gap-2 w-full md:w-auto">
                                             <span
                                                 class="px-3 py-1 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
                                                 {{ $order->status_label }}
@@ -207,7 +235,7 @@
                                     </div>
 
                                     <!-- Items inside this order -->
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 py-2 border-y md:border-y-0 border-gray-100">
                                         @foreach ($order->orderDetails as $item)
                                             <div class="flex items-center gap-3">
                                                 <div
@@ -235,24 +263,34 @@
                                         @endforeach
                                     </div>
 
-                                    <div class="flex flex-wrap gap-2">
+                                    <!-- Mobile Price and Action Buttons Row -->
+                                    <div class="flex md:hidden items-center justify-between pb-1">
+                                        <span class="text-xs text-gray-500 font-medium">Total Amount</span>
+                                        <p class="text-base font-bold text-gray-900 leading-none">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                            {{ number_format($order->grand_total) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                        </p>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center gap-2 pt-2 md:pt-0">
                                         <!-- View Details Button -->
                                         <a href="{{ route('user.order.details', $order->id) }}"
-                                            class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                            <i class="fas fa-eye"></i> View Details
+                                            class="px-3.5 py-1.5 md:px-4 md:py-2 bg-white border border-gray-200 rounded-lg text-xs md:text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-1.5 md:gap-2">
+                                            <i class="fas fa-eye text-xs"></i> View Details
                                         </a>
 
                                         <!-- Invoice Button -->
                                         <a href="{{ route('order.invoice', $order->id) }}"
-                                            class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                            <i class="fas fa-download"></i> Invoice
+                                            class="px-3.5 py-1.5 md:px-4 md:py-2 bg-white border border-gray-200 rounded-lg text-xs md:text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-1.5 md:gap-2">
+                                            <i class="fas fa-download text-xs"></i> Invoice
                                         </a>
 
                                         <!-- Review Button (Shown only if Delivered) -->
                                         @if ($order->status === \App\Enums\Status::Delivered->value)
                                             <a href="{{ route('user.order.details', $order->id) }}"
-                                                class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                                <i class="fa-solid fa-star-half-stroke"></i> Review
+                                                class="px-3.5 py-1.5 md:px-4 md:py-2 bg-white border border-gray-200 rounded-lg text-xs md:text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-1.5 md:gap-2">
+                                                <i class="fa-solid fa-star-half-stroke text-xs"></i> Review
                                             </a>
                                         @endif
 
@@ -261,18 +299,18 @@
                                                 $order->status !== \App\Enums\Status::Cancelled->value)
                                             <button type="button"
                                                 onclick="openPaymentModal('{{ $order->id }}', '{{ $order->grand_total }}')"
-                                                class="px-4 py-2 primary-bg hover:bg-[#e65f00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold flex items-center gap-2">
-                                                <i class="fa-brands fa-amazon-pay"></i> Pay Now
+                                                class="px-3.5 py-1.5 md:px-4 md:py-2 primary-bg hover:bg-[#e65f00] text-primary border border-[#FF6A00] rounded-lg text-xs md:text-sm font-bold flex items-center gap-1.5 md:gap-2">
+                                                <i class="fa-brands fa-amazon-pay text-xs"></i> Pay Now
                                             </button>
                                         @elseif($order->payment_status === \App\Models\Order::PAYMENT_PENDING)
                                             <span
-                                                class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold flex items-center gap-2 border border-yellow-200">
-                                                <i class="fas fa-history"></i> Verification Pending
+                                                class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-[11px] md:text-xs font-bold flex items-center gap-1.5 border border-yellow-200">
+                                                <i class="fas fa-history text-xs"></i> Verification Pending
                                             </span>
                                         @elseif($order->payment_status === \App\Models\Order::PAYMENT_PAID)
                                             <span
-                                                class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-xs font-bold flex items-center gap-2">
-                                                <i class="fas fa-check-circle"></i> Paid
+                                                class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-[11px] md:text-xs font-bold flex items-center gap-1.5">
+                                                <i class="fas fa-check-circle text-xs"></i> Paid
                                             </span>
                                         @endif
                                     </div>

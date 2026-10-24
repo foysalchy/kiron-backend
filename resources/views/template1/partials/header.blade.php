@@ -532,7 +532,7 @@
             <img src="{{ asset('./images/template1/frontend/sell.png') }}" alt="Cart" height="24px" width="24px"
                 loading="lazy">
             <span
-                class="absolute -top-1 -right-2 primary-bg text-primary text-[9px] font-bold px-1 rounded-full border border-white">
+                class="cart-count-nav absolute -top-1 -right-2 primary-bg text-primary text-[9px] font-bold px-1 rounded-full border border-white">
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
             </span>
             <span class="text-xs font-medium">Cart</span>
