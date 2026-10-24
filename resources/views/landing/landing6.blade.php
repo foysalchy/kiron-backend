@@ -467,7 +467,7 @@
                     <div
                         class="grid grid-cols-1 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : ($multiProducts->count() === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' : 'sm:grid-cols-2 md:grid-cols-3') }} gap-6 md:gap-8">
                         @foreach($multiProducts as $p)
-                            <x-landing.landing-product-card-1 :product="$p" :setup="$setup" />
+                            <x-landing.landing-product-card-1 :product="$p" :setup="$setup" :landing="$landing" />
                         @endforeach
                     </div>
                 </div>
@@ -1024,7 +1024,22 @@
     </main>
 
     {{-- Product Card Interactivity Scripts (Variant Selection & Add to Order) --}}
+    @php
+        $formLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
+        $isCardEn = ($formLang === 'en');
+        $jsCardTrans = [
+            'stock_out' => $isCardEn ? 'Out of Stock' : 'স্টক আউট',
+            'stock_end' => $isCardEn ? 'Out of Stock' : 'স্টক শেষ',
+            'add_to_cart' => $isCardEn ? 'Add to Cart' : 'কার্টে যোগ করুন',
+            'order_now' => $isCardEn ? 'Order Now' : 'অর্ডার করুন',
+            'added' => $isCardEn ? 'Added' : 'যোগ হয়েছে',
+            'not_in_stock' => $isCardEn ? 'Sorry! The selected product is currently out of stock.' : 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।',
+            'option_not_in_stock' => $isCardEn ? 'Sorry! This option is currently out of stock.' : 'দুঃখিত! এই অপশনটি বর্তমানে স্টকে নেই।',
+        ];
+    @endphp
     <script>
+        const cardTrans = @json($jsCardTrans);
+
         // Card Variation Change Handler
         function onCardVariationChange(selectEl, productId) {
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
@@ -1069,23 +1084,23 @@
                     if (addBtn) {
                         addBtn.disabled = true;
                         addBtn.className = "card-add-btn w-full inline-flex items-center justify-center gap-1 py-2.5 px-2 bg-gray-300 cursor-not-allowed opacity-75 text-gray-600 font-bold text-xs rounded-lg shadow-sm";
-                        addBtn.innerHTML = '<i class="fa-solid fa-ban text-xs"></i> <span>স্টক আউট</span>';
+                        addBtn.innerHTML = '<i class="fa-solid fa-ban text-xs"></i> <span>' + cardTrans.stock_out + '</span>';
                     }
                     if (orderBtn) {
                         orderBtn.disabled = true;
                         orderBtn.className = "card-order-btn w-full inline-flex items-center justify-center gap-1 py-2.5 px-2 bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold text-xs rounded-lg shadow-sm";
-                        orderBtn.innerHTML = '<span>স্টক শেষ</span>';
+                        orderBtn.innerHTML = '<span>' + cardTrans.stock_end + '</span>';
                     }
                 } else {
                     if (addBtn) {
                         addBtn.disabled = false;
                         addBtn.className = "card-add-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-green-50 hover:bg-green-100 text-[#00703c] border-2 border-[#00703c]/40 hover:border-[#00703c] font-bold text-xs rounded-lg transition-all active:scale-[0.98] cursor-pointer shadow-sm";
-                        addBtn.innerHTML = '<i class="fa-solid fa-cart-plus text-xs text-[#00703c]"></i> <span class="btn-label">কার্টে যোগ করুন</span>';
+                        addBtn.innerHTML = '<i class="fa-solid fa-cart-plus text-xs text-[#00703c]"></i> <span class="btn-label">' + cardTrans.add_to_cart + '</span>';
                     }
                     if (orderBtn) {
                         orderBtn.disabled = false;
                         orderBtn.className = "card-order-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-[#00703c] hover:bg-[#00582f] text-white font-bold text-xs rounded-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer";
-                        orderBtn.innerHTML = '<span class="btn-label">অর্ডার করুন</span> <i class="fa-solid fa-arrow-down text-xs"></i>';
+                        orderBtn.innerHTML = '<span class="btn-label">' + cardTrans.order_now + '</span> <i class="fa-solid fa-arrow-down text-xs"></i>';
                     }
                 }
             }
@@ -1102,7 +1117,7 @@
                 if (selectEl) {
                     const selectedOpt = selectEl.options[selectEl.selectedIndex];
                     if (selectedOpt && selectedOpt.dataset.outOfStock === '1') {
-                        alert('দুঃখিত! এই অপশনটি বর্তমানে স্টকে নেই।');
+                        alert(cardTrans.option_not_in_stock);
                         return;
                     }
                     targetVarId = selectEl.value;
@@ -1110,7 +1125,7 @@
                 } else {
                     targetCheckbox = document.querySelector(`input[name="product_ids[]"][value="${productId}"]`);
                     if (targetCheckbox && targetCheckbox.dataset.outOfStock === '1') {
-                        alert('দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।');
+                        alert(cardTrans.not_in_stock);
                         return;
                     }
                 }
@@ -1122,7 +1137,7 @@
                         const origContent = btn.innerHTML;
                         btn.classList.remove('bg-green-50', 'text-[#00703c]');
                         btn.classList.add('bg-green-600', 'text-white');
-                        btn.innerHTML = '<i class="fa-solid fa-check text-xs"></i> <span>যোগ হয়েছে</span>';
+                        btn.innerHTML = '<i class="fa-solid fa-check text-xs"></i> <span>' + cardTrans.added + '</span>';
                         setTimeout(() => {
                             btn.classList.remove('bg-green-600', 'text-white');
                             btn.classList.add('bg-green-50', 'text-[#00703c]');
@@ -1134,7 +1149,7 @@
 
             if (targetCheckbox) {
                 if (targetCheckbox.dataset.outOfStock === '1') {
-                    alert('দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।');
+                    alert(cardTrans.not_in_stock);
                     return;
                 }
 

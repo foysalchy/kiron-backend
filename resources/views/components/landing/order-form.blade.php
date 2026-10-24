@@ -176,7 +176,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-800 text-sm md:text-base leading-snug">{{ $p->title }}</h4>
-                                        <span class="text-xs text-gray-500 font-semibold">মূল্য: {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
+                                        <span class="text-xs text-gray-500 font-semibold">{{ $trans['price_label'] }} {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
                                     </div>
                                 </div>
                             </div>
