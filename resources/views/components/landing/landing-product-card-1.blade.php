@@ -1,6 +1,7 @@
 @props([
     'product',
     'setup',
+    'landing' => null,
 ])
 
 @php
@@ -46,15 +47,28 @@
         }
     }
     
+    // Language determination (bn or en, default bn)
+    $formLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
+    $isEn = ($formLang === 'en');
+
+    $cardTrans = [
+        'off' => $isEn ? ' OFF' : ' ছাড়',
+        'variants' => $isEn ? ' Variants' : ' টি ভ্যারিয়েন্ট',
+        'choose_option' => $isEn ? 'Choose an option' : 'পছন্দের অপশন বেছে নিন',
+        'out_of_stock' => $isEn ? 'Out of Stock' : 'স্টক আউট',
+        'add_to_cart' => $isEn ? 'Add to Cart' : 'কার্টে যোগ করুন',
+        'order_now' => $isEn ? 'Order Now' : 'অর্ডার করুন',
+    ];
+
     // Calculate discount label (Percentage or Fixed amount)
     $discountLabel = '';
     if ($pRegularPrice > $pSalePrice && $pRegularPrice > 0) {
         $diff = $pRegularPrice - $pSalePrice;
         $percentage = round(($diff / $pRegularPrice) * 100);
         if ($percentage > 0) {
-            $discountLabel = $percentage . '% ছাড়';
+            $discountLabel = $percentage . '%' . $cardTrans['off'];
         } else {
-            $discountLabel = number_format($diff) . ($setup->currency ?? '৳') . ' ছাড়';
+            $discountLabel = number_format($diff) . ($setup->currency ?? '৳') . $cardTrans['off'];
         }
     }
 
@@ -84,7 +98,7 @@
 
             @if($hasVariations)
                 <span class="absolute bottom-2 right-2 bg-gray-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                    {{ $product->variations->count() }} টি ভ্যারিয়েন্ট
+                    {{ $product->variations->count() }}{{ $cardTrans['variants'] }}
                 </span>
             @endif
         </div>
@@ -101,11 +115,11 @@
         @if($hasVariations)
             <div class="mb-3">
                 <label for="variant-select-{{ $product->id }}" class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">
-                    পছন্দের অপশন বেছে নিন
+                    {{ $cardTrans['choose_option'] }}
                 </label>
                 <div class="relative">
                     <select id="variant-select-{{ $product->id }}"
-                        aria-label="পছন্দের অপশন বেছে নিন - {{ $product->title }}"
+                        aria-label="{{ $cardTrans['choose_option'] }} - {{ $product->title }}"
                         onchange="onCardVariationChange(this, {{ $product->id }})" 
                         class="card-variant-select w-full appearance-none bg-gray-50 hover:bg-gray-100 focus:bg-white border border-gray-300 focus:border-[#35B11E] rounded-lg px-3 py-2 pr-8 text-xs font-semibold text-gray-800 outline-none transition-colors cursor-pointer shadow-sm">
                         @foreach($product->variations as $idx => $v)
@@ -120,7 +134,7 @@
                                 if ($v->regular_price > $vPrice && $v->regular_price > 0) {
                                     $vDiff = $v->regular_price - $vPrice;
                                     $vPerc = round(($vDiff / $v->regular_price) * 100);
-                                    $vDiscountLabel = $vPerc > 0 ? ($vPerc . '% ছাড়') : (number_format($vDiff) . ($setup->currency ?? '৳') . ' ছাড়');
+                                    $vDiscountLabel = $vPerc > 0 ? ($vPerc . '%' . $cardTrans['off']) : (number_format($vDiff) . ($setup->currency ?? '৳') . $cardTrans['off']);
                                 }
                             @endphp
                             <option value="{{ $v->id }}" 
@@ -132,7 +146,7 @@
                                 data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
                                 {{ $vOutOfStock ? 'disabled' : '' }}
                                 {{ $isSelected ? 'selected' : '' }}>
-                                {{ $v->display_name }} ({{ number_format($vPrice, 2) }}{{ $setup->currency }}) {{ $vOutOfStock ? '- স্টক আউট' : '' }}
+                                {{ $v->display_name }} ({{ number_format($vPrice, 2) }}{{ $setup->currency }}) {{ $vOutOfStock ? ('- ' . $cardTrans['out_of_stock']) : '' }}
                             </option>
                         @endforeach
                     </select>
@@ -163,7 +177,7 @@
                 disabled
                 class="card-add-btn w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold text-sm rounded-lg shadow-sm">
                 <i class="fa-solid fa-ban text-xs"></i>
-                <span class="btn-label">স্টক আউট</span>
+                <span class="btn-label">{{ $cardTrans['out_of_stock'] }}</span>
             </button>
         @else
             <div class="card-btn-group grid grid-cols-2 gap-2">
@@ -172,14 +186,14 @@
                     onclick="addProductToLandingOrder({{ $product->id }}, false)"
                     class="card-add-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-green-50 hover:bg-green-100 text-[#0D2601] border-2 border-[#35B11E]/40 hover:border-[#35B11E] font-bold text-xs rounded-lg transition-all active:scale-[0.98] cursor-pointer shadow-sm">
                     <i class="fa-solid fa-cart-plus text-xs text-[#35B11E]"></i>
-                    <span class="btn-label">কার্টে যোগ করুন</span>
+                    <span class="btn-label">{{ $cardTrans['add_to_cart'] }}</span>
                 </button>
 
                 {{-- Direct Order (adds & scrolls to form) --}}
                 <button type="button" 
                     onclick="addProductToLandingOrder({{ $product->id }}, true)"
                     class="card-order-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-[#0D2601] hover:bg-[#1a4a03] text-white font-bold text-xs rounded-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer">
-                    <span class="btn-label">অর্ডার করুন</span>
+                    <span class="btn-label">{{ $cardTrans['order_now'] }}</span>
                     <i class="fa-solid fa-arrow-down text-xs"></i>
                 </button>
             </div>
