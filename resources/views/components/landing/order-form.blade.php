@@ -65,7 +65,7 @@
         'out_of_stock' => $isEn ? 'Out of Stock' : 'স্টক আউট',
         'out_of_stock_full' => $isEn ? 'Out of Stock (Currently unavailable)' : 'স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)',
         'out_of_stock_btn' => $isEn ? 'Out of Stock (Unavailable)' : 'স্টক আউট (পণ্যটি শেষ)',
-        'add_product_to_cart' => $isEn ? 'Add this product to cart' : 'এই প্রোডাক্টটি কার্টে যোগ করুন',
+        'add_product_to_cart' => $isEn ? 'Remove from Cart' : 'কার্ট থেকে রিমুভ করুন',
         'your_name' => $isEn ? 'Your Name' : 'আপনার নাম লিখুন',
         'phone_number' => $isEn ? 'Mobile Number' : 'মোবাইল নাম্বার লিখুন',
         'full_address' => $isEn ? 'Full Address' : 'সম্পূর্ণ ঠিকানা লিখুন',
