@@ -138,7 +138,7 @@ class LandingPage extends Model
     // Mutators
     public function setSlugAttribute($value)
     {
-        $this->attributes['slug'] = $value ? Str::slug($value) : null;
+        $this->attributes['slug'] = $value ? trim($value) : null;
     }
 
     // Boot method to ensure slug uniqueness if provided

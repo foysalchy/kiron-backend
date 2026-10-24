@@ -543,32 +543,36 @@
             <section class="w-full py-12 md:py-20 px-4 bg-[#f8faf8] border-b border-gray-100 overflow-hidden">
                 <div class="max-w-6xl mx-auto">
 
-                    {{-- Top Header: Rendered via dynamic $content1 (Title & Subtitle with Badge) --}}
-                    <div
-                        class="text-center max-w-3xl mx-auto mb-10 md:mb-14 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -10px;">Content</span>@endif
+                    {{-- Top Header: Benefits Badge + Content (Title & Subtitle) --}}
+                    <div class="text-center max-w-3xl mx-auto mb-10 md:mb-14">
 
                         <div
-                            class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/70 text-[#00703c] text-xs sm:text-sm font-semibold tracking-wide uppercase mb-3">
+                            data-field="benefits_badge"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/70 text-[#00703c] text-xs sm:text-sm font-semibold tracking-wide uppercase mb-3 relative cursor-pointer {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" data-field="benefits_badge" style="top: -12px; left: 0;">Benefits Badge</span>@endif
                             <span>✦</span>
                             <span>{{ $benefitsBadge }}</span>
                         </div>
 
-                        @if($content1)
-                            <div
-                                class="prose max-w-none text-[#1b3a27] [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:text-[#1b3a27] [&_h1]:leading-snug [&_h1]:mb-2 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:text-[#1b3a27] [&_h2]:leading-snug [&_h2]:mb-2 [&_h3]:text-2xl [&_h3]:sm:text-3xl [&_h3]:md:text-4xl [&_h3]:font-black [&_h3]:text-[#1b3a27] [&_h3]:leading-snug [&_h3]:mb-2 [&_p]:text-sm sm:[&_p]:text-base [&_p]:text-gray-600 [&_p]:mt-1.5 [&_ul]:hidden">
-                                {!! $content1 !!}
-                            </div>
-                        @else
-                            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#1b3a27] leading-snug tracking-tight">
-                                {{ $benefitsTitle }}
-                            </h2>
-                            @if($benefitsSubtitle)
-                                <p class="text-xs sm:text-sm md:text-base text-gray-500 font-medium tracking-wide mt-2">
-                                    {{ $benefitsSubtitle }}
-                                </p>
+                        <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" data-field="content" style="top: -12px; left: 0;">Content</span>@endif
+
+                            @if($content1)
+                                <div
+                                    class="prose max-w-none text-[#1b3a27] [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:text-[#1b3a27] [&_h1]:leading-snug [&_h1]:mb-2 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:text-[#1b3a27] [&_h2]:leading-snug [&_h2]:mb-2 [&_h3]:text-2xl [&_h3]:sm:text-3xl [&_h3]:md:text-4xl [&_h3]:font-black [&_h3]:text-[#1b3a27] [&_h3]:leading-snug [&_h3]:mb-2 [&_p]:text-sm sm:[&_p]:text-base [&_p]:text-gray-600 [&_p]:mt-1.5 [&_ul]:hidden">
+                                    {!! $content1 !!}
+                                </div>
+                            @else
+                                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#1b3a27] leading-snug tracking-tight">
+                                    {{ $benefitsTitle }}
+                                </h2>
+                                @if($benefitsSubtitle)
+                                    <p class="text-xs sm:text-sm md:text-base text-gray-500 font-medium tracking-wide mt-2">
+                                        {{ $benefitsSubtitle }}
+                                    </p>
+                                @endif
                             @endif
-                        @endif
+                        </div>
                     </div>
 
                     {{-- 3-Column Layout: Left Features | Center Product Thumbnail | Right Features --}}
@@ -926,10 +930,10 @@
                 <div class="max-w-3xl mx-auto space-y-3 sm:space-y-4">
 
                     @php
-                        $supportContent = data_get($landing->extras, 'content') ?: ($landing->content ?? null);
+                        $supportContent = data_get($landing->extras, 'content3') ?: null;
                     @endphp
                     <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 0; z-index: 50;">Content</span>@endif
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 0; z-index: 50;">Content 3</span>@endif
                         @if(!empty($supportContent))
                             <div class="prose max-w-none text-[#00703c] leading-relaxed {{ $isPreviewMode ? '[&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm' : '' }}">
                                 {!! $supportContent !!}
@@ -960,7 +964,9 @@
                         {{-- WhatsApp Button --}}
                         @if(!empty($whatsappUrl))
                         <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer"
-                            class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#075E54] hover:bg-[#05463f] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all">
+                            data-field="social_settings"
+                            class="relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#075E54] hover:bg-[#05463f] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" data-field="social_settings" style="top: -12px; background-color: #05463f;">Social: WhatsApp</span>@endif
                             <i class="fa-brands fa-whatsapp text-base sm:text-lg"></i>
                             <span>WhatsApp-এ মেসেজ করুন</span>
                         </a>
@@ -969,7 +975,9 @@
                         {{-- Messenger Button --}}
                         @if(!empty($messengerUrl))
                         <a href="{{ $messengerUrl }}" target="_blank" rel="noopener noreferrer"
-                            class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#0066d6] hover:bg-[#0052ad] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all">
+                            data-field="social_settings"
+                            class="relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#0066d6] hover:bg-[#0052ad] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" data-field="social_settings" style="top: -12px; background-color: #0052ad;">Social: Messenger</span>@endif
                             <i class="fa-brands fa-facebook-messenger text-base sm:text-lg"></i>
                             <span>Messenger-এ মেসেজ দিন</span>
                         </a>
@@ -1250,11 +1258,12 @@
                     if (!targetEl) return;
 
                     const badgeEl = badge || targetEl.querySelector('.preview-badge');
-                    if (!badgeEl) return;
                     e.preventDefault();
 
-                    const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
-                    let field = null;
+                    let field = targetEl.getAttribute('data-field') || (badgeEl ? badgeEl.getAttribute('data-field') : null);
+
+                    if (!field && badgeEl) {
+                        const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
 
                     if (text.includes('regular price')) {
                         field = 'regular_price';
@@ -1288,12 +1297,17 @@
                         field = 'feature1';
                     } else if (text.includes('features') || text.includes('feature')) {
                         field = 'feature1';
+                    } else if (text.includes('benefits badge')) {
+                        field = 'benefits_badge';
                     } else if (text.includes('button text')) {
                         field = 'button_text';
+                    } else if (text.includes('content 3') || text.includes('content3')) {
+                        field = 'content3';
                     } else if (text.includes('content 2')) {
                         field = 'content2';
                     } else if (text.includes('content')) {
                         field = 'content';
+                    }
                     }
 
                     if (field) {
