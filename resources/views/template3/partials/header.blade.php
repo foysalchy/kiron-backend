@@ -475,27 +475,27 @@
                 <a href="{{ route('user.dashboard') }}"
                     class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span>আমার ড্যাশবোর্ড</span>
+                    <span>My Dashboard</span>
                 </a>
 
                 <form action="{{ route('user.logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full text-center text-red-500 font-bold text-sm py-2 hover:underline">
-                        লগআউট করুন
+                        Logout
                     </button>
                 </form>
             @else
                 <a href="{{ route('user.login') }}" aria-label="Login to your account"
                     class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                     <i class="fas fa-user-circle text-xl"></i>
-                    <span>লগইন / রেজিস্টার</span>
+                    <span>Login / Register</span>
                 </a>
             @endauth
 
             <a href="tel:{{ $setup->phone ?? '' }}"
                 class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                 <i class="fas fa-phone-alt"></i>
-                <span>কল করুন</span>
+                <span>Call Us</span>
             </a>
         </div>
     </div>
