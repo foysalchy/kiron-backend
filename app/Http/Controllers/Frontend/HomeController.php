@@ -164,7 +164,7 @@ class HomeController extends FrontendController
                 return Product::where('company_id', $companyId)
                     ->select($productSelect)
                     ->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                    ->where('status', Status::Active->value)
+                    ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
                     ->where(function ($q) {
                         $q->where('discount', '>', 0)
                             ->orWhereHas('variations', function ($vq) {
