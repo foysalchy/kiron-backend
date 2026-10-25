@@ -8,8 +8,6 @@
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @vite('resources/css/app.css')
     @include('components.fontawesome')
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet" />
 
     <style>
         * {
@@ -19,7 +17,7 @@
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: "Manrope", "Hind Siliguri", sans-serif;
             background-color: #F8FAFC;
             color: #1E293B;
             font-size: 14px;
@@ -652,7 +650,13 @@
                             <p>{{ $setup->address }}</p>
                             <p>Phone: {{ $setup->phone }}</p>
                             <p>Email: {{ $setup->email }}</p>
-                            <p>Website: www.{{ strtolower(str_replace(' ', '', $setup->shop_name)) }}.com</p>
+                            @php
+                                $domainSetup = $order->company?->domainSetup ?? getCurrentCompany();
+                                $websiteUrl = $domainSetup?->custom_domain
+                                    ?: ($domainSetup?->sub_domain ? $domainSetup->sub_domain . '.dorja.io' : request()->getHost());
+                            @endphp
+                            <p>Website: <a href="{{ route('home') }}" target="_blank" style="color: inherit; text-decoration: none;">{{ $websiteUrl }}</a></p>
+
                         </div>
                     </div>
                     <div class="invoice-meta">

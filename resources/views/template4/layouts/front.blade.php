@@ -4,17 +4,16 @@
 <head>
      @yield('meta')
     <meta name="csrf-token" content="{{ csrf_token() }}">
- 
- 
+
+
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? ''}}">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @include('components.fontawesome')
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-   
+
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
         :root {
@@ -89,7 +88,7 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        
+
 .prose h1 {
     margin-top: 0;
     margin-bottom: 5px;

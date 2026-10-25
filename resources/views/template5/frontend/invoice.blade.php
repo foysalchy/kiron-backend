@@ -648,7 +648,13 @@
                             <p>{{ $setup->address }}</p>
                             <p>Phone: {{ $setup->phone }}</p>
                             <p>Email: {{ $setup->email }}</p>
-                            <p>Website: www.{{ strtolower(str_replace(' ', '', $setup->shop_name)) }}.com</p>
+                            @php
+                                $domainSetup = $order->company?->domainSetup ?? getCurrentCompany();
+                                $websiteUrl = $domainSetup?->custom_domain
+                                    ?: ($domainSetup?->sub_domain ? $domainSetup->sub_domain . '.dorja.io' : request()->getHost());
+                            @endphp
+                            <p>Website: <a href="{{ route('home') }}" target="_blank" style="color: inherit; text-decoration: none;">{{ $websiteUrl }}</a></p>
+
                         </div>
                     </div>
                     <div class="invoice-meta">
