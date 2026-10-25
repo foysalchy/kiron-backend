@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerGroupController;
@@ -441,6 +442,18 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}/restore', [AttributeValueController::class, 'restore']);
                     Route::delete('/{id}/force', [AttributeValueController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [AttributeValueController::class, 'toggleStatus']);
+                });
+
+                // Filter Routes
+                Route::prefix('filters')->group(function () {
+                    Route::get('/', [FilterController::class, 'index']);
+                    Route::post('/', [FilterController::class, 'store']);
+                    Route::get('/{id}', [FilterController::class, 'show']);
+                    Route::post('/update/{id}', [FilterController::class, 'update']);
+                    Route::delete('/{id}', [FilterController::class, 'destroy']);
+                    Route::get('/{id}/restore', [FilterController::class, 'restore']);
+                    Route::delete('/{id}/force', [FilterController::class, 'forceDestroy']);
+                    Route::patch('/{id}/toggle-status', [FilterController::class, 'toggleStatus']);
                 });
 
                 // Brand Routes

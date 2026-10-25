@@ -8,6 +8,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\AttributeGroup;
+use App\Models\AttributeValue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,9 @@ class AttributeGroupService
     public function getAllAttributeGroup(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = AttributeGroup::query();
+            $query = AttributeGroup::with(['values' => function ($q) {
+                $q->select('id', 'attribute_group_id', 'name', 'status');
+            }]);
 
 
             // Apply filters
@@ -62,7 +65,7 @@ class AttributeGroupService
      */
     public function getAttributeGroupById(int $id): AttributeGroup
     {
-        $group = AttributeGroup::find($id);
+        $group = AttributeGroup::with('values')->find($id);
 
         if (!$group) {
             throw ApiException::notFound('Attribute Group');
@@ -77,12 +80,31 @@ class AttributeGroupService
     public function createAttributeGroup(array $data): AttributeGroup
     {
         try {
+            return DB::transaction(function () use ($data) {
+                $values = $data['values'] ?? [];
+                unset($data['values']);
 
-            $group = AttributeGroup::create($data);
-            LogHelper::created('attribute_group', $group->id, $group->company_id,$group->name);
+                $group = AttributeGroup::create($data);
 
-            Log::info('Attribute group created successfully', ['attribute group id' => $group->id]);
-            return $group;
+                if (!empty($values) && is_array($values)) {
+                    foreach ($values as $val) {
+                        $valName = trim((string) $val);
+                        if ($valName !== '') {
+                            AttributeValue::create([
+                                'company_id' => $group->company_id,
+                                'attribute_group_id' => $group->id,
+                                'name' => $valName,
+                                'status' => Status::Active->value,
+                            ]);
+                        }
+                    }
+                }
+
+                LogHelper::created('attribute_group', $group->id, $group->company_id, $group->name);
+                Log::info('Attribute group created successfully', ['attribute group id' => $group->id]);
+
+                return $group->load('values');
+            });
         } catch (\Exception $e) {
 
             Log::error('Attribute Group creation failed: ' . $e->getMessage(), [
@@ -99,14 +121,37 @@ class AttributeGroupService
      */
     public function updateAttributeGroup(int $id, array $data): AttributeGroup
     {
-
-
         try {
-            $group = $this->getAttributeGroupById($id);
-            $group->update($data);
-            LogHelper::updated('attribute_group', $group->id, $group->company_id,$group->name);
-            Log::info('Attribute Group updated successfully', ['atrribute group id' => $group->id]);
-            return $group->fresh();
+            return DB::transaction(function () use ($id, $data) {
+                $group = $this->getAttributeGroupById($id);
+
+                $values = $data['values'] ?? null;
+                unset($data['values']);
+
+                $group->update($data);
+
+                if ($values !== null && is_array($values)) {
+                    $cleanedValues = array_values(array_filter(array_map('trim', $values), fn($v) => $v !== ''));
+                    
+                    // Delete existing values for this group
+                    $group->values()->forceDelete();
+
+                    // Re-create new values
+                    foreach ($cleanedValues as $valName) {
+                        AttributeValue::create([
+                            'company_id' => $group->company_id,
+                            'attribute_group_id' => $group->id,
+                            'name' => $valName,
+                            'status' => Status::Active->value,
+                        ]);
+                    }
+                }
+
+                LogHelper::updated('attribute_group', $group->id, $group->company_id, $group->name);
+                Log::info('Attribute Group updated successfully', ['atrribute group id' => $group->id]);
+
+                return $group->fresh()->load('values');
+            });
         } catch (\Exception $e) {
 
             Log::error('Attribute Group update failed: ' . $e->getMessage(), [

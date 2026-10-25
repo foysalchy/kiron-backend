@@ -23,6 +23,7 @@ use App\Models\EmailTemplate;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\ExtraCategory;
+use App\Models\Filter;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\NoteTemplate;
@@ -62,8 +63,16 @@ class SelectOptionController extends Controller
         if ($wants('subCategories')) $data['subCategories'] = SubCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'mega_category_id']);
         if ($wants('miniCategories')) $data['miniCategories'] = MiniCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'sub_category_id']);
         if ($wants('extraCategories')) $data['extraCategories'] = ExtraCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'mini_category_id']);
-        if ($wants('attributeGroups')) $data['attributeGroups'] = AttributeGroup::getActiveCachedOptions($companyId, ['id', 'name']);
+        if ($wants('attributeGroups')) $data['attributeGroups'] = AttributeGroup::getActiveCachedOptions($companyId, ['id', 'name', 'mega_category_ids', 'is_filterable']);
         if ($wants('attributeValues')) $data['attributeValues'] = AttributeValue::getActiveCachedOptions($companyId, ['id', 'name', 'attribute_group_id']);
+        if ($wants('filters')) {
+            $data['filters'] = Filter::with(['values' => function($q) {
+                $q->select('id', 'filter_id', 'name')->where('status', Status::Active->value);
+            }])
+            ->where('status', Status::Active->value)
+            ->select('id', 'name', 'mega_category_ids')
+            ->get();
+        }
 
         return response()->json($data);
     }
