@@ -43,6 +43,7 @@ enum Status: int
   case Open = 36;
   case Resumed = 37;
   case Fake = 38;
+  case Upcoming = 39;
 
   public function label(): string
   {
@@ -86,6 +87,7 @@ enum Status: int
       self::Open => 'Open',
       self::Resumed => 'Resumed',
       self::Fake => 'Fake',
+      self::Upcoming => 'Upcoming',
     };
   }
   public const ORDER_FLOW = [
