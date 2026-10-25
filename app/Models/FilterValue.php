@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FilterValue extends Model
 {
-    use SoftDeletes, CompanyScoped, HasCachedOptions;
+    use SoftDeletes, CompanyScoped, HasCachedOptions, HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -27,7 +28,10 @@ class FilterValue extends Model
     protected $hidden = [
         'deleted_at',
     ];
-
+    public static function homepageCacheKeys(): array
+    {
+        return ['shop_filters'];
+    }
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
