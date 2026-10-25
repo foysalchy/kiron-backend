@@ -377,11 +377,98 @@
                         @else
                             <div
                                 class="relative rounded-2xl overflow-hidden shadow-lg bg-white flex justify-center items-center p-2">
-                                <img src="{{ $productImg }}" width="800" height="600" loading="eager" decoding="async"
-                                    fetchpriority="high" class="w-full h-auto max-h-[60vh] object-contain rounded-xl"
+                                <img id="landing1-main-img" src="{{ $productImg }}" width="800" height="600" loading="eager" decoding="async"
+                                    fetchpriority="high" class="w-full h-auto max-h-[60vh] object-contain rounded-xl transition-opacity duration-200"
                                     alt="{{ $landing->name ?? $product->title }}">
                             </div>
                         @endif
+                    </div>
+
+                    @php
+                        $heroGalleries = [];
+                        if ($productImg) $heroGalleries[] = $productImg;
+                        if (isset($product) && $product->relationLoaded('galleries') ? $product->galleries : ($product->galleries ?? null)) {
+                            foreach ($product->galleries as $g) {
+                                if (!empty($g->image_url)) {
+                                    $heroGalleries[] = $g->image_url;
+                                }
+                            }
+                        }
+                        if (isset($product) && $product->type === 'variation' && $product->variations) {
+                            foreach ($product->variations as $v) {
+                                if (!empty($v->image_url)) {
+                                    $heroGalleries[] = $v->image_url;
+                                }
+                                if ($v->relationLoaded('galleries') ? $v->galleries : ($v->galleries ?? null)) {
+                                    foreach ($v->galleries as $vg) {
+                                        if (!empty($vg->image_url)) {
+                                            $heroGalleries[] = $vg->image_url;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $displayGalleries = $heroGalleries;
+                        if (count($heroGalleries) > 1) {
+                            while (count($displayGalleries) < 12) {
+                                $displayGalleries = array_merge($displayGalleries, $heroGalleries);
+                            }
+                        }
+                    @endphp
+
+                    @if(count($heroGalleries) > 1)
+                        <div class="relative mt-4 mx-auto px-2">
+                            {{-- Left Arrow --}}
+                            <button type="button" aria-label="Scroll product images left"
+                                class="l1-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#35B11E] text-white shadow-lg items-center justify-center hover:bg-[#2e8c03] transition-all cursor-pointer">
+                                <i class="fa-solid fa-chevron-left text-sm"></i>
+                            </button>
+
+                            {{-- Swiper Container (Pure 1-direction infinite loop) --}}
+                            <div class="swiper landing1-gallery-swiper w-full">
+                                <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 2 ? '!justify-center' : '' }} {{ count($heroGalleries) <= 5 ? 'md:!justify-center' : 'md:!justify-start' }}">
+                                    @foreach ($displayGalleries as $index => $imgUrl)
+                                        <div class="swiper-slide !w-auto !flex-shrink-0">
+                                            <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                                data-img-src="{{ $imgUrl }}"
+                                                class="landing1-thumb-btn h-20 w-20 md:h-30 md:w-30 shrink-0 rounded-xl overflow-hidden border-2 border-transparent hover:border-[#35B11E]/70 transition-all p-1 bg-white cursor-pointer block">
+                                                <img src="{{ $imgUrl }}" alt="{{ $product->title ?? 'Product' }} image {{ $index + 1 }}"
+                                                    class="w-full h-full object-contain rounded-lg pointer-events-none">
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Right Arrow --}}
+                            <button type="button" aria-label="Scroll product images right"
+                                class="l1-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#35B11E] text-white shadow-lg items-center justify-center hover:bg-[#2e8c03] transition-all cursor-pointer">
+                                <i class="fa-solid fa-chevron-right text-sm"></i>
+                            </button>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const galWrap = document.querySelector('.landing1-gallery-swiper');
+                                if (galWrap) {
+                                    galWrap.addEventListener('click', function (e) {
+                                        const btn = e.target.closest('.landing1-thumb-btn');
+                                        if (!btn) return;
+                                        const src = btn.getAttribute('data-img-src');
+                                        const mainImg = document.getElementById('landing1-main-img');
+                                        if (mainImg && src) {
+                                            mainImg.style.opacity = '0.3';
+                                            setTimeout(() => {
+                                                mainImg.src = src;
+                                                mainImg.style.opacity = '1';
+                                            }, 150);
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                    @endif
                     </div>
                 </div>
             </div>
@@ -735,45 +822,73 @@
         (function () {
             function startSwiper() {
                 const el = document.querySelector('.rv-swiper');
-                if (!el) return;
+                const galSwiperEl = document.querySelector('.landing1-gallery-swiper');
 
                 const runInit = function (SwiperClass) {
-                    if (!SwiperClass || !el) return;
-                    if (el.swiper) {
-                        el.swiper.destroy(true, true);
+                    if (!SwiperClass) return;
+
+                    // Hero Product Gallery Swiper (Continuous 1-direction infinite loop)
+                    if (galSwiperEl && !galSwiperEl.swiper) {
+                        new SwiperClass(galSwiperEl, {
+                            slidesPerView: 'auto',
+                            spaceBetween: 12,
+                            loop: true,
+                            loopPreventsSliding: false,
+                            grabCursor: true,
+                            observer: true,
+                            observeParents: true,
+                            preventClicks: false,
+                            preventClicksPropagation: false,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: false,
+                            },
+                            navigation: {
+                                nextEl: '.l1-gal-next',
+                                prevEl: '.l1-gal-prev',
+                            },
+                        });
                     }
 
-                    const totalSlides = el.querySelectorAll('.swiper-slide').length;
-                    const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
-
-                    new SwiperClass(el, {
-                        slidesPerView: 1,
-                        spaceBetween: 20,
-                        loop: totalSlides >= 2,
-                        autoplay: {
-                            delay: 2500,
-                            disableOnInteraction: false,
-                            pauseOnMouseEnter: true,
-                        },
-                        pagination: {
-                            el: paginationEl,
-                            clickable: true,
-                        },
-                        navigation: {
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev',
-                        },
-                        breakpoints: {
-                            640: {
-                                slidesPerView: Math.min(2, totalSlides),
-                                spaceBetween: 20,
-                            },
-                            1024: {
-                                slidesPerView: Math.min(3, totalSlides),
-                                spaceBetween: 30,
-                            }
+                    // Reviews Swiper
+                    if (el) {
+                        if (el.swiper) {
+                            el.swiper.destroy(true, true);
                         }
-                    });
+
+                        const totalSlides = el.querySelectorAll('.swiper-slide').length;
+                        const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
+
+                        new SwiperClass(el, {
+                            slidesPerView: 1,
+                            spaceBetween: 20,
+                            loop: totalSlides >= 2,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            },
+                            pagination: {
+                                el: paginationEl,
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            breakpoints: {
+                                640: {
+                                    slidesPerView: Math.min(2, totalSlides),
+                                    spaceBetween: 20,
+                                },
+                                1024: {
+                                    slidesPerView: Math.min(3, totalSlides),
+                                    spaceBetween: 30,
+                                }
+                            }
+                        });
+                    }
                 };
 
                 if (window.Swiper) {
