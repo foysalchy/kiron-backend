@@ -129,53 +129,30 @@
 
                         <!-- ③ ALL FILTERS PANEL (Initially Hidden) -->
                         <div id="all-filters-panel"
-                            class="{{ request()->has('brand') || request()->has('attributes') ? '' : 'hidden' }}">
+                            class="{{ request()->has('filter_values') ? '' : 'hidden' }}">
 
-                            <!-- Brand List -->
-                            <div class="px-4 pt-2 pb-3 border-b border-gray-50">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Brands</h3>
-                                <div class="flex flex-col gap-0 text-gray-800 font-medium">
-                                    @foreach ($brands as $brand)
-                                        @php $isSelectedBrand = in_array($brand->id, (array)request('brand')); @endphp
-                                        <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                            <span
-                                                class="text-sm group-hover:text-[var(--primary-color)] {{ $isSelectedBrand ? 'text-[var(--primary-color)]' : '' }}">
-                                                {{ $brand->name }}
-                                            </span>
-                                            <div class="relative flex items-center">
-                                                <input type="checkbox" name="brand[]" value="{{ $brand->id }}"
-                                                    onchange="this.form.submit()" {{ $isSelectedBrand ? 'checked' : '' }}
-                                                    class="absolute opacity-0 w-4 h-4 cursor-pointer z-10">
-                                                <div
-                                                    class="w-4 h-4 border {{ $isSelectedBrand ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/10' : 'border-gray-300' }} rounded-full group-hover:border-[var(--primary-color)] shrink-0 flex items-center justify-center">
-                                                    @if ($isSelectedBrand)
-                                                        <div class="w-1.5 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
-                                                    @endif
-                                                </div>
+                            <!-- Dynamic Product Filters (RAM, ROM, Material, etc.) -->
+                            @if(isset($filters) && $filters->isNotEmpty())
+                                @foreach ($filters as $filter)
+                                    @if($filter->values->isNotEmpty())
+                                        <div class="px-4 pt-3 pb-3 border-b border-gray-50">
+                                            <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By {{ $filter->name }}</h3>
+                                            <div class="flex flex-col gap-2 text-gray-800 font-medium">
+                                                @foreach ($filter->values as $value)
+                                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                                        <input type="checkbox" name="filter_values[]"
+                                                            value="{{ $value->id }}" onchange="this.form.submit()"
+                                                            {{ in_array($value->id, (array)request('filter_values', [])) ? 'checked' : '' }}
+                                                            class="w-3.5 h-3.5 accent-[var(--primary-color)]">
+                                                        <span
+                                                            class="text-sm group-hover:text-[var(--primary-color)]">{{ $value->name }}</span>
+                                                    </label>
+                                                @endforeach
                                             </div>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Attributes (Color, Size, Style) -->
-                            @foreach ($attributeGroups as $group)
-                                <div class="px-4 pt-3 pb-3 border-b border-gray-50">
-                                    <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By {{ $group->name }}</h3>
-                                    <div class="flex flex-col gap-2 text-gray-800 font-medium">
-                                        @foreach ($group->values as $value)
-                                            <label class="flex items-center gap-2 cursor-pointer group">
-                                                <input type="checkbox" name="attributes[{{ $group->id }}][]"
-                                                    value="{{ $value->id }}" onchange="this.form.submit()"
-                                                    {{ isset(request('attributes')[$group->id]) && in_array($value->id, request('attributes')[$group->id]) ? 'checked' : '' }}
-                                                    class="w-3.5 h-3.5 accent-[var(--primary-color)]">
-                                                <span
-                                                    class="text-sm group-hover:text-[var(--primary-color)]">{{ $value->name }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @endif
 
                             <!-- Clear Button -->
                             <div class="p-4">

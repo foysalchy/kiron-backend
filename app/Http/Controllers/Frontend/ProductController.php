@@ -8,6 +8,8 @@ use App\Models\AttributeGroup;
 use App\Models\Brand;
 use App\Models\ContentSetting;
 use App\Models\ExtraCategory;
+use App\Models\Filter;
+use App\Models\FilterValue;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\Product;
@@ -105,61 +107,13 @@ class ProductController extends FrontendController
 
         $template = $this->template ?? 'template1';
 
-        $requirements = [
-            'template1' => ['brands', 'attributeGroups'],
-            'template2' => ['brands', 'attributeGroups'],
-            'template3' => ['brands', 'attributeGroups'],
-            'template4' => ['brands', 'attributeGroups'],
-            'template5' => ['categories', 'attributeGroups'],
-        ];
-
-        $reqs = $requirements[$template] ?? $requirements['template1'];
-
-        $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-
         $brands = collect();
-        if (in_array('brands', $reqs)) {
-            $brands = \Illuminate\Support\Facades\Cache::remember("shop_brands_{$companyId}", $ttl, function () use ($companyId) {
-                return Brand::where('company_id', $companyId)->where('status', Status::Active->value)->select('id', 'name', 'slug')->get();
-            });
-        }
-
         $categories = collect();
-        if (in_array('categories', $reqs)) {
-            $categories = \Illuminate\Support\Facades\Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
-                $cats = MegaCategory::where('company_id', $companyId)
-                    ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
-
-                $cats->map(function ($cat) use ($companyId) {
-                    $cat->product_count = \App\Models\Product::where('status', 1)
-                        ->where('company_id', $companyId)
-                        ->where(function ($q) use ($cat) {
-                            $q->whereJsonContains('mega_category_ids', (int) $cat->id)
-                                ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
-                        })
-                        ->count();
-                    return $cat;
-                });
-
-                return $cats;
-            });
-        }
-
         $attributeGroups = collect();
-        if (in_array('attributeGroups', $reqs)) {
-            $attributeGroups = \Illuminate\Support\Facades\Cache::remember("shop_attributes_{$companyId}", $ttl, function () use ($companyId) {
-                return AttributeGroup::where('company_id', $companyId)
-                    ->whereIn('name', ['Size', 'Color', 'Style'])
-                    ->with('values')
-                    ->where('status', Status::Active->value)
-                    ->get()
-                    ->unique('name');
-            });
-        }
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'maxPriceLimit', 'breadcrumb'))->with([
+        $filters = $this->getShopFilters();
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'filters', 'maxPriceLimit', 'breadcrumb'))->with([
             'category'    => null,
             'allProducts' => $products
         ]);
@@ -225,9 +179,11 @@ class ProductController extends FrontendController
         $breadcrumb = [];
         $category = MegaCategory::where('slug', $slug)->first();
         $column = 'mega_category_ids';
+        $megaCategoryId = null;
 
         if ($category) {
             $column = 'mega_category_ids';
+            $megaCategoryId = $category->id;
             $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
         }
 
@@ -235,6 +191,7 @@ class ProductController extends FrontendController
             $category = SubCategory::with('megaCategory')->where('slug', $slug)->first();
             if ($category) {
                 $column = 'sub_category_ids';
+                $megaCategoryId = $category->mega_category_id;
                 if ($category->megaCategory) {
                     $breadcrumb[] = ['name' => $category->megaCategory->name, 'slug' => $category->megaCategory->slug];
                 }
@@ -248,6 +205,7 @@ class ProductController extends FrontendController
                 $column = 'mini_category_ids';
                 $sub = $category->subCategory;
                 $mega = $sub?->megaCategory;
+                $megaCategoryId = $mega?->id;
                 if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
                 if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
                 $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
@@ -261,6 +219,7 @@ class ProductController extends FrontendController
                 $mini = $category->miniCategory;
                 $sub = $mini?->subCategory;
                 $mega = $sub?->megaCategory;
+                $megaCategoryId = $mega?->id;
                 if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
                 if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
                 if ($mini) $breadcrumb[] = ['name' => $mini->name, 'slug' => $mini->slug];
@@ -289,61 +248,13 @@ class ProductController extends FrontendController
 
         $template = $this->template ?? 'template1';
 
-        $requirements = [
-            'template1' => ['brands', 'attributeGroups'],
-            'template2' => ['brands', 'attributeGroups'],
-            'template3' => ['brands', 'attributeGroups'],
-            'template4' => ['brands', 'attributeGroups'],
-            'template5' => ['categories', 'attributeGroups'],
-        ];
-
-        $reqs = $requirements[$template] ?? $requirements['template1'];
-
-        $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-
         $brands = collect();
-        if (in_array('brands', $reqs)) {
-            $brands = \Illuminate\Support\Facades\Cache::remember("shop_brands_{$companyId}", $ttl, function () use ($companyId) {
-                return Brand::where('company_id', $companyId)->where('status', Status::Active->value)->select('id', 'name', 'slug')->get();
-            });
-        }
-
         $categories = collect();
-        if (in_array('categories', $reqs)) {
-            $categories = \Illuminate\Support\Facades\Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
-                $cats = MegaCategory::where('company_id', $companyId)
-                    ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
-
-                $cats->map(function ($cat) use ($companyId) {
-                    $cat->product_count = \App\Models\Product::where('status', 1)
-                        ->where('company_id', $companyId)
-                        ->where(function ($q) use ($cat) {
-                            $q->whereJsonContains('mega_category_ids', (int) $cat->id)
-                                ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
-                        })
-                        ->count();
-                    return $cat;
-                });
-
-                return $cats;
-            });
-        }
-
         $attributeGroups = collect();
-        if (in_array('attributeGroups', $reqs)) {
-            $attributeGroups = \Illuminate\Support\Facades\Cache::remember("shop_attributes_{$companyId}", $ttl, function () use ($companyId) {
-                return AttributeGroup::where('company_id', $companyId)
-                    ->whereIn('name', ['Size', 'Color', 'Style'])
-                    ->with('values')
-                    ->where('status', Status::Active->value)
-                    ->get()
-                    ->unique('name');
-            });
-        }
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
+        $filters = $this->getShopFilters($megaCategoryId);
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'filters', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
             'allProducts' => $products
         ]);
     }
@@ -355,6 +266,34 @@ class ProductController extends FrontendController
         $maxVarPrice = ProductVariation::max('regular_price');
 
         return max((float)$maxProductPrice, (float)$maxVarPrice) ?: 1000;
+    }
+
+    private function getShopFilters($megaCategoryId = null)
+    {
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+
+        $allFilters = \Illuminate\Support\Facades\Cache::remember("shop_filters_{$companyId}", $ttl, function () use ($companyId) {
+            return Filter::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->with(['values' => function ($q) {
+                    $q->where('status', Status::Active->value);
+                }])
+                ->get();
+        });
+
+        if (!$megaCategoryId) {
+            return $allFilters;
+        }
+
+        // মেগা ক্যাটাগরি আইডি দিয়ে ফিল্টার
+        return $allFilters->filter(function ($filter) use ($megaCategoryId) {
+            $megaIds = (array) ($filter->mega_category_ids ?? []);
+            if (empty($megaIds)) {
+                return true; // যে ফিল্টারে কোনো মেগা ক্যাটাগরি সেট নেই, তা সবার জন্য উন্মুক্ত
+            }
+            return in_array((int) $megaCategoryId, array_map('intval', $megaIds));
+        })->values();
     }
 
     // Variation Price Support
@@ -407,7 +346,28 @@ class ProductController extends FrontendController
             });
         }
 
-        // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
+        // ৪. ডায়নামিক প্রোডাক্ট ফিল্টার (RAM, ROM, Material ইত্যাদি)
+        // একই ফিল্টারের ভ্যালুগুলোর মধ্যে OR, আলাদা ফিল্টারের মধ্যে AND
+        if ($request->filled('filter_values')) {
+            $selectedValIds = array_filter((array) $request->filter_values);
+            if (!empty($selectedValIds)) {
+                $groupedValues = FilterValue::whereIn('id', $selectedValIds)
+                    ->get(['id', 'filter_id'])
+                    ->groupBy('filter_id');
+
+                foreach ($groupedValues as $filterId => $values) {
+                    $valIds = $values->pluck('id')->all();
+                    $query->where(function ($q) use ($valIds) {
+                        foreach ($valIds as $vId) {
+                            $q->orWhereJsonContains('filter_value_ids', (int) $vId)
+                              ->orWhereJsonContains('filter_value_ids', (string) $vId);
+                        }
+                    });
+                }
+            }
+        }
+
+        // ৫. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি - ব্যাকওয়ার্ড কম্প্যাটিবিলিটির জন্য)
         if ($request->filled('attributes')) {
             foreach ($request->attributes as $groupId => $ids) {
                 $ids = array_filter((array)$ids);
@@ -628,64 +588,15 @@ class ProductController extends FrontendController
 
         $template = $this->template ?? 'template1';
 
-        $requirements = [
-            'template1' => ['brands', 'attributeGroups'],
-            'template2' => ['brands', 'attributeGroups'],
-            'template3' => ['brands', 'attributeGroups'],
-            'template4' => ['brands', 'attributeGroups'],
-            'template5' => ['categories', 'attributeGroups'],
-        ];
-
-        $reqs = $requirements[$template] ?? $requirements['template1'];
-
-        $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-
         $brands = collect();
-        if (in_array('brands', $reqs)) {
-            $brands = \Illuminate\Support\Facades\Cache::remember("shop_brands_{$companyId}", $ttl, function () use ($companyId) {
-                return Brand::where('company_id', $companyId)->where('status', Status::Active->value)->select('id', 'name', 'slug')->get();
-            });
-        }
-
         $categories = collect();
-        if (in_array('categories', $reqs)) {
-            $categories = \Illuminate\Support\Facades\Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
-                $cats = MegaCategory::where('company_id', $companyId)
-                    ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
-
-                $cats->map(function ($cat) use ($companyId) {
-                    $cat->product_count = \App\Models\Product::where('status', 1)
-                        ->where('company_id', $companyId)
-                        ->where(function ($q) use ($cat) {
-                            $q->whereJsonContains('mega_category_ids', (int) $cat->id)
-                                ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
-                        })
-                        ->count();
-                    return $cat;
-                });
-
-                return $cats;
-            });
-        }
-
         $attributeGroups = collect();
-        if (in_array('attributeGroups', $reqs)) {
-            $attributeGroups = \Illuminate\Support\Facades\Cache::remember("shop_attributes_{$companyId}", $ttl, function () use ($companyId) {
-                return AttributeGroup::where('company_id', $companyId)
-                    ->whereIn('name', ['Size', 'Color', 'Style'])
-                    ->with('values')
-                    ->where('status', Status::Active->value)
-                    ->get()
-                    ->unique('name');
-            });
-        }
 
         // Pass a virtual category object for the title
         $category = (object) ['name' => 'Flash Sale Items'];
+        $filters = $this->getShopFilters();
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'));
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'filters', 'category', 'maxPriceLimit'));
     }
 
 
@@ -708,63 +619,14 @@ class ProductController extends FrontendController
 
         $template = $this->template ?? 'template1';
 
-        $requirements = [
-            'template1' => ['brands', 'attributeGroups'],
-            'template2' => ['brands', 'attributeGroups'],
-            'template3' => ['brands', 'attributeGroups'],
-            'template4' => ['brands', 'attributeGroups'],
-            'template5' => ['categories', 'attributeGroups'],
-        ];
-
-        $reqs = $requirements[$template] ?? $requirements['template1'];
-
-        $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-
         $brands = collect();
-        if (in_array('brands', $reqs)) {
-            $brands = \Illuminate\Support\Facades\Cache::remember("shop_brands_{$companyId}", $ttl, function () use ($companyId) {
-                return Brand::where('company_id', $companyId)->where('status', Status::Active->value)->select('id', 'name', 'slug')->get();
-            });
-        }
-
         $categories = collect();
-        if (in_array('categories', $reqs)) {
-            $categories = \Illuminate\Support\Facades\Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
-                $cats = MegaCategory::where('company_id', $companyId)
-                    ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
-
-                $cats->map(function ($cat) use ($companyId) {
-                    $cat->product_count = \App\Models\Product::where('status', 1)
-                        ->where('company_id', $companyId)
-                        ->where(function ($q) use ($cat) {
-                            $q->whereJsonContains('mega_category_ids', (int) $cat->id)
-                                ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
-                        })
-                        ->count();
-                    return $cat;
-                });
-
-                return $cats;
-            });
-        }
-
         $attributeGroups = collect();
-        if (in_array('attributeGroups', $reqs)) {
-            $attributeGroups = \Illuminate\Support\Facades\Cache::remember("shop_attributes_{$companyId}", $ttl, function () use ($companyId) {
-                return AttributeGroup::where('company_id', $companyId)
-                    ->whereIn('name', ['Size', 'Color', 'Style'])
-                    ->with('values')
-                    ->where('status', Status::Active->value)
-                    ->get()
-                    ->unique('name');
-            });
-        }
 
         $category = $brand;
+        $filters = $this->getShopFilters();
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'filters', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }
@@ -840,61 +702,22 @@ class ProductController extends FrontendController
 
         $template = $this->template ?? 'template1';
 
-        $requirements = [
-            'template1' => ['brands', 'attributeGroups'],
-            'template2' => ['brands', 'attributeGroups'],
-            'template3' => ['brands', 'attributeGroups'],
-            'template4' => ['brands', 'attributeGroups'],
-            'template5' => ['categories', 'attributeGroups'],
-        ];
-
-        $reqs = $requirements[$template] ?? $requirements['template1'];
-
-        $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-
         $brands = collect();
-        if (in_array('brands', $reqs)) {
-            $brands = \Illuminate\Support\Facades\Cache::remember("shop_brands_{$companyId}", $ttl, function () use ($companyId) {
-                return Brand::where('company_id', $companyId)->where('status', Status::Active->value)->select('id', 'name', 'slug')->get();
-            });
-        }
-
         $categories = collect();
-        if (in_array('categories', $reqs)) {
-            $categories = \Illuminate\Support\Facades\Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
-                $cats = MegaCategory::where('company_id', $companyId)
-                    ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
-
-                $cats->map(function ($cat) use ($companyId) {
-                    $cat->product_count = \App\Models\Product::where('status', 1)
-                        ->where('company_id', $companyId)
-                        ->where(function ($q) use ($cat) {
-                            $q->whereJsonContains('mega_category_ids', (int) $cat->id)
-                                ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
-                        })
-                        ->count();
-                    return $cat;
-                });
-
-                return $cats;
-            });
-        }
-
         $attributeGroups = collect();
-        if (in_array('attributeGroups', $reqs)) {
-            $attributeGroups = \Illuminate\Support\Facades\Cache::remember("shop_attributes_{$companyId}", $ttl, function () use ($companyId) {
-                return AttributeGroup::where('company_id', $companyId)
-                    ->whereIn('name', ['Size', 'Color', 'Style'])
-                    ->with('values')
-                    ->where('status', Status::Active->value)
-                    ->get()
-                    ->unique('name');
-            });
+
+        $megaCategoryId = null;
+        if ($category instanceof MegaCategory) {
+            $megaCategoryId = $category->id;
+        } elseif ($category instanceof SubCategory) {
+            $megaCategoryId = $category->mega_category_id;
+        } elseif ($category instanceof MiniCategory) {
+            $megaCategoryId = $category->subCategory?->mega_category_id;
         }
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+        $filters = $this->getShopFilters($megaCategoryId);
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'filters', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }
