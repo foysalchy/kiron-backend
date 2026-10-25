@@ -92,6 +92,14 @@
                 <!-- RIGHT COLUMN (Info) -->
                 <div class="lg:col-span-5 flex flex-col gap-y-4 md:gap-y-6">
                     <div>
+                        @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
+
+                        @if ($isUpcoming)
+                            <span class="inline-block bg-blue-600 text-white text-sm md:text-base font-bold px-3 py-1 rounded-full mb-3">
+                                {{ \App\Enums\Status::Upcoming->label() }}
+                            </span>
+                        @endif
+
                         <h1 class="text-xl md:text-2xl lg:text-3xl font-normal text-gray-900 leading-tight">
                             {{ $product->title }}
                         </h1>
@@ -170,11 +178,11 @@
 
                             <div class="flex-1 flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
                                 <!-- Add to Cart Button -->
-                                <button onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart()" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                                 <!-- Buy Now Button -->
-                                <button onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart(true)" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
@@ -641,6 +649,9 @@
         }
 
         function handleAddToCart(isOrderNow = false) {
+            if (@json($isUpcoming)) {
+                return;
+            }
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const qty = document.getElementById('main-qty').value;
             let items = [];

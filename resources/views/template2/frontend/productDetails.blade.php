@@ -70,6 +70,14 @@
 
                 <!-- Right: Product Purchase Details -->
                 <div class="lg:p-6 md:p-8 px-0 py-4">
+                    @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
+
+                    @if ($isUpcoming)
+                        <span class="inline-block bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full mb-4">
+                            {{ \App\Enums\Status::Upcoming->label() }}
+                        </span>
+                    @endif
+
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
                         <span id="discount-badge"
                             class="inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
@@ -174,11 +182,11 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- 1. Add To Cart -->
-                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
                             class="order-2 md:order-1 col-span-1 md:col-span-1 flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                         <!-- 2. Order Now Button -->
-                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
                             class="order-1 md:order-2 col-span-2 md:col-span-1 flex-1 secondary-bg hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
 
                         <!--  Wishlist -->
@@ -819,6 +827,9 @@
         }
 
         function handleAddToCart(isOrderNow = false) {
+            if (@json($isUpcoming)) {
+                return;
+            }
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const qty = document.getElementById('main-qty').value;
             let items = [];

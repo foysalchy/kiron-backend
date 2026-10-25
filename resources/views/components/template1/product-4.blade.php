@@ -21,6 +21,7 @@
             $discountLabel = $percentage . '%';
         }
     }
+    $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
     $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 @endphp
 
@@ -29,14 +30,22 @@
 
     <!-- image section -->
     <div class="relative overflow-hidden aspect-square bg-[#f9f9f9]">
-        <!-- Discount Badge -->
-        <!-- Discount Badge (Top Left) -->
-        @if ($discountLabel)
-            <div
-                class="absolute top-3 left-3 z-20 bg-[#be123c] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                -{{ $discountLabel }}
-            </div>
-        @endif
+        <!-- Badges (Top Left) -->
+        <div class="absolute top-3 left-3 z-20 flex flex-col gap-1 items-start">
+            @if ($discountLabel)
+                <div
+                    class="bg-[#be123c] text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                    -{{ $discountLabel }}
+                </div>
+            @endif
+
+            @if ($product->status == \App\Enums\Status::Upcoming->value)
+                <div
+                    class="bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                    {{ \App\Enums\Status::Upcoming->label() }}
+                </div>
+            @endif
+        </div>
 
         <!-- Free Delivery Badge (Bottom Left) -->
         @if ($product->is_free_delivery)
@@ -116,10 +125,10 @@
         </div>
 
         <!-- action button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
+        <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             aria-label="cart button" class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-2 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
-            {{ $isOutOfStock ? 'bg-gray-300' : 'bg-[#be123c] hover:bg-red-700 active:scale-95' }}">
+            {{ ($isUpcoming || $isOutOfStock) ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#be123c] hover:bg-red-700 active:scale-95' }}">
 
             @if ($isOutOfStock)
                 STOCK OUT
