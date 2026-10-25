@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('components.meta-info.ecommerce-meta.landing-meta', ['landing' => $landing, 'setup' => $setup])
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    @vite(['resources/css/app.css', 'resources/css/landing2.css'])
+    @include('components.fontawesome')
+    @vite(['resources/css/app.css', 'resources/css/landing2.css', 'resources/js/app.js'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
 
@@ -260,12 +261,98 @@
                                     </video>
                                 </div>
                             @else
-                                <img src="{{ $productImg }}" width="800" height="600" loading="eager" decoding="async"
+                                <img id="landing2-main-img" src="{{ $productImg }}" width="800" height="600" loading="eager" decoding="async"
                                     fetchpriority="high"
-                                    class="w-auto h-auto max-w-full max-h-[550px] object-contain rounded-xl shadow-sm"
+                                    class="w-auto h-auto max-w-full max-h-[550px] object-contain rounded-xl shadow-sm transition-opacity duration-200"
                                     alt="{{ $landing->name ?? $product->title }}">
                             @endif
                         </div>
+
+                        @php
+                            $heroGalleries = [];
+                            if ($productImg) $heroGalleries[] = $productImg;
+                            if (isset($product) && $product->relationLoaded('galleries') ? $product->galleries : ($product->galleries ?? null)) {
+                                foreach ($product->galleries as $g) {
+                                    if (!empty($g->image_url)) {
+                                        $heroGalleries[] = $g->image_url;
+                                    }
+                                }
+                            }
+                            if (isset($product) && $product->type === 'variation' && $product->variations) {
+                                foreach ($product->variations as $v) {
+                                    if (!empty($v->image_url)) {
+                                        $heroGalleries[] = $v->image_url;
+                                    }
+                                    if ($v->relationLoaded('galleries') ? $v->galleries : ($v->galleries ?? null)) {
+                                        foreach ($v->galleries as $vg) {
+                                            if (!empty($vg->image_url)) {
+                                                $heroGalleries[] = $vg->image_url;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            $displayGalleries = $heroGalleries;
+                            if (count($heroGalleries) > 1) {
+                                while (count($displayGalleries) < 12) {
+                                    $displayGalleries = array_merge($displayGalleries, $heroGalleries);
+                                }
+                            }
+                        @endphp
+
+                        @if(count($heroGalleries) > 1)
+                            <div class="relative max-w-3xl mx-auto px-2 mb-10">
+                                {{-- Left Arrow --}}
+                                <button type="button" aria-label="Scroll product images left"
+                                    class="l2-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
+                                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                                </button>
+
+                                {{-- Swiper Container (Pure 1-direction infinite loop) --}}
+                                <div class="swiper rv-swiper landing2-gallery-swiper w-full">
+                                    <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 2 ? '!justify-center' : '' }} {{ count($heroGalleries) <= 5 ? 'md:!justify-center' : 'md:!justify-start' }}">
+                                        @foreach ($displayGalleries as $index => $imgUrl)
+                                            <div class="swiper-slide !w-auto !flex-shrink-0">
+                                                <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                                    data-img-src="{{ $imgUrl }}"
+                                                    class="landing2-thumb-btn h-20 w-20 md:h-30 md:w-30 shrink-0 rounded-xl overflow-hidden border-2 border-transparent hover:border-[#005EFF]/70 transition-all p-1 bg-white cursor-pointer block">
+                                                    <img src="{{ $imgUrl }}" alt="{{ $product->title ?? 'Product' }} image {{ $index + 1 }}"
+                                                        class="w-full h-full object-contain rounded-lg pointer-events-none">
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- Right Arrow --}}
+                                <button type="button" aria-label="Scroll product images right"
+                                    class="l2-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
+                                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                                </button>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const galWrap = document.querySelector('.landing2-gallery-swiper');
+                                    if (galWrap) {
+                                        galWrap.addEventListener('click', function (e) {
+                                            const btn = e.target.closest('.landing2-thumb-btn');
+                                            if (!btn) return;
+                                            const src = btn.getAttribute('data-img-src');
+                                            const mainImg = document.getElementById('landing2-main-img');
+                                            if (mainImg && src) {
+                                                mainImg.style.opacity = '0.3';
+                                                setTimeout(() => {
+                                                    mainImg.src = src;
+                                                    mainImg.style.opacity = '1';
+                                                }, 150);
+                                            }
+                                        });
+                                    }
+                                });
+                            </script>
+                        @endif
 
                         {{-- Stock status --}}
                         @if(!empty($landing->extras['features']) || $isPreviewMode)
@@ -598,6 +685,59 @@
             <p>© {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        (function () {
+            function startLanding2GallerySwiper() {
+                const galSwiperEl = document.querySelector('.landing2-gallery-swiper');
+                if (!galSwiperEl) return;
+
+                const runInit = function (SwiperClass) {
+                    if (!SwiperClass || !galSwiperEl) return;
+                    if (galSwiperEl.swiper) return;
+
+                    new SwiperClass(galSwiperEl, {
+                        slidesPerView: 'auto',
+                        spaceBetween: 12,
+                        loop: true,
+                        loopPreventsSliding: false,
+                        grabCursor: true,
+                        observer: true,
+                        observeParents: true,
+                        preventClicks: false,
+                        preventClicksPropagation: false,
+                        autoplay: {
+                            delay: 2500,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: false,
+                        },
+                        navigation: {
+                            nextEl: '.l2-gal-next',
+                            prevEl: '.l2-gal-prev',
+                        },
+                    });
+                };
+
+                if (window.Swiper) {
+                    runInit(window.Swiper);
+                } else if (window.SwiperPromise) {
+                    window.SwiperPromise.then(function (SwiperClass) {
+                        if (SwiperClass) runInit(SwiperClass);
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startLanding2GallerySwiper);
+            } else {
+                startLanding2GallerySwiper();
+            }
+
+            window.addEventListener('load', startLanding2GallerySwiper);
+            setTimeout(startLanding2GallerySwiper, 500);
+            setTimeout(startLanding2GallerySwiper, 1500);
+        })();
+    </script>
 
     @if(!empty($isPreviewMode) || (isset($isPreview) && $isPreview))
         <script>

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('components.meta-info.ecommerce-meta.landing-meta', ['landing' => $landing, 'setup' => $setup])
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    @vite(['resources/css/landing3.css', 'resources/js/landing3.js'])
+    @include('components.fontawesome')
+    @vite(['resources/css/landing3.css', 'resources/js/landing3.js', 'resources/js/app.js'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
 
@@ -287,10 +288,101 @@
                 <div class="relative w-full {{ $isPreviewMode ? 'preview-badge-container' : '' }} flex justify-center">
                     @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail /
                         Video</span>@endif
-                    <img src="{{ $productImg }}" width="600" height="600" loading="eager" decoding="async"
-                        class="max-w-full sm:max-w-xl md:max-w-2xl max-h-[500px] w-auto h-auto object-contain rounded-2xl shadow-md"
+                    <img id="landing3-main-img" src="{{ $productImg }}" width="600" height="600" loading="eager" decoding="async"
+                        class="max-w-full sm:max-w-xl md:max-w-2xl max-h-[500px] w-auto h-auto object-contain rounded-2xl shadow-md transition-opacity duration-200"
                         alt="{{ $landing->name ?? $product->title }}">
                 </div>
+                @endif
+
+                @php
+                    $heroGalleries = [];
+                    if ($productImg) $heroGalleries[] = $productImg;
+                    if (isset($product) && $product->relationLoaded('galleries') ? $product->galleries : ($product->galleries ?? null)) {
+                        foreach ($product->galleries as $g) {
+                            if (!empty($g->image_url)) {
+                                $heroGalleries[] = $g->image_url;
+                            }
+                        }
+                    }
+                    if (isset($product) && $product->type === 'variation' && $product->variations) {
+                        foreach ($product->variations as $v) {
+                            if (!empty($v->image_url)) {
+                                $heroGalleries[] = $v->image_url;
+                            }
+                            if ($v->relationLoaded('galleries') ? $v->galleries : ($v->galleries ?? null)) {
+                                foreach ($v->galleries as $vg) {
+                                    if (!empty($vg->image_url)) {
+                                        $heroGalleries[] = $vg->image_url;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $displayGalleries = $heroGalleries;
+                    if (count($heroGalleries) > 1) {
+                        while (count($displayGalleries) < 12) {
+                            $displayGalleries = array_merge($displayGalleries, $heroGalleries);
+                        }
+                    }
+                @endphp
+
+                @if(count($heroGalleries) > 1)
+                    <div class="relative max-w-4xl mx-auto px-2 mt-6">
+                        {{-- Left Arrow --}}
+                        <button type="button" aria-label="Scroll product images left"
+                            class="l3-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+
+                        {{-- Swiper Container (Pure 1-direction infinite loop) --}}
+                        <div class="swiper landing3-gallery-swiper w-full">
+                            <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 2 ? '!justify-center' : '' }} {{ count($heroGalleries) <= 5 ? 'md:!justify-center' : 'md:!justify-start' }}">
+                                @foreach ($displayGalleries as $index => $imgUrl)
+                                    <div class="swiper-slide !w-auto !flex-shrink-0">
+                                        <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                            data-img-src="{{ $imgUrl }}"
+                                            onclick="selectLanding3GalleryImage(this, '{{ $imgUrl }}')"
+                                            class="landing3-thumb-btn w-20 h-20 md:w-30 md:h-30 rounded-xl overflow-hidden border-2 border-transparent hover:border-[#00D05E]/70 transition-all p-1 bg-white cursor-pointer block">
+                                            <img src="{{ $imgUrl }}" alt="{{ $product->title ?? 'Product' }} image {{ $index + 1 }}"
+                                                class="w-full h-full object-contain rounded-lg pointer-events-none">
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Right Arrow --}}
+                        <button type="button" aria-label="Scroll product images right"
+                            class="l3-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+
+                    <script>
+                        function selectLanding3GalleryImage(btn, src) {
+                            const mainImg = document.getElementById('landing3-main-img');
+                            if (mainImg && src) {
+                                mainImg.style.opacity = '0.3';
+                                setTimeout(() => {
+                                    mainImg.src = src;
+                                    mainImg.style.opacity = '1';
+                                }, 150);
+                            }
+                        }
+
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const galContainer = document.querySelector('.landing3-gallery-swiper');
+                            if (galContainer) {
+                                galContainer.addEventListener('click', function (e) {
+                                    const btn = e.target.closest('.landing3-thumb-btn');
+                                    if (!btn) return;
+                                    const src = btn.getAttribute('data-img-src');
+                                    selectLanding3GalleryImage(btn, src);
+                                });
+                            }
+                        });
+                    </script>
                 @endif
             </div>
 
@@ -714,49 +806,86 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         (function() {
             function startLanding3Swiper() {
+                const galSwiperEl = document.querySelector('.landing3-gallery-swiper');
                 const el = document.querySelector('.rv-swiper');
-                if (!el || typeof Swiper === 'undefined') return;
 
-                if (el.swiper) {
-                    el.swiper.destroy(true, true);
-                }
+                const runInit = function (SwiperClass) {
+                    if (!SwiperClass) return;
 
-                const totalSlides = el.querySelectorAll('.swiper-slide').length;
-                const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
-
-                new Swiper(el, {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    loop: totalSlides >= 2,
-                    slideToClickedSlide: true,
-                    autoplay: {
-                        delay: 2500,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true,
-                    },
-                    pagination: {
-                        el: paginationEl,
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: Math.min(2, totalSlides),
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: Math.min(3, totalSlides),
-                            spaceBetween: 30,
-                        }
+                    // Hero Product Gallery Swiper
+                    if (galSwiperEl && !galSwiperEl.swiper) {
+                        new SwiperClass(galSwiperEl, {
+                            slidesPerView: 'auto',
+                            spaceBetween: 12,
+                            loop: true,
+                            loopPreventsSliding: false,
+                            grabCursor: true,
+                            observer: true,
+                            observeParents: true,
+                            preventClicks: false,
+                            preventClicksPropagation: false,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: false,
+                            },
+                            navigation: {
+                                nextEl: '.l3-gal-next',
+                                prevEl: '.l3-gal-prev',
+                            },
+                        });
                     }
-                });
+
+                    // Reviews Swiper (Original config)
+                    if (el) {
+                        if (el.swiper) {
+                            el.swiper.destroy(true, true);
+                        }
+
+                        const totalSlides = el.querySelectorAll('.swiper-slide').length;
+                        const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
+
+                        new SwiperClass(el, {
+                            slidesPerView: 1,
+                            spaceBetween: 20,
+                            loop: totalSlides >= 2,
+                            autoplay: {
+                                delay: 2500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            },
+                            pagination: {
+                                el: paginationEl,
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            breakpoints: {
+                                640: {
+                                    slidesPerView: Math.min(2, totalSlides),
+                                    spaceBetween: 20,
+                                },
+                                1024: {
+                                    slidesPerView: Math.min(3, totalSlides),
+                                    spaceBetween: 30,
+                                }
+                            }
+                        });
+                    }
+                };
+
+                if (window.Swiper) {
+                    runInit(window.Swiper);
+                } else if (window.SwiperPromise) {
+                    window.SwiperPromise.then(function (SwiperClass) {
+                        if (SwiperClass) runInit(SwiperClass);
+                    });
+                }
             }
 
             if (document.readyState === 'loading') {
