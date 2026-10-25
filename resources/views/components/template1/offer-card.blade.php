@@ -9,6 +9,7 @@
     $avgRating = $offer->reviews_avg_rating ?? 0;
     $totalReviews = $offer->reviews_count ?? 0;
 
+    $isUpcoming = ($offer->status == \App\Enums\Status::Upcoming->value);
     $isOutOfStock = $offer->manage_stock ? ($offer->available_stock <= 0) : false;
 @endphp
 
@@ -22,15 +23,24 @@
 
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
 
-        @if ($regularPrice > $salePrice)
-            <span
-                class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-[var(--primary-color)] text-white text-[9px] sm:text-[11px] font-mono tracking-wide px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
-                @php
-                    $discountPercent = $regularPrice > 0 ? round((($regularPrice - $salePrice) / $regularPrice) * 100) : 0;
-                @endphp
-                {{ $discountPercent }}% OFF
-            </span>
-        @endif
+        <div class="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex flex-col gap-1 items-start">
+            @if ($regularPrice > $salePrice)
+                <span
+                    class="bg-[var(--primary-color)] text-white text-[9px] sm:text-[11px] font-mono tracking-wide px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                    @php
+                        $discountPercent = $regularPrice > 0 ? round((($regularPrice - $salePrice) / $regularPrice) * 100) : 0;
+                    @endphp
+                    {{ $discountPercent }}% OFF
+                </span>
+            @endif
+
+            @if ($offer->status == \App\Enums\Status::Upcoming->value)
+                <span
+                    class="bg-blue-600 text-white text-[9px] sm:text-[11px] font-semibold tracking-wide px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-sm">
+                    {{ \App\Enums\Status::Upcoming->label() }}
+                </span>
+            @endif
+        </div>
     </div>
 
     <div class="p-3 sm:p-6 flex flex-col flex-1">
@@ -72,10 +82,10 @@
             </div>
         </div>
 
-        <button type="button" {{ $isOutOfStock ? 'disabled' : '' }}
+        <button type="button" {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             onclick="event.preventDefault(); event.stopPropagation(); {{ $offer->type === 'single' ? "addSingleToCart($offer->id, true)" : "openVariationModal($offer->id, true)" }}"
-            class="block bg-[var(--primary-color)] group-hover:bg-[var(--primary-color)]/90 transition-colors text-white text-xs sm:text-sm font-medium px-3 py-2 sm:px-4 sm:py-3 rounded-full w-full mt-2 sm:mt-3 text-center {{ $isOutOfStock ? 'opacity-60 cursor-not-allowed' : '' }}">
-            {{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}
+            class="block bg-[var(--primary-color)] group-hover:bg-[var(--primary-color)]/90 transition-colors text-white text-xs sm:text-sm font-medium px-3 py-2 sm:px-4 sm:py-3 rounded-full w-full mt-2 sm:mt-3 text-center {{ ($isUpcoming || $isOutOfStock) ? 'opacity-60 cursor-not-allowed' : '' }}">
+            {{ $isUpcoming ? \App\Enums\Status::Upcoming->label() : ($isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now')) }}
         </button>
 
     </div>
