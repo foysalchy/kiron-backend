@@ -115,9 +115,10 @@ class ProductController extends Controller
         return ResponseHelper::success(null, 'Product permanently deleted');
     }
 
-    public function toggleStatus(int $id): JsonResponse
+    public function toggleStatus(Request $request, int $id): JsonResponse
     {
-        $data = $this->productService->toggleStatus($id);
+        $status = $request->input('status');
+        $data = $this->productService->toggleStatus($id, $status !== null ? (int) $status : null);
 
         return ResponseHelper::success($data, 'Product status updated successfully');
     }

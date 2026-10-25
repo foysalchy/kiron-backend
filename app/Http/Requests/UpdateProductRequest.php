@@ -50,7 +50,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
 
                 // Basic Info
-                'status' => ['nullable', Rule::in([0, 1, '0', '1'])],
+                'status' => ['nullable', Rule::in([0, 1, 39, '0', '1', '39'])],
                 'title' => ['sometimes', 'required', 'string', 'max:255'],
                 'slug' => [
                     'nullable',

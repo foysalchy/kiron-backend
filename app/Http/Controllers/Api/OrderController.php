@@ -367,11 +367,13 @@ class OrderController extends Controller
             'order_ids' => 'required|array|min:1',
             'order_ids.*' => 'integer',
             'with_suppliers' => 'nullable|boolean',
+            'with_prices' => 'nullable|boolean',
             'group_by' => 'nullable|string|in:category,order',
         ]);
 
         $orderIds = $validated['order_ids'];
         $withSuppliers = $request->boolean('with_suppliers', false);
+        $withPrices = $request->boolean('with_prices', false);
         $groupBy = $request->input('group_by', 'category');
 
         // If order-wise requested
@@ -381,6 +383,9 @@ class OrderController extends Controller
                     'customer:id,name,phone',
                     'orderDetails.product' => function ($query) {
                         $query->select('id', 'title', 'thumbnail', 'thumbnail_95');
+                    },
+                    'orderDetails.variation' => function ($query) {
+                        $query->select('id', 'product_id', 'regular_price', 'image');
                     },
                     'orderDetails.variation.attributes.attributeGroup',
                     'orderDetails.variation.attributes.attributeValue',
@@ -455,8 +460,19 @@ class OrderController extends Controller
         // Fetch order details for the given orders
         $orderDetails = \App\Models\OrderDetail::whereIn('order_id', $orderIds)
             ->with([
-                'product' => function ($query) {
-                    $query->select('id', 'title', 'thumbnail', 'thumbnail_95', 'mega_category_ids');
+                'product' => function ($query) use ($withPrices) {
+                    $cols = ['id', 'title', 'thumbnail', 'thumbnail_95', 'mega_category_ids'];
+                    if ($withPrices) {
+                        $cols[] = 'purchase_price';
+                    }
+                    $query->select($cols);
+                },
+                'variation' => function ($query) use ($withPrices) {
+                    $cols = ['id', 'product_id', 'regular_price', 'image'];
+                    if ($withPrices) {
+                        $cols[] = 'purchase_price';
+                    }
+                    $query->select($cols);
                 },
                 'variation.attributes.attributeGroup',
                 'variation.attributes.attributeValue',
@@ -465,6 +481,50 @@ class OrderController extends Controller
 
         if ($orderDetails->isEmpty()) {
             return ResponseHelper::success(['categories' => []], 'No products found for selected orders.');
+        }
+
+        // Pre-fetch latest purchase_details.purchase_price ONLY when with_prices is true
+        $latestPurchasePrices = [];
+        if ($withPrices) {
+            $orderProductIds = [];
+            foreach ($orderDetails as $detail) {
+                if ($detail->product_id) {
+                    $orderProductIds[$detail->product_id] = $detail->product_id;
+                }
+            }
+
+            if (!empty($orderProductIds)) {
+                $purchaseDetailQuery = \App\Models\PurchaseDetail::whereIn('purchase_details.product_id', array_values($orderProductIds))
+                    ->join('purchases', 'purchases.id', '=', 'purchase_details.purchase_id')
+                    ->whereNull('purchases.deleted_at')
+                    ->where('purchases.status', \App\Enums\Status::Completed->value)
+                    ->whereNotNull('purchase_details.purchase_price')
+                    ->where('purchase_details.purchase_price', '>', 0)
+                    ->select(
+                        'purchase_details.product_id',
+                        'purchase_details.variation_id',
+                        'purchase_details.purchase_price',
+                        'purchases.purchase_date',
+                        'purchases.id as purchase_id'
+                    )
+                    ->orderBy('purchases.purchase_date', 'desc')
+                    ->orderBy('purchases.id', 'desc')
+                    ->get();
+
+                foreach ($purchaseDetailQuery as $pd) {
+                    $pId = $pd->product_id;
+                    $vId = $pd->variation_id ?: 0;
+                    $pKey = "{$pId}_{$vId}";
+
+                    if (!isset($latestPurchasePrices[$pKey])) {
+                        $latestPurchasePrices[$pKey] = (float) $pd->purchase_price;
+                    }
+                    $productKey = "{$pId}_0";
+                    if (!isset($latestPurchasePrices[$productKey])) {
+                        $latestPurchasePrices[$productKey] = (float) $pd->purchase_price;
+                    }
+                }
+            }
         }
 
         // Aggregate by product and variation: key = productId_variationId
@@ -506,7 +566,7 @@ class OrderController extends Controller
                     $thumbnail = $product->thumbnail_95_url ?: ($product->thumbnail_url ?: null);
                 }
 
-                $aggregatedItems[$key] = [
+                $itemData = [
                     'product_id' => $productId,
                     'variation_id' => $detail->variation_id,
                     'title' => $product->title . $variationTitle,
@@ -515,6 +575,28 @@ class OrderController extends Controller
                     'mega_category_ids' => $product->mega_category_ids ?? [],
                     'suppliers' => [],
                 ];
+
+                if ($withPrices) {
+                    // 1st: purchase_details.purchase_price
+                    // 2nd: product_variations.purchase_price
+                    // 3rd: products.purchase_price
+                    // fallback: 0
+                    $purchasePrice = 0.0;
+                    if (isset($latestPurchasePrices[$key])) {
+                        $purchasePrice = $latestPurchasePrices[$key];
+                    } elseif ($variationId && isset($latestPurchasePrices["{$productId}_0"])) {
+                        $purchasePrice = $latestPurchasePrices["{$productId}_0"];
+                    } elseif ($detail->variation?->purchase_price !== null && $detail->variation?->purchase_price !== '' && (float) $detail->variation->purchase_price > 0) {
+                        $purchasePrice = (float) $detail->variation->purchase_price;
+                    } elseif ($product->purchase_price !== null && $product->purchase_price !== '' && (float) $product->purchase_price > 0) {
+                        $purchasePrice = (float) $product->purchase_price;
+                    }
+
+                    $itemData['purchase_price'] = $purchasePrice;
+                    $itemData['sale_price'] = (float) $detail->unit_price;
+                }
+
+                $aggregatedItems[$key] = $itemData;
             }
 
             $aggregatedItems[$key]['quantity'] += (int) $detail->quantity;
