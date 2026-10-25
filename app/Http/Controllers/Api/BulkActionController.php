@@ -23,6 +23,7 @@ class BulkActionController extends Controller
         'extra-categories' => \App\Models\ExtraCategory::class,
         'attribute-values' => \App\Models\AttributeValue::class,
         'attribute-groups' => \App\Models\AttributeGroup::class,
+        'filters'          => \App\Models\Filter::class,
         'warehouses'       => \App\Models\Warehouse::class,
         'areas'            => \App\Models\Area::class,
         'cells'            => \App\Models\Cell::class,

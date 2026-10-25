@@ -66,6 +66,10 @@ class StoreProductRequest extends BaseCompanyRequest
                 'mini_category_ids.*'  => ['exists:mini_categories,id'],
                 'extra_category_ids'   => ['nullable', 'array'],
                 'extra_category_ids.*' => ['exists:extra_categories,id'],
+                'filter_attribute_group_ids'   => ['nullable', 'array'],
+                'filter_attribute_group_ids.*' => ['integer'],
+                'filter_value_ids'   => ['nullable', 'array'],
+                'filter_value_ids.*' => ['integer'],
 
                 // Product Type
                 'type'     => ['required', Rule::in(['single', 'variation'])],

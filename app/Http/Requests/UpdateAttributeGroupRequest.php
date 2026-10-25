@@ -21,6 +21,11 @@ class UpdateAttributeGroupRequest extends BaseCompanyRequest
             [
                 'name' => ['sometimes', 'string', 'max:255'],
                 'category' => ['sometimes', 'string', Rule::in(['Single', 'Multiple'])],
+                'mega_category_ids' => ['nullable', 'array'],
+                'mega_category_ids.*' => ['integer'],
+                'is_filterable' => ['nullable', 'boolean'],
+                'values' => ['nullable', 'array'],
+                'values.*' => ['nullable', 'string', 'max:255'],
                 'status' => ['integer'],
             ]
         );

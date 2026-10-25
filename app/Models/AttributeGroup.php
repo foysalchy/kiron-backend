@@ -19,7 +19,14 @@ class AttributeGroup extends Model
         'company_id',
         'name',
         'category',
+        'mega_category_ids',
+        'is_filterable',
         'status',
+    ];
+
+    protected $casts = [
+        'mega_category_ids' => 'array',
+        'is_filterable' => 'boolean',
     ];
 
   public static function homepageCacheKeys(): array
