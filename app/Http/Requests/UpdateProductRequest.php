@@ -14,6 +14,28 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $keys = ['mega_category_ids', 'sub_category_ids', 'mini_category_ids', 'extra_category_ids'];
+        $merge = [];
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                $val = $this->input($key);
+                if ($val === null || $val === '' || $val === '[]') {
+                    $merge[$key] = [];
+                } elseif (is_string($val)) {
+                    $decoded = json_decode($val, true);
+                    if (is_array($decoded)) {
+                        $merge[$key] = $decoded;
+                    }
+                }
+            }
+        }
+        if (!empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
     public function rules(): array
     {
         $companyId = $this->input('company_id') ?? $this->user()->company_id;
@@ -28,6 +50,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
 
                 // Basic Info
+                'status' => ['nullable', Rule::in([0, 1, '0', '1'])],
                 'title' => ['sometimes', 'required', 'string', 'max:255'],
                 'slug' => [
                     'nullable',
