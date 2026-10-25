@@ -29,6 +29,7 @@
     $totalReviews = $product->reviews_count ?? 0;
 
     // 4. Stock check
+    $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
     $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 @endphp
 
@@ -62,6 +63,13 @@
                 class="absolute top-1 right-1 secondary-bg text-white w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
                 <span class="text-xs font-bold leading-none">{{ $discountLabel }}</span>
                 <span class="text-xs font-bold leading-none mt-0.5 uppercase">Off</span>
+            </div>
+        @endif
+
+        @if ($product->status == \App\Enums\Status::Upcoming->value)
+            <div
+                class="absolute {{ $discountLabel ? 'top-14' : 'top-2' }} right-2 bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm z-10 leading-tight">
+                {{ \App\Enums\Status::Upcoming->label() }}
             </div>
         @endif
         @if ($product->is_free_delivery)
@@ -116,10 +124,10 @@
 
     <div class="flex items-center gap-2 mt-auto">
         <!-- Order Now Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
+        <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
             class="flex-grow py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
-    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'primary-bg text-primary primary-bg-hover' }}">
+    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'primary-bg text-primary primary-bg-hover disabled:opacity-50 disabled:cursor-not-allowed' }}">
 
             @if ($isOutOfStock)
                 Stock Out
@@ -129,11 +137,11 @@
         </button>
 
         <!-- Cart Icon Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
+        <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             aria-label="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id, false)" }}"
             class="primary-bg text-primary p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center
-            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">
+            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00] disabled:opacity-40 disabled:cursor-not-allowed' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

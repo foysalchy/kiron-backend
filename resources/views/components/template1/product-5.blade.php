@@ -13,6 +13,7 @@
     $regularPrice = $priceData->regular_price;
     $isVar = $priceData->is_variation;
 
+    $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
     $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 
     $avgRating = $product->reviews_avg_rating ?? 0;
@@ -37,6 +38,12 @@
     >
 
     <div class="absolute inset-0 bg-black/10"></div>
+    @if ($product->status == \App\Enums\Status::Upcoming->value)
+        <div
+            class="absolute top-3 left-3 z-20 bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+            {{ \App\Enums\Status::Upcoming->label() }}
+        </div>
+    @endif
     @if ($product->is_free_delivery)
         <div class="absolute bottom-3 left-3 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-20">
             Free Shipping
@@ -97,24 +104,24 @@
 
     <!-- Order Now Button -->
 <button
-    {{ $isOutOfStock ? 'disabled' : '' }}
+    {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
     aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}"
     onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
     class="flex-1 whitespace-nowrap h-9 px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
-    {{ $isOutOfStock
-        ? 'bg-smoke-300 text-white cursor-not-allowed'
+    {{ ($isUpcoming || $isOutOfStock)
+        ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
         : 'bg-[var(--secondary-color)] text-white hover:bg-[var(--secondary-color)]/90 cursor-pointer' }}"
 >
     {{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}
 </button>
     <!-- Add to Cart Button -->
     <button
-        {{ $isOutOfStock ? 'disabled' : '' }}
+        {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
         aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
         onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
         class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
-        {{ $isOutOfStock
-            ? 'bg-smoke-300 text-white cursor-not-allowed'
+        {{ ($isUpcoming || $isOutOfStock)
+            ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
             : 'bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 text-white cursor-pointer' }}"
     >
         @if ($isOutOfStock)

@@ -40,6 +40,7 @@
         $badgeTextColor = '#000000';
     }
 
+    $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
     $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 @endphp
 
@@ -54,6 +55,22 @@
                     alt="{{ $product->title }}" loading="lazy"
                     class="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110" />
             </div>
+
+            @if ($product->status == \App\Enums\Status::Upcoming->value)
+                <div
+                    class="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs md:text-sm font-bold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                    {{ \App\Enums\Status::Upcoming->label() }}
+                </div>
+            @endif
+
+
+            @if ($product->status == \App\Enums\Status::Upcoming->value)
+                <div
+                    class="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                    {{ \App\Enums\Status::Upcoming->label() }}
+                </div>
+            @endif
+
             <!-- Free Delivery Badge -->
             @if ($product->is_free_delivery)
                 <div
@@ -113,10 +130,10 @@
             @endif
         </div>
 
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
+        <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="w-full text-white text-center text-sm md:text-base rounded-full border-0 mt-4 py-2 transition-all cursor-pointer px-4 font-bold shadow-sm flex items-center justify-center gap-2
-            {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:primary-bg active:scale-95' }}">
+            {{ ($isUpcoming || $isOutOfStock) ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:primary-bg active:scale-95' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out

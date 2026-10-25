@@ -78,6 +78,8 @@
             <span class="text-coal font-medium truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </div>
 
+        @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
+
         <div class="grid lg:grid-cols-2 gap-12 lg:gap-20">
             <div class="space-y-4 min-w-0">
                 <div
@@ -91,6 +93,13 @@
                             class="absolute top-5 left-5 bg-[var(--primary-color)] text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
                             {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
                             Off
+                        </span>
+                    @endif
+
+                    @if ($isUpcoming)
+                        <span
+                            class="absolute top-5 right-5 bg-blue-600 text-white text-xs md:text-base font-semibold px-2 py-0.5 rounded-full shadow-sm z-10">
+                            {{ \App\Enums\Status::Upcoming->label() }}
                         </span>
                     @endif
                 </div>
@@ -224,12 +233,12 @@
                     <!-- Row 2 (mobile): Order Now + Add to Cart পাশাপাশি -->
                     <div class="flex items-center gap-3 sm:contents">
 
-                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
                             style="color: {{ $orderButtonTextColor }} !important;"
                             class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
 
-                        <button id="btn-cart" onclick="handleAddToCart()"
-                            class="flex-1 sm:order-3 sm:flex-1 h-12 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
+                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
+                            class="flex-1 sm:order-3 sm:flex-1 h-12 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                     </div>
 
@@ -554,6 +563,9 @@
         });
 
         function handleAddToCart(isOrderNow = false) {
+            if (@json($isUpcoming)) {
+                return;
+            }
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const qty = document.getElementById('main-qty').innerText;
             let items = [];

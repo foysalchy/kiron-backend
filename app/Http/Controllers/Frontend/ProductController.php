@@ -44,7 +44,7 @@ class ProductController extends FrontendController
             ->select($this->getOptimizedProductSelects())
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->where('status', Status::Active->value);
+            ->whereIn('status', [Status::Active->value, Status::Upcoming->value]);
 
 
         if ($request->filled('search')) {
