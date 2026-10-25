@@ -42,6 +42,7 @@ class StoreProductRequest extends BaseCompanyRequest
                 'assigned_to' => ['nullable', 'exists:users,id'],
 
                 // Basic Info
+                'status'       => ['nullable', Rule::in([0, 1, 39, '0', '1', '39'])],
                 'title'        => ['required', 'string', 'max:255'],
                 'manage_stock' => ['nullable'],
                 'product_type' => ['nullable', 'string', Rule::in(['raw_material', 'semi_finished', 'finished', 'service'])],

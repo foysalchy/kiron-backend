@@ -114,7 +114,7 @@ class BulkActionController extends Controller
         $request->validate([
             'ids'    => ['required', 'array', 'min:1'],
             'ids.*'  => ['required', 'integer'],
-            'status' => ['required', 'in:0,1'],
+            'status' => ['required', 'in:0,1,39'],
         ]);
 
         $model = $this->resolveModel($resource);

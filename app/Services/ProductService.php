@@ -1357,13 +1357,14 @@ class ProductService
     /**
      * Toggle product status
      */
-    public function toggleStatus(int $id): Product
+    public function toggleStatus(int $id, ?int $newStatus = null): Product
     {
         try {
             $product = $this->getProductById($id);
-            $product->update(['status' => !$product->status]);
+            $targetStatus = $newStatus !== null ? $newStatus : (!$product->status ? 1 : 0);
+            $product->update(['status' => $targetStatus]);
 
-            Log::info('Product status toggled', ['product_id' => $id]);
+            Log::info('Product status toggled', ['product_id' => $id, 'status' => $targetStatus]);
             LogHelper::statusChanged('product', $id, $product->company_id);
 
             return $product;
