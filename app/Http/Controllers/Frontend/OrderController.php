@@ -21,7 +21,13 @@ class OrderController extends FrontendController
 
     public function index()
     {
-
+        if (!auth('customer')->check()) {
+            session()->put('url.intended', route('checkout.index'));
+            $msg = (isset($this->setup->lang) && $this->setup->lang == 'bn')
+                ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
+                : 'Please login to proceed with checkout.';
+            return redirect()->route('user.login')->with('warning', $msg);
+        }
 
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
@@ -279,6 +285,14 @@ class OrderController extends FrontendController
     public function storeOrder(Request $request)
     {
         Log::info('storeOrder called', ['payment_method' => $request->payment_method]);
+
+        if (!auth('customer')->check()) {
+            session()->put('url.intended', route('checkout.index'));
+            $msg = (isset($this->setup->lang) && $this->setup->lang == 'bn')
+                ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
+                : 'Please login to proceed with checkout.';
+            return redirect()->route('user.login')->with('warning', $msg);
+        }
 
         $pm = strtolower($request->payment_method ?? '');
         $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
