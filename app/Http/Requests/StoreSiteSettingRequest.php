@@ -47,6 +47,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'store_address'     => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],
+                'login_required_for_checkout' => ['nullable', 'in:0,1'],
                 'allow_search_engine_index' => ['nullable', 'boolean'],
                 'watermark_status' => ['nullable', 'boolean'],
                 'watermark_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

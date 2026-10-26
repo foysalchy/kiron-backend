@@ -10,7 +10,7 @@ use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\{Cache, DB, Hash, Log, Session};
+use Illuminate\Support\Facades\{Cache, DB, Hash, Log, Session, View};
 
 class OrderController extends FrontendController
 {
@@ -21,9 +21,10 @@ class OrderController extends FrontendController
 
     public function index()
     {
-        if (!auth('customer')->check()) {
+        $setup = SiteSetting::where('company_id', $this->company_id)->first();
+        if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
             session()->put('url.intended', route('checkout.index'));
-            $msg = (isset($this->setup->lang) && $this->setup->lang == 'bn')
+            $msg = (isset($setup->lang) && $setup->lang == 'bn')
                 ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
                 : 'Please login to proceed with checkout.';
             return redirect()->route('user.login')->with('warning', $msg);
@@ -286,9 +287,10 @@ class OrderController extends FrontendController
     {
         Log::info('storeOrder called', ['payment_method' => $request->payment_method]);
 
-        if (!auth('customer')->check()) {
+        $setup = SiteSetting::where('company_id', $this->company_id)->first();
+        if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
             session()->put('url.intended', route('checkout.index'));
-            $msg = (isset($this->setup->lang) && $this->setup->lang == 'bn')
+            $msg = (isset($setup->lang) && $setup->lang == 'bn')
                 ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
                 : 'Please login to proceed with checkout.';
             return redirect()->route('user.login')->with('warning', $msg);

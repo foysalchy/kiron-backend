@@ -41,6 +41,7 @@ class SiteSetting extends Model
         'tags',
         'copy_right',
         'sms_forget_password',
+        'login_required_for_checkout',
         'allow_search_engine_index',
         'status',
         'meta_image',
@@ -55,6 +56,7 @@ class SiteSetting extends Model
 
     protected $casts = [
         'sms_forget_password' => 'boolean',
+        'login_required_for_checkout' => 'integer',
         'allow_search_engine_index' => 'boolean',
         'free_shipping_rules' => 'array',
     ];
