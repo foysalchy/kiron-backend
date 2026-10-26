@@ -57,14 +57,34 @@
                         <!-- Thumbnails (Updated to show all images) -->
                         <div id="thumbnail-container"
                             class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
+                            @php
+                                $videoData = $product->video_data;
+                            @endphp
+
                             @foreach ($allProductImages as $imgUrl)
                                 <button aria-label="View product image"
-                                    class="thumb-btn border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                    class="thumb-btn border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0 cursor-pointer"
                                     onclick="changeImage('{{ $imgUrl }}', this)">
-                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover" alt="Product thumbnail" /
+                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover pointer-events-none" alt="Product thumbnail"
                                         loading="lazy" width="800" height="800">
                                 </button>
                             @endforeach
+
+                            @if ($videoData)
+                                <button type="button" onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                    aria-label="Play Product Video"
+                                    class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0 relative group/vbtn cursor-pointer">
+                                    <img src="{{ $videoData['thumbnail_url'] ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                        onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                        class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800"
+                                        height="800">
+                                    <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                        <span class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                            <i class="fas fa-play text-[10px] sm:text-xs ml-0.5"></i>
+                                        </span>
+                                    </div>
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -408,6 +428,26 @@
         </section>
     @endif
 
+    {{-- Video Popup Modal --}}
+    @if ($videoData)
+        <div id="productVideoModal"
+            class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 transition-opacity duration-300"
+            onclick="handleVideoModalBackdropClick(event)">
+            <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+                onclick="event.stopPropagation()">
+                {{-- Close Button --}}
+                <button type="button" onclick="closeVideoModal()" aria-label="Close Video"
+                    class="absolute -top-3 -right-3 sm:top-3 sm:right-3 z-30 w-9 h-9 sm:w-10 sm:h-10 bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 hover:scale-105 transition-all cursor-pointer">
+                    <i class="fas fa-times text-base sm:text-lg"></i>
+                </button>
+
+                {{-- Player Area --}}
+                <div id="videoPlayerContainer" class="w-full aspect-video bg-black flex items-center justify-center">
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Hidden input for JS --}}
     <input type="hidden" id="main-qty" value="1">
     <input type="hidden" id="selected-variation-id" value="">
@@ -427,6 +467,47 @@
                 btn.classList.remove('border-gray-200');
             }
         }
+
+        const productVideoData = @json($videoData ?? null);
+
+        function openVideoModal(url, type) {
+            const modal = document.getElementById('productVideoModal');
+            const playerContainer = document.getElementById('videoPlayerContainer');
+            if (!modal || !playerContainer) return;
+
+            if (type === 'youtube' || type === 'vimeo') {
+                playerContainer.innerHTML = `<iframe src="${url}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+            } else {
+                playerContainer.innerHTML = `<video src="${url}" class="w-full h-full object-contain" controls autoplay playsinline></video>`;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('productVideoModal');
+            const playerContainer = document.getElementById('videoPlayerContainer');
+            if (!modal) return;
+
+            modal.classList.add('hidden');
+            if (playerContainer) {
+                playerContainer.innerHTML = '';
+            }
+            document.body.style.overflow = '';
+        }
+
+        function handleVideoModalBackdropClick(event) {
+            if (event.target.id === 'productVideoModal') {
+                closeVideoModal();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
         function changeQty(amount) {
             let qtyVal = document.getElementById('qty-value');
             let mainQty = document.getElementById('main-qty');
@@ -460,11 +541,27 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                onclick="changeImage('${imgUrl}', this)">
-                                <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-                            </button>`;
+                    <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0 cursor-pointer"
+                        onclick="changeImage('${imgUrl}', this)">
+                        <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-cover pointer-events-none" loading="lazy" width="800" height="800">
+                    </button>`;
             });
+
+            if (productVideoData && productVideoData.embed_url) {
+                container.innerHTML += `
+                    <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
+                        aria-label="Play Product Video"
+                        class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0 relative group/vbtn cursor-pointer">
+                        <img src="${productVideoData.thumbnail_url || '{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'}"
+                            onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                            class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                        <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                            <span class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                <i class="fas fa-play text-[10px] sm:text-xs ml-0.5"></i>
+                            </span>
+                        </div>
+                    </button>`;
+            }
         }
 
         function renderAttributes() {
