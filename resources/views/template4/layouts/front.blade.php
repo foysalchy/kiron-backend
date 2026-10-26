@@ -202,13 +202,13 @@
         const overlay = document.getElementById("overlay");
 
         function toggleSidebar() {
-            sidebar.classList.toggle("-translate-x-full");
-            overlay.classList.toggle("hidden");
+            if (sidebar) sidebar.classList.toggle("-translate-x-full");
+            if (overlay) overlay.classList.toggle("hidden");
         }
 
-        menuToggle.addEventListener("click", toggleSidebar);
-        closeSidebar.addEventListener("click", toggleSidebar);
-        overlay.addEventListener("click", toggleSidebar);
+        if (menuToggle) menuToggle.addEventListener("click", toggleSidebar);
+        if (closeSidebar) closeSidebar.addEventListener("click", toggleSidebar);
+        if (overlay) overlay.addEventListener("click", toggleSidebar);
 
         // Accordion Logic for Mobile
         document.querySelectorAll(".accordion-btn").forEach((btn) => {
