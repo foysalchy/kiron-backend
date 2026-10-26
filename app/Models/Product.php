@@ -249,6 +249,45 @@ class Product extends Model
             : null;
     }
 
+    public function getVideoDataAttribute(): ?array
+    {
+        if (empty($this->video_link)) {
+            return null;
+        }
+
+        $link = trim($this->video_link);
+
+        // 1. YouTube (support youtube.com/watch?v=, youtu.be/, shorts, embed, live, etc.)
+        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/i', $link, $matches) || preg_match('/(?:youtube\.com\/.*[?&]v=)([a-zA-Z0-9_-]{11})/i', $link, $matches)) {
+            $youtubeId = $matches[1];
+            return [
+                'type' => 'youtube',
+                'video_id' => $youtubeId,
+                'embed_url' => "https://www.youtube.com/embed/{$youtubeId}?autoplay=1&rel=0",
+                'thumbnail_url' => "https://img.youtube.com/vi/{$youtubeId}/hqdefault.jpg",
+            ];
+        }
+
+        // 2. Vimeo
+        if (preg_match('/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)/i', $link, $matches)) {
+            $vimeoId = end($matches);
+            return [
+                'type' => 'vimeo',
+                'video_id' => $vimeoId,
+                'embed_url' => "https://player.vimeo.com/video/{$vimeoId}?autoplay=1",
+                'thumbnail_url' => $this->thumbnail_310_url ?? $this->thumbnail_url,
+            ];
+        }
+
+        // 3. Direct or other video link
+        return [
+            'type' => 'direct',
+            'video_id' => null,
+            'embed_url' => $link,
+            'thumbnail_url' => $this->thumbnail_310_url ?? $this->thumbnail_url,
+        ];
+    }
+
     public function getSalePriceAttribute()
     {
         if (!$this->discount || $this->discount <= 0) {

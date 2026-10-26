@@ -117,16 +117,36 @@
                     </button>
 
                     <div id="thumbnail-container"
-                        class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ count($allProductImages) > 3 ? 'px-8 md:px-10' : '' }}">
+                        class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ (count($allProductImages) + (!empty($product->video_data) ? 1 : 0)) > 3 ? 'px-8 md:px-10' : '' }}">
+                        @php
+                            $videoData = $product->video_data;
+                        @endphp
+
                         @foreach ($allProductImages as $index => $imgUrl)
                             <button type="button" aria-label="View product image {{ $index + 1 }}"
                                 onclick="changeImage('{{ $imgUrl }}')"
-                                class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
+                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
                                 <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
                                     onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
                                     class="w-full h-full object-cover pointer-events-none">
                             </button>
                         @endforeach
+
+                        @if ($videoData)
+                            <button type="button" onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                aria-label="Play Product Video"
+                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                                <img src="{{ $videoData['thumbnail_url'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                                    onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                    class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800"
+                                    height="800">
+                                <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                    <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                        <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                                    </span>
+                                </div>
+                            </button>
+                        @endif
                     </div>
 
                     <!-- Right Arrow -->
@@ -247,6 +267,26 @@
 
             </div>
         </div>
+
+        {{-- Video Popup Modal --}}
+        @if ($videoData)
+            <div id="productVideoModal"
+                class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 transition-opacity duration-300"
+                onclick="handleVideoModalBackdropClick(event)">
+                <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+                    onclick="event.stopPropagation()">
+                    {{-- Close Button --}}
+                    <button type="button" onclick="closeVideoModal()" aria-label="Close Video"
+                        class="absolute -top-3 -right-3 sm:top-3 sm:right-3 z-30 w-9 h-9 sm:w-10 sm:h-10 bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 hover:scale-105 transition-all cursor-pointer">
+                        <i class="fas fa-times text-base sm:text-lg"></i>
+                    </button>
+
+                    {{-- Player Area --}}
+                    <div id="videoPlayerContainer" class="w-full aspect-video bg-black flex items-center justify-center">
+                    </div>
+                </div>
+            </div>
+        @endif
     </section>
 
     <!-- ============ RELATED PRODUCTS ============ -->
@@ -326,6 +366,47 @@
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
+        const productVideoData = @json($videoData ?? null);
+
+        function openVideoModal(url, type) {
+            const modal = document.getElementById('productVideoModal');
+            const playerContainer = document.getElementById('videoPlayerContainer');
+            if (!modal || !playerContainer) return;
+
+            if (type === 'youtube' || type === 'vimeo') {
+                playerContainer.innerHTML = `<iframe src="${url}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+            } else {
+                playerContainer.innerHTML = `<video src="${url}" class="w-full h-full object-contain" controls autoplay playsinline></video>`;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('productVideoModal');
+            const playerContainer = document.getElementById('videoPlayerContainer');
+            if (!modal) return;
+
+            modal.classList.add('hidden');
+            if (playerContainer) {
+                playerContainer.innerHTML = '';
+            }
+            document.body.style.overflow = '';
+        }
+
+        function handleVideoModalBackdropClick(event) {
+            if (event.target.id === 'productVideoModal') {
+                closeVideoModal();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+
         function updateGalleryThumbnails(images) {
             const container = document.getElementById('thumbnail-container');
             const leftArrow = document.getElementById('thumb-arrow-left');
@@ -336,13 +417,30 @@
             images.forEach((img, i) => {
                 container.innerHTML += `
                           <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
-                            class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
+                            class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
                             <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
                           </button>`;
             });
 
+            if (productVideoData && productVideoData.embed_url) {
+                container.innerHTML += `
+                    <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
+                        aria-label="Play Product Video"
+                        class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                        <img src="${productVideoData.thumbnail_url || '{{ asset('images/template1/frontend/product-thumbnail.webp') }}'}"
+                            onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                            class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                        <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                            <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                            </span>
+                        </div>
+                    </button>`;
+            }
+
             // ============ Arrow visibility + container padding dynamically আপডেট ============
-            const showArrows = images.length > 3;
+            const totalCount = images.length + (productVideoData && productVideoData.embed_url ? 1 : 0);
+            const showArrows = totalCount > 3;
 
             if (leftArrow) leftArrow.classList.toggle('hidden', !showArrows);
             if (leftArrow) leftArrow.classList.toggle('flex', showArrows);
