@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Reservation;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
@@ -50,7 +51,7 @@ class AuthController extends FrontendController
 
         Auth::guard('customer')->login($user);
 
-        return redirect()->route('user.dashboard')->with('success', 'Registration was successful. Welcome to our store!');
+        return redirect()->intended(route('user.dashboard'))->with('success', 'Registration was successful. Welcome to our store!');
     }
 
     public function login()
