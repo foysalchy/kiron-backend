@@ -149,6 +149,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
     Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
     // Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
+    Route::get('/filter-subcategory-products', [HomeController::class, 'filterSubCategory'])->name('filter.subcategory.products');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
     Route::post('/newsletter-subscribe', [HomeController::class, 'subscribe'])->name('newsletter.subscribe');
 
