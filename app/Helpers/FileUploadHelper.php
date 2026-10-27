@@ -31,12 +31,18 @@ class FileUploadHelper
             $watermark = $manager->decode($watermarkContent);
 
             $mainWidth = $image->width();
-            $watermarkWidth = intval($mainWidth * 0.50); // 50% of image width for center watermark
-            if ($watermarkWidth < 100) $watermarkWidth = 100;
+            $watermarkWidth = intval($mainWidth * 0.28); // 28% of image width for balanced proportions
+            $minWatermarkWidth = max(20, intval($mainWidth * 0.20));
+            if ($watermarkWidth < $minWatermarkWidth) {
+                $watermarkWidth = $minWatermarkWidth;
+            }
 
             $watermark->scaleDown(width: $watermarkWidth);
 
-            // Place in the center with 25% opacity (0.25) so it's more visible
+            // Convert watermark to grayscale for subtle gray shadow appearance (not colorful)
+            $watermark->grayscale();
+
+            // Place in the center with 25% opacity for a soft, professional gray shadow watermark
             $image->insert($watermark, 0, 0, 'center', 0.25);
 
             return $image;

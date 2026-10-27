@@ -829,6 +829,11 @@ class ProductService
             unset($data['gallery_images']);
             unset($data['deleted_gallery_ids']);
 
+            // Ensure discount is never null
+            if (array_key_exists('discount', $data) && ($data['discount'] === null || $data['discount'] === '')) {
+                $data['discount'] = 0;
+            }
+
             // Update based on product type
             if ($product->type === 'single') {
                 $this->updateSingleProduct($product, $data);
