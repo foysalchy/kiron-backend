@@ -14,6 +14,8 @@ use App\Models\ExtraCategory;
 use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\Filter;
+use App\Models\FilterValue;
 use App\Helpers\FileUploadHelper;
 use Illuminate\Support\Str;
 use Exception;
@@ -134,27 +136,51 @@ class ProductImportController extends Controller
                 
                 $brandSlug = trim($row[12] ?? $row['raw_brand'] ?? '');
                 $megaCatSlug = trim($row[13] ?? $row['raw_category'] ?? '');
-                $attributesStr = trim($row[14] ?? $row['attributes'] ?? '');
-                $thumbnailUrl = trim($row[15] ?? $row['thumbnailUrl'] ?? '');
-                $shortDescription = trim($row[16] ?? $row['shortDescription'] ?? '') ?: null;
-                
-                // Full Description might be in column 17 (if new template) or in JSON payload
-                // If old template was used (20 cols: 0-19), Meta Title was at 17, Meta Description at 18, Meta Keywords at 19.
-                // In new template (21 cols: 0-20), Full Description is at 17, Meta Title at 18, Meta Description at 19, Meta Keywords at 20.
+
+                // Filters & Attributes detection based on column count or JSON payload
                 if ($request->has('rows')) {
+                    $rawFilters = trim($row['raw_filters'] ?? $row['filters'] ?? '');
+                    $filterValueIds = isset($row['filter_value_ids']) && is_array($row['filter_value_ids'])
+                        ? array_values(array_filter(array_map('intval', $row['filter_value_ids'])))
+                        : [];
+                    $attributesStr = trim($row['attributes'] ?? '');
+                    $thumbnailUrl = trim($row['thumbnailUrl'] ?? '');
+                    $shortDescription = trim($row['shortDescription'] ?? '') ?: null;
                     $fullDescription = trim($row['fullDescription'] ?? '') ?: null;
                     $metaTitle = trim($row['metaTitle'] ?? '') ?: null;
                     $metaDescription = trim($row['metaDescription'] ?? '') ?: null;
                     $metaKeywordsStr = trim($row['metaKeywords'] ?? '');
                 } else {
                     $numCols = count($row);
-                    if ($numCols >= 21) {
+                    if ($numCols >= 22) {
+                        // 22-col template (with Filters at col 14)
+                        $rawFilters = trim($row[14] ?? '');
+                        $filterValueIds = [];
+                        $attributesStr = trim($row[15] ?? '');
+                        $thumbnailUrl = trim($row[16] ?? '');
+                        $shortDescription = trim($row[17] ?? '') ?: null;
+                        $fullDescription = trim($row[18] ?? '') ?: null;
+                        $metaTitle = trim($row[19] ?? '') ?: null;
+                        $metaDescription = trim($row[20] ?? '') ?: null;
+                        $metaKeywordsStr = trim($row[21] ?? '');
+                    } elseif ($numCols === 21) {
+                        // 21-col template without Filters (col 14 was Attributes, col 17 was Full Description)
+                        $rawFilters = '';
+                        $filterValueIds = [];
+                        $attributesStr = trim($row[14] ?? '');
+                        $thumbnailUrl = trim($row[15] ?? '');
+                        $shortDescription = trim($row[16] ?? '') ?: null;
                         $fullDescription = trim($row[17] ?? '') ?: null;
                         $metaTitle = trim($row[18] ?? '') ?: null;
                         $metaDescription = trim($row[19] ?? '') ?: null;
                         $metaKeywordsStr = trim($row[20] ?? '');
                     } else {
-                        // Backwards compatible with 20-col template without Full Description
+                        // 20-col legacy template
+                        $rawFilters = '';
+                        $filterValueIds = [];
+                        $attributesStr = trim($row[14] ?? '');
+                        $thumbnailUrl = trim($row[15] ?? '');
+                        $shortDescription = trim($row[16] ?? '') ?: null;
                         $fullDescription = null;
                         $metaTitle = trim($row[17] ?? '') ?: null;
                         $metaDescription = trim($row[18] ?? '') ?: null;
@@ -335,6 +361,34 @@ class ProductImportController extends Controller
                         $warehouseId = $warehouse->id;
                     } else {
                         $isWarehouseMissing = true;
+                    }
+                }
+
+                // Resolve Filters from raw string (e.g. "RAM:8GB, Storage:256GB" or "8GB, 256GB")
+                if (empty($filterValueIds) && !empty($rawFilters)) {
+                    $resolvedFilterValueIds = [];
+                    $filterParts = array_values(array_filter(array_map('trim', explode(',', $rawFilters))));
+                    
+                    foreach ($filterParts as $part) {
+                        if (str_contains($part, ':')) {
+                            [$fGroup, $fVal] = array_map('trim', explode(':', $part, 2));
+                            $matchedVal = FilterValue::where('name', $fVal)
+                                ->whereHas('filter', function($q) use ($fGroup) {
+                                    $q->where('name', $fGroup);
+                                })
+                                ->first();
+                            if ($matchedVal) {
+                                $resolvedFilterValueIds[] = (int)$matchedVal->id;
+                            }
+                        } else {
+                            $matchedVal = FilterValue::where('name', $part)->first();
+                            if ($matchedVal) {
+                                $resolvedFilterValueIds[] = (int)$matchedVal->id;
+                            }
+                        }
+                    }
+                    if (!empty($resolvedFilterValueIds)) {
+                        $filterValueIds = array_values(array_unique($resolvedFilterValueIds));
                     }
                 }
 
@@ -631,6 +685,7 @@ class ProductImportController extends Controller
                             'sub_category_ids' => $subCatIds ?: [],
                             'mini_category_ids' => $miniCatIds ?: [],
                             'extra_category_ids' => $extraCatIds ?: [],
+                            'filter_value_ids' => $filterValueIds ?: [],
                             'regular_price' => $regularPrice,
                             'discount' => $discount,
                             'discount_type' => $discountType,
@@ -703,6 +758,7 @@ class ProductImportController extends Controller
                         // Raw data (what the user typed)
                         'raw_brand' => $brandSlug,
                         'raw_category' => $megaCatSlug,
+                        'raw_filters' => $rawFilters,
                         'raw_warehouse' => $warehouseName,
                         'attributes' => $attributesStr,
                         'thumbnailUrl' => $thumbnailUrl,
@@ -718,6 +774,7 @@ class ProductImportController extends Controller
                         'sub_category_ids' => $subCatIds ?: [],
                         'mini_category_ids' => $miniCatIds ?: [],
                         'extra_category_ids' => $extraCatIds ?: [],
+                        'filter_value_ids' => $filterValueIds ?: [],
                         'warehouse_id' => $warehouseId,
                     ];
                 }

@@ -171,6 +171,12 @@ class PartyService
             'balance',
             'due_amount',
             'credit_limit',
+            'credit_days',
+            'gender',
+            'division',
+            'district',
+            'thana',
+            'profile',
             'status',
             'created_at'
         ])->with([
@@ -206,6 +212,12 @@ class PartyService
             'balance',
             'due_amount',
             'credit_limit',
+            'credit_days',
+            'gender',
+            'division',
+            'district',
+            'thana',
+            'profile',
             'status',
             'created_at'
         ])->with([

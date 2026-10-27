@@ -454,6 +454,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}/restore', [FilterController::class, 'restore']);
                     Route::delete('/{id}/force', [FilterController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [FilterController::class, 'toggleStatus']);
+                    Route::post('/{id}/values', [FilterController::class, 'addValues']);
                 });
 
                 // Brand Routes

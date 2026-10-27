@@ -85,4 +85,17 @@ class FilterController extends Controller
 
         return ResponseHelper::success($data, 'Filter status updated successfully');
     }
+
+    public function addValues(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'names' => ['required', 'array'],
+            'names.*' => ['required', 'string', 'max:255'],
+        ]);
+
+        $data = $this->filterService->addFilterValues($id, $request->only('names'));
+
+        return ResponseHelper::success($data, 'Filter values added successfully');
+    }
 }
+

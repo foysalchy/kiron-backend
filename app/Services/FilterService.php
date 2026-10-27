@@ -215,4 +215,46 @@ class FilterService
             throw ApiException::serverError('Failed to toggle Filter status');
         }
     }
+
+    public function addFilterValues(int $id, array $data): array
+    {
+        try {
+            $filter = $this->getFilterById($id);
+            $createdValues = [];
+
+            DB::transaction(function () use ($filter, $data, &$createdValues) {
+                $names = $data['names'] ?? [];
+                if (is_string($names)) {
+                    $names = [$names];
+                }
+
+                foreach ($names as $name) {
+                    $valName = trim((string) $name);
+                    if ($valName !== '') {
+                        $value = FilterValue::create([
+                            'company_id' => $filter->company_id,
+                            'filter_id' => $filter->id,
+                            'name' => $valName,
+                            'status' => Status::Active->value,
+                        ]);
+                        $createdValues[] = $value;
+                    }
+                }
+            });
+
+            Log::info('Filter values added successfully', ['filter_id' => $filter->id, 'count' => count($createdValues)]);
+
+            return [
+                'count' => count($createdValues),
+                'filter_id' => $filter->id,
+                'values' => $createdValues,
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Failed to add filter values: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to add filter values');
+        }
+    }
 }
+
