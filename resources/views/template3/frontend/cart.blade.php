@@ -19,8 +19,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
                 <!-- Cart Items -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg   shadow-xs overflow-hidden">
+                <div class="lg:col-span-2 border border-gray-200 rounded-lg">
+                    <div class="bg-white rounded-lg shadow-xs overflow-hidden">
                         <div class="p-5">
                             <h2 class="text-xl font-bold text-gray-800">Cart Items</h2>
                         </div>
@@ -28,7 +28,7 @@
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
                                 <div
-                                    class="flex flex-col sm:flex-row items-start md:items-center gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
+                                    class="flex flex-col sm:flex-row items-start md:items-center gap-3 md:gap-6 p-3 md:p-4  bg-gray-50 rounded-lg relative group">
 
                                     <!-- ইমেজ এবং ডিটেইলস সেকশন (মোবাইলে এটি এক লাইনে থাকবে) -->
                                     <div class="flex flex-row items-start gap-3 md:gap-6 flex-1 w-full">
@@ -113,7 +113,7 @@
 
                 <!-- RIGHT: Summary -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg   shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-gray-100 rounded-lg border border-gray-200 shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
                         @php
@@ -184,7 +184,7 @@
                             <div class="flex gap-2">
                                 <input type="text" name="coupon_code" placeholder="Enter Coupon Code"
                                     value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
-                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
+                                    class="flex-1 border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
 
                                 @if (session()->has('coupon'))

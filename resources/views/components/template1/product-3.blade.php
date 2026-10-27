@@ -123,8 +123,8 @@
             <div class="basis-full h-0 sm:hidden"></div>
 
             @if ($discountLabel)
-                <span class="secondary-bg text-xs md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
-                        max-md:absolute max-md:top-1 max-md:left-1" style="color: {{ $badgeTextColor }} !important;">
+                <span class="bg-[#e95757]! text-white! text-xs md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                        max-md:absolute max-md:top-1 max-md:left-1">
                     -{{ $discountLabel }} OFF
                 </span>
             @endif

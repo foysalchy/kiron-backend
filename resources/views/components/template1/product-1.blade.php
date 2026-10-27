@@ -52,7 +52,7 @@
         <div class="absolute top-2 left-2 z-10 flex flex-col gap-1 items-start">
             @if ($discountLabel)
                 <div
-                    class="secondary-bg text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                    class="bg-[#e95757]! text-white! text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm leading-tight">
                     -{{ $discountLabel }}
                 </div>
             @endif
