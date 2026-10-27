@@ -376,15 +376,13 @@ class HomeController extends FrontendController
             $products = Product::where('status', Status::Active->value)
                 ->where('company_id', $companyId)
                 ->whereJsonContains('sub_category_ids', $subId)
-                ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock', 'manage_stock'])
+                ->select(['id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95', 'regular_price', 'discount', 'discount_type', 'type', 'status', 'available_stock', 'manage_stock', 'is_free_delivery'])
                 ->with(['variations'])
                 ->latest()->take(6)->get();
 
             $html = '';
-            $template = $this->template;
-
             foreach ($products as $product) {
-                $html .= view("components.{$template}.product-card", compact('product'))->render();
+                $html .= view("components.template1.product-card", compact('product'))->render();
             }
 
             if ($html == '') {
