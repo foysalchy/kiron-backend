@@ -35,7 +35,7 @@
                             </div>
                         @empty
                             <div class="min-w-full h-full">
-                                <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
+                                <img src="{{ asset('./images/template1/frontend/product-thumbnail.webp') }}" alt="default image"
                                     class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                             </div>
                         @endforelse
@@ -105,8 +105,8 @@
 
                                 <!-- Image Wrapper -->
                                 <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
-                                    <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/default.webp') }}"
-                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
+                                    <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}';"
                                         class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                                         alt="{{ $tItem['label'] }}" loading="lazy" width="800" height="800">
                                 </div>
@@ -156,8 +156,8 @@
 
                             <!-- Image Wrapper -->
                             <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
-                                <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
-                                    onerror="this.onerror=null;this.src='{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}';"
+                                <img src="{{ $category->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                                    onerror="this.onerror=null;this.src='{{ $category->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}';"
                                     class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                                     alt="{{ $category->name }}">
                             </div>
@@ -191,19 +191,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 @foreach ($group->products as $product)
                     @php
-                        $currency = $setup->currency ?? 'à§³';
-                        $isVar = $product->type !== 'single';
-
-                        $regularPrice = (float) $product->regular_price;
-                        $salePrice = (float) $product->sale_price;
-
-                        $minPrice = 0;
-                        $maxPrice = 0;
-
-                        if ($isVar && $product->variations->count() > 0) {
-                            $minPrice = $product->variations->min('regular_price');
-                            $maxPrice = $product->variations->max('regular_price');
-                        }
+                        $priceData = $product->display_price_data;
+                        $salePrice = (float) $priceData->sale_price;
+                        $regularPrice = (float) $priceData->regular_price;
+                        $currency = $setup->currency ?? '৳';
+                        $currencyPos = $setup->currency_position ?? 'left';
                     @endphp
 
                     <div
@@ -212,7 +204,7 @@
                         <div
                             class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                                <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}" alt="{{ $product->title }}" loading="lazy"
+                                <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}" alt="{{ $product->title }}" loading="lazy"
                                     class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
                             </a>
                         </div>
@@ -228,19 +220,17 @@
 
                                 <!-- Price Logic (Corrected Fields) -->
                                 <div class="text-[var(--primary-color)] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
-                                    @if ($isVar && $minPrice > 0)
-
-                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} -
-                                            {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
+                                    @if ($regularPrice > $salePrice && $salePrice > 0)
+                                        <span class="line-through text-gray-500 text-xs md:text-sm font-bold">
+                                            {{ $currencyPos == 'left' ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ $currencyPos == 'right' ? $currency : '' }}
+                                        </span>
+                                        <span>
+                                            {{ $currencyPos == 'left' ? $currency : '' }}{{ number_format($salePrice, 0) }}{{ $currencyPos == 'right' ? $currency : '' }}
+                                        </span>
                                     @else
-
-                                        @if ($salePrice < $regularPrice && $salePrice > 0)
-                                            <span
-                                                class="line-through text-gray-500 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
-                                            <span>{{ number_format($salePrice, 0) }}{{ $currency }}</span>
-                                        @elseif($regularPrice > 0)
-                                            <span>{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
-                                        @endif
+                                        <span>
+                                            {{ $currencyPos == 'left' ? $currency : '' }}{{ number_format($salePrice > 0 ? $salePrice : $regularPrice, 0) }}{{ $currencyPos == 'right' ? $currency : '' }}
+                                        </span>
                                     @endif
                                 </div>
                             </div>

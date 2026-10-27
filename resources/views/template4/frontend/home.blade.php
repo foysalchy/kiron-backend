@@ -343,19 +343,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     @foreach ($group->products as $product)
                         @php
+                            $priceData = $product->display_price_data;
+                            $salePrice = (float) $priceData->sale_price;
+                            $regularPrice = (float) $priceData->regular_price;
                             $currency = $setup->currency ?? '৳';
-                            $isVar = $product->type !== 'single';
-
-                            $regularPrice = (float) $product->regular_price;
-                            $salePrice = (float) $product->sale_price;
-
-                            $minPrice = 0;
-                            $maxPrice = 0;
-
-                            if ($isVar && $product->variations->count() > 0) {
-                                $minPrice = $product->variations->min('regular_price');
-                                $maxPrice = $product->variations->max('regular_price');
-                            }
+                            $isLeft = ($setup->currency_position ?? 'left') == 'left';
                         @endphp
 
                         <div
@@ -364,7 +356,7 @@
                             <div
                                 class="w-[110px] md:w-[75px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                                 <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                                    <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
+                                    <img src="{{ $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}" alt="{{ $product->title }}"
                                         class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500  ">
                                 </a>
                             </div>
@@ -380,29 +372,17 @@
 
                                     <!-- Price Logic (Corrected Fields) -->
                                     <div class="text-[#016738] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
-                                        @php $isLeft = ($setup->currency_position ?? 'left') == 'left'; @endphp
-
-                                        @if ($isVar && $minPrice > 0)
-                                            {{-- ভ্যারিয়েশন: Lowest - Highest Regular Price --}}
+                                        @if ($regularPrice > $salePrice && $salePrice > 0)
+                                            <span class="line-through text-gray-600 text-xs md:text-sm font-bold">
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                            </span>
                                             <span>
-                                                {{ $isLeft ? $currency : '' }}{{ number_format($minPrice, 0) }}{{ !$isLeft ? $currency : '' }}
-                                                –
-                                                {{ $isLeft ? $currency : '' }}{{ number_format($maxPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($salePrice, 0) }}{{ !$isLeft ? $currency : '' }}
                                             </span>
                                         @else
-                                            {{-- সিঙ্গেল: Discount থাকলে কাটা দামসহ দেখাবে --}}
-                                            @if ($salePrice < $regularPrice && $salePrice > 0)
-                                                <span class="line-through text-gray-600 text-xs md:text-sm font-bold">
-                                                    {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
-                                                </span>
-                                                <span>
-                                                    {{ $isLeft ? $currency : '' }}{{ number_format($salePrice, 0) }}{{ !$isLeft ? $currency : '' }}
-                                                </span>
-                                            @elseif($regularPrice > 0)
-                                                <span>
-                                                    {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
-                                                </span>
-                                            @endif
+                                            <span>
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($salePrice > 0 ? $salePrice : $regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
@@ -437,7 +417,7 @@
                                 <!-- Left Part: Product Image -->
                                 <div
                                     class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                                    <img src="{{ $product->thumbnail_95_url ?? '' }}" height="150" width="150"
+                                    <img src="{{ $product->thumbnail_95_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}" height="150" width="150"
                                         alt="{{ $product->title }}" loading="lazy"
                                         class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                                 </div>
