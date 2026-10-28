@@ -23,26 +23,46 @@
             <div class="archiveTopInfo">
 
                 <!-- Breadcrumb -->
-                <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                    <a href="{{ route('home') }}" class="hover:text-gray-500 transition-colors">Home</a>
-
-                    <!-- Chevron Icon -->
-                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                        class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                    </svg>
-
-                    <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
-                        {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+                <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                        Home
                     </a>
 
-                    <!-- Chevron Icon -->
-                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                        class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                    </svg>
+                    @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                        @foreach($breadcrumb as $item)
+                            <!-- Chevron Icon -->
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                            </svg>
 
-                    <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                            @if($loop->last)
+                                <span class="text-brand font-bold">{{ $item['name'] }}</span>
+                            @else
+                                <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                    {{ $item['name'] }}
+                                </a>
+                            @endif
+                        @endforeach
+                    @else
+                        <!-- Chevron Icon -->
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                            class="w-4 h-4 text-gray-500 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                        </svg>
+
+                        <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
+                            {{ ($category instanceof \App\Models\Brand) ? 'Brand' : 'Category' }}
+                        </a>
+
+                        <!-- Chevron Icon -->
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                            class="w-4 h-4 text-gray-500 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                        </svg>
+
+                        <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                    @endif
                 </nav>
                 <div class="meta_info">
                     @if (isset($category->meta_title) && $category->meta_title)

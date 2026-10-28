@@ -197,7 +197,7 @@
                 @else
                     <li class="flex-shrink-0">
                         <a href="{{ route('home') }}"
-                            class="text-base font-normal text-header hover:text-header whitespace-nowrap py-3 block">Home</a>
+                            class="text-black text-base font-normal text-header hover:text-header whitespace-nowrap py-3 block">Home</a>
                     </li>
                     <li class="flex-shrink-0">
                         <a href="{{ route('shop.index') }}"

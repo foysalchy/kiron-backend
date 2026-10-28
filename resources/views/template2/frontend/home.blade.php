@@ -259,7 +259,7 @@
 
             <!-- Product Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
-                @foreach ($allProducts as $product)
+                @foreach ($allProducts->take(12) as $product)
                     <x-template1.product-card :product="$product" />
                 @endforeach
 

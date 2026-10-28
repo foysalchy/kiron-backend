@@ -19,8 +19,6 @@
                     <i class="fas fa-home text-xs"></i> {{ __('Home') }}
                 </a>
                 <i class="fas fa-chevron-right text-[8px]"></i>
-                <span class="text-gray-500">{{ __('Notice') }}</span>
-                <i class="fas fa-chevron-right text-[8px]"></i>
                 <span class="text-gray-800 font-medium truncate max-w-[200px] md:max-w-none">{{ $notice->title }}</span>
             </nav>
 
@@ -28,7 +26,7 @@
                 <div class="p-6 md:p-10 pb-4 md:pb-6 border-b border-gray-100">
                     <div class="flex items-center gap-2 text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full w-max mb-3">
                         <i class="fas fa-bullhorn text-[11px]"></i>
-                        <span>{{ __('Notice Announcement') }}</span>
+                        <span>{{ __('Announcement') }}</span>
                     </div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-3">
                         {{ $notice->title }}

@@ -99,13 +99,16 @@
                         </span>
                     @endif
 
-                    @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                        <span id="discount-badge"
-                            class="inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
-                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
-                            OFF
-                        </span>
-                    @endif
+                    @php
+                        $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                    @endphp
+
+                    <span id="discount-badge"
+                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
+                        @if ($hasDiscount)
+                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% OFF
+                        @endif
+                    </span>
 
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
 
@@ -140,15 +143,18 @@
                     @endif
 
                     <div class="flex items-baseline gap-4 mb-6">
-                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-500 text-lg line-through">
+                        @php
+                            $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                        @endphp
+                        <span id="regular-price" class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-500 text-lg line-through">
+                            @if ($hasRegPrice)
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                                 @else
                                     {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                                 @endif
-                            </span>
-                        @endif
+                            @endif
+                        </span>
 
                         <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
@@ -275,7 +281,18 @@
                                 Call Now
                             </a>
 
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                            @php
+                                $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
+                                if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
+                                    $waPhone = '88' . $rawPhone;
+                                } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
+                                    $waPhone = '880' . $rawPhone;
+                                } else {
+                                    $waPhone = $rawPhone;
+                                }
+                            @endphp
+
+                            <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                                 target="_blank"
                                 class="bg-[#25D366] hover:bg-green-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -872,6 +889,14 @@
         }
 
         function handleSelection(group, valId, isLastGroup) {
+            let isSingleChoice = false;
+            for (let gName in groupCategories) {
+                if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') {
+                    isSingleChoice = true;
+                    break;
+                }
+            }
+
             if (!isLastGroup) {
                 activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
                 let idx = attributeGroups.indexOf(group);
@@ -881,40 +906,58 @@
                     recalculateSelectedPrice();
                 }
             } else {
-                activeFilters[group] = valId;
                 let matched = allVariations.find(v => {
-                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                    let tempFilters = { ...activeFilters };
+                    tempFilters[group] = valId;
+                    return attributeGroups.every(g => v.attributes[g] && v.attributes[g].id == tempFilters[g]);
                 });
 
-                if (matched) {
-                    let isSingleChoice = false;
-                    for (let gName in matched.attributes) {
-                        if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') {
-                            isSingleChoice = true;
-                            break;
-                        }
-                    }
-
-                    if (isSingleChoice) {
+                if (isSingleChoice) {
+                    if (activeFilters[group] == valId) {
+                        // Single choice: ২য় বার ক্লিক করলে deselect
+                        activeFilters[group] = null;
+                        finalSelectedVariationIds = [];
+                        updateGalleryThumbnails(defaultGalleries);
+                        const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp'));
+                        if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
+                    } else if (matched) {
+                        activeFilters[group] = valId;
                         finalSelectedVariationIds = [matched.id];
                         let combined = [...(matched.galleries || []), ...defaultGalleries];
                         updateGalleryThumbnails([...new Set(combined)]);
                         if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
-                    } else {
+                    }
+                } else {
+                    // Multiple choice: প্রতিটি ভ্যারিয়েন্ট টগল হবে (সিলেক্ট থাকলে deselect, না থাকলে select)
+                    if (matched) {
                         const index = finalSelectedVariationIds.indexOf(matched.id);
                         if (index > -1) {
+                            // ২য় বার ক্লিক: deselect
                             finalSelectedVariationIds.splice(index, 1);
-                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                            if (finalSelectedVariationIds.length === 0) {
+                                activeFilters[group] = null;
+                                updateGalleryThumbnails(defaultGalleries);
+                                const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp'));
+                                if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
+                            } else {
+                                // যদি অন্য ভ্যারিয়েন্ট এখনও সিলেক্টেড থাকে, শেষটির ফিল্টার অ্যাক্টিভ রাখা
+                                const lastSelected = allVariations.find(v => v.id === finalSelectedVariationIds[finalSelectedVariationIds.length - 1]);
+                                if (lastSelected && lastSelected.attributes[group]) {
+                                    activeFilters[group] = lastSelected.attributes[group].id;
+                                }
+                            }
                         } else {
+                            // ১ম বার ক্লিক: select
+                            activeFilters[group] = valId;
                             finalSelectedVariationIds.push(matched.id);
                             let combined = [...(matched.galleries || []), ...defaultGalleries];
                             updateGalleryThumbnails([...new Set(combined)]);
                             if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
                         }
                     }
-
-                    recalculateSelectedPrice();
                 }
+
+                recalculateSelectedPrice();
             }
             updateSkuDisplay();
             renderAttributes();
