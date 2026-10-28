@@ -23,36 +23,73 @@
         <div class="archiveTopInfo">
 
             <!-- Breadcrumb -->
-            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                <a href="{{ route('home') }}" class="inline-flex min-h-12 min-w-12 items-center justify-center px-2 hover:text-gray-500 transition-colors">Home</a>
-
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
-
-                <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
-                    {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+                <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                    Home
                 </a>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                    @foreach($breadcrumb as $item)
+                        <!-- Chevron Icon -->
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                            class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                        </svg>
 
-                <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                        @if($loop->last)
+                            <span class="text-brand font-bold">{{ $item['name'] }}</span>
+                        @else
+                            <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                {{ $item['name'] }}
+                            </a>
+                        @endif
+                    @endforeach
+                @else
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-500 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+
+                    <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
+                        {{ ($category instanceof \App\Models\Brand) ? 'Brand' : 'Category' }}
+                    </a>
+
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-500 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+
+                    <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                @endif
             </nav>
             <div class="meta_info">
+                @php
+                    $pageData = null;
+                    if (!($category && $category->name)) {
+                        $pageData = \App\Services\Saas\SystemPageService::get(
+                            \App\Enums\SystemPageType::SHOP,
+                            $setup->company_id ?? null
+                        );
+                    }
+                @endphp
+
                 @if (isset($category->meta_title) && $category->meta_title)
                     <h1 class="text-[24px] py-1">{{$category->meta_title}}</h1>
+                @elseif ($pageData && $pageData->meta_title)
+                    <h1 class="text-[24px] py-1">{{ $pageData->meta_title }}</h1>
                 @endif
+
                 <!-- Description Section -->
                 @if (isset($category->meta_description) && $category->meta_description)
-                        <p class="text-[15px] text-gray-600 l">
-                            {!! $category->meta_description !!}
-                        </p>
+                    <p class="text-[15px] text-gray-600 l">
+                        {!! $category->meta_description !!}
+                    </p>
+                @elseif ($pageData && $pageData->meta_description)
+                    <p class="text-[15px] text-gray-600 l">
+                        {!! $pageData->meta_description !!}
+                    </p>
                 @endif
             </div>
         </div>
@@ -222,10 +259,18 @@
                 </div>
 
 
-                 @if (isset($category->description) && $category->description)
-                <div class="bg-white rounded-lg shadow-xs  mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
-                    {!! $category->description !!}
-                </div>
+                @if (isset($category->description) && $category->description)
+                    <div class="bg-white rounded-lg shadow-xs mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
+                        {!! $category->description !!}
+                    </div>
+                @elseif (isset($pageData->description) && !empty($pageData->description))
+                    <div class="bg-gray-50 border border-gray-100 rounded-lg px-6 py-6 prose prose-slate max-w-none mt-4
+                        prose-headings:text-[#041533] prose-headings:font-bold
+                        prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+                        prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+                        prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
+                        {!! $pageData->description !!}
+                    </div>
                 @endif
             </main>
 
