@@ -117,6 +117,7 @@ class ProductImportController extends Controller
             // We need to keep track of parent products created in this session
             // to link variations if they reference Parent SKU
             $parentProductsBySku = [];
+            $skuRenameMap = [];
             $seenSkus = [];
 
             foreach ($data as $index => $row) {
@@ -262,6 +263,16 @@ class ProductImportController extends Controller
 
                 $sku = $skuCandidate;
                 $seenSkus[] = strtolower($sku);
+
+                if ($originalSku !== $sku) {
+                    $skuRenameMap[$originalSku] = $sku;
+                    $skuRenameMap[strtolower($originalSku)] = $sku;
+                    $strippedOriginal = preg_replace('/_COPY(_\d+)?$/i', '', $originalSku);
+                    if ($strippedOriginal && $strippedOriginal !== $originalSku) {
+                        $skuRenameMap[$strippedOriginal] = $sku;
+                        $skuRenameMap[strtolower($strippedOriginal)] = $sku;
+                    }
+                }
 
                 // Lookups
                 $brandId = $row['brand_id'] ?? null;
@@ -417,6 +428,11 @@ class ProductImportController extends Controller
                 }
 
                 // Determine if this is a child variation (has parent SKU) or a parent variation
+                if (!empty($parentSku) && isset($skuRenameMap[$parentSku])) {
+                    $parentSku = $skuRenameMap[$parentSku];
+                } elseif (!empty($parentSku) && isset($skuRenameMap[strtolower($parentSku)])) {
+                    $parentSku = $skuRenameMap[strtolower($parentSku)];
+                }
                 $isChildVariation = ($type === 'variation' && !empty($parentSku));
                 $companyId = auth()->user()->company_id ?? null;
 
@@ -424,22 +440,26 @@ class ProductImportController extends Controller
                 $parent = null;
                 $slugCandidate = null;
                 if ($isChildVariation) {
-                    $parentQuery = Product::where(function($q) use ($parentSku) {
-                        $q->where('sku_code', $parentSku)
-                          ->orWhere('sku_code', '"' . $parentSku . '"')
-                          ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
-                          ->orWhereJsonContains('sku_code', $parentSku);
-                    })->where('type', 'variation');
-
-                    if ($companyId) {
-                        $parentQuery->where('company_id', $companyId);
-                    }
-                    $parent = $parentQuery->first();
-                    if (!$parent && isset($parentProductsBySku[$parentSku])) {
+                    // Priority 1: Check if parent was just created/found in the current import batch
+                    if (isset($parentProductsBySku[$parentSku])) {
                         $parent = $parentProductsBySku[$parentSku];
-                    }
-                    if (!$parent && isset($parentProductsBySku[strtolower($parentSku)])) {
+                    } elseif (isset($parentProductsBySku[strtolower($parentSku)])) {
                         $parent = $parentProductsBySku[strtolower($parentSku)];
+                    }
+
+                    // Priority 2: If not in current batch, check database
+                    if (!$parent) {
+                        $parentQuery = Product::where(function($q) use ($parentSku) {
+                            $q->where('sku_code', $parentSku)
+                              ->orWhere('sku_code', '"' . $parentSku . '"')
+                              ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
+                              ->orWhereJsonContains('sku_code', $parentSku);
+                        })->where('type', 'variation');
+
+                        if ($companyId) {
+                            $parentQuery->where('company_id', $companyId);
+                        }
+                        $parent = $parentQuery->first();
                     }
                 } else {
                     $baseSlug = Str::slug($title ?: 'product');
@@ -568,8 +588,39 @@ class ProductImportController extends Controller
                                 $groupName = trim($parts[0]);
                                 $valueName = trim($parts[1]);
 
-                                $group = \App\Models\AttributeGroup::where('name', $groupName)->first();
-                                if (!$group) {
+                                $groupQuery = \App\Models\AttributeGroup::where('name', $groupName);
+                                if ($companyId) {
+                                    $groupQuery->where('company_id', $companyId);
+                                }
+                                $group = $groupQuery->first();
+
+                                if (!$group && !$isPreview) {
+                                    // Auto-create attribute group in destination store if missing
+                                    try {
+                                        $group = \App\Models\AttributeGroup::create([
+                                            'name' => $groupName,
+                                            'company_id' => $companyId,
+                                            'category' => 'Multiple',
+                                            'status' => \App\Enums\Status::Active->value,
+                                            'is_filterable' => false,
+                                        ]);
+                                    } catch (\Exception $e) {
+                                        // fallback if unique constraint or error
+                                        $group = \App\Models\AttributeGroup::where('name', $groupName)
+                                            ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                                            ->first();
+                                    }
+                                }
+
+                                if (!$group && $isPreview) {
+                                    // In preview mode, allow dynamic creation on confirm
+                                    $validAttributePairs[] = [
+                                        'group_id' => 99999,
+                                        'value_id' => 99999,
+                                        'group_name' => $groupName,
+                                        'value_name' => $valueName,
+                                    ];
+                                } elseif (!$group) {
                                     $isAttributeMissing = true;
                                     $missingAttributeDetails[] = "Attribute group '$groupName' not found.";
                                     $missingAttributes[] = [
@@ -579,10 +630,39 @@ class ProductImportController extends Controller
                                         'group_id' => null,
                                     ];
                                 } else {
-                                    $value = \App\Models\AttributeValue::where('attribute_group_id', $group->id)
-                                        ->where('name', $valueName)
-                                        ->first();
-                                    if (!$value) {
+                                    $valueQuery = \App\Models\AttributeValue::where('attribute_group_id', $group->id)
+                                        ->where('name', $valueName);
+                                    if ($companyId) {
+                                        $valueQuery->where('company_id', $companyId);
+                                    }
+                                    $value = $valueQuery->first();
+
+                                    if (!$value && !$isPreview) {
+                                        // Auto-create attribute value under this group if missing
+                                        try {
+                                            $value = \App\Models\AttributeValue::create([
+                                                'attribute_group_id' => $group->id,
+                                                'name' => $valueName,
+                                                'company_id' => $companyId,
+                                                'status' => \App\Enums\Status::Active->value,
+                                            ]);
+                                        } catch (\Exception $e) {
+                                            $value = \App\Models\AttributeValue::where('attribute_group_id', $group->id)
+                                                ->where('name', $valueName)
+                                                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                                                ->first();
+                                        }
+                                    }
+
+                                    if (!$value && $isPreview) {
+                                        // In preview mode, consider valid as it will be auto-created on confirm
+                                        $validAttributePairs[] = [
+                                            'group_id' => $group->id,
+                                            'value_id' => 99999,
+                                            'group_name' => $groupName,
+                                            'value_name' => $valueName,
+                                        ];
+                                    } elseif (!$value) {
                                         $isAttributeMissing = true;
                                         $missingAttributeDetails[] = "Attribute value '$valueName' not found under '$groupName'.";
                                         $missingAttributes[] = [
@@ -612,17 +692,23 @@ class ProductImportController extends Controller
                     $companyId = auth()->user()->company_id ?? null;
                     // This is a child variation
                     if (!$parent) {
-                        $parentQuery = Product::where(function($q) use ($parentSku) {
-                            $q->where('sku_code', $parentSku)
-                              ->orWhere('sku_code', '"' . $parentSku . '"')
-                              ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
-                              ->orWhereJsonContains('sku_code', $parentSku);
-                        })->where('type', 'variation');
+                        if (isset($parentProductsBySku[$parentSku])) {
+                            $parent = $parentProductsBySku[$parentSku];
+                        } elseif (isset($parentProductsBySku[strtolower($parentSku)])) {
+                            $parent = $parentProductsBySku[strtolower($parentSku)];
+                        } else {
+                            $parentQuery = Product::where(function($q) use ($parentSku) {
+                                $q->where('sku_code', $parentSku)
+                                  ->orWhere('sku_code', '"' . $parentSku . '"')
+                                  ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
+                                  ->orWhereJsonContains('sku_code', $parentSku);
+                            })->where('type', 'variation');
 
-                        if ($companyId) {
-                            $parentQuery->where('company_id', $companyId);
+                            if ($companyId) {
+                                $parentQuery->where('company_id', $companyId);
+                            }
+                            $parent = $parentQuery->first();
                         }
-                        $parent = $parentQuery->first();
                     }
                     $parentId = $parent ? $parent->id : ($parentProductsBySku[$parentSku]->id ?? ($parentProductsBySku[strtolower($parentSku)]->id ?? null));
                     
@@ -645,9 +731,21 @@ class ProductImportController extends Controller
                             $skuExistsQuery->whereHas('product', fn($q) => $q->where('company_id', $companyId));
                         }
                         if ($skuExistsQuery->exists()) {
-                            $skipped++;
-                            $errors[] = "Row $index: Variation SKU '$sku' already exists in your store.";
-                            continue;
+                            // If re-importing the same batch or duplicate SKU found, generate a unique variation SKU
+                            $origVarSku = $sku;
+                            $vCopyIdx = 1;
+                            while (true) {
+                                $candidateVarSku = $vCopyIdx === 1 ? "{$origVarSku}_COPY" : "{$origVarSku}_COPY_{$vCopyIdx}";
+                                $chk = \App\Models\ProductVariation::where('sku', $candidateVarSku);
+                                if ($companyId) {
+                                    $chk->whereHas('product', fn($q) => $q->where('company_id', $companyId));
+                                }
+                                if (!$chk->exists()) {
+                                    $sku = $candidateVarSku;
+                                    break;
+                                }
+                                $vCopyIdx++;
+                            }
                         }
                     }
 
