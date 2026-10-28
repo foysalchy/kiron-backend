@@ -16,7 +16,14 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
     protected function prepareForValidation(): void
     {
-        $keys = ['mega_category_ids', 'sub_category_ids', 'mini_category_ids', 'extra_category_ids'];
+        $keys = [
+            'mega_category_ids',
+            'sub_category_ids',
+            'mini_category_ids',
+            'extra_category_ids',
+            'filter_value_ids',
+            'filter_attribute_group_ids'
+        ];
         $merge = [];
         foreach ($keys as $key) {
             if ($this->has($key)) {
