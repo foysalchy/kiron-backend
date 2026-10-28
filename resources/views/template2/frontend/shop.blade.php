@@ -260,7 +260,7 @@
                     {!! $category->description !!}
                 </div>
                 @else
-                                 <div
+                <div
                     class=" bg-gray-50  border border-gray-100 rounded-lg px-6 py-6
                     prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold

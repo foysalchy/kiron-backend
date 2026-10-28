@@ -36,13 +36,31 @@
                     @endif
                 </nav>
                 <div class="meta_info py-4">
+                    @php
+                        $pageData = null;
+                        if (!($category && $category->name)) {
+                            $pageData = \App\Services\Saas\SystemPageService::get(
+                                \App\Enums\SystemPageType::SHOP,
+                                $setup->company_id ?? null
+                            );
+                        }
+                    @endphp
+
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
-                        {{ $category->name ?? 'Shop' }} Price in Bangladesh
+                        @if($category && $category->name)
+                            {{ $category->name }} Price in Bangladesh
+                        @elseif($pageData && $pageData->meta_title)
+                            {{ $pageData->meta_title }}
+                        @else
+                            Shop Price in Bangladesh
+                        @endif
                     </h1>
 
                     <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">
                         @if (isset($category->meta_description) && $category->meta_description)
                             <p>{!! $category->meta_description ?? '' !!}</p>
+                        @elseif ($pageData && $pageData->meta_description)
+                            <p>{!! $pageData->meta_description !!}</p>
                         @else
                             @php
                                 $isL = ($setup->currency_position ?? 'left') == 'left';
@@ -324,10 +342,19 @@
                     </p>
                 </div>
                 @if (isset($category->description) && $category->description)
-                    <section class="mt-12  border-t border-gray-100">
+                    <section class="mt-12 border-t border-gray-100">
                         <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed">
-                            {{-- <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ $category->name }}</h2> --}}
                             {!! $category->description !!}
+                        </div>
+                    </section>
+                @elseif (isset($pageData->description) && !empty($pageData->description))
+                    <section class="mt-12 border-t border-gray-100 pt-6">
+                        <div class="bg-gray-50 border border-gray-100 rounded-lg px-6 py-6 prose prose-slate max-w-none
+                            prose-headings:text-[#041533] prose-headings:font-bold
+                            prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+                            prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+                            prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
+                            {!! $pageData->description !!}
                         </div>
                     </section>
                 @endif

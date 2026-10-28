@@ -133,15 +133,18 @@
                         @endforeach
 
                         @if ($videoData)
-                            <button type="button" onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                            <button type="button"
+                                onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
                                 aria-label="Play Product Video"
                                 class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
                                 <img src="{{ $videoData['thumbnail_url'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
                                     onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
-                                    class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800"
-                                    height="800">
-                                <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                                    <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                    class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail"
+                                    loading="lazy" width="800" height="800">
+                                <div
+                                    class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                    <span
+                                        class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
                                         <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
                                     </span>
                                 </div>
@@ -240,7 +243,7 @@
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             aria-label="{{ $isWishlisted ? 'Remove ' . $product->title . ' from wishlist' : 'Add ' . $product->title . ' to wishlist' }}"
                             class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
-                        {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
+                            {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
                             <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
                                 fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
                                 <path
@@ -277,8 +280,8 @@
                     onclick="event.stopPropagation()">
                     {{-- Close Button --}}
                     <button type="button" onclick="closeVideoModal()" aria-label="Close Video"
-                        class="absolute -top-3 -right-3 sm:top-3 sm:right-3 z-30 w-9 h-9 sm:w-10 sm:h-10 bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 hover:scale-105 transition-all cursor-pointer">
-                        <i class="fas fa-times text-base sm:text-lg"></i>
+                        class="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 w-8 h-8 sm:w-10 sm:h-10 bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 hover:scale-105 transition-all cursor-pointer">
+                        <i class="fas fa-times text-sm sm:text-lg"></i>
                     </button>
 
                     {{-- Player Area --}}
@@ -401,7 +404,7 @@
             }
         }
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeVideoModal();
             }
@@ -416,26 +419,26 @@
             container.innerHTML = '';
             images.forEach((img, i) => {
                 container.innerHTML += `
-                          <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
-                            class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
-                            <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
-                          </button>`;
+                              <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
+                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
+                                <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
+                              </button>`;
             });
 
             if (productVideoData && productVideoData.embed_url) {
                 container.innerHTML += `
-                    <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
-                        aria-label="Play Product Video"
-                        class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
-                        <img src="${productVideoData.thumbnail_url || '{{ asset('images/template1/frontend/product-thumbnail.webp') }}'}"
-                            onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
-                            class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
-                        <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                            <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
-                            </span>
-                        </div>
-                    </button>`;
+                        <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
+                            aria-label="Play Product Video"
+                            class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                            <img src="${productVideoData.thumbnail_url || '{{ asset('images/template1/frontend/product-thumbnail.webp') }}'}"
+                                onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                            <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                    <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                                </span>
+                            </div>
+                        </button>`;
             }
 
             // ============ Arrow visibility + container padding dynamically আপডেট ============
@@ -491,7 +494,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                                    {{ $product->display_price_data->sale_price ?? 0 }},
+                                        {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;

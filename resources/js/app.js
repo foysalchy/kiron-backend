@@ -5,7 +5,7 @@ import toastr from 'toastr';
 window.$ = window.jQuery = $;
 window.toastr = toastr;
 
-window.SwiperPromise = document.querySelector('.rv-swiper, .mainHeroSwiper, .heroSwiper')
+window.SwiperPromise = document.querySelector('.rv-swiper, .mainHeroSwiper, .heroSwiper, .t1-product-thumb-swiper, .t2-product-thumb-swiper, .t3-product-thumb-swiper, .t4-product-thumb-swiper')
     ? Promise.all([
         import('swiper/bundle'),
         import('swiper/css/bundle'),
