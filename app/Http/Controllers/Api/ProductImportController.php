@@ -20,6 +20,7 @@ use App\Helpers\FileUploadHelper;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ProductImportController extends Controller
 {
@@ -55,11 +56,17 @@ class ProductImportController extends Controller
             $type = $request->query('type', 'xlsx');
             $fileName = 'products_data_' . date('Y_m_d_His') . '.' . $type;
 
+            $productIds = $request->input('product_ids', []);
+            if (is_string($productIds)) {
+                $productIds = explode(',', $productIds);
+            }
+            $productIds = is_array($productIds) ? array_filter(array_map('intval', $productIds)) : [];
+
             if ($type === 'csv') {
-                return Excel::download(new \App\Exports\ProductDataExport, $fileName, \Maatwebsite\Excel\Excel::CSV);
+                return Excel::download(new \App\Exports\ProductDataExport($productIds), $fileName, \Maatwebsite\Excel\Excel::CSV);
             }
 
-            return Excel::download(new \App\Exports\ProductDataExport, $fileName, \Maatwebsite\Excel\Excel::XLSX);
+            return Excel::download(new \App\Exports\ProductDataExport($productIds), $fileName, \Maatwebsite\Excel\Excel::XLSX);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -138,6 +145,7 @@ class ProductImportController extends Controller
                 $megaCatSlug = trim($row[13] ?? $row['raw_category'] ?? '');
 
                 // Filters & Attributes detection based on column count or JSON payload
+                $galleryImageUrlsStr = '';
                 if ($request->has('rows')) {
                     $rawFilters = trim($row['raw_filters'] ?? $row['filters'] ?? '');
                     $filterValueIds = isset($row['filter_value_ids']) && is_array($row['filter_value_ids'])
@@ -145,6 +153,7 @@ class ProductImportController extends Controller
                         : [];
                     $attributesStr = trim($row['attributes'] ?? '');
                     $thumbnailUrl = trim($row['thumbnailUrl'] ?? '');
+                    $galleryImageUrlsStr = trim($row['galleryImageUrls'] ?? '');
                     $shortDescription = trim($row['shortDescription'] ?? '') ?: null;
                     $fullDescription = trim($row['fullDescription'] ?? '') ?: null;
                     $metaTitle = trim($row['metaTitle'] ?? '') ?: null;
@@ -152,12 +161,25 @@ class ProductImportController extends Controller
                     $metaKeywordsStr = trim($row['metaKeywords'] ?? '');
                 } else {
                     $numCols = count($row);
-                    if ($numCols >= 22) {
-                        // 22-col template (with Filters at col 14)
+                    if ($numCols >= 23) {
+                        // 23-col template (with Filters at col 14, Gallery Images at col 17)
                         $rawFilters = trim($row[14] ?? '');
                         $filterValueIds = [];
                         $attributesStr = trim($row[15] ?? '');
                         $thumbnailUrl = trim($row[16] ?? '');
+                        $galleryImageUrlsStr = trim($row[17] ?? '');
+                        $shortDescription = trim($row[18] ?? '') ?: null;
+                        $fullDescription = trim($row[19] ?? '') ?: null;
+                        $metaTitle = trim($row[20] ?? '') ?: null;
+                        $metaDescription = trim($row[21] ?? '') ?: null;
+                        $metaKeywordsStr = trim($row[22] ?? '');
+                    } elseif ($numCols === 22) {
+                        // 22-col template (with Filters at col 14, no separate gallery col)
+                        $rawFilters = trim($row[14] ?? '');
+                        $filterValueIds = [];
+                        $attributesStr = trim($row[15] ?? '');
+                        $thumbnailUrl = trim($row[16] ?? '');
+                        $galleryImageUrlsStr = '';
                         $shortDescription = trim($row[17] ?? '') ?: null;
                         $fullDescription = trim($row[18] ?? '') ?: null;
                         $metaTitle = trim($row[19] ?? '') ?: null;
@@ -169,6 +191,7 @@ class ProductImportController extends Controller
                         $filterValueIds = [];
                         $attributesStr = trim($row[14] ?? '');
                         $thumbnailUrl = trim($row[15] ?? '');
+                        $galleryImageUrlsStr = '';
                         $shortDescription = trim($row[16] ?? '') ?: null;
                         $fullDescription = trim($row[17] ?? '') ?: null;
                         $metaTitle = trim($row[18] ?? '') ?: null;
@@ -180,6 +203,7 @@ class ProductImportController extends Controller
                         $filterValueIds = [];
                         $attributesStr = trim($row[14] ?? '');
                         $thumbnailUrl = trim($row[15] ?? '');
+                        $galleryImageUrlsStr = '';
                         $shortDescription = trim($row[16] ?? '') ?: null;
                         $fullDescription = null;
                         $metaTitle = trim($row[17] ?? '') ?: null;
@@ -400,13 +424,22 @@ class ProductImportController extends Controller
                 $parent = null;
                 $slugCandidate = null;
                 if ($isChildVariation) {
-                    $parentQuery = Product::where('sku_code', $parentSku)->where('type', 'variation');
+                    $parentQuery = Product::where(function($q) use ($parentSku) {
+                        $q->where('sku_code', $parentSku)
+                          ->orWhere('sku_code', '"' . $parentSku . '"')
+                          ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
+                          ->orWhereJsonContains('sku_code', $parentSku);
+                    })->where('type', 'variation');
+
                     if ($companyId) {
                         $parentQuery->where('company_id', $companyId);
                     }
                     $parent = $parentQuery->first();
                     if (!$parent && isset($parentProductsBySku[$parentSku])) {
                         $parent = $parentProductsBySku[$parentSku];
+                    }
+                    if (!$parent && isset($parentProductsBySku[strtolower($parentSku)])) {
+                        $parent = $parentProductsBySku[strtolower($parentSku)];
                     }
                 } else {
                     $baseSlug = Str::slug($title ?: 'product');
@@ -578,12 +611,20 @@ class ProductImportController extends Controller
                 if ($isChildVariation) {
                     $companyId = auth()->user()->company_id ?? null;
                     // This is a child variation
-                    $parentQuery = Product::where('sku_code', $parentSku)->where('type', 'variation');
-                    if ($companyId) {
-                        $parentQuery->where('company_id', $companyId);
+                    if (!$parent) {
+                        $parentQuery = Product::where(function($q) use ($parentSku) {
+                            $q->where('sku_code', $parentSku)
+                              ->orWhere('sku_code', '"' . $parentSku . '"')
+                              ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$parentSku])
+                              ->orWhereJsonContains('sku_code', $parentSku);
+                        })->where('type', 'variation');
+
+                        if ($companyId) {
+                            $parentQuery->where('company_id', $companyId);
+                        }
+                        $parent = $parentQuery->first();
                     }
-                    $parent = $parentQuery->first();
-                    $parentId = $parent ? $parent->id : ($parentProductsBySku[$parentSku]->id ?? null);
+                    $parentId = $parent ? $parent->id : ($parentProductsBySku[$parentSku]->id ?? ($parentProductsBySku[strtolower($parentSku)]->id ?? null));
                     
                     if (!$parentId) {
                         $skipped++;
@@ -654,6 +695,55 @@ class ProductImportController extends Controller
                                 'attribute_value_id' => $vPair['value_id'],
                             ]);
                         }
+
+                        // Attach variation gallery images from uploaded files
+                        if ($request->hasFile("rows.$index.galleryFiles")) {
+                            $vGalFiles = $request->file("rows.$index.galleryFiles");
+                            $vParentSlug = $parent ? $parent->slug : Str::slug($parentSku ?: 'var');
+                            foreach ((array)$vGalFiles as $gIdx => $gFile) {
+                                try {
+                                    $vGalFileName = Str::slug($vParentSlug) . '_vgallery' . ($gIdx + 1) . '-' . uniqid() . '-' . time();
+                                    $vGalPath = FileUploadHelper::uploadImage(
+                                        $gFile,
+                                        'products/galleries',
+                                        'r2',
+                                        2048,
+                                        $vGalFileName,
+                                        true
+                                    );
+                                    if ($vGalPath) {
+                                        \App\Models\VariationGallery::create([
+                                            'variation_id' => $variation->id,
+                                            'image' => $vGalPath,
+                                        ]);
+                                    }
+                                } catch (\Exception $e) {
+                                    Log::warning("Failed to upload variation gallery multipart image for row {$index}: " . $e->getMessage());
+                                }
+                            }
+                        }
+
+                        // Attach variation gallery images from URL if present
+                        if (!empty($galleryImageUrlsStr)) {
+                            $vGalUrls = array_filter(array_map('trim', explode(',', $galleryImageUrlsStr)));
+                            $vParentSlug = $parent ? $parent->slug : Str::slug($parentSku ?: 'var');
+                            foreach ($vGalUrls as $gIdx => $gUrl) {
+                                if (filter_var($gUrl, FILTER_VALIDATE_URL)) {
+                                    try {
+                                        $vGalFileName = Str::slug($vParentSlug) . '_vgallery' . ($gIdx + 1) . '-' . uniqid() . '-' . time();
+                                        $vGalPath = FileUploadHelper::uploadFromUrl($gUrl, 'products/galleries', 'r2', true, $vGalFileName);
+                                        if ($vGalPath) {
+                                            \App\Models\VariationGallery::create([
+                                                'variation_id' => $variation->id,
+                                                'image' => $vGalPath,
+                                            ]);
+                                        }
+                                    } catch (\Exception $e) {
+                                        Log::warning("Failed to upload variation gallery image from URL for row {$index}: " . $e->getMessage());
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     // This is single or parent variation
@@ -708,6 +798,9 @@ class ProductImportController extends Controller
 
                         if ($actualType === 'variation') {
                             $parentProductsBySku[$sku] = $product;
+                            $parentProductsBySku[strtolower($sku)] = $product;
+                            $parentProductsBySku[$originalSku] = $product;
+                            $parentProductsBySku[strtolower($originalSku)] = $product;
                         }
 
                         if ($manageStock && $warehouseId && $actualType === 'single') {
@@ -723,10 +816,63 @@ class ProductImportController extends Controller
                                 'created_by' => Auth::id() ?? 1,
                             ]);
                         }
+
+                        // Attach product gallery images from uploaded files
+                        if ($request->hasFile("rows.$index.galleryFiles")) {
+                            $galFiles = $request->file("rows.$index.galleryFiles");
+                            $pSlug = $product->slug ?: Str::slug($title);
+                            foreach ((array)$galFiles as $gIdx => $gFile) {
+                                try {
+                                    $galFileName = Str::slug($pSlug) . '_gallery' . ($gIdx + 1) . '-' . uniqid() . '-' . time();
+                                    $galPath = FileUploadHelper::uploadImage(
+                                        $gFile,
+                                        'products/galleries',
+                                        'r2',
+                                        2048,
+                                        $galFileName,
+                                        true
+                                    );
+                                    if ($galPath) {
+                                        \App\Models\Gallery::create([
+                                            'product_id' => $product->id,
+                                            'image' => $galPath,
+                                        ]);
+                                    }
+                                } catch (\Exception $e) {
+                                    Log::warning("Failed to upload gallery multipart image for row {$index}: " . $e->getMessage());
+                                }
+                            }
+                        }
+
+                        // Attach product gallery images from URL if present
+                        if (!empty($galleryImageUrlsStr)) {
+                            $galUrls = array_filter(array_map('trim', explode(',', $galleryImageUrlsStr)));
+                            $pSlug = $product->slug ?: Str::slug($title);
+                            foreach ($galUrls as $gIdx => $gUrl) {
+                                if (filter_var($gUrl, FILTER_VALIDATE_URL)) {
+                                    try {
+                                        $galFileName = Str::slug($pSlug) . '_gallery' . ($gIdx + 1) . '-' . uniqid() . '-' . time();
+                                        $galPath = FileUploadHelper::uploadFromUrl($gUrl, 'products/galleries', 'r2', true, $galFileName);
+                                        if ($galPath) {
+                                            \App\Models\Gallery::create([
+                                                'product_id' => $product->id,
+                                                'image' => $galPath,
+                                            ]);
+                                        }
+                                    } catch (\Exception $e) {
+                                        Log::warning("Failed to upload gallery image from URL for row {$index}: " . $e->getMessage());
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         // In preview mode, fake the parent linking so child validation passes
                         if ($actualType === 'variation') {
-                            $parentProductsBySku[$sku] = (object)['id' => 99999]; // dummy ID
+                            $dummyParent = (object)['id' => 99999];
+                            $parentProductsBySku[$sku] = $dummyParent;
+                            $parentProductsBySku[strtolower($sku)] = $dummyParent;
+                            $parentProductsBySku[$originalSku] = $dummyParent;
+                            $parentProductsBySku[strtolower($originalSku)] = $dummyParent;
                         }
                     }
                 }
@@ -762,6 +908,7 @@ class ProductImportController extends Controller
                         'raw_warehouse' => $warehouseName,
                         'attributes' => $attributesStr,
                         'thumbnailUrl' => $thumbnailUrl,
+                        'galleryImageUrls' => $galleryImageUrlsStr,
                         'shortDescription' => $shortDescription,
                         'fullDescription' => $fullDescription,
                         'metaTitle' => $metaTitle,

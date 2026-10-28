@@ -98,6 +98,7 @@
 </script>
 
 @if(!empty($activePreviewTheme))
+<x-theme-preview-switcher />
 <script>
     (function() {
         const previewTheme = @json($activePreviewTheme);
