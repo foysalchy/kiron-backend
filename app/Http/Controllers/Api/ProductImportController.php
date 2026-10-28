@@ -119,6 +119,7 @@ class ProductImportController extends Controller
             $parentProductsBySku = [];
             $skuRenameMap = [];
             $seenSkus = [];
+            $affectedParentIds = [];
 
             foreach ($data as $index => $row) {
                 // If it's from Excel, $index is numeric and row is array of columns.
@@ -436,6 +437,11 @@ class ProductImportController extends Controller
                 $isChildVariation = ($type === 'variation' && !empty($parentSku));
                 $companyId = auth()->user()->company_id ?? null;
 
+                // Parent variation products do not hold stock or warehouse directly (managed at child variation level)
+                if (($type === 'variation' || $type === 'variable') && !$isChildVariation) {
+                    $isWarehouseMissing = false;
+                }
+
                 // Pre-resolve parent product or slug candidate to align image naming with ProductService standards
                 $parent = null;
                 $slugCandidate = null;
@@ -716,6 +722,10 @@ class ProductImportController extends Controller
                         $skipped++;
                         $errors[] = "Row $index: Parent SKU ($parentSku) not found for variation.";
                         continue;
+                    }
+
+                    if (!$isPreview) {
+                        $affectedParentIds[$parentId] = $parentId;
                     }
 
                     // If attributes are missing or invalid, skip this variation row during actual import
@@ -1022,6 +1032,21 @@ class ProductImportController extends Controller
                         'filter_value_ids' => $filterValueIds ?: [],
                         'warehouse_id' => $warehouseId,
                     ];
+                }
+            }
+
+            // After all rows are processed, recalculate total stock and stock status for affected variation parent products
+            if (!$isPreview && !empty($affectedParentIds)) {
+                foreach ($affectedParentIds as $pId) {
+                    $parentProd = Product::find($pId);
+                    if ($parentProd && $parentProd->type === 'variation') {
+                        $totalStock = (int) ProductVariation::where('product_id', $pId)->sum('available_stock');
+                        $parentProd->update([
+                            'stock_quantity' => $totalStock,
+                            'available_stock' => $totalStock,
+                            'stock_status' => $totalStock > 0 ? 'in_stock' : 'out_of_stock',
+                        ]);
+                    }
                 }
             }
 
