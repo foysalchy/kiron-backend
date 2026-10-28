@@ -243,7 +243,7 @@ class ProductController extends FrontendController
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
 
-        $products = $query->paginate(12)->appends($request->query());
+        $products = $query->paginate(15)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
@@ -583,7 +583,7 @@ class ProductController extends FrontendController
 
         $this->applyFiltersAndSorting($query, $request);
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
@@ -614,7 +614,7 @@ class ProductController extends FrontendController
 
         $this->applyFiltersAndSorting($query, $request);
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
@@ -697,7 +697,7 @@ class ProductController extends FrontendController
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
 
-        $products = $query->paginate(12)->appends($request->query());
+        $products = $query->paginate(15)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';

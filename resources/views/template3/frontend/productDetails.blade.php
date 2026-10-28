@@ -62,21 +62,24 @@
                                 class="thumb-btn aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer">
                                 <img src="{{ $imgUrl }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
-                                    class="w-full h-full object-contain pointer-events-none" alt="Product Image" loading="lazy" width="800"
-                                    height="800">
+                                    class="w-full h-full object-contain pointer-events-none" alt="Product Image" loading="lazy"
+                                    width="800" height="800">
                             </button>
                         @endforeach
 
                         @if ($videoData)
-                            <button type="button" onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                            <button type="button"
+                                onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
                                 aria-label="Play Product Video"
                                 class="thumb-btn aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer">
                                 <img src="{{ $videoData['thumbnail_url'] ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
-                                    class="w-full h-full object-contain pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800"
-                                    height="800">
-                                <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                                    <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                    class="w-full h-full object-contain pointer-events-none" alt="Product Video Thumbnail"
+                                    loading="lazy" width="800" height="800">
+                                <div
+                                    class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                    <span
+                                        class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
                                         <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
                                     </span>
                                 </div>
@@ -90,18 +93,23 @@
                     @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
 
                     @if ($isUpcoming)
-                        <span class="inline-block bg-blue-600 text-white text-sm md:text-base font-bold px-3 py-1 rounded-full mb-4">
+                        <span
+                            class="inline-block bg-blue-600 text-white text-sm md:text-base font-bold px-3 py-1 rounded-full mb-4">
                             {{ \App\Enums\Status::Upcoming->label() }}
                         </span>
                     @endif
 
-                    @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                        <span id="discount-badge"
-                            class="inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
+                    @php
+                        $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                    @endphp
+
+                    <span id="discount-badge"
+                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
+                        @if ($hasDiscount)
                             {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
                             OFF
-                        </span>
-                    @endif
+                        @endif
+                    </span>
 
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
                     @php
@@ -133,15 +141,19 @@
                     </div>
 
                     <div class="flex items-baseline gap-4 mb-6">
-                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-400 text-lg line-through">
+                        @php
+                            $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                        @endphp
+                        <span id="regular-price"
+                            class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-400 text-lg line-through">
+                            @if ($hasRegPrice)
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                                 @else
                                     {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                                 @endif
-                            </span>
-                        @endif
+                            @endif
+                        </span>
 
                         <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
@@ -206,7 +218,7 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                                    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                                        {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -268,7 +280,18 @@
                                 Call Now
                             </a>
 
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                            @php
+                                $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
+                                if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
+                                    $waPhone = '88' . $rawPhone;
+                                } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
+                                    $waPhone = '880' . $rawPhone;
+                                } else {
+                                    $waPhone = $rawPhone;
+                                }
+                            @endphp
+
+                            <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                                 target="_blank"
                                 class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -532,7 +555,7 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-                    @foreach ($relatedProducts->take(10) as $rel)
+                    @foreach ($relatedProducts->take(5) as $rel)
                         <x-template1.product-card :product="$rel" />
                     @endforeach
                 </div>
@@ -633,7 +656,7 @@
             }
         }
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeVideoModal();
             }
@@ -683,26 +706,26 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                    <button class="thumb-btn aspect-square rounded-lg border ${borderClass} p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer shrink-0"
-                        onclick="changeImage('${imgUrl}', this)">
-                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-contain pointer-events-none" alt="Product Thumbnail" loading="lazy" width="800" height="800">
-                    </button>`;
+                        <button class="thumb-btn aspect-square rounded-lg border ${borderClass} p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer shrink-0"
+                            onclick="changeImage('${imgUrl}', this)">
+                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-contain pointer-events-none" alt="Product Thumbnail" loading="lazy" width="800" height="800">
+                        </button>`;
             });
 
             if (productVideoData && productVideoData.embed_url) {
                 container.innerHTML += `
-                    <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
-                        aria-label="Play Product Video"
-                        class="thumb-btn aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer shrink-0">
-                        <img src="${productVideoData.thumbnail_url || '{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'}"
-                            onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
-                            class="w-full h-full object-contain pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
-                        <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                            <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
-                            </span>
-                        </div>
-                    </button>`;
+                        <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
+                            aria-label="Play Product Video"
+                            class="thumb-btn aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer shrink-0">
+                            <img src="${productVideoData.thumbnail_url || '{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'}"
+                                onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                class="w-full h-full object-contain pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                            <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                    <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                                </span>
+                            </div>
+                        </button>`;
             }
         }
 
@@ -790,7 +813,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                                        {{ $product->display_price_data->sale_price ?? 0 }},
+                                            {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;
@@ -838,6 +861,14 @@
         }
 
         function handleSelection(group, valId, isLastGroup) {
+            let isSingleChoice = false;
+            for (let gName in groupCategories) {
+                if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') {
+                    isSingleChoice = true;
+                    break;
+                }
+            }
+
             if (!isLastGroup) {
                 activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
                 let idx = attributeGroups.indexOf(group);
@@ -847,37 +878,58 @@
                     recalculateSelectedPrice();
                 }
             } else {
-                activeFilters[group] = valId;
                 let matched = allVariations.find(v => {
-                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                    let tempFilters = { ...activeFilters };
+                    tempFilters[group] = valId;
+                    return attributeGroups.every(g => v.attributes[g] && v.attributes[g].id == tempFilters[g]);
                 });
 
-                if (matched) {
-                    let isSingleChoice = false;
-                    for (let gName in matched.attributes) {
-                        if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
-                    }
-
-                    if (isSingleChoice) {
+                if (isSingleChoice) {
+                    if (activeFilters[group] == valId) {
+                        // Single choice: ২য় বার ক্লিক করলে deselect
+                        activeFilters[group] = null;
+                        finalSelectedVariationIds = [];
+                        updateGalleryThumbnails(defaultGalleries);
+                        const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp'));
+                        if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
+                    } else if (matched) {
+                        activeFilters[group] = valId;
                         finalSelectedVariationIds = [matched.id];
                         let combined = [...(matched.galleries || []), ...defaultGalleries];
                         updateGalleryThumbnails([...new Set(combined)]);
                         if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
-                    } else {
+                    }
+                } else {
+                    // Multiple choice: প্রতিটি ভ্যারিয়েন্ট টগল হবে (সিলেক্ট থাকলে deselect, না থাকলে select)
+                    if (matched) {
                         const index = finalSelectedVariationIds.indexOf(matched.id);
                         if (index > -1) {
+                            // ২য় বার ক্লিক: deselect
                             finalSelectedVariationIds.splice(index, 1);
-                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                            if (finalSelectedVariationIds.length === 0) {
+                                activeFilters[group] = null;
+                                updateGalleryThumbnails(defaultGalleries);
+                                const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp'));
+                                if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
+                            } else {
+                                // যদি অন্য ভ্যারিয়েন্ট এখনও সিলেক্টেড থাকে, শেষটির ফিল্টার অ্যাক্টিভ রাখা
+                                const lastSelected = allVariations.find(v => v.id === finalSelectedVariationIds[finalSelectedVariationIds.length - 1]);
+                                if (lastSelected && lastSelected.attributes[group]) {
+                                    activeFilters[group] = lastSelected.attributes[group].id;
+                                }
+                            }
                         } else {
+                            // ১ম বার ক্লিক: select
+                            activeFilters[group] = valId;
                             finalSelectedVariationIds.push(matched.id);
                             let combined = [...(matched.galleries || []), ...defaultGalleries];
                             updateGalleryThumbnails([...new Set(combined)]);
                             if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
                         }
                     }
-
-                    recalculateSelectedPrice();
                 }
+
+                recalculateSelectedPrice();
             }
             updateSkuDisplay();
             renderAttributes();
