@@ -268,7 +268,7 @@ class HomeController extends FrontendController
                     ->with(['brand:id,company_id,name,slug,logo', 'variations'])
                     ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
                     ->latest()
-                    ->take(12)
+                    ->take(15)
                     ->get();
             });
         }
