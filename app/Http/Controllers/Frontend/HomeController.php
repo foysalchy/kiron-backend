@@ -255,12 +255,12 @@ class HomeController extends FrontendController
                     ->withAvg('reviews', 'rating')
                     ->withSum('orderDetails as total_sales', 'quantity')
                     ->orderByDesc('total_sales')
-                    ->take(12)
+                    ->take(15)
                     ->get();
             });
         }
 
-        // ৯. অল প্রোডাক্টস (লেটেস্ট ১২টি)
+        // ৯. অল প্রোডাক্টস (লেটেস্ট ১৫টি)
         if (in_array('allProducts', $reqs)) {
             $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () use ($companyId, $productSelect) {
                 return Product::where('company_id', $companyId)
