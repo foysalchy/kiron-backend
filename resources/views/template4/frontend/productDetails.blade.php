@@ -249,6 +249,10 @@
                             </div>
                         @endif
 
+                        @php
+                            $isProductOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock && $product->available_stock <= 0);
+                        @endphp
+
                         <!-- Quantity & Action Buttons -->
                         <div class="flex flex-col xl:flex-row items-start xl:items-center gap-4 md:gap-6">
                             <div class="flex items-center gap-3 md:gap-4">
@@ -265,19 +269,19 @@
 
                             <div class="flex-1 flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
                                 <!-- Add to Cart Button -->
-                                <button onclick="handleAddToCart()" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                                 <!-- Buy Now Button -->
-                                <button onclick="handleAddToCart(true)" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
                         <p
-                            class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
+                            class="text-sm mt-4 {{ !$isProductOutOfStock ? 'text-green-700' : 'text-red-500' }}">
                             <i
-                                class="fas {{ (!$product->manage_stock || $product->available_stock > 0) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
-                            {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
+                                class="fas {{ !$isProductOutOfStock ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                            {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
                         </p>
 
                         <p class="text-sm md:text-base text-gray-600 mt-5 md:mt-6 leading-relaxed">
@@ -456,8 +460,8 @@
                                     <div class="flex justify-between py-2 border-b border-gray-100">
                                         <span class="text-gray-600 font-medium">Availability:</span>
                                         <span
-                                            class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
-                                            {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
+                                            class="font-bold {{ !$isProductOutOfStock ? 'text-green-600' : 'text-red-500' }}">
+                                            {{ !$isProductOutOfStock ? 'In Stock' : 'Out of Stock' }}
                                         </span>
                                     </div>
 

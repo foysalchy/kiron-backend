@@ -232,9 +232,12 @@
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         {{-- Replace this part --}}
+                        @php
+                            $isProductOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock && $product->available_stock <= 0);
+                        @endphp
                         <span
-                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
-                            {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
+                            class="text-sm {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
+                            {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
                         </span>
                     </div>
 
@@ -253,11 +256,11 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- 1. Add To Cart -->
-                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
+                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="order-2 md:order-1 col-span-1 md:col-span-1 flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                         <!-- 2. Order Now Button -->
-                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || ($product->manage_stock && $product->available_stock <= 0)) ? 'disabled' : '' }}
+                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="order-1 md:order-2 col-span-2 md:col-span-1 flex-1 secondary-bg hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
 
                         <!--  Wishlist -->
@@ -445,8 +448,8 @@
                                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                             <span class="font-medium text-gray-500">Availability:</span>
                                             <span
-                                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
-                                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                                class="font-bold {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
+                                                {{ $isProductOutOfStock ? 'Out of Stock' : 'In Stock' }}
                                             </span>
                                         </div>
 
