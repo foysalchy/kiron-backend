@@ -2774,16 +2774,9 @@ class ProductService
         }
 
         $updatedCount = 0;
-        $skippedCount = 0;
 
-        DB::transaction(function () use ($products, $stockStatus, &$updatedCount, &$skippedCount) {
+        DB::transaction(function () use ($products, $stockStatus, &$updatedCount) {
             foreach ($products as $product) {
-                // Skip products where stock management is disabled
-                if (!$product->manage_stock) {
-                    $skippedCount++;
-                    continue;
-                }
-
                 $product->update([
                     'stock_status' => $stockStatus,
                 ]);
@@ -2802,7 +2795,6 @@ class ProductService
 
         return [
             'updated_count' => $updatedCount,
-            'skipped_count' => $skippedCount,
             'stock_status'  => $stockStatus,
         ];
     }

@@ -271,40 +271,10 @@
                         </button>
                     </div>
 
-                    <!-- Dynamic Trust List -->
-                    <div class="space-y-3 text-md mb-6">
-                        @foreach ($trustBadges->where('page_type', 'product_page') as $item)
-                            <div class="flex items-center gap-2"
-                                style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
-                                <div class="shrink-0">
-                                    @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) }}" class="h-5 w-5 object-contain">
-                                    @else
-                                        <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
-                                    @endif
-                                </div>
-                                <span class="">
-                                    {{ $item->title }} {{ $item->subtitle ? ': ' . $item->subtitle : '' }}
-                                </span>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Dynamic 3-Column Grid -->
-                    @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                            @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
-                                <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                                    <div class="text-orange-500 shrink-0">
-                                        @if ($card->icon_file)
-                                            <img src="{{ asset('storage/' . $card->icon_file) }}" class="h-5 w-5 object-contain">
-                                        @else
-                                            <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
-                                        @endif
-                                    </div>
-                                    <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
-                                </div>
-                            @endforeach
+                    <!-- Product Custom Block (Notice/Announcement/Policy) -->
+                    @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
+                        <div class="product-custom-block my-5 p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                            {!! $productCustomBlock->text_content !!}
                         </div>
                     @endif
 

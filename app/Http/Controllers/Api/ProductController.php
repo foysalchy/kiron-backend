@@ -538,12 +538,7 @@ class ProductController extends Controller
         );
 
         $statusLabel = $validated['stock_status'] === 'in_stock' ? 'In Stock' : 'Out of Stock';
-        $message = "{$data['updated_count']} product(s) marked as {$statusLabel} successfully";
-        if (!empty($data['skipped_count'])) {
-            $message .= " ({$data['skipped_count']} skipped because stock management is disabled)";
-        }
-
-        return ResponseHelper::success($data, $message);
+        return ResponseHelper::success($data, "{$data['updated_count']} product(s) marked as {$statusLabel} successfully");
     }
 }
 
