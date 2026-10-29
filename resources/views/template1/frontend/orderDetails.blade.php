@@ -3,6 +3,32 @@
     @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup, 'order' => $order])
 @endsection
 @section('content')
+    @php
+        $currentStatusVal = (int) ($order->status instanceof \App\Enums\Status ? $order->status->value : $order->status);
+        $statusEnum = \App\Enums\Status::tryFrom($currentStatusVal);
+        $statusLabel = $statusEnum?->label() ?? 'Draft';
+
+        $statusColorClasses = match ($currentStatusVal) {
+            \App\Enums\Status::Pending->value         => 'bg-orange-100 text-orange-700',
+            \App\Enums\Status::Approved->value        => 'bg-teal-100 text-teal-700',
+            \App\Enums\Status::Confirmed->value       => 'bg-blue-100 text-blue-700',
+            \App\Enums\Status::Processing->value      => 'bg-blue-100 text-blue-700',
+            \App\Enums\Status::ReadyToShipped->value  => 'bg-indigo-100 text-indigo-700',
+            \App\Enums\Status::Shipped->value         => 'bg-indigo-100 text-indigo-700',
+            \App\Enums\Status::HandovertoCourier->value => 'bg-purple-100 text-purple-700',
+            \App\Enums\Status::InTransit->value       => 'bg-purple-100 text-purple-700',
+            \App\Enums\Status::Delivered->value       => 'bg-green-100 text-green-700',
+            \App\Enums\Status::Completed->value       => 'bg-emerald-100 text-emerald-700',
+            \App\Enums\Status::Cancelled->value       => 'bg-red-100 text-red-700',
+            \App\Enums\Status::Returned->value,
+            \App\Enums\Status::ReturntoCourier->value,
+            \App\Enums\Status::ReturnReceived->value  => 'bg-rose-100 text-rose-700',
+            \App\Enums\Status::ReturnRequest->value   => 'bg-purple-100 text-purple-700',
+            \App\Enums\Status::Draft->value           => 'bg-gray-100 text-gray-700',
+            \App\Enums\Status::Hold->value            => 'bg-amber-100 text-amber-700',
+            default                                   => 'bg-gray-100 text-gray-700',
+        };
+    @endphp
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Header Actions -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
@@ -14,8 +40,8 @@
                 <h1 class="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
-                <span class="px-4 py-1 {{ $order->status_color }} text-md font-bold rounded-lg mb-1">
-                    {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
+                <span class="px-4 py-1 {{ $statusColorClasses }} text-md font-bold rounded-lg mb-1">
+                    {{ $statusLabel }}
                 </span>
                 <p class="text-sm text-gray-600 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
@@ -44,10 +70,15 @@
                                 </div>
 
                                 <div class="flex-1 text-center sm:text-left">
-                                    {{-- 2. Safe Title Check --}}
-                                    <h3 class="text-md font-bold text-gray-800 mb-1 leading-tight">
-                                        {{ $item->product->title ?? 'Product Not Available' }}
-                                    </h4>
+                                    {{-- 2. Safe Title Check & Delivery Status --}}
+                                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                                        <h3 class="text-md font-bold text-gray-800 leading-tight">
+                                            {{ $item->product->title ?? 'Product Not Available' }}
+                                        </h3>
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full {{ $statusColorClasses }} uppercase">
+                                            {{ $statusLabel }}
+                                        </span>
+                                    </div>
 
                                     @if ($item->variation)
                                         <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
@@ -73,7 +104,7 @@
 
                                 {{-- 3. Safe Review Button Logic --}}
                                 @php
-                                    $canReview = $item->product && $order->status === \App\Enums\Status::Delivered;
+                                    $canReview = $item->product && ($currentStatusVal === \App\Enums\Status::Delivered->value);
                                 @endphp
 
                                 @if ($canReview)
@@ -105,12 +136,11 @@
                         class="relative pl-8 space-y-8 before:content-[''] before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
 
                         @php
-                            $currentStatus = $order->status; // এটি একটি Enum Object
-                            $flow = \App\Enums\Status::ORDER_FLOW; // এটি Enum Objects এর এ্যারে
+                            $flow = \App\Enums\Status::ORDER_FLOW;
 
                             $currentIndex = -1;
                             foreach ($flow as $index => $status) {
-                                if ($status === $currentStatus) {
+                                if ($status->value === $currentStatusVal) {
                                     $currentIndex = $index;
                                     break;
                                 }

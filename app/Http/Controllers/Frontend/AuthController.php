@@ -186,7 +186,8 @@ class AuthController extends FrontendController
             ->latest()
             ->get();
 
-        $paymentMethods = CustomerPaymentMethod::where('status', Status::Active->value)
+        $paymentMethods = CustomerPaymentMethod::where('company_id', $this->company_id)
+            ->where('status', Status::Active->value)
             ->get();
 
         $totalOrders = $allOrders->count();
