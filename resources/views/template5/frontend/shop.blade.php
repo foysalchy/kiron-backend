@@ -149,12 +149,50 @@
                             </div>
                         </div>
 
+                        <!-- Availability Filter (Static) -->
+                        <div class="border-t border-gray-100">
+                            <button type="button" onclick="toggleAvailabilityFilter()"
+                                class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <span class="text-sm font-bold text-gray-800">Availability</span>
+                                <svg id="availability-arrow" class="w-4 h-4 text-gray-500 transition-transform duration-300"
+                                    style="{{ request()->has('availability') ? 'transform: rotate(180deg);' : '' }}"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="availability-panel" class="{{ request()->has('availability') ? '' : 'hidden' }} px-4 pb-4 border-b border-gray-50">
+                                <div class="flex flex-col gap-2.5 text-gray-800 font-medium pt-1">
+                                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                                        <input type="checkbox" name="availability[]" value="in_stock"
+                                            onchange="this.form.submit()"
+                                            {{ in_array('in_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                            class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                        <span class="text-sm text-gray-700 group-hover:text-[var(--primary-color)]">In Stock</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                                        <input type="checkbox" name="availability[]" value="out_of_stock"
+                                            onchange="this.form.submit()"
+                                            {{ in_array('out_of_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                            class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                        <span class="text-sm text-gray-700 group-hover:text-[var(--primary-color)]">Out Of Stock</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                                        <input type="checkbox" name="availability[]" value="upcoming"
+                                            onchange="this.form.submit()"
+                                            {{ in_array('upcoming', (array)request('availability', [])) ? 'checked' : '' }}
+                                            class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                        <span class="text-sm text-gray-700 group-hover:text-[var(--primary-color)]">Up Coming</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- ② Filter By Brand header — Toggle Button -->
                         <button type="button" onclick="toggleAllFilters()"
                             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50">
                             <span class="text-sm font-bold text-gray-800">More Filters</span>
                             <svg id="all-filters-arrow" class="w-4 h-4 text-gray-400 transition-transform duration-300"
+                                style="{{ request()->has('filter_values') ? 'transform: rotate(180deg);' : '' }}"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -286,6 +324,18 @@
             box.classList.toggle('hidden');
         }
 
+        function toggleAvailabilityFilter() {
+            const panel = document.getElementById('availability-panel');
+            const arrow = document.getElementById('availability-arrow');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                panel.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
         function toggleAllFilters() {
             const panel = document.getElementById('all-filters-panel');
             const arrow = document.getElementById('all-filters-arrow');
@@ -304,6 +354,12 @@
             const arrow = document.getElementById('all-filters-arrow');
             if (panel && !panel.classList.contains('hidden')) {
                 arrow.style.transform = 'rotate(180deg)';
+            }
+
+            const availPanel = document.getElementById('availability-panel');
+            const availArrow = document.getElementById('availability-arrow');
+            if (availPanel && !availPanel.classList.contains('hidden')) {
+                availArrow.style.transform = 'rotate(180deg)';
             }
         });
         const slider = document.getElementById('price-slider');

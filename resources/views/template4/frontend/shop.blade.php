@@ -126,6 +126,31 @@
                     </div>
                 </div>
 
+                <!-- Availability Filter (Mobile) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">Availability</label>
+                    <div class="flex flex-col gap-2.5 text-gray-800 font-medium">
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="availability[]" value="in_stock"
+                                {{ in_array('in_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                            <span class="text-sm text-gray-700">In Stock</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="availability[]" value="out_of_stock"
+                                {{ in_array('out_of_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                            <span class="text-sm text-gray-700">Out Of Stock</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="availability[]" value="upcoming"
+                                {{ in_array('upcoming', (array)request('availability', [])) ? 'checked' : '' }}
+                                class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                            <span class="text-sm text-gray-700">Up Coming</span>
+                        </label>
+                    </div>
+                </div>
+
 
                 <!-- ③ Dynamic Filters (RAM, ROM, Material, etc. from $filters) -->
                 @if(isset($filters) && $filters->isNotEmpty())
@@ -227,6 +252,44 @@
                         </div>
                     </div>
 
+                    <!-- Availability Filter (Static) -->
+                    <div class="border-t border-gray-100 pt-4">
+                        <button type="button" onclick="toggleAvailabilityFilter()"
+                            class="w-full flex items-center justify-between py-2 hover:text-[var(--primary-color)] transition-colors">
+                            <span class="text-sm font-bold text-gray-800 uppercase tracking-wider">Availability</span>
+                            <svg id="availability-arrow" class="w-4 h-4 text-gray-500 transition-transform duration-300"
+                                style="{{ request()->has('availability') ? 'transform: rotate(180deg);' : '' }}"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="availability-panel" class="{{ request()->has('availability') ? '' : 'hidden' }} space-y-2.5 pt-3">
+                            <div class="flex flex-col gap-2.5 text-gray-800 font-medium">
+                                <label class="flex items-center gap-2.5 cursor-pointer group">
+                                    <input type="checkbox" name="availability[]" value="in_stock"
+                                        onchange="this.form.submit()"
+                                        {{ in_array('in_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                    <span class="text-xs sm:text-sm text-gray-600 group-hover:text-[var(--primary-color)]">In Stock</span>
+                                </label>
+                                <label class="flex items-center gap-2.5 cursor-pointer group">
+                                    <input type="checkbox" name="availability[]" value="out_of_stock"
+                                        onchange="this.form.submit()"
+                                        {{ in_array('out_of_stock', (array)request('availability', [])) ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                    <span class="text-xs sm:text-sm text-gray-600 group-hover:text-[var(--primary-color)]">Out Of Stock</span>
+                                </label>
+                                <label class="flex items-center gap-2.5 cursor-pointer group">
+                                    <input type="checkbox" name="availability[]" value="upcoming"
+                                        onchange="this.form.submit()"
+                                        {{ in_array('upcoming', (array)request('availability', [])) ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded border-gray-300 accent-[var(--primary-color)]">
+                                    <span class="text-xs sm:text-sm text-gray-600 group-hover:text-[var(--primary-color)]">Up Coming</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ② More Filters (Accordion) -->
                     @if(isset($filters) && $filters->isNotEmpty())
                         <div class="border-t border-gray-100 pt-4">
@@ -234,6 +297,7 @@
                                 class="w-full flex items-center justify-between py-2 hover:text-[var(--primary-color)] transition-colors">
                                 <span class="text-sm font-bold text-gray-800 uppercase tracking-wider">More Filters</span>
                                 <svg id="all-filters-arrow" class="w-4 h-4 text-gray-400 transition-transform duration-300"
+                                    style="{{ request()->has('filter_values') ? 'transform: rotate(180deg);' : '' }}"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -296,6 +360,9 @@
                             <form action="" method="GET" id="sortForm">
                                 <input type="hidden" name="min_price" value="{{ request('min_price') }}">
                                 <input type="hidden" name="max_price" value="{{ request('max_price') }}">
+                                @foreach((array)request('availability', []) as $val)
+                                    <input type="hidden" name="availability[]" value="{{ $val }}">
+                                @endforeach
                                 @foreach((array)request('filter_values', []) as $val)
                                     <input type="hidden" name="filter_values[]" value="{{ $val }}">
                                 @endforeach
@@ -413,6 +480,18 @@
         });
     </script>
     <script>
+        function toggleAvailabilityFilter() {
+            const panel = document.getElementById('availability-panel');
+            const arrow = document.getElementById('availability-arrow');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
+            } else {
+                panel.classList.add('hidden');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
         function toggleAllFilters() {
             const panel = document.getElementById('all-filters-panel');
             const arrow = document.getElementById('all-filters-arrow');
@@ -430,6 +509,12 @@
             const arrow = document.getElementById('all-filters-arrow');
             if (panel && !panel.classList.contains('hidden') && arrow) {
                 arrow.style.transform = 'rotate(180deg)';
+            }
+
+            const availPanel = document.getElementById('availability-panel');
+            const availArrow = document.getElementById('availability-arrow');
+            if (availPanel && !availPanel.classList.contains('hidden') && availArrow) {
+                availArrow.style.transform = 'rotate(180deg)';
             }
 
             const slider = document.getElementById('price-slider');
