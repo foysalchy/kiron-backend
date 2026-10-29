@@ -21,7 +21,7 @@ class StorePreviewService
      */
     public static function getDummySliders(): Collection
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         return collect([
             (object) [
@@ -59,7 +59,7 @@ class StorePreviewService
      */
     public static function getDummySidebarSliders(): Collection
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         return collect([
             (object) [
@@ -84,7 +84,7 @@ class StorePreviewService
      */
     public static function getDummyMiddleSliders(): Collection
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         return collect([
             (object) [
@@ -109,7 +109,7 @@ class StorePreviewService
      */
     public static function getDummyCategories(): Collection
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         $categories = [
             ['name' => 'Men\'s Fashion', 'slug' => 'mens-fashion', 'count' => 18],
@@ -137,7 +137,7 @@ class StorePreviewService
      */
     public static function getDummyFeatureCategory(): array
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         return [
             'name' => 'Featured Categories',
@@ -158,7 +158,7 @@ class StorePreviewService
      */
     public static function getDummyProducts(int $count = 6): Collection
     {
-        $defaultImg = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
 
         $titles = [
             'Wireless Noise Cancelling Bluetooth Headphones',
@@ -302,7 +302,7 @@ class StorePreviewService
      */
     public static function getDummyBrands(): Collection
     {
-        $defaultLogo = asset('images/template1/frontend/product-thumbnail.webp');
+        $defaultLogo = asset('images/template1/frontend/dorja-sample.webp');
 
         return collect([
             (object) ['id' => 1, 'name' => 'Brand Vanguard', 'slug' => '#', 'logo' => $defaultLogo, 'is_dummy' => true],
@@ -379,4 +379,3 @@ class StorePreviewService
         ]);
     }
 }
-
