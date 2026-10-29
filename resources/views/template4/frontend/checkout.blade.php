@@ -125,7 +125,7 @@
                 </div>
 
                 <!-- ════════ RIGHT COLUMN (Order Summary) ════════ -->
-                <aside
+                <aside id="checkout-order-summary"
                     class="lg:col-span-4 bg-white p-4 sm:p-5 md:p-6 border border-gray-100 rounded-lg shadow-sm lg:sticky lg:top-24">
                     <h3 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Order Summary</h3>
 
@@ -191,11 +191,11 @@
                                 <!-- Quantity Display -->
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                    <a href="{{ route('cart.remove', $item->rowId) }}"
+                                    <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                         aria-label="Remove {{ $item->name }} from cart"
-                                        class="checkout-cart-remove text-red-400 hover:text-red-600">
+                                        class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer p-0">
                                         <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -536,6 +536,57 @@
                 handlePaymentSelection(firstSlug, firstName);
             }
         });
+
+        function removeCheckoutItem(rowId) {
+            fetch(`{{ url('cart/remove') }}/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.cart_count === 0) {
+                        window.location.href = "{{ route('cart.index') }}";
+                        return;
+                    }
+                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+
+                    fetch(window.location.href)
+                        .then(r => r.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newSummary = doc.getElementById('checkout-order-summary');
+                            const currentSummary = document.getElementById('checkout-order-summary');
+                            if (newSummary && currentSummary) {
+                                currentSummary.innerHTML = newSummary.innerHTML;
+                            }
+                            const newTotal = doc.getElementById('total-display');
+                            if (newTotal) {
+                                const rawVal = parseFloat(newTotal.innerText.replace(/[^0-9.]/g, ''));
+                                if (!isNaN(rawVal)) {
+                                    _checkoutTotal = rawVal;
+                                    const activePaymentForm = document.querySelector('.payment-form:not(.hidden)');
+                                    if (activePaymentForm) {
+                                        const amountInput = activePaymentForm.querySelector('[name="amount"]');
+                                        if (amountInput) amountInput.value = Math.round(_checkoutTotal);
+                                    }
+                                }
+                            }
+                        });
+
+                    if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.error(data.message || 'Error removing item');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+            });
+        }
 
         const checkoutCustomerFields = ['name', 'phone', 'email', 'district', 'address'];
         const checkoutFormStateKey = 'template4-checkout-customer-form';

@@ -10,7 +10,7 @@
         <span class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Shopping Cart</span>
     </nav>
 
-    <div class="w-full bg-white">
+    <div class="w-full bg-white" id="cart-container">
         <div class="container mx-auto mt-6 px-4 py-4 md:py-10">
             @if (Cart::count() > 0)
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
@@ -48,15 +48,15 @@
                                             <p class="text-xs md:text-sm text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}
                                             </p>
 
-                                            <a href="{{ route('cart.remove', $item->rowId) }}"
-                                                class="remove-btn text-xs md:text-sm text-red-700 hover:text-red-800 flex items-center gap-1 mt-1.5 md:mt-2 transition font-medium focus:outline-none">
+                                            <button type="button" onclick="removeCartItem('{{ $item->rowId }}')"
+                                                class="remove-btn text-xs md:text-sm text-red-700 hover:text-red-800 flex items-center gap-1 mt-1.5 md:mt-2 transition font-medium focus:outline-none cursor-pointer">
                                                 <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor"
                                                     stroke-width="2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                                 Remove
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-span-6 sm:col-span-3 flex justify-start sm:justify-center mt-2 sm:mt-0">
@@ -226,6 +226,23 @@
 
 @push('scripts')
     <script>
+        function refreshCartUI() {
+            fetch(window.location.href)
+                .then(r => r.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newContainer = temp.querySelector('#cart-container');
+                    const currentContainer = document.getElementById('cart-container');
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                    } else if (currentContainer && !newContainer) {
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error('Cart refresh failed:', err));
+        }
+
         function updateCartQty(rowId, newQty) {
             if (newQty < 1) return;
             const form = document.getElementById('update-cart-form');
@@ -244,20 +261,8 @@
                         document.querySelectorAll('.cart-count-nav').forEach(badge => {
                             badge.innerText = data.cart_count;
                         });
-
-                        fetch(window.location.href)
-                            .then(r => r.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-                                const newMain = doc.querySelector('main');
-                                const currentMain = document.querySelector('main');
-                                if (newMain && currentMain) {
-                                    currentMain.innerHTML = newMain.innerHTML;
-                                } else {
-                                    location.reload();
-                                }
-                            });
+                        refreshCartUI();
+                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Cart updated');
                     } else if (typeof toastr !== 'undefined') {
                         toastr.error(data.message || 'Unable to update cart.');
                     }
@@ -266,6 +271,32 @@
                     if (typeof toastr !== 'undefined') {
                         toastr.error('Unable to update cart. Please try again.');
                     }
+                });
+        }
+
+        function removeCartItem(rowId) {
+            fetch(`{{ url('cart/remove') }}/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                            badge.innerText = data.cart_count;
+                        });
+                        refreshCartUI();
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Error removing item');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
                 });
         }
     </script>
