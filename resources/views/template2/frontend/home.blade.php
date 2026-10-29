@@ -9,10 +9,20 @@
 @endsection
 @section('content')
     <!-- NOTICE TICKER -->
+    @if(!empty($activePreviewTheme))
+        <div class="container mx-auto px-4 lg:px-0 pt-2">
+            <x-preview-badge name="Notice" :isDummy="!empty($notices->first()?->is_dummy)" />
+        </div>
+    @endif
     @include('components.frontend.notice-marquee', ['notices' => $notices])
 
     <!-- HERO SECTION (Updated to 2-Column Layout) -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2">
+                <x-preview-badge name="Slider" :isDummy="!empty($mainSliders->first()?->is_dummy)" />
+            </div>
+        @endif
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[220px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
 
             <!-- 1. LEFT: Main Slider -->
@@ -75,6 +85,11 @@
     <!-- TOP CATEGORIES SECTION (Updated as per Image) -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2 text-center">
+                <x-preview-badge name="Categories" :isDummy="!empty($featureCategory['is_dummy'])" />
+            </div>
+        @endif
         <div class="relative">
             <!-- Section Heading -->
             <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
@@ -127,6 +142,11 @@
     </section>
     @elseif (isset($categories) && $categories->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2 text-center">
+                <x-preview-badge name="Categories" :isDummy="!empty($categories->first()?->is_dummy)" />
+            </div>
+        @endif
         <div class="relative">
             <!-- Section Heading -->
             <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
@@ -178,6 +198,11 @@
     @endif
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Product Group" :isDummy="!empty($group->is_dummy)" />
+                </div>
+            @endif
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[var(--primary-color)]">{{ $group->name }}</h2>
@@ -253,8 +278,12 @@
         <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
             <!-- Header -->
-
-                <h2 class="text-md md:text-lg font-bold lg:mb-4 mb-2 uppercase tracking-tight">All Products</h2>
+            <div class="flex items-center justify-between lg:mb-4 mb-2">
+                <h2 class="text-md md:text-lg font-bold uppercase tracking-tight">All Products</h2>
+                @if(!empty($activePreviewTheme))
+                    <x-preview-badge name="Products" :isDummy="!empty($allProducts->first()?->is_dummy)" />
+                @endif
+            </div>
 
 
             <!-- Product Grid -->
@@ -278,6 +307,11 @@
      @if($homePageData->description)
         <section class="w-full  px-4 font-manrope">
             <div class="p-0 container mx-auto    ">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="SEO & Content" :isDummy="!empty($homePageData->is_dummy)" />
+                    </div>
+                @endif
                 <div
                     class=" bg-white  border border-gray-100 rounded-lg px-6 py-6
                     prose prose-slate max-w-none

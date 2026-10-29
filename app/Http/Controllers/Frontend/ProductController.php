@@ -400,16 +400,52 @@ class ProductController extends FrontendController
 
     public function productDetails($slug)
     {
+        // Preview mode dummy product support
+        if (\App\Services\StorePreviewService::isPreview() && str_starts_with($slug, 'sample-product-')) {
+            $dummyProducts = \App\Services\StorePreviewService::getDummyProducts(12);
+            $product = $dummyProducts->firstWhere('slug', $slug) ?? $dummyProducts->first();
+        } else {
+            $product = Product::with([
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+                'variations.galleries',
+                'galleries',
+                'brand:id,company_id,name,slug,logo',
+                'reviews.customer',
+                'reviews.variation.attributes.attributeGroup',
+            ])->where('slug', $slug)->firstOrFail();
+        }
 
-        $product = Product::with([
-            'variations.attributes.attributeGroup',
-            'variations.attributes.attributeValue',
-            'variations.galleries',
-            'galleries',
-            'brand:id,company_id,name,slug,logo',
-            'reviews.customer',
-            'reviews.variation.attributes.attributeGroup',
-        ])->where('slug', $slug)->firstOrFail();
+        // Don't track views or query DB for dummy sample preview products
+        if (!empty($product->is_dummy)) {
+            $attributeGroups = [];
+            $formattedVariations = [];
+            $valueImages = [];
+            $groupCategories = [];
+            $allProductImages = [$product->thumbnail_url];
+            $breadcrumb = [
+                ['name' => 'Sample Collection', 'slug' => '#'],
+                ['name' => $product->title, 'slug' => '#'],
+            ];
+            $relatedProducts = \App\Services\StorePreviewService::getDummyProducts(6);
+            $productCustomBlock = \App\Services\StorePreviewService::getDummyCustomBlock();
+            $trustBadges = collect([]);
+            $defaultGalleries = [$product->thumbnail_url];
+
+            return $this->view('frontend.productDetails', compact(
+                'product',
+                'relatedProducts',
+                'attributeGroups',
+                'formattedVariations',
+                'trustBadges',
+                'valueImages',
+                'defaultGalleries',
+                'allProductImages',
+                'groupCategories',
+                'breadcrumb',
+                'productCustomBlock'
+            ));
+        }
 
         $viewKey = 'viewed_product_' . $product->id;
 
@@ -527,6 +563,16 @@ class ProductController extends FrontendController
             ->where('page_type', ContentSetting::PAGE_PRODUCT)
             ->where('status', Status::Active)
             ->first();
+
+        // Preview Mode Dummy Fallback
+        if (\App\Services\StorePreviewService::isPreview()) {
+            if (empty($productCustomBlock)) {
+                $productCustomBlock = \App\Services\StorePreviewService::getDummyCustomBlock();
+            }
+            if (empty($relatedProducts) || $relatedProducts->isEmpty()) {
+                $relatedProducts = \App\Services\StorePreviewService::getDummyProducts(6);
+            }
+        }
 
 
         $allProductImages = [];
