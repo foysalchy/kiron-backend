@@ -448,7 +448,7 @@
 
                                     <!-- Subtitle/Short Description (Dynamic) -->
                                     <p class="text-[#4b5563] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
-                                        {{ $product->short_description ?? 'Quality Product' }}
+                                        {{ !empty($product->short_description) ? strip_tags($product->short_description) : 'Quality Product' }}
                                     </p>
                                 </div>
                             </div>
