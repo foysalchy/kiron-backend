@@ -42,7 +42,7 @@ class ProductController extends FrontendController
     public function index(Request $request)
     {
         $breadcrumb = [['name' => 'All Products', 'slug' => 'shop']];
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
@@ -229,7 +229,7 @@ class ProductController extends FrontendController
 
         if (!$category) abort(401);
 
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->where('status', Status::Active->value)
             ->withCount('reviews')
@@ -572,7 +572,7 @@ class ProductController extends FrontendController
     }
     public function flashSale(Request $request)
     { // Filter products that have a discount > 0
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->where('discount', '>', 0)
             ->where('status', Status::Active->value)
@@ -604,7 +604,7 @@ class ProductController extends FrontendController
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
 
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->where('status', Status::Active->value)
             ->where('brand_id', $brand->id)
@@ -668,7 +668,7 @@ class ProductController extends FrontendController
     {
         $category = SubCategory::where('slug', $sub_slug)->firstOrFail();
 
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->where('status', Status::Active->value)
             ->whereJsonContains('sub_category_ids', (int)$category->id)
@@ -682,7 +682,7 @@ class ProductController extends FrontendController
     {
         $category = MiniCategory::where('slug', $mini_slug)->firstOrFail();
 
-        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
             ->where('status', Status::Active->value)
             ->whereJsonContains('mini_category_ids', (int)$category->id)
@@ -735,6 +735,9 @@ class ProductController extends FrontendController
             'products.discount_type',
             'products.type',
             'products.status',
+            'products.available_stock',
+            'products.stock_status',
+            'products.manage_stock',
             'products.created_at',
         ];
 

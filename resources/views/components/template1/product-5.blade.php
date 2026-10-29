@@ -14,7 +14,7 @@
     $isVar = $priceData->is_variation;
 
     $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
-    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
+    $isOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock ? ($product->available_stock <= 0) : false);
 
     $avgRating = $product->reviews_avg_rating ?? 0;
     $totalReviews = $product->reviews_count ?? 0;

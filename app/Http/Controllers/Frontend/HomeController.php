@@ -51,6 +51,7 @@ class HomeController extends FrontendController
             'products.discount',
             'products.discount_type',
             'products.available_stock',
+            'products.stock_status',
             'products.manage_stock',
             'products.type',
             'products.status',
@@ -376,7 +377,7 @@ class HomeController extends FrontendController
             $products = Product::where('status', Status::Active->value)
                 ->where('company_id', $companyId)
                 ->whereJsonContains('sub_category_ids', $subId)
-                ->select(['id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95', 'regular_price', 'discount', 'discount_type', 'type', 'status', 'available_stock', 'manage_stock', 'is_free_delivery'])
+                ->select(['id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95', 'regular_price', 'discount', 'discount_type', 'type', 'status', 'available_stock', 'stock_status', 'manage_stock', 'is_free_delivery'])
                 ->with(['variations'])
                 ->latest()->take(6)->get();
 
