@@ -956,6 +956,36 @@
             }
         }
 
+        function syncVariationGallery() {
+            if (finalSelectedVariationIds.length === 0) {
+                updateGalleryThumbnails(defaultGalleries);
+                const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp'));
+                if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
+                return;
+            }
+
+            let selectedGalleries = [];
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(item => item.id === id);
+                if (v) {
+                    if (v.galleries && v.galleries.length > 0) {
+                        selectedGalleries.push(...v.galleries);
+                    } else if (v.main_image) {
+                        selectedGalleries.push(v.main_image);
+                    }
+                }
+            });
+
+            let combined = selectedGalleries.length > 0 ? selectedGalleries : defaultGalleries;
+            updateGalleryThumbnails([...new Set(combined)]);
+
+            const lastSelectedId = finalSelectedVariationIds[finalSelectedVariationIds.length - 1];
+            const lastVariation = allVariations.find(item => item.id === lastSelectedId);
+            if (lastVariation && lastVariation.main_image) {
+                document.getElementById('mainImage').src = lastVariation.main_image;
+            }
+        }
+
         function handleSelection(group, valId, isLastGroup) {
             let isSingleChoice = false;
             for (let gName in groupCategories) {
@@ -970,7 +1000,7 @@
                 let idx = attributeGroups.indexOf(group);
                 for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
                 if (finalSelectedVariationIds.length === 0) {
-                    updateGalleryThumbnails(defaultGalleries);
+                    syncVariationGallery();
                     recalculateSelectedPrice();
                 }
             } else {
@@ -985,15 +1015,9 @@
                         // Single choice: ২য় বার ক্লিক করলে deselect
                         activeFilters[group] = null;
                         finalSelectedVariationIds = [];
-                        updateGalleryThumbnails(defaultGalleries);
-                        const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/default.webp'));
-                        if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
                     } else if (matched) {
                         activeFilters[group] = valId;
                         finalSelectedVariationIds = [matched.id];
-                        let combined = [...(matched.galleries || []), ...defaultGalleries];
-                        updateGalleryThumbnails([...new Set(combined)]);
-                        if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
                     }
                 } else {
                     // Multiple choice: প্রতিটি ভ্যারিয়েন্ট টগল হবে (সিলেক্ট থাকলে deselect, না থাকলে select)
@@ -1004,9 +1028,6 @@
                             finalSelectedVariationIds.splice(index, 1);
                             if (finalSelectedVariationIds.length === 0) {
                                 activeFilters[group] = null;
-                                updateGalleryThumbnails(defaultGalleries);
-                                const defaultMainImg = @json($product->thumbnail_url ?? asset('./images/template1/frontend/default.webp'));
-                                if (defaultMainImg) document.getElementById('mainImage').src = defaultMainImg;
                             } else {
                                 // যদি অন্য ভ্যারিয়েন্ট এখনও সিলেক্টেড থাকে, শেষটির ফিল্টার অ্যাক্টিভ রাখা
                                 const lastSelected = allVariations.find(v => v.id === finalSelectedVariationIds[finalSelectedVariationIds.length - 1]);
@@ -1018,13 +1039,11 @@
                             // ১ম বার ক্লিক: select
                             activeFilters[group] = valId;
                             finalSelectedVariationIds.push(matched.id);
-                            let combined = [...(matched.galleries || []), ...defaultGalleries];
-                            updateGalleryThumbnails([...new Set(combined)]);
-                            if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
                         }
                     }
                 }
 
+                syncVariationGallery();
                 recalculateSelectedPrice();
             }
             updateSkuDisplay();
