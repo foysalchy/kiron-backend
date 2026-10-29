@@ -523,6 +523,11 @@ class ProductController extends FrontendController
                 ->get();
         });
 
+        $productCustomBlock = $trustBadges
+            ->where('page_type', ContentSetting::PAGE_PRODUCT)
+            ->where('status', Status::Active)
+            ->first();
+
 
         $allProductImages = [];
         $allProductImages[] = $product->thumbnail_url;
@@ -567,7 +572,8 @@ class ProductController extends FrontendController
             'defaultGalleries',
             'allProductImages',
             'groupCategories',
-            'breadcrumb'
+            'breadcrumb',
+            'productCustomBlock'
         ));
     }
     public function flashSale(Request $request)

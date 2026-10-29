@@ -22,7 +22,7 @@ class StoreContentSettingRequest extends FormRequest
             'icon_url'     => ['nullable', 'string', 'max:500'],
             'title'        => [$isAllPage ? 'required' : 'nullable', 'string', 'max:255'],
             'subtitle'     => ['nullable', 'string', 'max:255'],
-            'text_content' => [$isAllPage ? 'nullable' : 'nullable', 'string', 'max:2000'],
+            'text_content' => ['nullable', 'string'],
             'sort_order'   => ['nullable', 'integer', 'min:0'],
             'status'       => ['nullable', 'integer', 'in:0,1'],
         ];

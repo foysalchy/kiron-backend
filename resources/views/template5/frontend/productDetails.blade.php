@@ -270,6 +270,12 @@
 
                 </div>
 
+                <!-- Product Custom Block (Notice/Announcement/Policy) -->
+                @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
+                    <div class="product-custom-block my-5 p-4 rounded-xl border border-coal/10 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                        {!! $productCustomBlock->text_content !!}
+                    </div>
+                @endif
 
             </div>
         </div>

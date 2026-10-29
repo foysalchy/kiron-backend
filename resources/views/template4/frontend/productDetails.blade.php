@@ -289,6 +289,13 @@
                             {{ $product->mega_categories->pluck('name')->implode(', ') }}
                         </p>
 
+                        <!-- Product Custom Block (Notice/Announcement/Policy) -->
+                        @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
+                            <div class="product-custom-block my-5 p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                                {!! $productCustomBlock->text_content !!}
+                            </div>
+                        @endif
+
                         <!-- Contact Help -->
                         <div class="mt-3 md:mt-4 border border-gray-200 rounded-xl p-4 md:p-5 bg-white">
                             <p class="font-semibold text-gray-800 text-sm md:text-base mb-3">
