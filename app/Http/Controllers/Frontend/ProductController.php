@@ -326,6 +326,41 @@ class ProductController extends FrontendController
             });
         }
 
+        // Availability Filter (In Stock, Out Of Stock, Up Coming)
+        if ($request->filled('availability')) {
+            $availabilities = (array) $request->availability;
+            $query->where(function ($q) use ($availabilities) {
+                if (in_array('in_stock', $availabilities)) {
+                    $q->orWhere(function ($sq) {
+                        $sq->where('status', Status::Active->value)
+                            ->where('stock_status', 'in_stock')
+                            ->where(function ($mq) {
+                                $mq->where('manage_stock', 0)
+                                    ->orWhereNull('manage_stock')
+                                    ->orWhere('available_stock', '>', 0);
+                            });
+                    });
+                }
+
+                if (in_array('out_of_stock', $availabilities)) {
+                    $q->orWhere(function ($sq) {
+                        $sq->where('status', Status::Active->value)
+                            ->where(function ($stq) {
+                                $stq->where('stock_status', 'out_of_stock')
+                                    ->orWhere(function ($mq) {
+                                        $mq->where('manage_stock', 1)
+                                            ->where('available_stock', '<=', 0);
+                                    });
+                            });
+                    });
+                }
+
+                if (in_array('upcoming', $availabilities)) {
+                    $q->orWhere('status', Status::Upcoming->value);
+                }
+            });
+        }
+
         // ৩. ব্র্যান্ড ফিল্টার
         if ($request->filled('brand')) {
             $query->whereIn('brand_id', (array)$request->brand);
