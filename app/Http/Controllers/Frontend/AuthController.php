@@ -78,7 +78,9 @@ class AuthController extends FrontendController
 
         if (Auth::guard('customer')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('home'));
+            $previewTheme = $request->input('preview_theme') ?? request('preview_theme');
+            $fallbackUrl = $previewTheme ? route('home', ['preview_theme' => $previewTheme]) : route('home');
+            return redirect()->intended($fallbackUrl);
         }
 
         return back()->withErrors([

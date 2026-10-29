@@ -393,4 +393,144 @@ class StorePreviewService
             ],
         ]);
     }
+
+    public static function getDummyFooterFeatures()
+    {
+        return collect([
+            (object) [
+                'id' => 1,
+                'title' => 'Fast Delivery',
+                'subtitle' => 'Fast delivery within 24-48 hours',
+                'text_content' => 'Fast delivery within 24-48 hours',
+                'icon_file' => null,
+                'icon_url' => 'fas fa-truck',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'title' => 'Quality Guarantee',
+                'subtitle' => '100% original and premium products',
+                'text_content' => '100% original and premium products',
+                'icon_file' => null,
+                'icon_url' => 'fas fa-shield-alt',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 3,
+                'title' => 'Secure Payment',
+                'subtitle' => 'Cash on delivery & online payment',
+                'text_content' => 'Cash on delivery & online payment',
+                'icon_file' => null,
+                'icon_url' => 'fas fa-credit-card',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 4,
+                'title' => 'Customer Support',
+                'subtitle' => '24/7 dedicated customer assistance',
+                'text_content' => '24/7 dedicated customer assistance',
+                'icon_file' => null,
+                'icon_url' => 'fas fa-headset',
+                'is_dummy' => true,
+            ],
+        ]);
+    }
+
+    public static function getDummyFooterPages()
+    {
+        return collect([
+            (object) [
+                'id' => 1,
+                'title' => 'About Us',
+                'slug' => 'about-us',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'title' => 'Privacy Policy',
+                'slug' => 'privacy-policy',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 3,
+                'title' => 'Terms & Conditions',
+                'slug' => 'terms-and-conditions',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 4,
+                'title' => 'Return & Refund Policy',
+                'slug' => 'return-and-refund-policy',
+                'is_dummy' => true,
+            ],
+        ]);
+    }
+
+    public static function getDummySocialLinks()
+    {
+        return collect([
+            (object) [
+                'id' => 1,
+                'title' => 'facebook',
+                'link' => 'https://facebook.com',
+                'icon' => 'fa-brands fa-facebook-f',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'title' => 'instagram',
+                'link' => 'https://instagram.com',
+                'icon' => 'fa-brands fa-instagram',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 3,
+                'title' => 'youtube',
+                'link' => 'https://youtube.com',
+                'icon' => 'fa-brands fa-youtube',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 4,
+                'title' => 'tiktok',
+                'link' => 'https://tiktok.com',
+                'icon' => 'fa-brands fa-tiktok',
+                'is_dummy' => true,
+            ],
+        ]);
+    }
+
+    public static function getDummyFooterBottomRight()
+    {
+        return collect([
+            (object) [
+                'id' => 1,
+                'title' => 'bKash',
+                'icon_file' => null,
+                'icon_url' => null,
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'title' => 'Nagad',
+                'icon_file' => null,
+                'icon_url' => null,
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 3,
+                'title' => 'Visa',
+                'icon_file' => null,
+                'icon_url' => null,
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 4,
+                'title' => 'Mastercard',
+                'icon_file' => null,
+                'icon_url' => null,
+                'is_dummy' => true,
+            ],
+        ]);
+    }
 }

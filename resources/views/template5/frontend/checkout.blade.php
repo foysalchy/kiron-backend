@@ -585,7 +585,7 @@
                         _checkoutTotal = parseFloat(match[1]);
                     }
                 } else if (currentContainer && !newContainer) {
-                    window.location.href = "{{ route('shop.index') }}";
+                    window.location.href = "{{ route('shop.index', request()->query()) }}";
                 }
             })
             .catch(err => console.error('Checkout refresh failed:', err));
