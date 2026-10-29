@@ -3,14 +3,15 @@
 
     <!-- 1. Top Features Row -->
     @if ($footerFeatures->count() > 0)
-    <div class="p-6">
+    <div class="p-6 relative group/section">
+        <x-preview-badge name="Footer Features" :isDummy="!empty($footerFeatures->first()?->is_dummy)" />
         <div class="container mx-auto">
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($footerFeatures as $feature)
                 <div class="flex items-center gap-3">
                     <div
                         class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
-                        @if ($feature->icon_file)
+                        @if (!empty($feature->icon_file))
                         <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
                             class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                         @else
@@ -87,7 +88,8 @@
 
                 <!-- Column 3: Pages -->
                 @if(isset($footerPages) && count($footerPages) > 0)
-                <div>
+                <div class="relative group/section">
+                    <x-preview-badge name="Pages" :isDummy="!empty($footerPages->first()?->is_dummy)" />
                     <h2 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h2>
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
@@ -103,7 +105,8 @@
                 @endif
 
                 <!-- Column 4: Newsletter -->
-                <div>
+                <div class="relative group/section">
+                    <x-preview-badge name="Site Setting" />
                     <h2 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Contact Us</h2>
                     <ul class="  text-[16px]">
                         <li class="flex items-start gap-3 opacity-90">
@@ -144,7 +147,8 @@
                         </li>
                     </ul>
 
-                    <div class="flex gap-4 flex-wrap">
+                    <div class="flex gap-4 flex-wrap relative group/section pt-2">
+                        <x-preview-badge name="Social Setting" :isDummy="!empty($socialLinks->first()?->is_dummy)" />
                         @foreach ($socialLinks as $social)
                         <a href="{{ $social->link }}" target="_blank" aria-label="Follow us on {{ $social->name }}"
                             class="opacity-90 text-lg transition-all duration-300"
@@ -173,7 +177,8 @@
                     <p>{{ $setup->copy_right ?? ''}}</p>
                 </div>
                 @if ($footerBottomRight->isNotEmpty())
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 relative group/section">
+                    <x-preview-badge name="Payment Gateways" :isDummy="!empty($footerBottomRight->first()?->is_dummy)" />
                     <span class="text-xs md:text-sm opacity-90">We Accept:</span>
                     <div class="flex gap-2">
                         @foreach ($footerBottomRight as $item)

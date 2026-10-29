@@ -6,6 +6,11 @@
             <!-- Column 1: Logo & Newsletter (Takes 2 parts space) -->
             <div class="lg:col-span-2 space-y-8">
                 <div>
+                    @if(!empty($activePreviewTheme))
+                        <div class="mb-2">
+                            <x-preview-badge name="Site Setting" />
+                        </div>
+                    @endif
                     <a href="{{ route('home') }}" aria-label="Little Joy Home">
                         <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                             alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
@@ -32,9 +37,14 @@
 
             <!-- Column 2: SOLUTIONS -->
             <div class="lg:col-start-3">
-                <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
-                    Pages
-                </h3>
+                <div class="flex items-center gap-2 mb-8">
+                    <h3 class="text-lg font-bold uppercase tracking-widest">
+                        Pages
+                    </h3>
+                    @if(!empty($activePreviewTheme))
+                        <x-preview-badge name="Pages" :isDummy="!empty($footerPages->first()?->is_dummy)" />
+                    @endif
+                </div>
                 <ul class="space-y-4 text-footer/90 text-base">
                     @foreach ($footerPages as $page)
                         <li><a href="{{ url($page->slug) }}"
@@ -59,9 +69,14 @@
             <!-- Column 5: SOCIAL -->
             @if(isset($socialLinks) && count($socialLinks) > 0)
             <div>
-                <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
-                    Social
-                </h3>
+                <div class="flex items-center gap-2 mb-8">
+                    <h3 class="text-lg font-bold uppercase tracking-widest">
+                        Social
+                    </h3>
+                    @if(!empty($activePreviewTheme))
+                        <x-preview-badge name="Social Setting" :isDummy="!empty($socialLinks->first()?->is_dummy)" />
+                    @endif
+                </div>
                 <ul class="space-y-4 text-footer/90 text-base">
                     @foreach ($socialLinks as $social)
                         <li>

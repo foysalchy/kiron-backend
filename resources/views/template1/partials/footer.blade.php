@@ -5,12 +5,17 @@
     @if ($footerFeatures->count() > 0)
         <div class="p-6">
             <div class="container mx-auto">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="Footer Features" :isDummy="!empty($footerFeatures->first()?->is_dummy)" />
+                    </div>
+                @endif
                 <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach ($footerFeatures as $feature)
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
-                                @if ($feature->icon_file)
+                                @if (!empty($feature->icon_file))
                                     <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
                                         class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                                 @else
@@ -37,6 +42,11 @@
 
                 <!-- Column 1: Brand Info -->
                 <div class="sm:col-span-2 lg:col-span-1">
+                    @if(!empty($activePreviewTheme))
+                        <div class="mb-2">
+                            <x-preview-badge name="Site Setting" />
+                        </div>
+                    @endif
                     <div class="flex items-center gap-3 mb-5">
                         @if ($setup && $setup->logo)
                             <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
@@ -109,7 +119,12 @@
                 <!-- Column 3: Pages -->
                 @if(isset($footerPages) && count($footerPages) > 0)
                 <div>
-                    <h2 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h2>
+                    <div class="flex items-center gap-2 mb-4 md:mb-4">
+                        <h2 class="text-base md:text-lg font-bold">Pages</h2>
+                        @if(!empty($activePreviewTheme))
+                            <x-preview-badge name="Pages" :isDummy="!empty($footerPages->first()?->is_dummy)" />
+                        @endif
+                    </div>
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
                             <li>
@@ -141,6 +156,11 @@
                             </button>
                         </div>
                     </form>
+                    @if(!empty($activePreviewTheme))
+                        <div class="mb-2">
+                            <x-preview-badge name="Social Setting" :isDummy="!empty($socialLinks->first()?->is_dummy)" />
+                        </div>
+                    @endif
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
                             <a href="{{ $social->link }}" target="_blank"
@@ -170,15 +190,16 @@
                     <p> {{ $setup->copy_right ?? ''}}</p>
                 </div>
                 @if ($footerBottomRight->isNotEmpty())
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 relative group/section">
+                        <x-preview-badge name="Payment Gateways" :isDummy="!empty($footerBottomRight->first()?->is_dummy)" />
                         <span class="text-xs md:text-sm opacity-90">We Accept:</span>
                         <div class="flex gap-2">
                             @foreach ($footerBottomRight as $item)
                                 <div
-                                    class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
-                                    @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
-                                            height="16" width="120" loading="lazy" alt="{{ $item->title }}"
+                                    class="bg-white px-2 py-1 rounded text-gray-700 text-xs flex items-center">
+                                    @if ($item->icon_url)
+                                        <img src="{{ $item->icon_url }}"
+                                            height="16" width="16" loading="lazy" alt="{{ $item->title }}"
                                             class="h-4">
                                     @else
                                         {{ $item->title }}

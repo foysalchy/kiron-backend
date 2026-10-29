@@ -32,6 +32,28 @@ class FrontendController extends Controller
         $previewTheme = request('preview_theme');
         \Illuminate\Support\Facades\View::share('activePreviewTheme', $previewTheme);
 
+        if ($previewTheme) {
+            $sharedFooterFeatures = view()->shared('footerFeatures');
+            if (empty($sharedFooterFeatures) || (is_object($sharedFooterFeatures) && method_exists($sharedFooterFeatures, 'isEmpty') && $sharedFooterFeatures->isEmpty())) {
+                \Illuminate\Support\Facades\View::share('footerFeatures', \App\Services\StorePreviewService::getDummyFooterFeatures());
+            }
+
+            $sharedFooterPages = view()->shared('footerPages');
+            if (empty($sharedFooterPages) || (is_object($sharedFooterPages) && method_exists($sharedFooterPages, 'isEmpty') && $sharedFooterPages->isEmpty())) {
+                \Illuminate\Support\Facades\View::share('footerPages', \App\Services\StorePreviewService::getDummyFooterPages());
+            }
+
+            $sharedSocialLinks = view()->shared('socialLinks');
+            if (empty($sharedSocialLinks) || (is_object($sharedSocialLinks) && method_exists($sharedSocialLinks, 'isEmpty') && $sharedSocialLinks->isEmpty())) {
+                \Illuminate\Support\Facades\View::share('socialLinks', \App\Services\StorePreviewService::getDummySocialLinks());
+            }
+
+            $sharedFooterBottomRight = view()->shared('footerBottomRight');
+            if (empty($sharedFooterBottomRight) || (is_object($sharedFooterBottomRight) && method_exists($sharedFooterBottomRight, 'isEmpty') && $sharedFooterBottomRight->isEmpty())) {
+                \Illuminate\Support\Facades\View::share('footerBottomRight', \App\Services\StorePreviewService::getDummyFooterBottomRight());
+            }
+        }
+
         return view($templateName . '.' . $view, $data);
     }
 

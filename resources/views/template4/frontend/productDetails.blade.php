@@ -313,7 +313,7 @@
                             <div class="my-5">
                                 @if(!empty($activePreviewTheme))
                                     <div class="mb-1">
-                                        <x-preview-badge name="Content Setting" :isDummy="!empty($productCustomBlock->is_dummy)" />
+                                        <x-preview-badge name="Product Custom Block" :isDummy="!empty($productCustomBlock->is_dummy)" />
                                     </div>
                                 @endif
                                 <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">

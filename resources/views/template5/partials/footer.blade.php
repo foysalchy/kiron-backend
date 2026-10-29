@@ -7,6 +7,11 @@
 
       <!-- Brand -->
       <div>
+        @if(!empty($activePreviewTheme))
+          <div class="mb-2">
+            <x-preview-badge name="Site Setting" />
+          </div>
+        @endif
         <div class="flex items-baseline gap-2">
           <span class="font-semibold text-2xl text-footer">
             {{ $setup->shop_name ?? 'Bhaiya Digital' }}
@@ -16,6 +21,12 @@
         <p class="text-footer/70 text-sm mt-4 leading-relaxed max-w-xs">
           {{ $setup->description ?? 'Quality products, fast delivery, and a shopping experience you can trust.' }}
         </p>
+
+        @if(!empty($activePreviewTheme))
+          <div class="mt-4">
+            <x-preview-badge name="Social Setting" />
+          </div>
+        @endif
 
         <div class="flex items-center gap-4 mt-5">
           @if($setup->instagram_url ?? false)
