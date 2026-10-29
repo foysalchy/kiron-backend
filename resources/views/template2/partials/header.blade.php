@@ -35,7 +35,7 @@
                     <!-- Category Dropdown -->
                     <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px] max-w-[200px]">
                         <select name="category" id="header-category-select" aria-label="Select Category"
-                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header  bg-transparent outline-none appearance-none cursor-pointer">
+                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-gray-700 bg-transparent outline-none appearance-none cursor-pointer">
                             <option value="">All</option>
                             @foreach ($headerCategories as $cat)
                                 <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -44,7 +44,7 @@
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-[10px] text-header"></i>
+                            <i class="fas fa-chevron-down text-[10px] text-gray-500"></i>
                         </div>
                     </div>
                     <!-- Input -->
@@ -194,7 +194,7 @@
             <div
                 class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[100px] flex items-center">
                 <select name="category" id="mobile-category-select" aria-label="Select Category"
-                    class="w-full pl-2 pr-6 py-2 text-xs text-header font-semibold bg-transparent outline-none truncate appearance-none cursor-pointer">
+                    class="w-full pl-2 pr-6 py-2 text-xs text-gray-700 font-semibold bg-transparent outline-none truncate appearance-none cursor-pointer">
                     <option value="">All</option>
                     @foreach ($headerCategories as $cat)
                         <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -203,7 +203,7 @@
                     @endforeach
                 </select>
                 <div class="absolute inset-y-0 right-1 flex items-center pointer-events-none">
-                    <i class="fas fa-chevron-down text-[10px] text-header"></i>
+                    <i class="fas fa-chevron-down text-[10px] text-gray-500"></i>
                 </div>
             </div>
 
