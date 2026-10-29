@@ -83,7 +83,7 @@
                 <div class="hidden lg:flex items-center gap-3 md:gap-5">
                     <!-- আপনার অরিজিনাল Wishlist, Cart এবং Account কোড এখানে থাকবে -->
                     <!-- Wishlist -->
-                    <a href="{{ route('user.dashboard') }}"
+                    <a href="{{ auth('customer')->check() ? route('user.dashboard') : route('user.login') }}"
                         class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 relative"
                         aria-label="Wishlist">
 
@@ -307,7 +307,7 @@
         </a>
 
         <!-- Account -->
-        <a href="{{ route('user.dashboard') }}"
+        <a href="{{ auth('customer')->check() ? route('user.dashboard') : route('user.login') }}"
             class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] {{ request()->routeIs('user.dashboard') ? 'text-brand' : 'text-gray-500' }}"">
             <i class=" fa-regular fa-circle-user text-lg"></i>
             <span class="text-[10px] font-bold uppercase">Account</span>
