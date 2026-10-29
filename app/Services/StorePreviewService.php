@@ -250,9 +250,24 @@ class StorePreviewService
     public static function getDummyNotices(): Collection
     {
         return collect([
-            (object) ['text' => '🎉 Welcome to our official online store! Enjoy cash on delivery all across Bangladesh.'],
-            (object) ['text' => '🚚 Free shipping on orders over ৳1500. Order now and receive in 24-48 hours.'],
-            (object) ['text' => '⭐ 100% Genuine and authentic products with 7-day hassle-free replacement warranty.'],
+            (object) [
+                'id' => 1,
+                'title' => '🎉 Welcome to our official online store! Enjoy cash on delivery all across Bangladesh.',
+                'slug' => 'sample-notice-1',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'title' => '🚚 Free shipping on orders over ৳1500. Order now and receive in 24-48 hours.',
+                'slug' => 'sample-notice-2',
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 3,
+                'title' => '⭐ 100% Genuine and authentic products with 7-day hassle-free replacement warranty.',
+                'slug' => 'sample-notice-3',
+                'is_dummy' => true,
+            ],
         ]);
     }
 

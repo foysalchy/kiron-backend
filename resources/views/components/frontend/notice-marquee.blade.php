@@ -15,20 +15,20 @@
         <div class="flex-1 overflow-hidden relative group/ticker py-0.5">
             <div class="inline-flex items-center whitespace-nowrap animate-notice-ticker group-hover/ticker:[animation-play-state:paused] will-change-transform">
                 @foreach($notices as $notice)
-                    <a href="{{ route('notice.details', $notice->slug) }}"
+                    <a href="{{ !empty($notice->slug) && empty($notice->is_dummy) ? route('notice.details', $notice->slug) : '#' }}"
                        class="inline-flex items-center gap-2 text-gray-700 hover:text-brand font-medium transition-colors duration-150 mx-4 text-xs md:text-sm">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        <span>{{ $notice->title }}</span>
+                        <span>{{ $notice->title ?? $notice->text ?? '' }}</span>
                     </a>
                 @endforeach
 
                 {{-- Duplicate once for seamless infinite loop when few notices exist --}}
                 @if($notices->count() < 4)
                     @foreach($notices as $notice)
-                        <a href="{{ route('notice.details', $notice->slug) }}"
+                        <a href="{{ !empty($notice->slug) && empty($notice->is_dummy) ? route('notice.details', $notice->slug) : '#' }}"
                            class="inline-flex items-center gap-2 text-gray-700 hover:text-brand font-medium transition-colors duration-150 mx-4 text-xs md:text-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            <span>{{ $notice->title }}</span>
+                            <span>{{ $notice->title ?? $notice->text ?? '' }}</span>
                         </a>
                     @endforeach
                 @endif
