@@ -305,6 +305,36 @@ class HomeController extends FrontendController
             });
         }
 
+        // Preview Mode Dummy Fallback for empty sections
+        if (\App\Services\StorePreviewService::isPreview()) {
+            if (empty($mainSliders) || $mainSliders->isEmpty()) {
+                $mainSliders = \App\Services\StorePreviewService::getDummySliders();
+            }
+            if (empty($sidebarSliders) || $sidebarSliders->isEmpty()) {
+                $sidebarSliders = \App\Services\StorePreviewService::getDummySidebarSliders();
+            }
+            if (empty($middleSliders) || $middleSliders->isEmpty()) {
+                $middleSliders = \App\Services\StorePreviewService::getDummyMiddleSliders();
+            }
+            if (empty($featureCategory) || empty($featureCategory['items'])) {
+                if (empty($categories) || $categories->isEmpty()) {
+                    $featureCategory = \App\Services\StorePreviewService::getDummyFeatureCategory();
+                }
+            }
+            if (empty($productGroups) || $productGroups->isEmpty()) {
+                $productGroups = \App\Services\StorePreviewService::getDummyProductGroups();
+            }
+            if (empty($allProducts) || $allProducts->isEmpty()) {
+                $allProducts = \App\Services\StorePreviewService::getDummyProducts(12);
+            }
+            if (empty($notices) || $notices->isEmpty()) {
+                $notices = \App\Services\StorePreviewService::getDummyNotices();
+            }
+            if (empty($homePageData) || empty($homePageData->description)) {
+                $homePageData = \App\Services\StorePreviewService::getDummyHomeDescription();
+            }
+        }
+
         // ভিউতে ডেটা পাঠানো
         return $this->view('frontend.home', compact(
             'categories',
