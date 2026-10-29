@@ -3,7 +3,7 @@
     @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
 @endsection
 @section('content')
-    <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
+    <section id="cart-container" class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
             <!-- Top Header -->
             <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -69,12 +69,12 @@
                                         <!-- Qty Controls -->
                                         <div
                                             class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button
+                                            <button type="button"
                                                 onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }}, {{ $item->price }})"
                                                 class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                             <span id="qty-{{ $item->rowId }}"
                                                 class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
-                                            <button
+                                            <button type="button"
                                                 onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }}, {{ $item->price }})"
                                                 class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
@@ -85,11 +85,11 @@
                                                 class="font-black text-base md:text-xl text-[var(--primary-color)]">
                                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal, 0) : number_format($item->subtotal, 0) . ' ' . $setup->currency }}
                                             </p>
-                                            <a href="{{ route('cart.remove', $item->rowId) }}"
+                                            <button type="button" onclick="removeCartItem('{{ $item->rowId }}')"
                                                 aria-label="Remove {{ $item->name }} from cart"
-                                                class="text-red-400 hover:text-red-600 transition-colors">
+                                                class="text-red-400 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer p-0">
                                                 <i class="far fa-trash-alt text-base md:text-lg"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -265,6 +265,23 @@
 
 @push('scripts')
     <script>
+        function refreshCartUI() {
+            fetch(window.location.href)
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newContainer = temp.querySelector('#cart-container');
+                    const currentContainer = document.getElementById('cart-container');
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                    } else if (currentContainer && !newContainer) {
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error('Cart refresh failed:', err));
+        }
+
         function updateCartQty(rowId, newQty, price) {
             if (newQty < 1) return;
             const form = document.getElementById('update-cart-form');
@@ -283,35 +300,9 @@
                         document.querySelectorAll('.cart-count-nav').forEach(badge => {
                             badge.innerText = data.cart_count;
                         });
-
-                        // Update qty display
-                        const qtySpan = document.getElementById('qty-' + rowId);
-                        if (qtySpan) qtySpan.innerText = newQty;
-
-                        // Update item subtotal
-                        const itemSubSpan = document.getElementById('item-subtotal-' + rowId);
-                        if (itemSubSpan && price) {
-                            const newSub = (newQty * price).toLocaleString();
-                            itemSubSpan.innerText = '{{ $setup->currency_position ?? "left" == "left" ? $setup->currency . " " : "" }}' + newSub + '{{ $setup->currency_position ?? "left" == "right" ? " " . $setup->currency : "" }}';
-                        }
-
-                        // Fetch current page to silently update all global totals without manual math
-                        fetch(window.location.href)
-                            .then(r => r.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-
-                                // Just swap the calculation section if we want, or easier:
-                                // Just reload but without visual refresh by replacing the body
-                                // Actually, replacing innerHTML of a specific container is safest.
-                                // For cart.blade.php, we can just replace the whole main container!
-                                const newMain = doc.querySelector('main') || doc.body;
-                                const currentMain = document.querySelector('main') || document.body;
-                                if (newMain && currentMain) {
-                                    currentMain.innerHTML = newMain.innerHTML;
-                                }
-                            });
+                        refreshCartUI();
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Cart updated');
                     } else if (typeof toastr !== 'undefined') {
                         toastr.error(data.message || 'Unable to update cart.');
                     }
@@ -320,6 +311,32 @@
                     if (typeof toastr !== 'undefined') {
                         toastr.error('Unable to update cart. Please try again.');
                     }
+                });
+        }
+
+        function removeCartItem(rowId) {
+            fetch(`{{ url('cart/remove') }}/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                            badge.innerText = data.cart_count;
+                        });
+                        refreshCartUI();
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Error removing item');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Unable to remove item.');
                 });
         }
     </script>

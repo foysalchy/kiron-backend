@@ -80,11 +80,11 @@
                                         <!-- Qty Controls -->
                                         <div
                                             class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
-                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                                            <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
                                                 class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                             <span
                                                 class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
-                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                                            <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
                                                 class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
 
@@ -98,9 +98,9 @@
                                                     {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                                 </p>
                                             </div>
-                                            <button onclick="removeCartPageItem('{{ $item->rowId }}')"
+                                            <button type="button" onclick="removeCartPageItem('{{ $item->rowId }}')"
                                                 aria-label="Remove {{ $item->name ?? 'item' }} from cart"
-                                                class="text-red-400 hover:text-red-600 transition-colors p-1">
+                                                class="text-red-400 hover:text-red-600 transition-colors p-1 bg-transparent border-0 cursor-pointer">
                                                 <i class="far fa-trash-alt text-lg"></i>
                                             </button>
                                         </div>
@@ -287,23 +287,20 @@
 @push('scripts')
     <script>
         function refreshCartUI() {
-            const fetchUrl = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
-            fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            fetch(window.location.href)
                 .then(res => res.text())
                 .then(html => {
                     const temp = document.createElement('div');
                     temp.innerHTML = html;
-                    const newCart = temp.querySelector('#cart-container');
-                    const currentCart = document.getElementById('cart-container');
-
-                    if (newCart && currentCart) {
-                        currentCart.innerHTML = newCart.innerHTML;
-                        // re-init events or UI components if needed
-                    } else {
+                    const newContainer = temp.querySelector('#cart-container');
+                    const currentContainer = document.getElementById('cart-container');
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                    } else if (currentContainer && !newContainer) {
                         location.reload();
                     }
                 })
-                .catch(() => location.reload());
+                .catch(err => console.error('Cart refresh failed:', err));
         }
 
         function updateCartPageQty(rowId, newQty) {
@@ -315,41 +312,54 @@
 
             fetch(form.action, {
                 method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
-                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                        refreshCartUI();
-                    } else {
-                        if (typeof toastr !== 'undefined') toastr.error(data.message);
-                    }
-                })
-                .catch(() => {
-                    if (typeof toastr !== 'undefined') toastr.error('Unable to update cart.');
-                });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                        badge.innerText = data.cart_count;
+                    });
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                    if (typeof toastr !== 'undefined') toastr.success(data.message || 'Cart updated');
+                } else {
+                    if (typeof toastr !== 'undefined') toastr.error(data.message);
+                }
+            })
+            .catch(() => {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Unable to update cart. Please try again.');
+                }
+            });
         }
 
         function removeCartPageItem(rowId) {
-            fetch(`{{ url('cart/remove') }}/${rowId}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            fetch(`/cart/remove/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
-                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                        refreshCartUI();
-                    } else {
-                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Error removing item');
-                    }
-                })
-                .catch(() => {
-                    if (typeof toastr !== 'undefined') toastr.error('Unable to remove item.');
-                });
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.cart_count !== undefined) {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+                refreshCartUI();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+            });
         }
 
         function updateCartShipping(value) {

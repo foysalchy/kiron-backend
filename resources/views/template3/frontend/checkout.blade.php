@@ -200,11 +200,12 @@
                                     <!-- Quantity Display -->
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                        <a href="{{ route('cart.remove', $item->rowId) }}"
-                                            aria-label="Remove {{ $item->name ?? 'item' }} from cart"
-                                            class="checkout-cart-remove text-red-400 hover:text-red-600">
-                                            <i class="far fa-trash-alt text-xs"></i>
-                                        </a>
+                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
+                                            aria-label="Remove item" title="Remove item"
+                                            class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer">
+                                            <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
+                                            <span class="sr-only">Remove item</span>
+                                        </button>
                                     </div>
                                 </div>
                             @endforeach
@@ -298,30 +299,56 @@
 @push('scripts')
     <script>
         function refreshCartUI() {
-            const fetchUrl = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
-            fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            fetch(window.location.href)
                 .then(res => res.text())
                 .then(html => {
                     const temp = document.createElement('div');
                     temp.innerHTML = html;
 
-                    const newSummary = temp.querySelector('#checkout-summary-container');
-                    const currentSummary = document.getElementById('checkout-summary-container');
+                    const newContainer = temp.querySelector('#checkout-summary-container');
+                    const currentContainer = document.getElementById('checkout-summary-container');
 
-                    if (newSummary && currentSummary) {
-                        currentSummary.innerHTML = newSummary.innerHTML;
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
 
-                        // Extract and update the global total variable
-                        const totalMatch = html.match(/let _checkoutTotal = ([\d.]+);/);
-                        if (totalMatch && totalMatch[1]) {
-                            _checkoutTotal = parseFloat(totalMatch[1]);
+                        // Extract new checkout total from the newly rendered HTML script block
+                        const match = html.match(/let _checkoutTotal = (.*?);/);
+                        if (match && match[1]) {
+                            _checkoutTotal = parseFloat(match[1]);
                         }
-                    } else {
-                        // If cart is empty, checkout might redirect or structure changes
-                        location.reload();
+                    } else if (currentContainer && !newContainer) {
+                        window.location.href = "{{ route('shop.index') }}";
                     }
                 })
-                .catch(() => location.reload());
+                .catch(err => console.error('Checkout refresh failed:', err));
+        }
+
+        function removeCheckoutItem(rowId) {
+            fetch(`/cart/remove/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.cart_count !== undefined) {
+                    if (data.cart_count === 0) {
+                        window.location.href = "{{ route('shop.index') }}";
+                        return;
+                    }
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+                refreshCartUI();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+            });
         }
 
         let _activeDraftOrderId = @json($draftOrderId ?? null);
