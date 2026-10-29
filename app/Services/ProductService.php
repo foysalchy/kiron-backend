@@ -2762,4 +2762,48 @@ class ProductService
             'extra_category_ids' => $extraCategoryIds,
         ];
     }
+
+    /**
+     * Bulk update stock status for products (and their variations if variable)
+     */
+    public function bulkUpdateStockStatus(array $productIds, string $stockStatus): array
+    {
+        $products = Product::whereIn('id', $productIds)->with('variations')->get();
+        if ($products->isEmpty()) {
+            throw ApiException::notFound('No products found for the provided IDs');
+        }
+
+        $updatedCount = 0;
+        $skippedCount = 0;
+
+        DB::transaction(function () use ($products, $stockStatus, &$updatedCount, &$skippedCount) {
+            foreach ($products as $product) {
+                // Skip products where stock management is disabled
+                if (!$product->manage_stock) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $product->update([
+                    'stock_status' => $stockStatus,
+                ]);
+
+                if ($product->type === 'variation' && $product->variations->isNotEmpty()) {
+                    foreach ($product->variations as $variation) {
+                        $variation->update([
+                            'stock_status' => $stockStatus,
+                        ]);
+                    }
+                }
+
+                $updatedCount++;
+            }
+        });
+
+        return [
+            'updated_count' => $updatedCount,
+            'skipped_count' => $skippedCount,
+            'stock_status'  => $stockStatus,
+        ];
+    }
 }

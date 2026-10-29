@@ -10,7 +10,7 @@
     $totalReviews = $offer->reviews_count ?? 0;
 
     $isUpcoming = ($offer->status == \App\Enums\Status::Upcoming->value);
-    $isOutOfStock = $offer->manage_stock ? ($offer->available_stock <= 0) : false;
+    $isOutOfStock = ($offer->stock_status === 'out_of_stock') || ($offer->manage_stock ? ($offer->available_stock <= 0) : false);
 @endphp
 
 <a href="{{ url($offer->slug ?? $offer->id) }}"

@@ -523,5 +523,27 @@ class ProductController extends Controller
 
         return ResponseHelper::success($data, 'Products category updated successfully');
     }
+
+    public function bulkUpdateStockStatus(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_ids'   => 'required|array|min:1',
+            'product_ids.*' => 'required|integer',
+            'stock_status'  => 'required|string|in:in_stock,out_of_stock',
+        ]);
+
+        $data = $this->productService->bulkUpdateStockStatus(
+            $validated['product_ids'],
+            $validated['stock_status']
+        );
+
+        $statusLabel = $validated['stock_status'] === 'in_stock' ? 'In Stock' : 'Out of Stock';
+        $message = "{$data['updated_count']} product(s) marked as {$statusLabel} successfully";
+        if (!empty($data['skipped_count'])) {
+            $message .= " ({$data['skipped_count']} skipped because stock management is disabled)";
+        }
+
+        return ResponseHelper::success($data, $message);
+    }
 }
 

@@ -654,6 +654,7 @@ Route::prefix('v1')->group(function () {
                     Route::post('/bulk/generate-barcodes', [ProductController::class, 'bulkGenerateBarcodes']);
                     Route::post('/bulk/update-warehouse', [ProductController::class, 'bulkUpdateWarehouse']);
                     Route::post('/bulk/update-category', [ProductController::class, 'bulkUpdateCategory']);
+                    Route::post('/bulk/update-stock-status', [ProductController::class, 'bulkUpdateStockStatus']);
                 });
                 Route::get('/check-sku/product', [ProductController::class, 'checkSku']);
 

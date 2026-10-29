@@ -329,7 +329,16 @@ class CartController extends FrontendController
 
                 if (isset($item['variation_id'])) {
                     // ── VARIATION PRODUCT  ──
-                    $variation = ProductVariation::with(['product:id,title,slug,thumbnail', 'stocks.warehouse'])->findOrFail($item['variation_id']);
+                    $variation = ProductVariation::with(['product:id,title,slug,thumbnail,manage_stock,stock_status', 'stocks.warehouse'])->findOrFail($item['variation_id']);
+
+                    // Guard: Check variation or parent product stock status
+                    if ($variation->stock_status === 'out_of_stock' || ($variation->product && $variation->product->stock_status === 'out_of_stock')) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Sorry, this variation is currently out of stock.'
+                        ], 422);
+                    }
+
                     $stockRecord = $variation->stocks->where('quantity', '>=', $qty)->sortByDesc('quantity')->first();
 
                     if ($variation->product->manage_stock) {
@@ -367,6 +376,15 @@ class CartController extends FrontendController
                 } else {
                     // ── SINGLE PRODUCT  ──
                     $product = Product::findOrFail($item['id']);
+
+                    // Guard: Check product stock status
+                    if ($product->stock_status === 'out_of_stock') {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Sorry, this product is currently out of stock.'
+                        ], 422);
+                    }
+
                     $bestWarehouse = null;
                     $bestBinId = null;
                     if ($product->manage_stock) {                      // ← guard

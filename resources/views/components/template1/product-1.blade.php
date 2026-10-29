@@ -124,7 +124,7 @@
         </div>
         @php
             $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value);
-            $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
+            $isOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock ? ($product->available_stock <= 0) : false);
         @endphp
 
         <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
