@@ -134,6 +134,23 @@
                 }
             } catch (err) {}
         }, true);
+
+        // Auto append preview_theme on form submit (search bars, filters, etc.)
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!form || form.tagName !== 'FORM') return;
+
+            let input = form.querySelector('input[name="preview_theme"]');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'preview_theme';
+                input.value = previewTheme;
+                form.appendChild(input);
+            } else {
+                input.value = previewTheme;
+            }
+        }, true);
     })();
 </script>
 @endif
