@@ -29,10 +29,11 @@ class SocialSetting extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function getimageAttribute(): ?string
+
+    public function getIconImageAttribute($value): ?string
     {
-        return $this->icon_image
-            ? Storage::disk('r2')->url($this->icon_image)
+        return $value
+            ? Storage::disk('r2')->url($value)
             : null;
     }
 }
