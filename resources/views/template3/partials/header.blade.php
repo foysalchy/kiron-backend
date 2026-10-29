@@ -12,7 +12,7 @@
 
         <!-- Mobile Menu Toggle -->
         <button onclick="toggleMobileMenu()" aria-label="Open menu"
-            class="md:hidden text-gray-700 text-2xl focus:outline-none">
+            class="md:hidden text-header text-2xl focus:outline-none">
             <i class="fas fa-bars"></i>
         </button>
 
@@ -102,23 +102,63 @@
             <!-- Account -->
             <div class="relative group hidden md:block" id="desktop-account-wrapper">
                 @auth('customer')
-                    <button onclick="toggleDesktopAccount()" aria-label="Open account menu"
-                        class="flex items-center gap-1 text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
-                        <i class="fa-regular fa-user text-2xl"></i>
+                    <!-- Logged In User Trigger -->
+                    <button onclick="toggleDesktopAccount()" aria-label="Toggle account menu"
+                        class="flex items-center gap-2 text-header outline-none cursor-pointer select-none">
+                        <div
+                            class="w-8 h-8 md:w-9 md:h-9 rounded-full primary-bg text-primary flex items-center justify-center font-bold border-2 border-white shadow-sm">
+                            {{ substr(auth('customer')->user()->name, 0, 1) }}
+                        </div>
+                        <div class="hidden lg:block text-left">
+                            <p class="text-sm font-bold truncate max-w-[100px]">{{ auth('customer')->user()->name }}
+                            </p>
+                        </div>
+                        <i class="fas fa-chevron-down text-[10px] ml-1 transition-transform duration-300"
+                            id="account-chevron"></i>
                     </button>
-                    <!-- Dropdown Logic remains same as your previous code -->
+
+                    <!-- Dropdown Menu -->
                     <div id="desktop-account-menu"
                         class="hidden absolute right-0 mt-3 w-52 bg-white border border-gray-100 rounded-lg shadow-xl z-50 py-2">
+                        <div class="px-4 py-2 border-b border-gray-50 mb-2">
+                            <p class="text-xs text-gray-400">Logged In</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ auth('customer')->user()->email }}
+                            </p>
+                        </div>
+
                         <a href="{{ route('user.dashboard') }}"
-                            class="block px-4 py-2 text-sm hover:bg-gray-50">Dashboard</a>
-                        <form action="{{ route('user.logout') }}" method="POST">@csrf <button type="submit"
-                                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</button>
-                        </form>
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[var(--primary-color)] transition-colors">
+                            <i class="fas fa-th-large w-4 text-gray-400"></i> Dashboard
+                        </a>
+                        <a href="{{ route('user.dashboard') }}?section=orders"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[var(--primary-color)] transition-colors">
+                            <i class="fas fa-box w-4 text-gray-400"></i> My Orders
+                        </a>
+                        <a href="{{ route('user.dashboard') }}?section=profile"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[var(--primary-color)] transition-colors">
+                            <i class="fas fa-user-edit w-4 text-gray-400"></i> Update Profile
+                        </a>
+
+                        <div class="border-t border-gray-50 mt-2 pt-1">
+                            <form action="{{ route('user.logout') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-sign-out-alt w-4"></i> Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
-                    <a href="{{ route('user.login') }}" aria-label="Login to your account"
-                        class="text-gray-800 hover:text-blue-600 transition-colors">
-                        <i class="fa-regular fa-user text-2xl"></i>
+                    <!-- Guest User Icon -->
+                    <a href="{{ route('user.login') }}" aria-label="Login"
+                        class="flex items-center gap-2 text-header group/login">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                     </a>
                 @endauth
             </div>

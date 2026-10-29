@@ -198,7 +198,7 @@
                         @endphp
                         <li class="group relative">
                             <a href="{{ $finalUrl }}"
-                                class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
+                                class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
                                 {{ $item['label'] }}
                                 @if (!empty($item['children']))
                                     <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
@@ -215,7 +215,7 @@
                                                     $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
                                                 @endphp
                                                 <li class="px-4 py-2.5 hover:bg-gray-100">
-                                                    <a href="{{ $cUrl }}" class="group-hover:text-header uppercase block">
+                                                    <a href="{{ $cUrl }}" class="group-hover:text-[var(--primary-color)] uppercase block">
                                                         {{ $child['label'] }}
                                                     </a>
                                                 </li>
@@ -232,7 +232,7 @@
 
                     <li class="group relative">
                         <a href="{{ url($mega->slug ?? $mega->id) }}"
-                            class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
+                            class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
                             {{ $mega->name }}
                             @if ($mega->subCategories->count() > 0)
                                 <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
@@ -246,7 +246,7 @@
                                         <li
                                             class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
                                             <a href="{{ url($sub->slug ?? $sub->id) }}"
-                                                class="group-hover/sub:text-header uppercase">
+                                                class="group-hover/sub:text-[var(--primary-color)] uppercase">
                                                 {{ $sub->name }}
                                             </a>
                                             @if ($sub->miniCategories->count() > 0)
@@ -259,7 +259,7 @@
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <li class="px-4 py-2.5 hover:bg-gray-100">
                                                             <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                                class="block group-hover/mini:text-header uppercase">
+                                                                class="block group-hover/mini:text-[var(--primary-color)] uppercase">
                                                                 {{ $mini->name }}
                                                             </a>
                                                         </li>

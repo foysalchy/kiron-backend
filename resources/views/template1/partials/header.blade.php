@@ -43,7 +43,7 @@
 
         <!-- Logo Section -->
         <div class="flex items-center gap-3 flex-shrink-0">
-            <button class="lg:hidden text-2xl text-gray-700 focus:outline-none" onclick="toggleMobileMenu()"
+            <button class="lg:hidden text-2xl text-header focus:outline-none" onclick="toggleMobileMenu()"
                 aria-label="Toggle Menu">
                 <i class="fas fa-bars"></i>
             </button>
@@ -54,7 +54,7 @@
                     <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200"
                         height="80" class="h-8 md:h-12 w-auto object-contain">
                 @else
-                    <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+                    <span class="text-xl md:text-2xl font-bold text-header tracking-tight">
                         {{ $setup->shop_name ?? 'Bhaiya Digital' }}
                     </span>
                 @endif
@@ -115,7 +115,7 @@
         </form>
 
         <!-- Right Side Icons -->
-        <div class="flex items-center gap-3 lg:gap-6 text-[#1D2128]">
+        <div class="flex items-center gap-3 lg:gap-6 text-header">
 
             <!-- Nav Links (XL only) -->
 
