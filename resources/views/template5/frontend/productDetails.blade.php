@@ -798,7 +798,7 @@
                         }
 
                         document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                        if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
+                        if (isOrderNow) window.location.href = "{{ route('checkout.index', request()->query()) }}";
                         else toastr.success(data.message);
                     } else toastr.error(data.message);
                 });

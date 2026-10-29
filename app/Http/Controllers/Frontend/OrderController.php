@@ -23,15 +23,24 @@ class OrderController extends FrontendController
     {
         $setup = SiteSetting::where('company_id', $this->company_id)->first();
         if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
-            session()->put('url.intended', route('checkout.index'));
+            $previewTheme = request('preview_theme');
+            $intendedUrl = $previewTheme
+                ? route('checkout.index', ['preview_theme' => $previewTheme])
+                : route('checkout.index');
+            session()->put('url.intended', $intendedUrl);
+
             $msg = (isset($setup->lang) && $setup->lang == 'bn')
                 ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
                 : 'Please login to proceed with checkout.';
-            return redirect()->route('user.login')->with('warning', $msg);
+
+            $redirectParams = $previewTheme ? ['preview_theme' => $previewTheme] : [];
+            return redirect()->route('user.login', $redirectParams)->with('warning', $msg);
         }
 
         if (Cart::count() == 0) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
+            $previewTheme = request('preview_theme');
+            $params = $previewTheme ? ['preview_theme' => $previewTheme] : [];
+            return redirect()->route('cart.index', $params)->with('error', 'Your cart is empty!');
         }
         $paymentMethods = \Illuminate\Support\Facades\Cache::remember("payment_methods_{$this->company_id}", 86400, function () {
             return CustomerPaymentMethod::where('company_id', $this->company_id)
@@ -289,11 +298,18 @@ class OrderController extends FrontendController
 
         $setup = SiteSetting::where('company_id', $this->company_id)->first();
         if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
-            session()->put('url.intended', route('checkout.index'));
+            $previewTheme = request('preview_theme');
+            $intendedUrl = $previewTheme
+                ? route('checkout.index', ['preview_theme' => $previewTheme])
+                : route('checkout.index');
+            session()->put('url.intended', $intendedUrl);
+
             $msg = (isset($setup->lang) && $setup->lang == 'bn')
                 ? 'চেকআউট সম্পন্ন করতে অনুগ্রহ করে প্রথমে লগইন করুন।'
                 : 'Please login to proceed with checkout.';
-            return redirect()->route('user.login')->with('warning', $msg);
+
+            $redirectParams = $previewTheme ? ['preview_theme' => $previewTheme] : [];
+            return redirect()->route('user.login', $redirectParams)->with('warning', $msg);
         }
 
         $pm = strtolower($request->payment_method ?? '');
@@ -330,7 +346,9 @@ class OrderController extends FrontendController
         if ($currentStatus !== Status::Draft->value) {
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
-            return redirect()->route('order.thankyou', $order->id)->with('success', 'Order already placed.');
+            $previewTheme = request('preview_theme');
+            $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
+            return redirect()->route('order.thankyou', $p)->with('success', 'Order already placed.');
         }
 
         try {
@@ -345,7 +363,9 @@ class OrderController extends FrontendController
                 }
                 $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
                 if ($currentStatus !== Status::Draft->value) {
-                    return redirect()->route('order.thankyou', $order->id);
+                    $previewTheme = request('preview_theme');
+                    $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
+                    return redirect()->route('order.thankyou', $p);
                 }
                 // 4. Address update
                 $sourceInfo = [
@@ -467,7 +487,9 @@ class OrderController extends FrontendController
 
 
 
-                return redirect()->route('order.thankyou', $order->id)->with('success', 'Your order has been successfully placed.');
+                $previewTheme = request('preview_theme');
+                $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
+                return redirect()->route('order.thankyou', $thankYouParams)->with('success', 'Your order has been successfully placed.');
             });
         } catch (\Exception $e) {
             DB::rollBack();
