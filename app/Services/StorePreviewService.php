@@ -344,21 +344,33 @@ class StorePreviewService
     {
         return collect([
             (object) [
-                'name' => 'Tanvir Ahmed',
+                'id' => 1,
+                'customer' => (object) [
+                    'name' => 'Tanvir Ahmed',
+                    'image' => null,
+                ],
                 'rating' => 5,
                 'comment' => 'Excellent product quality and super fast delivery. Highly recommended store!',
                 'created_at' => now()->subDays(2),
                 'is_dummy' => true,
             ],
             (object) [
-                'name' => 'Farhana Kabir',
+                'id' => 2,
+                'customer' => (object) [
+                    'name' => 'Farhana Kabir',
+                    'image' => null,
+                ],
                 'rating' => 5,
                 'comment' => 'Packaging was top-notch and the item matched exactly as shown on the website.',
                 'created_at' => now()->subDays(5),
                 'is_dummy' => true,
             ],
             (object) [
-                'name' => 'Sabbir Hossain',
+                'id' => 3,
+                'customer' => (object) [
+                    'name' => 'Sabbir Hossain',
+                    'image' => null,
+                ],
                 'rating' => 4,
                 'comment' => 'Very satisfied with customer service. Will definitely order again.',
                 'created_at' => now()->subDays(8),

@@ -239,10 +239,29 @@
 
                     {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                     @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                        <div
-                            class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
-                            <i class="fa-solid fa-gift text-amber-600"></i>
-                            <span>{{ $setup->free_shipping_text }}</span>
+                        <div class="mb-4">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Shipping Charge Rule" />
+                                </div>
+                            @endif
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>{{ $setup->free_shipping_text }}</span>
+                            </div>
+                        </div>
+                    @elseif(!empty($activePreviewTheme))
+                        {{-- In Preview mode show dummy shipping text if empty --}}
+                        <div class="mb-4">
+                            <div class="mb-1">
+                                <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
+                            </div>
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>Free shipping on orders over ৳1500 (Sample Preview)</span>
+                            </div>
                         </div>
                     @endif
 
@@ -273,13 +292,25 @@
 
                     <!-- Product Custom Block (Notice/Announcement/Policy) -->
                     @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
-                        <div class="product-custom-block my-5 p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
-                            {!! $productCustomBlock->text_content !!}
+                        <div class="my-5">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Content Setting" :isDummy="!empty($productCustomBlock->is_dummy)" />
+                                </div>
+                            @endif
+                            <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                                {!! $productCustomBlock->text_content !!}
+                            </div>
                         </div>
                     @endif
 
                     <div class="bg-gray-100 py-3 px-3 rounded">
-                        <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-center flex-1 text-gray-700">Call or WhatsApp to order directly</div>
+                            @if(!empty($activePreviewTheme))
+                                <x-preview-badge name="Social Setting" />
+                            @endif
+                        </div>
 
                         <div class="grid grid-cols-2 gap-2 md:gap-3">
 
@@ -568,8 +599,13 @@
                                 <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                                     <i class="fas fa-layer-group text-[#FF6A00]"></i> Related Products
                                 </h2>
-                                <span
-                                    class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full">{{ $relatedProducts->take(5)->count() }}</span>
+                                <div class="flex items-center gap-2">
+                                    @if(!empty($activePreviewTheme))
+                                        <x-preview-badge name="Products" :isDummy="!empty($relatedProducts->first()?->is_dummy)" />
+                                    @endif
+                                    <span
+                                        class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full">{{ $relatedProducts->take(5)->count() }}</span>
+                                </div>
                             </div>
                             <div class="p-4 space-y-4 max-h-[800px] overflow-y-auto custom-scrollbar">
                                 @foreach($relatedProducts->take(5) as $related)

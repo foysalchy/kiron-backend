@@ -147,10 +147,20 @@
 @endpush
 @section('content')
     <!-- NOTICE TICKER -->
+    @if(!empty($activePreviewTheme))
+        <div class="container mx-auto px-4 pt-2">
+            <x-preview-badge name="Notice" :isDummy="!empty($notices->first()?->is_dummy)" />
+        </div>
+    @endif
     @include('components.frontend.notice-marquee', ['notices' => $notices])
 
     <!-- hero section -->
     <section class="container mx-auto mt-6 px-4 ">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2">
+                <x-preview-badge name="Slider" :isDummy="!empty($mainSliders->first()?->is_dummy)" />
+            </div>
+        @endif
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
 
             <!-- LEFT: Dynamic Swiper Slider -->
@@ -237,10 +247,17 @@
 
     <!-- PRODUCT CATEGORIES SECTION -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
-        <section class="w-full mx-auto px-4 mb-12">
+        <section class="w-full mx-auto px-4 mt-8 md:mt-12 mb-12">
             <div class="container mx-auto p-0">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-3 text-center">
+                        <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
+                    </div>
+                @endif
 
-                <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533]   tracking-tight mt-6 text-center">
+                <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] tracking-tight text-center">
+                    {{ $featureCategory['name'] ?? 'Featured Category' }}
+                </h2>
                     {{ $featureCategory['name'] ?? 'Featured Category' }}
                 </h2>
                 <p class="text-gray-600 text-center mb-4 lg:text-[16px] text-[14px]">Buy Your Desired Products from Featured
@@ -281,10 +298,15 @@
             </div>
         </section>
     @elseif (isset($headerCategories) && $headerCategories->count() > 0)
-        <section class="w-full mx-auto px-4 mb-12">
+        <section class="w-full mx-auto px-4 mt-8 md:mt-12 mb-12">
             <div class="container mx-auto p-0">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-3 text-center">
+                        <x-preview-badge name="Categories" />
+                    </div>
+                @endif
 
-                <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533]   tracking-tight mt-6 text-center">
+                <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] tracking-tight text-center">
                     Featured Category
                 </h2>
                 <p class="text-gray-600 text-center mb-4 lg:text-[16px] text-[14px]">Buy Your Desired Products from Featured
@@ -327,6 +349,11 @@
     @foreach ($productGroups as $group)
         <section class=" px-4  ">
             <div class="mb-12 container mx-auto p-0">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="Product Group" :isDummy="!empty($group->is_dummy)" />
+                    </div>
+                @endif
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-2xl font-semibold text-[#041533]  tracking-tight">
@@ -401,6 +428,11 @@
     @if($latestOffers->isNotEmpty())
         <section class="w-full bg-[#fcfcfc] px-4">
             <div class="p-0 container mx-auto">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="Products" :isDummy="!empty($latestOffers->first()?->is_dummy)" />
+                    </div>
+                @endif
 
                 <!-- Section Title -->
                 <h2 class="text-xl md:text-2xl text-[20px] font-bold text-[#041533] lg:mb-4 mb-3 tracking-tight">
@@ -461,6 +493,11 @@
     <!-- OUR FEATURED PRODUCTS SECTION -->
     <section class="w-full bg-[#fcfcfc] px-4 py-10">
         <div class="p-0 container mx-auto  ">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Products" :isDummy="!empty($popularProducts->first()?->is_dummy)" />
+                </div>
+            @endif
             <!-- Section Title -->
             <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] lg:mb-4 mb-3 tracking-tight">
                 Our Featured Products
@@ -529,6 +566,11 @@
     @if($homePageData->description)
         <section class="w-full bg-[#fcfcfc] px-4 font-manrope">
             <div class="p-0 container mx-auto    ">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="SEO & Content" :isDummy="!empty($homePageData->is_dummy)" />
+                    </div>
+                @endif
                 <div
                     class=" bg-gray-100  border border-gray-200 rounded-lg px-6 py-6
                             prose prose-slate max-w-none

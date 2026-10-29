@@ -87,7 +87,7 @@
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         @if(!empty($activePreviewTheme))
             <div class="mb-2 text-center">
-                <x-preview-badge name="Categories" :isDummy="!empty($featureCategory['is_dummy'])" />
+                <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
             </div>
         @endif
         <div class="relative">
