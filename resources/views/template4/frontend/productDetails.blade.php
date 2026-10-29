@@ -242,10 +242,29 @@
                     <div>
                         {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                         @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                            <div
-                                class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
-                                <i class="fa-solid fa-gift text-amber-600"></i>
-                                <span>{{ $setup->free_shipping_text }}</span>
+                            <div class="mb-4">
+                                @if(!empty($activePreviewTheme))
+                                    <div class="mb-1">
+                                        <x-preview-badge name="Shipping Charge Rule" />
+                                    </div>
+                                @endif
+                                <div
+                                    class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                    <i class="fa-solid fa-gift text-amber-600"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            </div>
+                        @elseif(!empty($activePreviewTheme))
+                            {{-- In Preview mode show dummy shipping text if empty --}}
+                            <div class="mb-4">
+                                <div class="mb-1">
+                                    <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
+                                </div>
+                                <div
+                                    class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                    <i class="fa-solid fa-gift text-amber-600"></i>
+                                    <span>Free shipping on orders over ৳1500 (Sample Preview)</span>
+                                </div>
                             </div>
                         @endif
 
@@ -291,16 +310,28 @@
 
                         <!-- Product Custom Block (Notice/Announcement/Policy) -->
                         @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
-                            <div class="product-custom-block my-5 p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
-                                {!! $productCustomBlock->text_content !!}
+                            <div class="my-5">
+                                @if(!empty($activePreviewTheme))
+                                    <div class="mb-1">
+                                        <x-preview-badge name="Content Setting" :isDummy="!empty($productCustomBlock->is_dummy)" />
+                                    </div>
+                                @endif
+                                <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                                    {!! $productCustomBlock->text_content !!}
+                                </div>
                             </div>
                         @endif
 
                         <!-- Contact Help -->
                         <div class="mt-3 md:mt-4 border border-gray-200 rounded-xl p-4 md:p-5 bg-white">
-                            <p class="font-semibold text-gray-800 text-sm md:text-base mb-3">
-                                Have a question?
-                            </p>
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="font-semibold text-gray-800 text-sm md:text-base">
+                                    Have a question?
+                                </p>
+                                @if(!empty($activePreviewTheme))
+                                    <x-preview-badge name="Social Setting" />
+                                @endif
+                            </div>
 
                             <div class="flex flex-wrap gap-2 md:gap-3">
                                 <!-- Call -->
@@ -488,8 +519,11 @@
                     <!-- RIGHT COLUMN: Related Products (Sticky Sidebar) -->
                     <aside class="lg:col-span-2 flex flex-col gap-6 sticky top-24">
                         <div class="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
-                            <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                            <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                                 <h3 class="font-bold text-gray-900 text-lg">Related Products</h3>
+                                @if(!empty($activePreviewTheme))
+                                    <x-preview-badge name="Products" :isDummy="!empty($relatedProducts->first()?->is_dummy)" />
+                                @endif
                             </div>
                             <div class="divide-y divide-gray-200">
                                 @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp

@@ -13,10 +13,20 @@
 @endsection
 @section('content')
     <!-- NOTICE TICKER -->
+    @if(!empty($activePreviewTheme))
+        <div class="container mx-auto px-4 lg:px-0 pt-2">
+            <x-preview-badge name="Notice" :isDummy="!empty($notices->first()?->is_dummy)" />
+        </div>
+    @endif
     @include('components.frontend.notice-marquee', ['notices' => $notices])
 
     <!-- HERO SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2 flex items-center gap-4">
+                <x-preview-badge name="Slider" :isDummy="!empty($mainSliders->first()?->is_dummy)" />
+            </div>
+        @endif
         <!-- Main 3-Column Layout -->
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
@@ -134,6 +144,11 @@
     <!-- TOP CATEGORIES SECTION -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
                 <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
                     {{ $featureCategory['name'] ?? 'Top Categories' }}
@@ -173,6 +188,11 @@
         </section>
     @elseif (isset($categories) && $categories->count() > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Categories" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
                 <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
                     Top Categories
@@ -209,6 +229,11 @@
     <!-- NEW ARRIVALS SECTION -->
     @if ($newArrivals->count() > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Products" :isDummy="!empty($newArrivals->first()?->is_dummy)" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
                 <!-- Header -->
@@ -266,6 +291,11 @@
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Product Group" :isDummy="!empty($group->is_dummy)" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6 relative">
 
                 <!-- Header -->
@@ -313,6 +343,11 @@
     <!-- DUAL BANNER SECTION -->
     @if ($middleSliders->count() > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Slider" :isDummy="!empty($middleSliders->first()?->is_dummy)" />
+                </div>
+            @endif
             <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
                 @foreach ($middleSliders as $slider)
@@ -344,6 +379,11 @@
     <!-- POPULAR BRANDS SECTION -->
     @if ($brands->count() > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Brand" :isDummy="!empty($brands->first()?->is_dummy)" />
+                </div>
+            @endif
             <!-- Main Card Container -->
             <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
@@ -397,6 +437,11 @@
     @if ($popularProducts->count() > 0)
         <!-- YOU MAY LIKE SECTION -->
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Products" :isDummy="!empty($popularProducts->first()?->is_dummy)" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
                 <!-- Header -->
@@ -426,6 +471,11 @@
     @if ($faqs->count() > 0)
         <!-- FAQ SECTION (Styled like You May Like) -->
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Knowledge Base" :isDummy="!empty($faqs->first()?->is_dummy)" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs p-4 md:p-10 border border-gray-50">
 
                 <!-- Section Header -->

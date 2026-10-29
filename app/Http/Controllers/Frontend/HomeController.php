@@ -317,9 +317,7 @@ class HomeController extends FrontendController
                 $middleSliders = \App\Services\StorePreviewService::getDummyMiddleSliders();
             }
             if (empty($featureCategory) || empty($featureCategory['items'])) {
-                if (empty($categories) || $categories->isEmpty()) {
-                    $featureCategory = \App\Services\StorePreviewService::getDummyFeatureCategory();
-                }
+                $featureCategory = \App\Services\StorePreviewService::getDummyFeatureCategory();
             }
             if (empty($productGroups) || $productGroups->isEmpty()) {
                 $productGroups = \App\Services\StorePreviewService::getDummyProductGroups();
@@ -332,6 +330,24 @@ class HomeController extends FrontendController
             }
             if (empty($homePageData) || empty($homePageData->description)) {
                 $homePageData = \App\Services\StorePreviewService::getDummyHomeDescription();
+            }
+            if (empty($allReviews) || $allReviews->isEmpty()) {
+                $allReviews = \App\Services\StorePreviewService::getDummyReviews();
+            }
+            if (empty($latestOffers) || $latestOffers->isEmpty()) {
+                $latestOffers = \App\Services\StorePreviewService::getDummyProducts(6);
+            }
+            if (empty($popularProducts) || $popularProducts->isEmpty()) {
+                $popularProducts = \App\Services\StorePreviewService::getDummyProducts(10);
+            }
+            if (empty($newArrivals) || $newArrivals->isEmpty()) {
+                $newArrivals = \App\Services\StorePreviewService::getDummyProducts(6);
+            }
+            if (empty($brands) || $brands->isEmpty()) {
+                $brands = \App\Services\StorePreviewService::getDummyBrands();
+            }
+            if (empty($faqs) || $faqs->isEmpty()) {
+                $faqs = \App\Services\StorePreviewService::getDummyFaqs();
             }
         }
 

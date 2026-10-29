@@ -13,10 +13,20 @@
 @endsection
 @section('content')
     <!-- NOTICE TICKER -->
+    @if(!empty($activePreviewTheme))
+        <div class="container mx-auto px-4 lg:px-0 pt-2">
+            <x-preview-badge name="Notice" :isDummy="!empty($notices->first()?->is_dummy)" />
+        </div>
+    @endif
     @include('components.frontend.notice-marquee', ['notices' => $notices])
 
     <!-- HERO SECTION (Full Width Slider) -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2">
+                <x-preview-badge name="Slider" :isDummy="!empty($mainSliders->first()?->is_dummy)" />
+            </div>
+        @endif
         <div class="w-full h-[220px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
             <!-- Slider Container -->
             <div class="relative h-full w-full rounded-2xl overflow-hidden shadow-sm bg-white group">
@@ -61,6 +71,11 @@
     <!-- 2. SHOP BY CATEGORY (Sub-Category Grid Layout) -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
+                </div>
+            @endif
             <!-- Section Heading -->
             <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
                 <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
@@ -122,6 +137,11 @@
 
         @if ($activeSub)
             <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0" id="mega-section-{{ $megaCat->id }}">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="Categories" />
+                    </div>
+                @endif
 
                 <!-- Header: Category Name & Sub-Category Tabs -->
                 <div
@@ -170,6 +190,11 @@
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Product Group" :isDummy="!empty($group->is_dummy)" />
+                </div>
+            @endif
             <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6 relative">
 
                 <!-- Header -->
@@ -215,6 +240,11 @@
     @endforeach
     <!-- Latest Products SECTION -->
     <section class="py-4 md:6 container mx-auto px-4 lg:px-0">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-2">
+                <x-preview-badge name="Products" :isDummy="!empty($allProducts->first()?->is_dummy)" />
+            </div>
+        @endif
         <!-- Header: Title left, View All right, and a Border bottom -->
         <div class="flex items-end justify-between border-b border-gray-200 pb-2 mb-8">
             <!-- Section Title -->
@@ -247,6 +277,11 @@
     <!-- DUAL BANNER SECTION -->
     @if ($middleSliders->count() > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Slider" :isDummy="!empty($middleSliders->first()?->is_dummy)" />
+                </div>
+            @endif
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
                 @foreach ($middleSliders->take(2) as $slider)
@@ -281,6 +316,11 @@
     @if (isset($allReviews) && $allReviews->isNotEmpty())
         <section class="py-4 md:py-6 bg-[#f8fafc]">
             <div class="container mx-auto px-4">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-2 text-center">
+                        <x-preview-badge name="Reviews" :isDummy="!empty($allReviews->first()?->is_dummy)" />
+                    </div>
+                @endif
                 <!-- Section Header -->
                 <div class="text-center mb-12">
                     <!-- Star with Lines -->

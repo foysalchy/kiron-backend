@@ -60,10 +60,20 @@
     }
   </style>
   <!-- NOTICE TICKER -->
+  @if(!empty($activePreviewTheme))
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 pt-2">
+      <x-preview-badge name="Notice" :isDummy="!empty($notices->first()?->is_dummy)" />
+    </div>
+  @endif
   @include('components.frontend.notice-marquee', ['notices' => $notices])
 
   <!-- ============ HERO ============ -->
   <section class="relative bg-hero overflow-hidden">
+    @if(!empty($activePreviewTheme))
+      <div class="absolute top-4 left-6 md:left-16 lg:left-24 z-30">
+        <x-preview-badge name="Slider" />
+      </div>
+    @endif
 
     <!-- Slider -->
     <div id="imageSlider" class="relative aspect-[4/3] md:aspect-[16/9] lg:aspect-[21/9] w-full">
@@ -222,6 +232,11 @@
   <!-- ============ CATEGORIES (dynamic) ============ -->
   @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 reveal">
+      @if(!empty($activePreviewTheme))
+        <div class="mb-3">
+          <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
+        </div>
+      @endif
       <div class="flex items-end justify-between mb-10">
         <div>
           <span class="text-[11px] tracking-[0.22em] uppercase text-brand">What are you looking for?</span>
@@ -272,6 +287,11 @@
     </section>
   @elseif (isset($categories) && $categories->count() > 0)
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 reveal">
+      @if(!empty($activePreviewTheme))
+        <div class="mb-3">
+          <x-preview-badge name="Categories" />
+        </div>
+      @endif
       <div class="flex items-end justify-between mb-10">
         <div>
           <span class="text-[11px] tracking-[0.22em] uppercase text-brand">What are you looking for?</span>
@@ -325,6 +345,11 @@
       </div>
 
       <div class="relative max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12">
+        @if(!empty($activePreviewTheme))
+          <div class="mb-3">
+            <x-preview-badge name="Products" :isDummy="!empty($latestOffers->first()?->is_dummy)" />
+          </div>
+        @endif
 
         <div class="flex items-end justify-between mb-10">
           <div>
@@ -370,6 +395,11 @@
   <!-- ============ POPULAR PRODUCTS ("YOU MAY LIKE") ============ -->
   @if ($popularProducts->count() > 0)
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12 reveal" id="menu">
+      @if(!empty($activePreviewTheme))
+        <div class="mb-3">
+          <x-preview-badge name="Products" :isDummy="!empty($popularProducts->first()?->is_dummy)" />
+        </div>
+      @endif
       <div class="flex items-end justify-between mb-2">
         <div>
           <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone</span>
@@ -444,6 +474,11 @@
   <!-- ============ FAQ ============ -->
   @if ($faqs->count() > 0)
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12 reveal">
+      @if(!empty($activePreviewTheme))
+        <div class="mb-3">
+          <x-preview-badge name="Knowledge Base" :isDummy="!empty($faqs->first()?->is_dummy)" />
+        </div>
+      @endif
       <div class="bg-white rounded-2xl border border-[var(--lumina-coal)]/10 p-6 md:p-10">
         <h2 class="font-semibold text-2xl md:text-3xl mb-8">Frequently Asked Questions</h2>
         <div class="space-y-8">
