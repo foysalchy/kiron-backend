@@ -121,7 +121,7 @@ class ProductController extends FrontendController
 
     public function filterMenu(Request $request)
     {
-        $query = Product::where('status', Status::Active->value)
+        $query = Product::whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
 
@@ -231,7 +231,7 @@ class ProductController extends FrontendController
 
         $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
-            ->where('status', Status::Active->value)
+            ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
 
@@ -275,7 +275,7 @@ class ProductController extends FrontendController
 
         $allFilters = \Illuminate\Support\Facades\Cache::remember("shop_filters_{$companyId}", $ttl, function () use ($companyId) {
             return Filter::where('company_id', $companyId)
-                ->where('status', Status::Active->value)
+                 ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
                 ->with(['values' => function ($q) {
                     $q->where('status', Status::Active->value);
                 }])
@@ -484,7 +484,7 @@ class ProductController extends FrontendController
                 "related_products_v2_{$product->id}",
                 now()->addHours(6),
                 function () use ($product, $subCategoryIds, $megaCategoryIds) {
-                    $relatedQuery = Product::where('status', Status::Active->value)
+                    $relatedQuery = Product::whereIn('status', [Status::Active->value, Status::Upcoming->value])
                         ->where('id', '!=', $product->id);
 
                     $relatedQuery->where(function ($q) use ($subCategoryIds, $megaCategoryIds) {
@@ -606,7 +606,7 @@ class ProductController extends FrontendController
 
         $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
-            ->where('status', Status::Active->value)
+            ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->where('brand_id', $brand->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
@@ -639,7 +639,7 @@ class ProductController extends FrontendController
             return response()->json([]);
         }
 
-        $productQuery = Product::where('status', Status::Active->value)
+        $productQuery = Product::whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->where('title', 'LIKE', "%{$query}%");
 
         if (!empty($categorySlug)) {
@@ -670,7 +670,7 @@ class ProductController extends FrontendController
 
         $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
-            ->where('status', Status::Active->value)
+            ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->whereJsonContains('sub_category_ids', (int)$category->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
@@ -684,7 +684,7 @@ class ProductController extends FrontendController
 
         $query = Product::with('variations:id,product_id,regular_price,discount,discount_type,stock_status,available_stock')
             ->select($this->getOptimizedProductSelects())
-            ->where('status', Status::Active->value)
+            ->whereIn('status', [Status::Active->value, Status::Upcoming->value])
             ->whereJsonContains('mini_category_ids', (int)$category->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
