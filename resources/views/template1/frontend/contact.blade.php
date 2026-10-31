@@ -188,6 +188,7 @@
 
                     </div>
                 </div>
+                @if ((isset($socialLinks) && $socialLinks->count() > 0) || !empty($activePreviewTheme))
                 <div class="lg:col-span-2 bg-white rounded-lg shadow-xs p-6 ">
                     <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
                         <h3 class="text-lg md:text-2xl font-black text-gray-900">Social Media</h3>
@@ -219,6 +220,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
                 <!-- WhatsApp Card -->
 
