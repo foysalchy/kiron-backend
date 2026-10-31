@@ -20,11 +20,18 @@ class SystemPageService
                 if ($companyId) {
                     $page = SystemPage::where('page_type', $pageType)
                         ->where('company_id', $companyId)
-                        ->first();
+                        ->whereNotNull('description')
+                        ->latest('id')
+                        ->first()
+                        ?? SystemPage::where('page_type', $pageType)
+                            ->where('company_id', $companyId)
+                            ->latest('id')
+                            ->first();
                 }
 
                 return $page ?? SystemPage::where('page_type', $pageType)
                     ->whereNull('company_id')
+                    ->latest('id')
                     ->first();
             }
         );
