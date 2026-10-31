@@ -25,7 +25,7 @@ class FrontendOrderService
     {
         $query = Order::query()
             ->with([
-                'customer:id,name,phone,address,email',
+                'customer:id,name,phone,address,email,thana,district,division',
                 'warehouse:id,name',
                 'company:id,name',
                 'orderDetails.product:id,title,sku_code,thumbnail',
@@ -297,7 +297,7 @@ class FrontendOrderService
     public function getOrderById($orderId)
     {
         $order = Order::with([
-            'customer:id,name,phone,address,email',
+            'customer:id,name,phone,address,email,thana,district,division',
             'warehouse:id,name',
             'company:id,name,email,phone,logo',
             'actionLogs.user:id,name,email',
