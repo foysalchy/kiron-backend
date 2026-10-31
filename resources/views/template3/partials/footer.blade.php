@@ -157,7 +157,7 @@
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
                             <a href="{{ $social->link }}" target="_blank"
-                                aria-label="Follow us on {{ $social->name }}"
+                                aria-label="Follow us on {{ $social->name ?? $social->title ?? 'Social' }}"
                                 class="opacity-90 text-lg transition-all duration-300"
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">

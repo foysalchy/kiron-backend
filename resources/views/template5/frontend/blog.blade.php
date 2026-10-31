@@ -1,4 +1,4 @@
-﻿@extends('template5.layouts.front')
+@extends('template5.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.blog-meta', ['setup' => $setup])
 @endsection
@@ -27,6 +27,11 @@
 
     <!-- 3. Blog Grid -->
     <section class="container mx-auto py-6 px-4">
+        @if(!empty($activePreviewTheme))
+            <div class="mb-4">
+                <x-preview-badge name="Blog" :isDummy="!empty($blogs->first()?->is_dummy)" />
+            </div>
+        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
             @forelse($blogs as $blog)

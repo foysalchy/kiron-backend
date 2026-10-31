@@ -200,6 +200,11 @@
                             ════════════════════════════════════════ -->
             <aside
                 class="hidden lg:block lg:col-span-3 bg-white px-5 py-6 border border-gray-100 rounded-2xl shadow-sm h-fit sticky top-24 ">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-3">
+                        <x-preview-badge name="Categories" />
+                    </div>
+                @endif
                 <!-- Price & Dynamic Product Filters -->
                 <form action="{{ url()->current() }}" method="GET" id="sidebar-filter-form">
                     <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
@@ -347,9 +352,14 @@
             <div class="lg:col-span-9 w-full overflow-hidden">
                 <!-- Top Sort Bar -->
                 <div class="bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-6 shadow-sm flex items-center justify-between">
-                    <h2 class="text-base md:text-xl font-bold text-gray-900">
-                        {{ $category ? $category->name : 'All Products' }}
-                    </h2>
+                    <div>
+                        <h2 class="text-base md:text-xl font-bold text-gray-900">
+                            {{ $category ? $category->name : 'All Products' }}
+                        </h2>
+                        @if(!empty($activePreviewTheme))
+                            <x-preview-badge name="Products" :isDummy="!empty($products->first()?->is_dummy)" />
+                        @endif
+                    </div>
 
                     <!-- Native Sort By Dropdown -->
                     <div class="flex items-center gap-3">

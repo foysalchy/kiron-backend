@@ -21,8 +21,13 @@ class DynamicRouteController extends Controller
     public function resolve(Request $request, $slug)
     {
         // Preview Mode: if slug starts with 'sample-product-', resolve as product
-        if (\App\Services\StorePreviewService::isPreview() && str_starts_with($slug, 'sample-product-')) {
-            return app(ProductController::class)->productDetails($slug);
+        if (\App\Services\StorePreviewService::isPreview()) {
+            if (str_starts_with($slug, 'sample-product-')) {
+                return app(ProductController::class)->productDetails($slug);
+            }
+            if (\App\Services\StorePreviewService::getDummyBlogBySlug($slug)) {
+                return app(BlogController::class)->blogDetails($slug);
+            }
         }
 
         $resolvedType = \Illuminate\Support\Facades\Cache::remember("slug_type_{$slug}", now()->addHours(24), function () use ($slug) {

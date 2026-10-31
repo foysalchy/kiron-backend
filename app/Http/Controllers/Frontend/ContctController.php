@@ -21,6 +21,11 @@ class ContctController extends FrontendController
                 ->where('status', Status::Active->value)
                 ->get();
         });
+
+        if (request('preview_theme') && ($faqs->isEmpty() || empty($faqs))) {
+            $faqs = \App\Services\StorePreviewService::getDummyFaqs();
+        }
+
         return  $this->view('frontend.contact', compact('faqs'));
     }
     public function send(Request $request)

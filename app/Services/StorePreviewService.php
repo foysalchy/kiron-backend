@@ -28,27 +28,42 @@ class StorePreviewService
                 'id' => 'dummy-slider-1',
                 'title' => 'Mega Season Sale - Up to 50% Off',
                 'subtitle' => 'Exclusive Collection Available Now',
+                'description' => 'Exclusive Collection Available Now',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
                 'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'main',
+                'status' => 1,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 'dummy-slider-2',
                 'title' => 'New Premium Arrivals',
                 'subtitle' => 'Trending styles of the season',
+                'description' => 'Trending styles of the season',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
                 'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'main',
+                'status' => 1,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 'dummy-slider-3',
                 'title' => 'Limited Time Flash Offers',
                 'subtitle' => 'Grab your favorite item today',
+                'description' => 'Grab your favorite item today',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
                 'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'main',
+                'status' => 1,
                 'is_dummy' => true,
             ],
         ]);
@@ -65,15 +80,29 @@ class StorePreviewService
             (object) [
                 'id' => 'dummy-side-1',
                 'title' => 'Special Weekend Deal',
+                'subtitle' => 'Check out now',
+                'description' => 'Check out now',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
+                'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'sidebar',
+                'status' => 1,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 'dummy-side-2',
                 'title' => 'Hot Best Sellers',
+                'subtitle' => 'Best of the season',
+                'description' => 'Best of the season',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
+                'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'sidebar',
+                'status' => 1,
                 'is_dummy' => true,
             ],
         ]);
@@ -90,15 +119,29 @@ class StorePreviewService
             (object) [
                 'id' => 'dummy-mid-1',
                 'title' => 'Exclusive Offer - Buy 1 Get 1',
+                'subtitle' => 'Up to 30% Off Selected Styles',
+                'description' => 'Up to 30% Off Selected Styles',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
+                'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'middle',
+                'status' => 1,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 'dummy-mid-2',
                 'title' => 'Free Nationwide Delivery',
+                'subtitle' => 'Best Deals Across Categories',
+                'description' => 'Best Deals Across Categories',
+                'image' => null,
+                'mobile_image' => null,
                 'image_url' => $defaultImg,
+                'mobile_image_url' => $defaultImg,
                 'url' => '#',
+                'placement' => 'middle',
+                'status' => 1,
                 'is_dummy' => true,
             ],
         ]);
@@ -335,17 +378,26 @@ class StorePreviewService
     {
         return collect([
             (object) [
+                'id' => 1,
+                'title' => 'How can I place an order?',
                 'question' => 'How can I place an order?',
+                'content' => 'Simply browse your desired product, choose variations if available, and click "Order Now" or "Add to Cart" to proceed to our fast checkout page.',
                 'answer' => 'Simply browse your desired product, choose variations if available, and click "Order Now" or "Add to Cart" to proceed to our fast checkout page.',
                 'is_dummy' => true,
             ],
             (object) [
+                'id' => 2,
+                'title' => 'What are the delivery charges and delivery times?',
                 'question' => 'What are the delivery charges and delivery times?',
+                'content' => 'Delivery inside Dhaka takes 24 to 48 hours, and outside Dhaka takes 2 to 3 days. Standard delivery charge is ৳60 inside Dhaka and ৳120 outside Dhaka.',
                 'answer' => 'Delivery inside Dhaka takes 24 to 48 hours, and outside Dhaka takes 2 to 3 days. Standard delivery charge is ৳60 inside Dhaka and ৳120 outside Dhaka.',
                 'is_dummy' => true,
             ],
             (object) [
+                'id' => 3,
+                'title' => 'Can I check the parcel before making payment?',
                 'question' => 'Can I check the parcel before making payment?',
+                'content' => 'Yes, you can inspect the package in front of our delivery executive before making the payment.',
                 'answer' => 'Yes, you can inspect the package in front of our delivery executive before making the payment.',
                 'is_dummy' => true,
             ],
@@ -471,30 +523,50 @@ class StorePreviewService
         return collect([
             (object) [
                 'id' => 1,
+                'name' => 'facebook',
                 'title' => 'facebook',
+                'icon_name' => 'Facebook',
                 'link' => 'https://facebook.com',
                 'icon' => 'fa-brands fa-facebook-f',
+                'icon_class' => 'fab fa-facebook-f',
+                'hover_bg' => '#1877F2',
+                'icon_image' => null,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 2,
+                'name' => 'instagram',
                 'title' => 'instagram',
+                'icon_name' => 'Instagram',
                 'link' => 'https://instagram.com',
                 'icon' => 'fa-brands fa-instagram',
+                'icon_class' => 'fab fa-instagram',
+                'hover_bg' => '#E4405F',
+                'icon_image' => null,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 3,
+                'name' => 'youtube',
                 'title' => 'youtube',
+                'icon_name' => 'YouTube',
                 'link' => 'https://youtube.com',
                 'icon' => 'fa-brands fa-youtube',
+                'icon_class' => 'fab fa-youtube',
+                'hover_bg' => '#FF0000',
+                'icon_image' => null,
                 'is_dummy' => true,
             ],
             (object) [
                 'id' => 4,
+                'name' => 'tiktok',
                 'title' => 'tiktok',
+                'icon_name' => 'TikTok',
                 'link' => 'https://tiktok.com',
                 'icon' => 'fa-brands fa-tiktok',
+                'icon_class' => 'fab fa-tiktok',
+                'hover_bg' => '#000000',
+                'icon_image' => null,
                 'is_dummy' => true,
             ],
         ]);
@@ -532,5 +604,103 @@ class StorePreviewService
                 'is_dummy' => true,
             ],
         ]);
+    }
+
+    public static function getDummyBlogs(): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $defaultImg = asset('images/template1/frontend/dorja-sample.webp');
+
+        $items = collect([
+            (object) [
+                'id' => 'dummy-blog-1',
+                'title' => 'Top 10 Essential Products for Your Daily Life',
+                'slug' => 'top-10-essential-products-for-daily-life',
+                'short' => 'Discover our curated selection of high-quality products designed to elevate your everyday lifestyle and comfort.',
+                'body' => '<p>Living a comfortable and organized life begins with choosing the right everyday essentials. In this article, we walk you through our top recommended items crafted to make your daily routine effortless and delightful.</p><p>From durable materials to modern designs, quality matters at every step. Explore our top picks today and enjoy an unmatched shopping experience.</p>',
+                'body_2' => null,
+                'body_3' => null,
+                'images' => [$defaultImg],
+                'thumbnail_url' => $defaultImg,
+                'meta_title' => 'Top 10 Essential Products for Your Daily Life',
+                'meta_description' => 'Discover our curated selection of high-quality products designed to elevate your everyday lifestyle.',
+                'meta_keywords' => ['Lifestyle', 'Trends', 'Shopping'],
+                'reading_time' => 3,
+                'created_at' => now()->subDays(2),
+                'updated_at' => now()->subDays(2),
+                'user' => (object) ['name' => 'Store Team'],
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 'dummy-blog-2',
+                'title' => 'Smart Shopping Guide: How to Choose Genuine Products Online',
+                'slug' => 'smart-shopping-guide-how-to-choose-genuine-products',
+                'short' => 'Learn expert tips and proven methods to verify authenticity, compare features, and get the best value on your online purchases.',
+                'body' => '<p>Online shopping offers great convenience, but knowing how to select authentic products is crucial. Check seller reviews, product descriptions, warranty terms, and secure payment options before placing your order.</p><p>We pride ourselves on offering 100% genuine products with fast, reliable doorstep delivery nationwide.</p>',
+                'body_2' => null,
+                'body_3' => null,
+                'images' => [$defaultImg],
+                'thumbnail_url' => $defaultImg,
+                'meta_title' => 'Smart Shopping Guide: How to Choose Genuine Products Online',
+                'meta_description' => 'Learn expert tips and proven methods to verify authenticity on your online purchases.',
+                'meta_keywords' => ['Tips', 'Shopping', 'Guide'],
+                'reading_time' => 4,
+                'created_at' => now()->subDays(5),
+                'updated_at' => now()->subDays(5),
+                'user' => (object) ['name' => 'Admin'],
+                'is_dummy' => true,
+            ],
+            (object) [
+                'id' => 'dummy-blog-3',
+                'title' => 'Seasonal Style Trends: Fresh Looks and New Arrivals',
+                'slug' => 'seasonal-style-trends-fresh-looks-new-arrivals',
+                'short' => 'Stay ahead of the curve with this season’s freshest trends, vibrant colors, and customer-favorite collections.',
+                'body' => '<p>Fashion and lifestyle are constantly evolving. This season brings a mix of contemporary minimalism and timeless classics that you can easily integrate into your wardrobe and home.</p><p>Check out our latest collections and find what matches your personal style best.</p>',
+                'body_2' => null,
+                'body_3' => null,
+                'images' => [$defaultImg],
+                'thumbnail_url' => $defaultImg,
+                'meta_title' => 'Seasonal Style Trends: Fresh Looks and New Arrivals',
+                'meta_description' => 'Stay ahead of the curve with this season’s freshest trends, vibrant colors, and customer-favorite collections.',
+                'meta_keywords' => ['Fashion', 'Trends', 'New Arrivals'],
+                'reading_time' => 3,
+                'created_at' => now()->subDays(8),
+                'updated_at' => now()->subDays(8),
+                'user' => (object) ['name' => 'Editor'],
+                'is_dummy' => true,
+            ],
+        ]);
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $items->count(),
+            6,
+            1,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+    }
+
+    public static function getDummyBlogBySlug(string $slug): ?object
+    {
+        $paginator = self::getDummyBlogs();
+        return $paginator->getCollection()->firstWhere('slug', $slug);
+    }
+
+    public static function getDummyPaginatedProducts(int $count = 12): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $products = self::getDummyProducts($count);
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $products,
+            $products->count(),
+            15,
+            1,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
     }
 }
