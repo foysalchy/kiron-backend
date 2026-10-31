@@ -25,6 +25,8 @@ $routesMap = [
 'Social Setting' => '/social-settings',
 'SEO & Content' => '/settings/meta',
 'Pages' => '/content/pages',
+'Blog' => '/content/blogs',
+'Contact Messages' => '/contact-messages',
 'Site Setting' => '/site-settings',
 ];
 

@@ -26,9 +26,14 @@
             </span>
         </nav>
 
-        <a class="inline-flex items-center text-gray-900 hover:text-primary mb-6 font-medium" href="{{ route('blog.index') }}">
-            <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
-        </a>
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+            <a class="inline-flex items-center text-gray-900 hover:text-primary font-medium" href="{{ route('blog.index') }}">
+                <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
+            </a>
+            @if(!empty($activePreviewTheme))
+                <x-preview-badge name="Blog" :isDummy="!empty($blog->is_dummy)" />
+            @endif
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

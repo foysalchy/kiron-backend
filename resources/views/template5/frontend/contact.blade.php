@@ -22,7 +22,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-0 items-start">
 
             <div class="lg:col-span-2 bg-white rounded-lg shadow-xs p-6 ">
-                <h2 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Send Us a Message</h2>
+                <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
+                    <h2 class="text-lg md:text-2xl font-black text-gray-900">Send Us a Message</h2>
+                    @if(!empty($activePreviewTheme))
+                        <x-preview-badge name="Contact Messages" />
+                    @endif
+                </div>
 
                 @if (session('success'))
                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
@@ -79,7 +84,12 @@
 
                 <!-- Contact Information -->
                 <div class="lg:col-span-2 bg-white rounded-lg shadow-xs p-6 ">
-                    <h3 class="text-2xl font-black text-gray-900 mb-4">Contact Information</h3>
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 class="text-2xl font-black text-gray-900">Contact Information</h3>
+                        @if(!empty($activePreviewTheme))
+                            <x-preview-badge name="Site Setting" />
+                        @endif
+                    </div>
 
                     <div class="space-y-2">
                         <!-- Phone -->
@@ -183,7 +193,12 @@
                     </div>
                 </div>
                 <div class="lg:col-span-2 bg-white rounded-lg shadow-xs p-6 ">
-                    <h3 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Social Media</h3>
+                    <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
+                        <h3 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Social Media</h3>
+                        @if(!empty($activePreviewTheme))
+                            <x-preview-badge name="Social Setting" :isDummy="!empty($socialLinks->first()?->is_dummy)" />
+                        @endif
+                    </div>
 
                     <div class="flex flex-wrap gap-3">
                         @foreach ($socialLinks as $social)
@@ -225,6 +240,11 @@
 
             <!-- Title -->
             <div class="py-10 text-center">
+                @if(!empty($activePreviewTheme))
+                    <div class="mb-3">
+                        <x-preview-badge name="Knowledge Base" :isDummy="!empty($faqs->first()?->is_dummy)" />
+                    </div>
+                @endif
                 <h2 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Frequently Asked Questions</h2>
             </div>
 

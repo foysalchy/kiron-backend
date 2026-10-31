@@ -105,6 +105,10 @@ class ProductController extends FrontendController
         $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
+        if (request('preview_theme') && $products->isEmpty()) {
+            $products = \App\Services\StorePreviewService::getDummyPaginatedProducts(12);
+        }
+
         $template = $this->template ?? 'template1';
 
         $brands = collect();

@@ -83,6 +83,11 @@
     <div class="flex flex-col lg:flex-row gap-6">
         <!-- ══════════════════════════ SIDEBAR ═════════════════════════════ -->
         <aside class="w-full lg:w-[220px] shrink-0" id="shop-sidebar">
+            @if(!empty($activePreviewTheme))
+                <div class="mb-2">
+                    <x-preview-badge name="Categories" />
+                </div>
+            @endif
             <form action="{{ url()->current() }}" method="GET" id="sidebar-filter-form">
                 <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
 
@@ -230,9 +235,14 @@
             <div class="bg-white rounded-lg shadow-xs overflow-hidden">
                 <!-- Shop Header -->
                 <div class="px-5 py-3.5 flex items-center justify-between">
-                    <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
-                        {{ $category ? $category->name : 'All Products' }}
-                    </h2>
+                    <div>
+                        <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
+                            {{ $category ? $category->name : 'All Products' }}
+                        </h2>
+                        @if(!empty($activePreviewTheme))
+                            <x-preview-badge name="Products" :isDummy="!empty($products->first()?->is_dummy)" />
+                        @endif
+                    </div>
                     <div class="relative">
                         <form action="" method="GET" id="sortForm">
                             <select name="sort" onchange="document.getElementById('sortForm').submit()"

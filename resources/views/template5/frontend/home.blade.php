@@ -484,8 +484,8 @@
         <div class="space-y-8">
           @foreach ($faqs as $faq)
             <div>
-              <h3 class="font-semibold text-lg mb-2">{{ $faq->title ?? '' }}</h3>
-              <div class="text-[var(--lumina-smoke)] text-sm leading-relaxed">{!! $faq->content !!}</div>
+              <h3 class="font-semibold text-lg mb-2">{{ $faq->title ?? $faq->question ?? '' }}</h3>
+              <div class="text-[var(--lumina-smoke)] text-sm leading-relaxed">{!! $faq->content ?? $faq->answer ?? '' !!}</div>
               @if (!$loop->last)
               <hr class="mt-8 border-gray-200">@endif
             </div>
