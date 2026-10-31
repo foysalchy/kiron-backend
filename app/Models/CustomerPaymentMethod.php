@@ -6,6 +6,7 @@ use App\Traits\CompanyScoped;
 use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerPaymentMethod extends Model
 {
@@ -60,6 +61,6 @@ class CustomerPaymentMethod extends Model
     // Accessors
     public function getIconUrlAttribute(): ?string
     {
-        return $this->icon ? asset('storage/' . $this->icon) : null;
+        return $this->icon ? Storage::disk('r2')->url($this->icon) : null;
     }
 }

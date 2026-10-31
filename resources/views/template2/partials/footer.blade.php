@@ -12,7 +12,7 @@
                     <div
                         class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
                         @if (!empty($feature->icon_file))
-                        <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
+                        <img src="{{ $feature->icon_url }}" alt="{{ $feature->title }}"
                             class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                         @else
                         <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-footer text-lg"></i>

@@ -45,7 +45,7 @@ class OrderController extends FrontendController
         $paymentMethods = \Illuminate\Support\Facades\Cache::remember("payment_methods_{$this->company_id}", 86400, function () {
             return CustomerPaymentMethod::where('company_id', $this->company_id)
                 ->where('status', Status::Active->value)
-                ->select(['id', 'company_id', 'name', 'account_number', 'method_details', 'status'])
+                ->select(['id', 'company_id', 'name', 'icon', 'account_number', 'method_details', 'status'])
                 ->get();
         });
 
