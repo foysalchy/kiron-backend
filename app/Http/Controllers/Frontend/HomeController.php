@@ -104,8 +104,15 @@ class HomeController extends FrontendController
             $homePageData = Cache::remember("home_page_data_{$companyId}", $ttl, function () use ($companyId) {
                 return SystemPage::where('company_id', $companyId)
                     ->where('page_type', 'home')
+                    ->whereNotNull('description')
+                    ->latest('id')
                     ->select('id', 'company_id', 'title', 'description', 'meta_title', 'meta_description', 'meta_keywords')
-                    ->first();
+                    ->first()
+                    ?? SystemPage::where('company_id', $companyId)
+                        ->where('page_type', 'home')
+                        ->latest('id')
+                        ->select('id', 'company_id', 'title', 'description', 'meta_title', 'meta_description', 'meta_keywords')
+                        ->first();
             });
         }
 
