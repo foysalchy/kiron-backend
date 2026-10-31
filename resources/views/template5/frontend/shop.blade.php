@@ -311,12 +311,8 @@
                     <div class="bg-white rounded-lg shadow-xs mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
                         {!! $category->description !!}
                     </div>
-                @elseif (isset($pageData->description) && !empty($pageData->description))
-                    <div class="bg-gray-50 border border-gray-100 rounded-lg px-6 py-6 prose prose-slate max-w-none mt-4
-                        prose-headings:text-[#041533] prose-headings:font-bold
-                        prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
-                        prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
-                        prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
+                @elseif (!empty($pageData?->description))
+                    <div class="bg-gray-100 border border-gray-200 rounded-lg px-6 py-6 prose max-w-none mt-4">
                         {!! $pageData->description !!}
                     </div>
                 @endif
