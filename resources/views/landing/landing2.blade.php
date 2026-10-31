@@ -667,8 +667,8 @@
 
     {{-- ══ FOOTER ══ --}}
     <footer class="bg-grid-dark py-16 px-4 text-center text-white bg-dark-grid border-gray-800">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-lg md:text-3xl font-bold mb-8">
+        <div class="max-w-5xl mx-auto space-y-6">
+            <div class="text-lg md:text-3xl font-bold">
                 📢 আমাদের অফিশিয়াল
                 <span>
                     @foreach ($socialLinks as $link)
@@ -680,9 +680,34 @@
                 </span>
                 পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
+
+            @php
+                $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
+                $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
+                $privacyLink = $privacy ? ($privacy->icon_url ?? $privacy->text_content) : '#';
+                $termsLink = $terms ? ($terms->icon_url ?? $terms->text_content) : '#';
+            @endphp
+            <div class="flex justify-center items-center gap-6 font-semibold text-gray-300 text-sm md:text-base relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Content Settings &gt; Footer &amp; Legal Tab</span>@endif
+                <a href="{{ $privacyLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#7DF9FF] transition-colors">Privacy Policy</a>
+                <span>•</span>
+                <a href="{{ $termsLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#7DF9FF] transition-colors">Terms & Conditions</a>
+            </div>
+
+            @if(!empty($setup->store_address) || !empty($setup->corporate_address))
+                <div class="text-gray-300 text-sm md:text-base inline-flex items-center justify-center gap-2 relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Site Settings &gt; Store Address</span>@endif
+                    <i class="fa-solid fa-location-dot text-[#7DF9FF]"></i>
+                    <span>{{ $setup->store_address ?? $setup->corporate_address }}</span>
+                </div>
+            @endif
+
             <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" width="96" height="96"
-                class="mx-auto h-12 md:h-16 w-auto mb-6 object-contain brightness-200">
-            <p>© {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.</p>
+                class="mx-auto h-12 md:h-16 w-auto object-contain brightness-200">
+            <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Site Settings &gt; Shop Name</span>@endif
+                <p class="text-gray-400 text-sm">&copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Your Shop' }}. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 

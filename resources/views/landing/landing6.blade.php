@@ -1004,17 +1004,35 @@
 
         {{-- ══ SECTION 9: FOOTER ══ --}}
         <footer
-            class="w-full bg-gray-50 py-8 px-4 text-center border-t border-gray-100 text-xs sm:text-sm text-gray-500 space-y-2">
-            @if(!empty($setup->store_address))
-                <p class="flex items-center justify-center gap-1.5 font-medium text-gray-600">
+            class="w-full bg-gray-50 py-8 px-4 text-center border-t border-gray-100 text-xs sm:text-sm text-gray-500 space-y-4">
+            @php
+                $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
+                $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
+                $privacyLink = $privacy ? ($privacy->icon_url ?? $privacy->text_content) : '#';
+                $termsLink = $terms ? ($terms->icon_url ?? $terms->text_content) : '#';
+            @endphp
+
+            @if(!empty($setup->store_address) || !empty($setup->corporate_address))
+                <div class="inline-flex items-center justify-center gap-1.5 font-medium text-gray-600 relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Site Settings &gt; Store Address</span>@endif
                     <i class="fa-solid fa-location-dot text-[#00703c]"></i>
-                    <span>{{ $setup->store_address }}</span>
-                </p>
+                    <span>{{ $setup->store_address ?? $setup->corporate_address }}</span>
+                </div>
             @endif
 
-            <p>
-                © {{ date('Y') }} {{ $setup->shop_name ?? 'Your Shop Name' }}. All rights reserved.
-            </p>
+            <div class="flex justify-center items-center gap-6 font-semibold text-gray-600 text-xs sm:text-sm relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Content Settings &gt; Footer &amp; Legal Tab</span>@endif
+                <a href="{{ $privacyLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#00703c] transition-colors">Privacy Policy</a>
+                <span>•</span>
+                <a href="{{ $termsLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#00703c] transition-colors">Terms & Conditions</a>
+            </div>
+
+            <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 50%; transform: translateX(-50%);">Site Settings &gt; Shop Name</span>@endif
+                <p>
+                    &copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Your Shop Name' }}. All rights reserved.
+                </p>
+            </div>
         </footer>
 
     </main>

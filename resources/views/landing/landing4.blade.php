@@ -708,28 +708,29 @@
     <footer class="bg-gray-50 pt-12 pb-8 px-4 border-t border-gray-100">
         <div class="max-w-5xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-                <div class="flex items-center gap-3 text-gray-700">
+                <div class="flex items-center gap-3 text-gray-700 relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -16px; left: 0;">Site Settings &gt; Store Address</span>@endif
                     <div class="w-10 h-10 rounded-full bg-[#2e8c03]/10 flex items-center justify-center text-[#2e8c03]">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
-                    <span class="font-medium text-sm md:text-base">{{ $setup->store_address }}</span>
+                    <span class="font-medium text-sm md:text-base">{{ $setup->store_address ?? $setup->corporate_address ?? 'Dhaka, Bangladesh' }}</span>
                 </div>
-                <div class="flex gap-6 font-semibold text-gray-600 text-sm md:text-base">
+                <div class="flex gap-6 font-semibold text-gray-600 text-sm md:text-base relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -16px; right: 0; left: auto;">Content Settings &gt; Footer &amp; Legal Tab</span>@endif
                     @php
-                        $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
-                        $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
+                        $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
+                        $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id ?? null)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
                         $privacyLink = $privacy ? ($privacy->icon_url ?? $privacy->text_content) : '#';
                         $termsLink = $terms ? ($terms->icon_url ?? $terms->text_content) : '#';
                     @endphp
-                    <a href="{{ $privacyLink }}" target="_blank" class="hover:text-[#2e8c03] transition-colors">Privacy
-                        Policy</a>
-                    <a href="{{ $termsLink }}" target="_blank" class="hover:text-[#2e8c03] transition-colors">Terms &
-                        Conditions</a>
+                    <a href="{{ $privacyLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#2e8c03] transition-colors">Privacy Policy</a>
+                    <a href="{{ $termsLink }}" target="_blank" rel="noopener noreferrer" class="hover:text-[#2e8c03] transition-colors">Terms & Conditions</a>
                 </div>
             </div>
-            <div class="border-t border-gray-200 pt-6 text-center">
+            <div class="border-t border-gray-200 pt-6 text-center relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 50%; transform: translateX(-50%);">Site Settings &gt; Shop Name</span>@endif
                 <p class="text-gray-500 text-sm">
-                <p>© {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.</p>
+                    &copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Your Shop' }}. All rights reserved.
                 </p>
             </div>
         </div>
