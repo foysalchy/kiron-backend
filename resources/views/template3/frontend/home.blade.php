@@ -405,6 +405,21 @@
             </div>
         </section>
     @endif
+
+    @if (!empty($homePageData?->description))
+        <section class="w-full px-4 font-manrope">
+            <div class="p-0 container mx-auto">
+                @if (!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="SEO & Content" :isDummy="!empty($homePageData->is_dummy)" />
+                    </div>
+                @endif
+                <div class="bg-white border border-gray-100 rounded-lg px-6 py-6 prose max-w-none">
+                    {!! $homePageData->description !!}
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection
 @push('scripts')
     <script>

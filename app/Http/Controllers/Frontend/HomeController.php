@@ -31,7 +31,7 @@ class HomeController extends FrontendController
         $requirements = [
             'template1' => ['notices', 'homePageData', 'faqs', 'categories', 'featureCategory', 'newArrivals', 'productGroups', 'brands', 'popularProducts', 'allProducts', 'mainSliders', 'sidebarSliders', 'middleSliders'],
             'template2' => ['notices', 'homePageData', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'sidebarSliders'],
-            'template3' => ['notices', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'middleSliders', 'allReviews'],
+            'template3' => ['notices', 'homePageData', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'middleSliders', 'allReviews'],
             'template4' => ['notices', 'homePageData', 'featureCategory', 'latestOffers', 'productGroups', 'popularProducts', 'mainSliders', 'sidebarSliders'],
             'template5' => ['notices', 'faqs', 'categories', 'featureCategory', 'latestOffers', 'popularProducts', 'mainSliders'],
         ];
