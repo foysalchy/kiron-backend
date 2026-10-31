@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, SiteSetting, Warehouse};
+use App\Models\{Cart as CartTrack, ContentSetting, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, SiteSetting, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -650,7 +650,12 @@ class OrderController extends FrontendController
             ])
             ->findOrFail($id);
 
-        return $this->view('frontend.invoice', compact('order'));
+        $invoiceFooter = ContentSetting::where('company_id', $companyId)
+            ->where('page_type', ContentSetting::INVOICE_FOOTER)
+            ->where('status', Status::Active->value)
+            ->first();
+
+        return $this->view('frontend.invoice', compact('order', 'invoiceFooter'));
     }
 
     public function thankyou($id)

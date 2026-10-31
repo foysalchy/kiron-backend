@@ -418,11 +418,11 @@
             margin-bottom: 12px;
         }
 
-        .footer-row ul {
+        .footer-row > div:not(.footer-contact) ul:not(.prose ul) {
             list-style: none;
         }
 
-        .footer-row ul li {
+        .footer-row > div:not(.footer-contact) ul:not(.prose ul) li {
             font-size: 12px;
             color: #6b7280;
             font-weight: 500;
@@ -661,7 +661,7 @@
                             <p>Email: {{ $setup->email }}</p>
                             @php
                                 $domainSetup = $order->company?->domainSetup ?? getCurrentCompany();
-                                $websiteUrl = $domainSetup?->custom_domain 
+                                $websiteUrl = $domainSetup?->custom_domain
                                     ?: ($domainSetup?->sub_domain ? $domainSetup->sub_domain . '.dorja.io' : request()->getHost());
                             @endphp
                             <p>Website: <a href="{{ route('home') }}" target="_blank" style="color: inherit; text-decoration: none;">{{ $websiteUrl }}</a></p>
@@ -770,12 +770,11 @@
                     <!-- Footer Info -->
                     <div class="footer-row">
                         <div>
-                            <h4>Terms & Conditions:</h4>
-                            <ul>
-                                <li>• Contact us within 7 days for eligible product returns.</li>
-                                <li>• 1-year service warranty applies to manufacturing defects.</li>
-                                <li>• All prices are listed in Bangladeshi Taka (BDT).</li>
-                            </ul>
+                            @if (!empty($invoiceFooter) && !empty($invoiceFooter->text_content))
+                                <div class="prose max-w-none text-gray-700 text-xs">
+                                    {!! $invoiceFooter->text_content !!}
+                                </div>
+                            @endif
                         </div>
                         <div class="footer-contact">
                             <p>For any questions, please contact us:</p>
