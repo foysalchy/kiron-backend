@@ -38,6 +38,7 @@ class ContentSetting extends Model
     const FOOTER_BOTTOM_RIGHT = 'footer_bottom_right';
     const PRIVACY_POLICY = 'privacy_policy';
     const TERMS_AND_CONDITIONS = 'terms_and_conditions';
+    const INVOICE_FOOTER = 'invoice_footer';
 
     const PAGE_TYPES = [
         self::PAGE_PRODUCT,
@@ -48,6 +49,7 @@ class ContentSetting extends Model
         self::FOOTER_BOTTOM_RIGHT,
         self::PRIVACY_POLICY,
         self::TERMS_AND_CONDITIONS,
+        self::INVOICE_FOOTER,
     ];
 
     public static function globalLayoutSections(): array
