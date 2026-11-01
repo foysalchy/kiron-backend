@@ -393,7 +393,7 @@
             @else
                 <div class="flex gap-3 px-5 py-4 border-b border-gray-100">
                     <a href="{{ route('user.login') }}"
-                        class="flex-1 text-center py-2 border border-[var(--primary-color)] text-header rounded-lg text-sm font-bold">Login</a>
+                        class="flex-1 text-center py-2 border border-[var(--primary-color)] text-primary rounded-lg text-sm font-bold">Login</a>
                     <a href="{{ route('user.register') }}"
                         class="flex-1 text-center py-2 primary-bg text-primary text-primary rounded-lg text-sm font-bold">Register</a>
                 </div>
