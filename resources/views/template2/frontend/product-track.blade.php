@@ -21,8 +21,8 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-search"></i>
                                 </span>
-                                <input type="text" name="order_no" id="orderId" placeholder="e.g. SALE-20240115-0001"
-                                    required value="{{ request('order_no') }}"
+                                <input type="text" name="order_no" id="orderId" placeholder="e.g. INV-0001" required
+                                    value="{{ request('order_no') }}"
                                     class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#016738] outline-none transition-all">
                             </div>
                         </div>
@@ -61,7 +61,8 @@
                             <div class="absolute -left-8 top-1 w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
                             <p class="font-bold text-sm text-orange-600">{{ $order->status_label }}</p>
                             <p class="text-[11px] text-gray-500">Last Update:
-                                {{ $order->updated_at->format('d M, Y - h:i A') }}</p>
+                                {{ $order->updated_at->format('d M, Y - h:i A') }}
+                            </p>
                         </div>
                     </div>
                 </div>
