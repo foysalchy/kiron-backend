@@ -149,9 +149,9 @@
                         <div class="flex mb-5">
                             <input type="email" name="email" id="subscriber-email" placeholder="Enter your email"
                                 required
-                                class="  border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm outline-none focus:border-[#BD4F00]">
+                                class="border border-[var(--primary-color)] text-footer px-3 py-2.5 rounded-l-md w-full text-sm outline-none focus:border-[var(--primary-color)]">
                             <button type="submit" id="subscribe-btn"
-                                class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap text-white">
+                                class="primary-bg hover:bg-[var(--primary-color)] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap text-white">
                                 Subscribe
                             </button>
                         </div>

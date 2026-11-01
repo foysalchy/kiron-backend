@@ -1,13 +1,7 @@
 @extends('template2.layouts.front')
 
 @section('meta')
-    <title>{{ $notice->title }} - {{ $setup->shop_name ?? config('app.name') }}</title>
-    <meta name="description" content="{{ Str::limit(strip_tags($notice->description), 160) }}">
-    <meta property="og:title" content="{{ $notice->title }}">
-    <meta property="og:description" content="{{ Str::limit(strip_tags($notice->description), 160) }}">
-    @if($notice->image_url)
-        <meta property="og:image" content="{{ $notice->image_url }}">
-    @endif
+    @include('components.meta-info.ecommerce-meta.notice-details-meta', ['setup' => $setup, 'notice' => $notice])
 @endsection
 
 @section('content')

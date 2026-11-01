@@ -21,9 +21,9 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-search"></i>
                                 </span>
-                                <input type="text" name="order_no" id="orderId" placeholder="e.g. SALE-20240115-0001"
+                                <input type="text" name="order_no" id="orderId" placeholder="e.g. INV-0001"
                                     required value="{{ request('order_no') }}"
-                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--primary-color)]/20 focus:border-[#016738] outline-none transition-all">
+                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--primary-color)]/20 focus:border-[var(--primary-color)] outline-none transition-all">
                             </div>
                         </div>
                         <button type="submit"
