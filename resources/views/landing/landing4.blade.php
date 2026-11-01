@@ -383,7 +383,11 @@
                             @if($isPreviewMode)<span class="preview-badge" style="top: -24px; z-index: 50;">Selected
                             Products ({{ $multiProducts->count() }})</span>@endif
 
-                            @if(!empty($setup->free_shipping_text))
+                            @php
+                                $activeShippingRule = $setup->active_free_shipping_rule ?? null;
+                                $hasLandingRule = !empty($activeShippingRule) && (!empty($activeShippingRule['landing']) || !empty($activeShippingRule['apply_in_landing']));
+                            @endphp
+                            @if($hasLandingRule && !empty($setup->free_shipping_text))
                                 <div
                                     class="mb-6 p-3.5 bg-amber-500/10 border-2 border-dashed border-[#f2a413] rounded-xl flex items-center justify-center gap-3 text-[#ffdd80] text-sm sm:text-base md:text-xl font-bold shadow-md">
                                     <i class="fa-solid fa-gift text-[#f2a413] text-lg sm:text-xl animate-bounce"></i>
