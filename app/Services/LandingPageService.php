@@ -20,7 +20,7 @@ class LandingPageService
     public function getAllLandingPages(array $filters = [], bool $paginate = true)
     {
         try {
-            $query = LandingPage::query();
+            $query = LandingPage::with(['product:id,title,slug,thumbnail']);
 
             // Apply filters
             if (isset($filters['status'])) {
