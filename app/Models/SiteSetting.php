@@ -38,6 +38,7 @@ class SiteSetting extends Model
         'outside_charge',
         'corporate_address',
         'store_address',
+        'google_map',
         'tags',
         'copy_right',
         'sms_forget_password',
@@ -62,7 +63,7 @@ class SiteSetting extends Model
     ];
 
 
-    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url', 'watermark_logo_url', 'active_free_shipping_rule'];
+    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url', 'watermark_logo_url', 'active_free_shipping_rule', 'google_map_url'];
     public static function homepageCacheKeys(): array
     {
         return ['site_settings_cart', 'site_settings'];
@@ -125,6 +126,17 @@ class SiteSetting extends Model
         return $this->dark_logo
             ? Storage::disk('r2')->url($this->dark_logo)
             : null;
+    }
+
+    public function getGoogleMapUrlAttribute(): ?string
+    {
+        if (empty($this->google_map)) {
+            return null;
+        }
+        if (preg_match('/src=["\']([^"\']+)["\']/i', $this->google_map, $matches)) {
+            return $matches[1];
+        }
+        return str_starts_with($this->google_map, 'http') ? $this->google_map : null;
     }
 
     /**

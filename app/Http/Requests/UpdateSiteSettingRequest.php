@@ -45,6 +45,7 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'outside_charge'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
+                'google_map'        => ['nullable', 'string'],
                 'tags'              => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],

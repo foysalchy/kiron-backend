@@ -45,6 +45,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'outside_charge'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
+                'google_map'        => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],
                 'login_required_for_checkout' => ['nullable', 'in:0,1'],

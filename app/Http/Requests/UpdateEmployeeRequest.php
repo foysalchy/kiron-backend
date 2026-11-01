@@ -51,7 +51,7 @@ class UpdateEmployeeRequest extends UpdateBaseCompanyRequest
 
                 // --- Work Info ---
                 'joining_date'            => ['sometimes', 'required', 'date'],
-                'payslip_generation_date' => ['sometimes', 'required', 'date'],
+                'payslip_generation_date' => ['nullable', 'date'],
                 'confirmation_date'       => ['nullable', 'date'],
                 'in_time'                 => ['nullable', 'date_format:H:i'],
                 'out_time'                => ['nullable', 'date_format:H:i'],

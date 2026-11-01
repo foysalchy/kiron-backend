@@ -44,7 +44,7 @@ class StoreEmployeeRequest extends BaseCompanyRequest
 
                 // --- Work Info ---
                 'joining_date'            => ['required', 'date'],
-                'payslip_generation_date' => ['required', 'date'],
+                'payslip_generation_date' => ['nullable', 'date'],
                 'confirmation_date'       => ['nullable', 'date', 'before_or_equal:joining_date'],
                 'in_time'                 => ['nullable', 'date_format:H:i'],
                 'out_time'                => ['nullable', 'date_format:H:i'],
