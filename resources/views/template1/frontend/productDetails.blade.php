@@ -275,7 +275,7 @@
 
                         <!-- ২. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="flex-1 secondary-bg hover:bg-yellow-500 !text-gray-900 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
                         </button>
 
