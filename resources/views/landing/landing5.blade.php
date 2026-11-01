@@ -225,12 +225,11 @@
         }
 
         // Thumbnail resolving
-        if ($isPreviewMode) {
-            $productImg = (!empty($landing->thumbnail_url) && !str_contains($landing->thumbnail_url, 'diaper'))
-                ? $landing->thumbnail_url
-                : $previewDefaultGheeImg;
+        $productFallbackImg = $product->display_image_url ?? $product->thumbnail_url ?? null;
+        if (!empty($landing->thumbnail_url) && (!$isPreviewMode || !str_contains($landing->thumbnail_url, 'diaper'))) {
+            $productImg = $landing->thumbnail_url;
         } else {
-            $productImg = $landing->thumbnail_url ?? $product->display_image_url ?? $product->thumbnail_url ?? $previewDefaultGheeImg;
+            $productImg = $productFallbackImg ?: $previewDefaultGheeImg;
         }
 
         // Short Description resolving
@@ -277,7 +276,8 @@
             : (!empty($landing->offer_title) ? $landing->offer_title : $exactImgOfferTitle);
 
         // Trust description resolving
-        $desc = ($isPreviewMode && (empty($landing->description) || str_contains($landing->description, 'Diaper') || str_contains($landing->description, 'About This Product'))) ? $exactImgTrustDesc : ($landing->description ?: $exactImgTrustDesc);
+        $hasDesc = !empty(trim(strip_tags($landing->description ?? '')));
+        $desc = $hasDesc ? $landing->description : ($isPreviewMode ? $exactImgTrustDesc : null);
 
         // Content 1 & 2 resolving
         $content1 = ($isPreviewMode && (empty($landing->extras['content']) || str_contains($landing->extras['content'], 'Product Overview')))
@@ -526,17 +526,17 @@
         </header>
 
         {{-- ══ SECTION 2: GREEN TRUST BANNER ══ --}}
+        @if($desc)
         <section class="w-full bg-[#00703c] text-white py-8 md:py-12 px-4 text-center shadow-inner">
             <div class="max-w-4xl mx-auto space-y-3">
-                @if($desc)
-                    <div
-                        class="text-sm sm:text-base text-emerald-100 leading-relaxed font-normal {{ $isPreviewMode ? 'preview-badge-container' : '' }} [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:tracking-wide [&_h1]:leading-snug [&_h1]:text-white [&_h1]:mb-3 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:tracking-wide [&_h2]:leading-snug [&_h2]:text-white [&_h2]:mb-3 [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:font-black [&_h3]:tracking-wide [&_h3]:text-white [&_h3]:mb-2">
-                        @if($isPreviewMode)<span class="preview-badge" style="top:-5px; left:10px;">Details</span>@endif
-                        {!! $desc !!}
-                    </div>
-                @endif
+                <div
+                    class="text-sm sm:text-base text-emerald-100 leading-relaxed font-normal {{ $isPreviewMode ? 'preview-badge-container' : '' }} [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:tracking-wide [&_h1]:leading-snug [&_h1]:text-white [&_h1]:mb-3 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:tracking-wide [&_h2]:leading-snug [&_h2]:text-white [&_h2]:mb-3 [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:font-black [&_h3]:tracking-wide [&_h3]:text-white [&_h3]:mb-2">
+                    @if($isPreviewMode)<span class="preview-badge" style="top:-5px; left:10px;">Details</span>@endif
+                    {!! $desc !!}
+                </div>
             </div>
         </section>
+        @endif
 
         {{-- ══ SECTION 3: BENEFITS SECTION (OUR BENEFITS) ══ --}}
         @php
@@ -1044,7 +1044,7 @@
                             class="relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#0e2a47] hover:bg-[#091b2e] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: -12px;">Phone Number</span>@endif
                             <i class="fa-solid fa-phone text-xs sm:text-sm"></i>
-                            <span>Phone-এ কল করুন</span>
+                            <span>কল করুন: {{ $rawPhone }}</span>
                         </a>
                         @endif
                     </div>
