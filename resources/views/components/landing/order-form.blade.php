@@ -159,30 +159,81 @@
                 <div class="space-y-6" id="multi-product-list-wrapper">
                     @foreach ($allProducts as $p)
                         @php
-                            $pHasVars = ($p->type === 'variation') && ($p->variations && $p->variations->count() > 0);
+                            $varsCount = ($p->variations) ? $p->variations->count() : 0;
+                            $pHasMultipleVars = ($p->type === 'variation') && ($varsCount > 1);
+                            $pHasSingleVar = ($p->type === 'variation') && ($varsCount === 1);
+                            $singleVar = $pHasSingleVar ? $p->variations->first() : null;
+
+                            $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
+                            $pPrice = $p->sale_price ?? ($p->regular_price - ($p->discount ?? 0));
+
+                            if ($pHasSingleVar && $singleVar) {
+                                $pPrice = $singleVar->regular_price - ($singleVar->discount ?? 0);
+                                if (!empty($singleVar->image)) {
+                                    $pImg = \Illuminate\Support\Facades\Storage::disk('r2')->url($singleVar->image);
+                                }
+                            }
+
                             $pIsSingleOutOfStock = ($p->type === 'single') && (
                                 $p->stock_status === 'out_of_stock' ||
                                 ($p->manage_stock && ($p->available_stock <= 0))
                             );
-                            $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
-                            $pPrice = $p->sale_price ?? ($p->regular_price - ($p->discount ?? 0));
+
+                            $singleVarOutOfStock = false;
+                            $singleVarMaxStock = 999999;
+                            if ($pHasSingleVar && $singleVar) {
+                                $singleVarOutOfStock = (
+                                    $singleVar->stock_status === 'out_of_stock' ||
+                                    ($p->manage_stock && ($singleVar->available_stock <= 0))
+                                );
+                                $singleVarMaxStock = $p->manage_stock ? ($singleVar->available_stock ?? 0) : 999999;
+                            }
                         @endphp
 
                         <div class="order-product-item-wrapper border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm space-y-3 hidden" data-order-product-id="{{ $p->id }}">
-                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                            <div class="flex items-center justify-between {{ $pHasMultipleVars ? 'border-b border-gray-100 pb-3' : '' }}">
                                 <div class="flex items-center gap-3">
                                     <div class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
                                         <img src="{{ $pImg }}" class="w-full h-full object-contain" alt="{{ $p->title }}">
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-800 text-sm md:text-base leading-snug">{{ $p->title }}</h4>
-                                        <span class="text-xs text-gray-500 font-semibold">{{ $trans['price_label'] }} {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="text-xs text-gray-500 font-semibold">{{ $trans['price_label'] }} {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
+                                            @if ($pHasSingleVar && $singleVar)
+                                                <span class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">({{ $singleVar->display_name }})</span>
+                                                @if ($singleVarOutOfStock)
+                                                    <span class="text-[10px] text-red-600 font-bold">({{ $trans['out_of_stock'] }})</span>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
+                                @if (!$pHasMultipleVars)
+                                    @if ($pHasSingleVar && $singleVar)
+                                        <button type="button"
+                                            onclick="removeVariationItem('{{ $singleVar->id }}', false)"
+                                            class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="{{ $trans['remove'] }}">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <button type="button"
+                                            onclick="removeVariationItem('{{ $p->id }}', true)"
+                                            class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="{{ $trans['remove'] }}">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    @endif
+                                @endif
                             </div>
 
-                            @if ($pHasVars)
-                                {{-- Variations of this product --}}
+                            @if ($pHasMultipleVars)
+                                {{-- Variations of this product (multiple variations) --}}
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                                     @foreach ($p->variations as $variation)
                                         @php
@@ -229,39 +280,33 @@
                                         </label>
                                     @endforeach
                                 </div>
+                            @elseif ($pHasSingleVar && $singleVar)
+                                {{-- Single variation product (hidden input, acts as single item visually) --}}
+                                <input type="checkbox" name="variation_ids[]" value="{{ $singleVar->id }}"
+                                    data-price="{{ $pPrice }}"
+                                    data-name="{{ $singleVar->display_name }}"
+                                    data-title="{{ $p->title }}"
+                                    data-img="{{ $pImg }}"
+                                    data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                    data-out-of-stock="{{ $singleVarOutOfStock ? '1' : '0' }}"
+                                    data-max-stock="{{ $singleVarMaxStock }}"
+                                    {{ $singleVarOutOfStock ? 'disabled' : '' }}
+                                    onchange="onVariationCheckboxChange()"
+                                    class="hidden variant-checkbox">
                             @else
-                                {{-- Single product item selection --}}
-                                <label class="relative {{ $pIsSingleOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
-                                    <input type="checkbox" name="product_ids[]" value="{{ $p->id }}"
-                                        data-price="{{ $pPrice }}"
-                                        data-name="Regular"
-                                        data-title="{{ $p->title }}"
-                                        data-img="{{ $pImg }}"
-                                        data-is-product="1"
-                                        data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
-                                        data-out-of-stock="{{ $pIsSingleOutOfStock ? '1' : '0' }}"
-                                        data-max-stock="{{ $p->manage_stock ? ($p->available_stock ?? 0) : 999999 }}"
-                                        {{ $pIsSingleOutOfStock ? 'disabled' : '' }}
-                                        onchange="onVariationCheckboxChange()"
-                                        class="hidden peer variant-checkbox">
-
-                                    <div class="variant-card-box flex items-center justify-between gap-3 p-3 border-2 border-gray-200 rounded-xl transition-all hover:border-gray-300 bg-white">
-                                        <div class="flex items-center gap-3">
-                                            <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
-                                                <svg class="w-3.5 h-3.5 text-white hidden checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                </svg>
-                                            </div>
-                                            <div class="text-left">
-                                                <p class="text-xs font-bold text-gray-800">{{ $trans['add_product_to_cart'] }}</p>
-                                                @if($pIsSingleOutOfStock)
-                                                    <span class="text-[10px] text-red-600 font-bold">{{ $trans['out_of_stock'] }}</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <span class="text-xs font-bold text-gray-900">{{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
-                                    </div>
-                                </label>
+                                {{-- Single product item (hidden input, card removed via side remove icon) --}}
+                                <input type="checkbox" name="product_ids[]" value="{{ $p->id }}"
+                                    data-price="{{ $pPrice }}"
+                                    data-name="Regular"
+                                    data-title="{{ $p->title }}"
+                                    data-img="{{ $pImg }}"
+                                    data-is-product="1"
+                                    data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                    data-out-of-stock="{{ $pIsSingleOutOfStock ? '1' : '0' }}"
+                                    data-max-stock="{{ $p->manage_stock ? ($p->available_stock ?? 0) : 999999 }}"
+                                    {{ $pIsSingleOutOfStock ? 'disabled' : '' }}
+                                    onchange="onVariationCheckboxChange()"
+                                    class="hidden variant-checkbox">
                             @endif
                         </div>
                     @endforeach
