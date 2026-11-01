@@ -402,13 +402,20 @@
             </div>
         </section>
 
+        @php
+        $featuresTitle = data_get($landing->extras, 'features_title') ?: ($isPreviewMode ? 'চিয়া সিড কেন খাবেন? খাওয়ার উপকারিতা' : null);
+        $dynamicBenefits = data_get($landing->extras, 'features');
+        if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
+            $dynamicBenefits = $previewFeatures;
+        }
+        $hasBenefits = (!empty($dynamicBenefits) && count($dynamicBenefits) > 0);
+        @endphp
+
+        @if($hasBenefits || $featuresTitle || $isPreviewMode)
         {{-- ══ SECTION 2: BENEFITS LIST ══ --}}
         <section class="py-10 px-4 bg-white">
             <div class="max-w-7xl mx-auto">
 
-                @php
-                $featuresTitle = data_get($landing->extras, 'features_title') ?: ($isPreviewMode ? 'চিয়া সিড কেন খাবেন? খাওয়ার উপকারিতা' : null);
-                @endphp
                 @if($featuresTitle || $isPreviewMode)
                 <div class="text-center mb-8 md:mb-10 px-2">
                     <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -422,14 +429,7 @@
                 </div>
                 @endif
 
-                @php
-                $dynamicBenefits = data_get($landing->extras, 'features');
-                if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
-                $dynamicBenefits = $previewFeatures;
-                }
-                @endphp
-
-                @if(!empty($dynamicBenefits) && count($dynamicBenefits) > 0)
+                @if($hasBenefits)
                 <div class="grid grid-cols-1 gap-3 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
                         style="top: -20px; z-index: 50;">Features</span>@endif
@@ -438,7 +438,11 @@
                     <div
                         class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <span aria-hidden="true"
-                            class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
+                            class="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-full bg-[#1f8a54] text-white shrink-0 shadow-sm">
+                            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </span>
 
                         <p class="text-lg md:text-3xl text-gray-700 font-medium">
                             {{ is_array($benefit) ? ($benefit['title'] ?? '') : $benefit }}
@@ -463,14 +467,22 @@
                 </div>
             </div>
         </section>
+        @endif
 
+        @php
+        $features2Title = data_get($landing->extras, 'features2_title') ?: ($isPreviewMode ? 'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?' : null);
+        $dynamicNutrition = data_get($landing->extras, 'features2');
+        if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
+            $dynamicNutrition = $previewFeatures2;
+        }
+        $hasNutrition = (!empty($dynamicNutrition) && count($dynamicNutrition) > 0);
+        @endphp
+
+        @if($hasNutrition || $features2Title || $isPreviewMode)
         {{-- ══ SECTION 3: NUTRITION GRID ══ --}}
         <section class="py-10 px-4 bg-white">
             <div class="max-w-7xl mx-auto text-center">
 
-                @php
-                $features2Title = data_get($landing->extras, 'features2_title') ?: ($isPreviewMode ? 'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?' : null);
-                @endphp
                 @if($features2Title || $isPreviewMode)
                 <div class="text-center mb-8 md:mb-12 px-2">
                     <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -487,14 +499,7 @@
                 </div>
                 @endif
 
-                @php
-                $dynamicNutrition = data_get($landing->extras, 'features2');
-                if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
-                $dynamicNutrition = $previewFeatures2;
-                }
-                @endphp
-
-                @if(!empty($dynamicNutrition) && count($dynamicNutrition) > 0)
+                @if($hasNutrition)
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
@@ -527,6 +532,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
         {{-- ══ SECTION 4: MID DESCRIPTION & PRICE (Pure Tailwind Dynamic) ══ --}}
         <section class="bg-[#1D4935] py-16 md:py-24 px-4 text-center text-white">
@@ -603,13 +609,23 @@
 
             </div>
         </section>
+        @php
+        $featureKeys = ['features3', 'features4', 'features5', 'features6'];
+        $hasWhyChoose = false;
+        foreach ($featureKeys as $k) {
+            if (!empty(data_get($landing->extras, $k . '.0'))) {
+                $hasWhyChoose = true;
+                break;
+            }
+        }
+        $whyChooseTitle = data_get($landing->extras, 'content') ?: ($landing->content ?? ($isPreviewMode ? 'আমাদের কাছ থেকে কেন কিনবেন?' : null));
+        @endphp
+
+        @if ($hasWhyChoose || $isPreviewMode)
         {{-- ══ SECTION 5: WHY CHOOSE US ══ --}}
         <section class="py-10 px-4 bg-white text-center">
             <div class="max-w-7xl mx-auto">
 
-                @php
-                $whyChooseTitle = data_get($landing->extras, 'content') ?: ($landing->content ?? ($isPreviewMode ? 'আমাদের কাছ থেকে কেন কিনবেন?' : null));
-                @endphp
                 @if($whyChooseTitle || $isPreviewMode)
                 <div
                     class="inline-block relative mb-12 md:mb-16 px-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -625,17 +641,6 @@
                 @endif
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-
-                    @php
-                    $featureKeys = ['features3', 'features4', 'features5', 'features6'];
-                    $hasWhyChoose = false;
-                    foreach ($featureKeys as $k) {
-                    if (!empty(data_get($landing->extras, $k . '.0'))) {
-                    $hasWhyChoose = true;
-                    break;
-                    }
-                    }
-                    @endphp
 
                     @if ($hasWhyChoose)
                     @foreach ($featureKeys as $key)
@@ -709,6 +714,13 @@
                 </div>
             </div>
         </section>
+        @endif
+        @php
+        $reviewImgs = (!empty($landing->img_paths) && count($landing->img_paths) > 0)
+        ? $landing->img_paths
+        : ($isPreviewMode ? $previewReviewImages : []);
+        @endphp
+        @if(!empty($reviewImgs) && count($reviewImgs) > 0)
         {{-- ══ SECTION 8: REVIEW SLIDER ══ --}}
         <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
             <div class="container mx-auto">
@@ -720,12 +732,6 @@
                     </h2>
                 </div>
 
-                @php
-                $reviewImgs = (!empty($landing->img_paths) && count($landing->img_paths) > 0)
-                ? $landing->img_paths
-                : ($isPreviewMode ? $previewReviewImages : []);
-                @endphp
-                @if(!empty($reviewImgs) && count($reviewImgs) > 0)
                 <div class="relative px-4 md:px-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" data-field="img_paths" style="top: -12px; z-index: 50;">Review Images</span>@endif
                     <!-- Swiper Container -->
@@ -745,9 +751,9 @@
 
                     <div class="swiper-pagination !-bottom-2"></div>
                 </div>
-                @endif
             </div>
         </section>
+        @endif
 
         {{-- ══ SECTION 7: ORDER FORM (Dynamic Component) ══ --}}
         <section id="order" class="py-20 px-4 bg-white border-t border-gray-100">
