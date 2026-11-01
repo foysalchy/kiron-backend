@@ -266,26 +266,38 @@
         </div>
     </section>
     @endif
-    <!-- OUR LOCATION SECTION (With Real Google Map) -->
+    @php
+        $hasCustomMap = !empty($setup->google_map_url);
+        $dummyMapUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.1075677025856!2d90.41018317589578!3d23.779185187720234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70b22a019d3%3A0xe54331201990c74e!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1709456789012!5m2!1sen!2sbd';
+        $displayMapUrl = $hasCustomMap ? $setup->google_map_url : $dummyMapUrl;
+    @endphp
+
+    @if($hasCustomMap || !empty($activePreviewTheme))
+    <!-- OUR LOCATION SECTION -->
     <section class="container py-6 mx-auto">
         <div class="bg-white rounded-lg shadow-xs p-6">
 
-            <!-- Title -->
-            <h3 class="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                Our location
-            </h3>
+            <!-- Title & Preview Badge -->
+            <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
+                <h3 class="text-2xl font-black text-gray-900 flex items-center gap-3">
+                    Our location
+                </h3>
+                @if(!empty($activePreviewTheme))
+                    <x-preview-badge name="Site Setting" :isDummy="!$hasCustomMap" />
+                @endif
+            </div>
 
             <!-- Map Container -->
             <div class="relative w-full rounded-lg overflow-hidden shadow-inner group">
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.1075677025856!2d90.41018317589578!3d23.779185187720234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70b22a019d3%3A0xe54331201990c74e!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1709456789012!5m2!1sen!2sbd"
-                    title="Map showing our location in Gulshan 2, Dhaka"
+                    src="{{ $displayMapUrl }}"
+                    title="Map showing our location"
                     class="w-full h-[400px] md:h-[500px] grayscale-[0.2] contrast-[1.1] transition-all group-hover:grayscale-0"
                     style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
 
                 <div class="absolute bottom-4 right-4 z-10">
-                    <a href="https://maps.app.goo.gl/9uT5Qx5Y8hX6q8yX9" target="_blank"
+                    <a href="{{ $displayMapUrl }}" target="_blank"
                         class="bg-white text-gray-800 px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 hover:bg-[var(--primary-color)] hover:text-white transition-all">
                         <i class="fas fa-external-link-alt"></i>
                         View Zoom on Google Maps
@@ -294,6 +306,7 @@
             </div>
         </div>
     </section>
+    @endif
 @endsection
 @push('scripts')
     <script>

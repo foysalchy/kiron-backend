@@ -46,6 +46,24 @@ class EmployeeSalaryService
             throw ApiException::notFound('Employee not found');
         }
 
+        // Auto-create default 'Basic' pay head if not exists for this company
+        $companyId = $employee->company_id ?? auth()->user()?->company_id;
+        if ($companyId) {
+            $hasBasic = \App\Models\PayHead::where('company_id', $companyId)
+                ->where('name', 'like', '%basic%')
+                ->exists();
+
+            if (!$hasBasic) {
+                \App\Models\PayHead::create([
+                    'company_id'  => $companyId,
+                    'name'        => 'Basic',
+                    'type'        => 'addition',
+                    'description' => 'Default master basic salary head',
+                    'status'      => \App\Enums\Status::Active->value,
+                ]);
+            }
+        }
+
         // 1. Get already saved salaries (if any)
         $existingSalaries = EmployeeSalary::where('employee_id', $employeeId)->get();
 
