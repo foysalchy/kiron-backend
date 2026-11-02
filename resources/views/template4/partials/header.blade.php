@@ -228,7 +228,7 @@
                     @endif
                 @endforeach
             @else
-                @foreach ($headerCategories->take(5) as $mega)
+                @foreach ($headerCategories as $mega)
 
                     <li class="group relative">
                         <a href="{{ url($mega->slug ?? $mega->id) }}"
