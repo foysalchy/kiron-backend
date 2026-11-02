@@ -8,6 +8,7 @@ use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Page extends Model
 {
@@ -34,6 +35,7 @@ class Page extends Model
     {
         return ['footer_pages'];
     }
+    protected $appends = ['image_url'];
     protected $hidden = ['deleted_at'];
 
     // Relationships
@@ -56,6 +58,8 @@ class Page extends Model
     // Accessors
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
     }
 }

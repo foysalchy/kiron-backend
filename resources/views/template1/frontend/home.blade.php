@@ -34,7 +34,7 @@
             <div class="relative flex h-full min-h-0 w-[250px] flex-col rounded-lg bg-white pb-2 shadow-xs hidden lg:flex">
                 <div class="primary-bg text-primary shrink-0 py-3 text-lg text-center font-semibold">
                     Explore Categories</div>
-                <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
                     @foreach ($categories as $category)
                         <div class="group border-b border-gray-200">
                             <a href="{{ url($category->slug) }}"
@@ -53,7 +53,7 @@
                             <!-- subcategory panel -->
                             @if ($category->subCategories->count() > 0)
                                 <div
-                                    class="absolute left-full top-0 w-[240px] h-full min-h-max bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 transition-all duration-300">
+                                    class="absolute left-full top-0 w-[240px] h-full bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 overflow-y-auto before:content-[''] before:absolute before:-left-4 before:top-0 before:w-5 before:h-full">
 
                                     @foreach ($category->subCategories as $subCategory)
                                         <!-- sub category -->
@@ -69,7 +69,7 @@
                                             <!-- mini category pannel -->
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
                                                 <div
-                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
+                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 overflow-y-auto before:content-[''] before:absolute before:-left-3 before:top-0 before:w-4 before:h-full">
                                                     @foreach ($subCategory->miniCategories as $miniCategory)
                                                         <a href="{{ url($miniCategory->slug) }}"
                                                             class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
