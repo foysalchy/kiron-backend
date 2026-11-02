@@ -1,4 +1,7 @@
 @extends('template2.layouts.front')
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.page-meta', ['page' => $page, 'setup' => $setup])
+@endsection
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -32,7 +35,7 @@
                         <img src="{{ $page->image_url }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif
 
-                    <div class="prose max-w-none text-gray-600 leading-relaxed text-[16px]">
+                    <div class="prose max-w-none leading-relaxed">
                         {!! $page->description !!}
                     </div>
                 </div>
@@ -40,35 +43,4 @@
 
         </div>
     </section>
-
-    <!-- Styles to match the image typography -->
-    <style>
-        .page-description h2,
-        .page-description h3 {
-            font-weight: 800;
-            color: #1D2128;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
-        .page-description p {
-            margin-bottom: 0px;
-        }
-
-        .page-description ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .page-description li {
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .page-description strong {
-            color: #FF6A00;
-        }
-    </style>
 @endsection
