@@ -9,6 +9,11 @@ use Illuminate\Validation\Rule;
 
 class UpdateLandingPageRequest extends BaseCompanyRequest
 {
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     protected function prepareForValidation(): void
     {
         if ($this->hasFile('thumbnail')) {
@@ -25,6 +30,8 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
 
     public function rules(): array
     {
+        $landingPageId = $this->route('id');
+        $companyId = $this->getCompanyId();
 
         return array_merge(
             $this->companyRules(),
@@ -48,7 +55,14 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'regular_price' => ['nullable', 'string', 'max:255'],
                 'discount_price' => ['nullable', 'string', 'max:255'],
-                'slug' => ['nullable', 'string', 'max:255'],
+                'slug' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('landing_pages', 'slug')->ignore($landingPageId)->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
                 'header_code' => ['nullable', 'string'],

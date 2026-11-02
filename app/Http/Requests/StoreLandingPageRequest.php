@@ -5,9 +5,15 @@ namespace App\Http\Requests;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 
 class StoreLandingPageRequest extends BaseCompanyRequest
 {
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     protected function prepareForValidation(): void
     {
         if ($this->hasFile('thumbnail')) {
@@ -24,6 +30,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
 
     public function rules(): array
     {
+        $companyId = $this->getCompanyId();
 
         return array_merge(
             $this->companyRules(),
@@ -43,7 +50,14 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'regular_price' => ['nullable', 'string', 'max:255'],
                 'discount_price' => ['nullable', 'string', 'max:255'],
-                'slug' => ['required', 'string', 'max:255', 'unique:landing_pages,slug'],
+                'slug' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('landing_pages', 'slug')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
                 'header_code' => ['nullable', 'string'],

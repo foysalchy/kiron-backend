@@ -18,6 +18,11 @@ class UpdateCourierMethodRequest extends UpdateBaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,12 +30,19 @@ class UpdateCourierMethodRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-        $methodId = $this->route('id'); 
+        $methodId = $this->route('id');
+        $companyId = $this->getCompanyId();
 
         return array_merge($this->companyRules(), [
             'name'    => ['sometimes', 'required', 'string', 'max:255'],
-            'slug'    => ['sometimes', 'required', 'string', 'max:255', 
-                Rule::unique('courier_methods', 'slug')->ignore($methodId)
+            'slug'    => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courier_methods', 'slug')->ignore($methodId)->where(function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                }),
             ],
             'details' => ['nullable', 'array'],
             'status'  => ['sometimes', 'integer'],

@@ -18,6 +18,11 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -26,12 +31,21 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         $blogId = $this->route('id') ?? $this->route('blog');
+        $companyId = $this->getCompanyId();
 
         return array_merge(
             $this->companyRules(),
             [
                 'title'            => ['sometimes', 'required', 'string', 'max:255'],
-                'slug'             => ['sometimes', 'required', 'string', 'max:255', Rule::unique('blogs', 'slug')->ignore($blogId)],
+                'slug'             => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('blogs', 'slug')->ignore($blogId)->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'short'            => ['sometimes', 'required', 'string'],
                 'body'             => ['nullable', 'string'],
                 'body_2'           => ['nullable', 'string'],

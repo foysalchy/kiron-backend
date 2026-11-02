@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreKnowledgeBaseRequest extends BaseCompanyRequest
 {
@@ -13,13 +14,27 @@ class StoreKnowledgeBaseRequest extends BaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     public function rules(): array
     {
+        $companyId = $this->getCompanyId();
+
         return array_merge(
             $this->companyRules(),
             [
                 'title'   => ['required', 'string', 'max:255'],
-                'slug'    => ['nullable', 'string', 'max:255', 'unique:knowledge_bases,slug'],
+                'slug'    => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('knowledge_bases', 'slug')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'content' => ['required', 'string'],
                 'category' => ['nullable', 'string'],
             ]
