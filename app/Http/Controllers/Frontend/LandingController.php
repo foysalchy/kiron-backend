@@ -620,6 +620,7 @@ class LandingController extends FrontendController
                     'order_id'      => $order->id,
                     'order_code'    => $order->order_no ?? ('#' . $order->id),
                     'thankyou_url'  => route('order.thankyou', $order->id),
+                    'invoice_url'   => route('order.invoice', $order->id),
                 ]);
             }
 
@@ -628,6 +629,7 @@ class LandingController extends FrontendController
                 'landing_order_success' => true,
                 'order_id'              => $order->id,
                 'order_code'            => $order->order_no ?? ('#' . $order->id),
+                'invoice_url'           => route('order.invoice', $order->id),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
