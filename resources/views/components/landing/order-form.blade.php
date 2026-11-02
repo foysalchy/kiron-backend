@@ -581,24 +581,31 @@
 
 {{-- Order Success Modal --}}
 <div id="order-success-modal" class="fixed inset-0 z-[999999] {{ session('success') ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-xs p-4" onclick="if(event.target === this) closeOrderSuccessModal()">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 md:p-10 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
         <!-- Icon -->
-        <div class="w-16 h-16 mx-auto mb-4 bg-green-100 text-green-600 rounded-full flex items-center justify-center shadow-inner">
-            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <div class="w-16 h-16 mx-auto mb-5 bg-[#dcfce7] text-[#16a34a] rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
         </div>
         <!-- Title -->
-        <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $trans['order_success_title'] }}</h3>
-        <p id="order-success-modal-code" class="text-sm font-bold text-[#1f8a54] mb-3 {{ session('order_code') ? '' : 'hidden' }}">{{ $trans['order_id'] }} <span>{{ session('order_code') }}</span></p>
-        <!-- Success message -->
-        <div id="order-success-modal-message" class="bg-green-50 text-green-800 text-sm md:text-base font-medium rounded-xl p-3.5 mb-6 border border-green-200/60 leading-relaxed">
-            {{ session('success') ?? $trans['order_success_msg'] }}
+        <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2.5">Thank you for your order!</h3>
+        <!-- Subtitle -->
+        <p class="text-gray-500 text-sm md:text-base leading-relaxed mb-8">
+            Your order <span id="order-success-modal-code" class="font-semibold text-gray-800">{{ session('order_code') ? (str_starts_with(session('order_code'), '#') ? session('order_code') : '#' . session('order_code')) : '' }}</span> has been placed successfully. We'll send you a confirmation email shortly.
+        </p>
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="{{ url('/') }}" class="w-full sm:w-auto px-6 py-2.5 bg-[#16a34a] hover:bg-[#1a3a1a] text-white font-medium text-sm md:text-base rounded-lg transition-colors text-center shadow-xs">
+                Continue to Shopping
+            </a>
+            <a id="order-success-invoice-btn" href="{{ session('invoice_url') ?? (session('order_id') ? route('order.invoice', session('order_id')) : '#') }}" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-sm md:text-base rounded-lg transition-colors flex items-center justify-center gap-2 text-center">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <span>Download Invoice</span>
+            </a>
         </div>
-        <!-- Action Button -->
-        <button type="button" onclick="closeOrderSuccessModal()" class="w-full py-3.5 px-6 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98">
-            {{ $trans['ok'] }}
-        </button>
     </div>
 </div>
 
@@ -1164,28 +1171,28 @@
     }
 
     let latestThankyouUrl = "{{ session('order_id') ? route('order.thankyou', session('order_id')) : '' }}";
+    let latestInvoiceUrl = "{{ session('invoice_url') ?? (session('order_id') ? route('order.invoice', session('order_id')) : '') }}";
 
-    function showOrderSuccessModal(message, orderCode, thankyouUrl) {
+    function showOrderSuccessModal(message, orderCode, thankyouUrl, invoiceUrl, orderId) {
         if (thankyouUrl) {
             latestThankyouUrl = thankyouUrl;
         }
+        if (invoiceUrl) {
+            latestInvoiceUrl = invoiceUrl;
+        } else if (orderId) {
+            latestInvoiceUrl = "/invoice/" + orderId;
+        }
         const modal = document.getElementById('order-success-modal');
         if (modal) {
-            const msgEl = document.getElementById('order-success-modal-message');
-            if (msgEl && message) msgEl.innerText = message;
             const codeEl = document.getElementById('order-success-modal-code');
             if (codeEl) {
                 if (orderCode) {
-                    const span = codeEl.querySelector('span');
-                    if (span) {
-                        span.innerText = orderCode;
-                    } else {
-                        codeEl.innerText = (FORM_TRANS.order_id || 'অর্ডার আইডি:') + ' ' + orderCode;
-                    }
-                    codeEl.classList.remove('hidden');
-                } else {
-                    codeEl.classList.add('hidden');
+                    codeEl.innerText = (orderCode.startsWith('#') ? orderCode : '#' + orderCode);
                 }
+            }
+            const invoiceBtn = document.getElementById('order-success-invoice-btn');
+            if (invoiceBtn && latestInvoiceUrl) {
+                invoiceBtn.href = latestInvoiceUrl;
             }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1216,10 +1223,6 @@
     }
 
     function closeOrderSuccessModal() {
-        if (latestThankyouUrl) {
-            window.location.href = latestThankyouUrl;
-            return;
-        }
         const modal = document.getElementById('order-success-modal');
         if (modal) {
             modal.classList.add('hidden');
@@ -1385,15 +1388,29 @@
                 }
 
                 if (res.ok && data.success) {
+                    const orderValue = parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0);
+                    const orderId = data.order_id || '';
+
                     if (typeof fbq === 'function') {
-                        fbq('track', 'Lead', {
+                        fbq('track', 'Purchase', {
                             content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
                             content_ids: ['{{ $mainProduct->id ?? "" }}'],
-                            value: parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0),
+                            content_type: 'product',
+                            value: orderValue,
                             currency: 'BDT'
-                        });
+                        }, orderId ? { eventID: 'ORDER_' + orderId } : undefined);
                     }
-                    showOrderSuccessModal(data.message, data.order_code, data.thankyou_url);
+
+                    if (typeof ttq !== 'undefined' && typeof ttq.track === 'function') {
+                        ttq.track('CompletePayment', {
+                            content_id: '{{ $mainProduct->id ?? "" }}',
+                            content_type: 'product',
+                            value: orderValue,
+                            currency: 'BDT'
+                        }, orderId ? { event_id: 'ORDER_' + orderId } : undefined);
+                    }
+
+                    showOrderSuccessModal(data.message, data.order_code, data.thankyou_url, data.invoice_url, data.order_id);
                     try {
                         landingForm.reset();
                         qty = 1;
