@@ -50,5 +50,9 @@
     display: inline-flex;
     animation: noticeTicker 25s linear infinite;
 }
+.animate-notice-ticker:hover,
+.group\/ticker:hover .animate-notice-ticker {
+    animation-play-state: paused !important;
+}
 </style>
 @endif
