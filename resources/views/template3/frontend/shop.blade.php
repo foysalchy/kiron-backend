@@ -315,7 +315,7 @@
 
 
                 @if (isset($category->description) && $category->description)
-                    <div class="bg-white rounded-lg shadow-xs mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
+                    <div class="bg-gray-100 border border-gray-200 rounded-lg px-6 py-6 prose max-w-none">
                         {!! $category->description !!}
                     </div>
                 @elseif (isset($pageData->description) && !empty($pageData->description))
