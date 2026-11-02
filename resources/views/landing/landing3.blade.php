@@ -439,7 +439,7 @@
                         class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <span aria-hidden="true"
                             class="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-full bg-[#1f8a54] text-white shrink-0 shadow-sm">
-                            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 md:w-4 md:h-4 stroke-[4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                             </svg>
                         </span>
@@ -565,7 +565,7 @@
                 @if($displayPhone)
                 <div class="mb-12 space-y-4">
                     <p
-                        class="text-[#CCFF00] font-bold text-lg md:text-3xl tracking-wide uppercase relative inline-block {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        class="text-[#CCFF00] font-bold text-lg md:text-3xl tracking-wide uppercase relative  {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Call Text</span>@endif
                         {{ $callText }}
                     </p>
