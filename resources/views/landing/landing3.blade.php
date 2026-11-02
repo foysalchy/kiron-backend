@@ -217,7 +217,7 @@
 
     <main>
         {{-- ══ SECTION 1: HERO (Dynamic Version) ══ --}}
-        <section class="relative bg-[#0D2601] text-white pt-12 pb-24 md:pb-48 px-4 text-center overflow-hidden">
+        <section class="relative bg-[#0D2601] text-white pt-12 pb-0 md:pb-0 px-4 text-center overflow-hidden">
             <div class="container mx-auto relative z-10">
 
                 {{-- 1. Logo --}}

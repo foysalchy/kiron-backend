@@ -102,7 +102,7 @@
     ];
 @endphp
 
-<div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
+<div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm  border border-gray-200">
     <form @if($isPreviewMode) action="javascript:void(0);" onsubmit="event.preventDefault(); showPreviewAlert(); return false;" @else action="{{ route('landing.order.store') }}" method="POST" @endif id="landing-order-form">
 
 
