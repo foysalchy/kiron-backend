@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\LandingPage;
+use App\Models\Market;
 use App\Models\Order;
 use App\Models\Party;
 use App\Models\Product;
@@ -613,14 +614,18 @@ class LandingController extends FrontendController
 
             DB::commit();
 
+            $market = Market::where('company_id', $order->company_id)->first();
+            $instantPurchase = !isset($market->instant_purchase_event) || (bool)$market->instant_purchase_event;
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
-                    'success'       => true,
-                    'message'       => 'আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!',
-                    'order_id'      => $order->id,
-                    'order_code'    => $order->order_no ?? ('#' . $order->id),
-                    'thankyou_url'  => route('order.thankyou', $order->id),
-                    'invoice_url'   => route('order.invoice', $order->id),
+                    'success'          => true,
+                    'message'          => 'আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!',
+                    'order_id'         => $order->id,
+                    'order_code'       => $order->order_no ?? ('#' . $order->id),
+                    'thankyou_url'     => route('order.thankyou', $order->id),
+                    'invoice_url'      => route('order.invoice', $order->id),
+                    'instant_purchase' => $instantPurchase,
                 ]);
             }
 
@@ -630,6 +635,7 @@ class LandingController extends FrontendController
                 'order_id'              => $order->id,
                 'order_code'            => $order->order_no ?? ('#' . $order->id),
                 'invoice_url'           => route('order.invoice', $order->id),
+                'instant_purchase'      => $instantPurchase,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

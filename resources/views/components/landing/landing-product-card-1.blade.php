@@ -13,7 +13,7 @@
 
     // Stock check for single product: only check available_stock if manage_stock is true
     $pIsSingleOutOfStock = ($product->type === 'single') && (
-        $product->stock_status === 'out_of_stock' || 
+        $product->stock_status === 'out_of_stock' ||
         ($product->manage_stock && ($product->available_stock <= 0))
     );
 
@@ -46,10 +46,10 @@
             }
         }
     }
-    
-    // Language determination (bn or en, default bn)
-    $formLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
-    $isEn = ($formLang === 'en');
+
+    // Language determination (bn or en, prioritize landing settings, fallback to site setup lang)
+    $formLang = data_get($landing->extras ?? null, 'order_form_lang') ?: ($landing->order_form_lang ?: ($setup->lang ?? 'bn'));
+    $isEn = in_array(strtolower($formLang), ['en', 'english']);
 
     $cardTrans = [
         'off' => $isEn ? ' OFF' : ' ছাড়',
@@ -58,6 +58,7 @@
         'out_of_stock' => $isEn ? 'Out of Stock' : 'স্টক আউট',
         'add_to_cart' => $isEn ? 'Add to Cart' : 'কার্টে যোগ করুন',
         'order_now' => $isEn ? 'Order Now' : 'অর্ডার করুন',
+        'free_shipping' => $isEn ? 'Free Shipping' : 'ফ্রি ডেলিভারি',
     ];
 
     // Calculate discount label (Percentage or Fixed amount)
@@ -81,18 +82,18 @@
     <div>
         {{-- Thumbnail Container --}}
         <div class="w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center relative">
-            <img src="{{ $pImg }}" 
-                alt="{{ $product->title }}" 
+            <img src="{{ $pImg }}"
+                alt="{{ $product->title }}"
                 loading="lazy"
                 class="card-img w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
-            
-            <span class="card-discount-badge absolute top-2 left-2 bg-[#b45309] text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm {{ empty($discountLabel) ? 'hidden' : '' }}">
+
+            <span class="card-discount-badge absolute top-2 left-2 bg-[#e95757]! text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm {{ empty($discountLabel) ? 'hidden' : '' }}">
                 {{ $discountLabel }}
             </span>
 
             @if($product->is_free_delivery)
                 <span class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                    Free Shipping
+                    {{ $cardTrans['free_shipping'] }}
                 </span>
             @endif
 
@@ -120,7 +121,7 @@
                 <div class="relative">
                     <select id="variant-select-{{ $product->id }}"
                         aria-label="{{ $cardTrans['choose_option'] }} - {{ $product->title }}"
-                        onchange="onCardVariationChange(this, {{ $product->id }})" 
+                        onchange="onCardVariationChange(this, {{ $product->id }})"
                         class="card-variant-select w-full appearance-none bg-gray-50 hover:bg-gray-100 focus:bg-white border border-gray-300 focus:border-[#35B11E] rounded-lg px-3 py-2 pr-8 text-xs font-semibold text-gray-800 outline-none transition-colors cursor-pointer shadow-sm">
                         @foreach($product->variations as $idx => $v)
                             @php
@@ -137,8 +138,8 @@
                                     $vDiscountLabel = $vPerc > 0 ? ($vPerc . '%' . $cardTrans['off']) : (number_format($vDiff) . ($setup->currency ?? '৳') . $cardTrans['off']);
                                 }
                             @endphp
-                            <option value="{{ $v->id }}" 
-                                data-price="{{ $vPrice }}" 
+                            <option value="{{ $v->id }}"
+                                data-price="{{ $vPrice }}"
                                 data-regular="{{ $v->regular_price }}"
                                 data-discount-label="{{ $vDiscountLabel }}"
                                 data-img="{{ $vImg }}"
@@ -173,7 +174,7 @@
 
         {{-- Order / Select Action Buttons --}}
         @if($initialOutOfStock)
-            <button type="button" 
+            <button type="button"
                 disabled
                 class="card-add-btn w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold text-sm rounded-lg shadow-sm">
                 <i class="fa-solid fa-ban text-xs"></i>
@@ -182,7 +183,7 @@
         @else
             <div class="card-btn-group grid grid-cols-2 gap-2">
                 {{-- Add to Cart (stays on same place) --}}
-                <button type="button" 
+                <button type="button"
                     onclick="addProductToLandingOrder({{ $product->id }}, false)"
                     class="card-add-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-green-50 hover:bg-green-100 text-[#0D2601] border-2 border-[#35B11E]/40 hover:border-[#35B11E] font-bold text-xs rounded-lg transition-all active:scale-[0.98] cursor-pointer shadow-sm">
                     <i class="fa-solid fa-cart-plus text-xs text-[#35B11E]"></i>
@@ -190,7 +191,7 @@
                 </button>
 
                 {{-- Direct Order (adds & scrolls to form) --}}
-                <button type="button" 
+                <button type="button"
                     onclick="addProductToLandingOrder({{ $product->id }}, true)"
                     class="card-order-btn w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-2 bg-[#0D2601] hover:bg-[#1a4a03] text-white font-bold text-xs rounded-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer">
                     <span class="btn-label">{{ $cardTrans['order_now'] }}</span>
