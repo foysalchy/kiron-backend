@@ -14,15 +14,28 @@ class UpdateKnowledgeBaseRequest extends UpdateBaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     public function rules(): array
     {
         $id = $this->route('id');
+        $companyId = $this->getCompanyId();
 
         return array_merge(
             $this->companyRules(),
             [
                 'title'   => ['sometimes', 'required', 'string', 'max:255'],
-                'slug'    => ['nullable', 'string', 'max:255', Rule::unique('knowledge_bases', 'slug')->ignore($id)],
+                'slug'    => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('knowledge_bases', 'slug')->ignore($id)->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'content' => ['sometimes', 'required', 'string'],
                 'category' => ['sometimes', 'required', 'string'],
             ]

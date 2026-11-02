@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreCourierMethodRequest extends BaseCompanyRequest
 {
@@ -17,6 +18,11 @@ class StoreCourierMethodRequest extends BaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()?->company_id;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,11 +30,20 @@ class StoreCourierMethodRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
+        $companyId = $this->getCompanyId();
+
         return array_merge(
             $this->companyRules(),
             [
                 'name'    => ['required', 'string', 'max:255'],
-                'slug'    => ['required', 'string', 'max:255', 'unique:courier_methods,slug'],
+                'slug'    => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('courier_methods', 'slug')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    }),
+                ],
                 'details' => ['nullable', 'array'],
                 'details.*' => ['string'], 
                 'status'  => ['nullable', 'integer'],
