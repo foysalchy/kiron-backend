@@ -243,7 +243,7 @@
                         <a href="{{ route('shop.index') }}"
                             class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors py-3 block">Shop</a>
                     </li>
-                    @foreach ($headerCategories->take(7) as $mega)
+                    @foreach ($headerCategories as $mega)
                         @php
                             $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
                         @endphp

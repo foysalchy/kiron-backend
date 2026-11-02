@@ -302,7 +302,7 @@
                             Offers
                         </a>
                     </li>
-                    @foreach ($headerCategories->take(9) as $mega)
+                    @foreach ($headerCategories as $mega)
                         @php
                             $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
                         @endphp
