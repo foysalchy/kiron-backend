@@ -190,36 +190,88 @@
     <div class="container mx-auto px-4 md:px-10">
         <ul class="flex items-center justify-center text-sm font-semibold text-gray-700">
             @if ($menuItems && count($menuItems) > 0)
+                @php
+                    $categoriesBySlug = isset($headerCategories) ? $headerCategories->keyBy('slug') : collect();
+                @endphp
                 @foreach (collect($menuItems)->sortBy('order') as $item)
                     @if (data_get($item, 'visible') === true)
                         @php
                             $link = $item['link'] ?? '#';
                             $finalUrl = str_starts_with($link, 'http') ? $link : url($link);
+                            $manualChildren = !empty($item['children']) ? collect($item['children'])->where('visible', true) : collect();
+
+                            $matchedCategory = null;
+                            if ($manualChildren->isEmpty()) {
+                                $slug = $item['ref_id'] ?? null;
+                                if (!$slug && !empty($item['link'])) {
+                                    $parsedPath = trim(parse_url($item['link'], PHP_URL_PATH) ?? '', '/');
+                                    $segments = explode('/', $parsedPath);
+                                    $slug = end($segments);
+                                }
+                                if ($slug) {
+                                    $matchedCategory = $categoriesBySlug->get($slug);
+                                }
+                            }
+
+                            $autoSubCategories = ($matchedCategory && $matchedCategory->subCategories && $matchedCategory->subCategories->count() > 0)
+                                ? $matchedCategory->subCategories
+                                : collect();
+
+                            $hasDropdown = $manualChildren->isNotEmpty() || $autoSubCategories->isNotEmpty();
                         @endphp
                         <li class="group relative">
                             <a href="{{ $finalUrl }}"
                                 class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
                                 {{ $item['label'] }}
-                                @if (!empty($item['children']))
+                                @if ($hasDropdown)
                                     <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
                                 @endif
                             </a>
 
-                            @if (!empty($item['children']))
+                            @if ($manualChildren->isNotEmpty())
                                 <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
                                     <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
-                                        @foreach ($item['children'] as $child)
-                                            @if (data_get($child, 'visible') === true)
-                                                @php
-                                                    $cLink = $child['link'] ?? '#';
-                                                    $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
-                                                @endphp
-                                                <li class="px-4 py-2.5 hover:bg-gray-100">
-                                                    <a href="{{ $cUrl }}" class="group-hover:text-[var(--primary-color)] uppercase block">
-                                                        {{ $child['label'] }}
-                                                    </a>
-                                                </li>
-                                            @endif
+                                        @foreach ($manualChildren as $child)
+                                            @php
+                                                $cLink = $child['link'] ?? '#';
+                                                $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
+                                            @endphp
+                                            <li class="px-4 py-2.5 hover:bg-gray-100">
+                                                <a href="{{ $cUrl }}" class="group-hover:text-[var(--primary-color)] uppercase block">
+                                                    {{ $child['label'] }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @elseif ($autoSubCategories->isNotEmpty())
+                                <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                    <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
+                                        @foreach ($autoSubCategories as $sub)
+                                            <li
+                                                class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
+                                                <a href="{{ url($sub->slug ?? $sub->id) }}"
+                                                    class="group-hover/sub:text-[var(--primary-color)] uppercase">
+                                                    {{ $sub->name }}
+                                                </a>
+                                                @if ($sub->miniCategories && $sub->miniCategories->count() > 0)
+                                                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                                                @endif
+
+                                                @if ($sub->miniCategories && $sub->miniCategories->count() > 0)
+                                                    <ul
+                                                        class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
+                                                        @foreach ($sub->miniCategories as $mini)
+                                                            <li class="px-4 py-2.5 hover:bg-gray-100">
+                                                                <a href="{{ url($mini->slug ?? $mini->id) }}"
+                                                                    class="block group-hover/mini:text-[var(--primary-color)] uppercase">
+                                                                    {{ $mini->name }}
+                                                                </a>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </li>
                                         @endforeach
                                     </ul>
                                 </div>

@@ -248,40 +248,97 @@
             <ul
                 class="flex items-center justify-center text-primary text-sm lg:text-base font-medium flex-wrap lg:flex-nowrap">
                 @if ($menuItems && count($menuItems) > 0)
+                    @php
+                        $categoriesBySlug = isset($headerCategories) ? $headerCategories->keyBy('slug') : collect();
+                    @endphp
                     @foreach (collect($menuItems)->sortBy('order') as $item)
                         @if (data_get($item, 'visible') === true)
                             @php
                                 $link = $item['link'] ?? '#';
                                 $finalUrl = str_starts_with($link, 'http') ? $link : url($link);
+                                $manualChildren = !empty($item['children']) ? collect($item['children'])->where('visible', true) : collect();
+
+                                $matchedCategory = null;
+                                if ($manualChildren->isEmpty()) {
+                                    $slug = $item['ref_id'] ?? null;
+                                    if (!$slug && !empty($item['link'])) {
+                                        $parsedPath = trim(parse_url($item['link'], PHP_URL_PATH) ?? '', '/');
+                                        $segments = explode('/', $parsedPath);
+                                        $slug = end($segments);
+                                    }
+                                    if ($slug) {
+                                        $matchedCategory = $categoriesBySlug->get($slug);
+                                    }
+                                }
+
+                                $autoSubCategories = ($matchedCategory && $matchedCategory->subCategories && $matchedCategory->subCategories->count() > 0)
+                                    ? $matchedCategory->subCategories->sortBy(fn($sub) => strtolower($sub->name))
+                                    : collect();
+
+                                $hasDropdown = $manualChildren->isNotEmpty() || $autoSubCategories->isNotEmpty();
                             @endphp
                             <li class="nav-dropdown-item group relative flex-shrink-0">
                                 <a href="{{ $finalUrl }}"
                                     class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap ">
                                     <span>{{ $item['label'] }}</span>
-                                    @if (!empty($item['children']))
+                                    @if ($hasDropdown)
                                         <i
                                             class="fa-solid fa-chevron-down text-[10px] opacity-70 group-hover:rotate-180 transition-transform duration-200"></i>
                                     @endif
                                 </a>
 
-                                @if (!empty($item['children']))
+                                @if ($manualChildren->isNotEmpty())
                                     <div class="nav-dropdown-menu absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
                                         <ul
                                             class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2 rounded-b-md text-gray-700 text-sm font-medium">
-                                            @foreach (collect($item['children'])->sortBy('order') as $child)
-                                                @if (data_get($child, 'visible') === true)
-                                                    @php
-                                                        $childLink = $child['link'] ?? '#';
-                                                        $childUrl = str_starts_with($childLink, 'http') ? $childLink : url($childLink);
-                                                    @endphp
-                                                    <li
-                                                        class="nav-sub-item group/sub  hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
-                                                        <a href="{{ $childUrl }}"
-                                                            class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700  flex-1 text-xs md:text-sm font-semibold transition-colors">
-                                                            {{ $child['label'] }}
-                                                        </a>
-                                                    </li>
-                                                @endif
+                                            @foreach ($manualChildren->sortBy('order') as $child)
+                                                @php
+                                                    $childLink = $child['link'] ?? '#';
+                                                    $childUrl = str_starts_with($childLink, 'http') ? $childLink : url($childLink);
+                                                @endphp
+                                                <li
+                                                    class="nav-sub-item group/sub  hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
+                                                    <a href="{{ $childUrl }}"
+                                                        class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700  flex-1 text-xs md:text-sm font-semibold transition-colors">
+                                                        {{ $child['label'] }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @elseif ($autoSubCategories->isNotEmpty())
+                                    <div class="nav-dropdown-menu absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                        <ul
+                                            class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2 rounded-b-md text-gray-700 text-sm font-medium">
+                                            @foreach ($autoSubCategories as $sub)
+                                                @php
+                                                    $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
+                                                @endphp
+                                                <li
+                                                    class="nav-sub-item group/sub hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
+                                                    <a href="{{ url($sub->slug ?? $sub->id) }}"
+                                                        class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700 flex-1 text-xs md:text-sm font-medium transition-colors">
+                                                        {{ $sub->name }}
+                                                    </a>
+                                                    @if ($hasMini)
+                                                        <i
+                                                            class="fa-solid fa-chevron-right text-xs text-gray-400 pr-[10px] group-hover/sub:text-[var(--primary-color,#016738)] group-hover/sub:translate-x-0.5 transition-transform"></i>
+                                                    @endif
+
+                                                    @if ($hasMini)
+                                                        <ul
+                                                            class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
+                                                            @foreach ($sub->miniCategories->sortBy(fn($mini) => strtolower($mini->name)) as $mini)
+                                                                <li class="hover:bg-gray-100 border-b border-gray-50 last:border-0">
+                                                                    <a href="{{ url($mini->slug ?? $mini->id) }}"
+                                                                        class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 text-[14px] font-medium transition-colors">
+                                                                        {{ $mini->name }}
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endif
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </div>
