@@ -569,7 +569,6 @@
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Call Text</span>@endif
                         {{ $callText }}
                     </p>
-                    <br class="hidden md:block">
                     <p
                         class="text-white font-black text-2xl md:text-3xl relative inline-block {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Phone
@@ -582,13 +581,7 @@
                 </div>
                 @endif
 
-                <div
-                    class="inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Title</span>@endif
-                    <p class="text-[#CCFF00] font-bold text-lg md:text-4xl">
-                        {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
-                    </p>
-                </div>
+                 
 
                 @if($regularPrice)
                 <p
@@ -600,7 +593,7 @@
                 @endif
                 @if($discountPrice)
                 <p
-                    class="text-3xl md:text-4xl font-semibold text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    class="text-3xl md:text-4xl font-semibold text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10  tracking-tighter {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount
                         Price</span>@endif
                     {{ $discountPrice }}
