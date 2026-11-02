@@ -581,7 +581,14 @@
 
 {{-- Order Success Modal --}}
 <div id="order-success-modal" class="fixed inset-0 z-[999999] {{ session('success') ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-xs p-4" onclick="if(event.target === this) closeOrderSuccessModal()">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 md:p-10 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 md:p-10 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
+        <!-- Close Button -->
+        <button type="button" onclick="closeOrderSuccessModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer" aria-label="Close modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
         <!-- Icon -->
         <div class="w-16 h-16 mx-auto mb-5 bg-[#dcfce7] text-[#16a34a] rounded-full flex items-center justify-center">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -1391,23 +1398,25 @@
                     const orderValue = parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0);
                     const orderId = data.order_id || '';
 
-                    if (typeof fbq === 'function') {
-                        fbq('track', 'Purchase', {
-                            content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
-                            content_ids: ['{{ $mainProduct->id ?? "" }}'],
-                            content_type: 'product',
-                            value: orderValue,
-                            currency: 'BDT'
-                        }, orderId ? { eventID: 'ORDER_' + orderId } : undefined);
-                    }
+                    if (data.instant_purchase !== false) {
+                        if (typeof fbq === 'function') {
+                            fbq('track', 'Purchase', {
+                                content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
+                                content_ids: ['{{ $mainProduct->id ?? "" }}'],
+                                content_type: 'product',
+                                value: orderValue,
+                                currency: 'BDT'
+                            }, orderId ? { eventID: 'ORDER_' + orderId } : undefined);
+                        }
 
-                    if (typeof ttq !== 'undefined' && typeof ttq.track === 'function') {
-                        ttq.track('CompletePayment', {
-                            content_id: '{{ $mainProduct->id ?? "" }}',
-                            content_type: 'product',
-                            value: orderValue,
-                            currency: 'BDT'
-                        }, orderId ? { event_id: 'ORDER_' + orderId } : undefined);
+                        if (typeof ttq !== 'undefined' && typeof ttq.track === 'function') {
+                            ttq.track('CompletePayment', {
+                                content_id: '{{ $mainProduct->id ?? "" }}',
+                                content_type: 'product',
+                                value: orderValue,
+                                currency: 'BDT'
+                            }, orderId ? { event_id: 'ORDER_' + orderId } : undefined);
+                        }
                     }
 
                     showOrderSuccessModal(data.message, data.order_code, data.thankyou_url, data.invoice_url, data.order_id);
