@@ -12,7 +12,7 @@
         :title="$page->meta_title ?? $page->title"
         :description="$page->meta_description ?? Str::limit(strip_tags($page->description), 160)"
         :keywords="$keywords"
-        :image="$page->image ? asset('storage/' . $page->image) : null"
+        :image="$page->image_url"
     />
 @endsection
 @section('content')
@@ -43,8 +43,8 @@
 
                 <!-- Body -->
                 <div class="p-8 md:p-12 mt-0 md:pt-0 pt-0">
-                    @if ($page->image)
-                        <img src="{{ asset('storage/' . $page->image) }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
+                    @if ($page->image_url)
+                        <img src="{{ $page->image_url }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif
 
                     <div class="page-description text-gray-600 leading-relaxed text-[16px]">

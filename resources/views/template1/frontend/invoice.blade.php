@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - #{{ $order->order_no }}</title>
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    @vite('resources/css/app.css')
     @include('components.fontawesome')
 
     <style>
@@ -799,32 +798,87 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         function downloadInvoicePDF() {
-            const element = document.getElementById('invoice-content');
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: 'Invoice-{{ $order->order_no }}.pdf',
-                image: {
-                    type: 'jpeg',
-                    quality: 0.98
-                },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    scrollY: 0,
-                    windowHeight: element.scrollHeight
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                },
-                pagebreak: {
-                    mode: ['avoid-all', 'css', 'legacy']
-                }
-            };
-            window.scrollTo(0, 0);
-            html2pdf().set(opt).from(element).save();
+            const btn = document.querySelector('.btn-download');
+            const originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+            }
+
+            function runPdfDownload() {
+                const element = document.getElementById('invoice-content');
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: 'Invoice-{{ $order->order_no }}.pdf',
+                    image: {
+                        type: 'jpeg',
+                        quality: 0.98
+                    },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        letterRendering: true,
+                        scrollY: 0,
+                        onclone: function (clonedDoc) {
+                            // Strip any stylesheet that could have oklch or unparsable color functions
+                            const links = clonedDoc.querySelectorAll('link[rel="stylesheet"]');
+                            links.forEach(function (l) {
+                                if (l.href && (l.href.includes('app') || l.href.includes('tailwind'))) {
+                                    l.remove();
+                                }
+                            });
+                        }
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait'
+                    },
+                    pagebreak: {
+                        mode: ['css', 'legacy']
+                    }
+                };
+
+                window.scrollTo(0, 0);
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(function () {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('Invoice PDF error:', err);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        }
+                        alert('PDF download failed. Error: ' + (err?.message || err || 'Check console'));
+                    });
+            }
+
+            if (typeof html2pdf === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js';
+                script.onload = function () {
+                    runPdfDownload();
+                };
+                script.onerror = function () {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                    }
+                    alert('Could not load PDF library. Please check your internet connection or ad-blocker.');
+                };
+                document.head.appendChild(script);
+            } else {
+                runPdfDownload();
+            }
         }
     </script>
 </body>
