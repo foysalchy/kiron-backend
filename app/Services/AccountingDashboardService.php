@@ -442,6 +442,7 @@ class AccountingDashboardService
         $orders = \App\Models\Order::with(['orderDetails.product', 'orderDetails.variation'])
             ->where('company_id', $companyId)
             ->whereBetween('order_date', [$start, $end])
+            ->where('status', \App\Enums\Status::Delivered->value)
             ->get();
 
         $totalOrders = $orders->count();
