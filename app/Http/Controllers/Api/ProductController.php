@@ -37,6 +37,7 @@ class ProductController extends Controller
             'per_page' => $request->query('per_page', 15),
             'select' => $request->query('select'),
             'with_relations' => $request->query('with_relations'),
+            'with_counts' => $request->query('with_counts'),
         ];
         $data = $this->productService->getAllProducts($filters, true);
 

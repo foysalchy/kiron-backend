@@ -7,6 +7,7 @@ use App\Traits\CompanyScoped;
 use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -39,6 +40,7 @@ class LandingPage extends Model
         'instruction_title',
         'img_paths',
         'status',
+        'views',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -61,6 +63,11 @@ class LandingPage extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     /**

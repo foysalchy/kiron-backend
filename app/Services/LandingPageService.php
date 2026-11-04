@@ -20,7 +20,8 @@ class LandingPageService
     public function getAllLandingPages(array $filters = [], bool $paginate = true)
     {
         try {
-            $query = LandingPage::with(['product:id,title,slug,thumbnail']);
+            $query = LandingPage::with(['product:id,title,slug,thumbnail'])
+                ->withCount('orders');
 
             // Apply filters
             if (isset($filters['status'])) {

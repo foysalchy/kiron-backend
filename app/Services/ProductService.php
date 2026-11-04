@@ -47,6 +47,16 @@ class ProductService
                 $query->select(explode(',', $filters['select']));
             }
 
+            if (!empty($filters['with_counts']) && $filters['with_counts'] !== 'false') {
+                $query->withCount([
+                    'views as view_count',
+                    'carts as cart_count',
+                    'orderDetails as order_count' => function ($q) {
+                        $q->whereHas('order', fn($oq) => $oq->where('status', '!=', \App\Enums\Status::Cancelled->value));
+                    }
+                ]);
+            }
+
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
