@@ -95,6 +95,46 @@ class ProductGroupController extends Controller
             $request->query('parameters', [])
         );
 
-        return ResponseHelper::success($data, 'Customers retrieved successfully');
+        // Enrich all items with view_count, cart_count, and order_count
+        if ($data && $data->isNotEmpty()) {
+            $productIds = $data->map(function ($item) {
+                return is_object($item) ? ($item->product_id ?? ($item->product->id ?? null)) : ($item['product_id'] ?? null);
+            })->filter()->unique()->values();
+
+            if ($productIds->isNotEmpty()) {
+                $counts = \App\Models\Product::whereIn('id', $productIds)
+                    ->withCount([
+                        'views as view_count',
+                        'carts as cart_count',
+                        'orderDetails as order_count' => function ($q) {
+                            $q->whereHas('order', fn($oq) => $oq->where('status', '!=', \App\Enums\Status::Cancelled->value));
+                        }
+                    ])
+                    ->get()
+                    ->keyBy('id');
+
+                $data = $data->map(function ($item) use ($counts) {
+                    $pId = is_object($item) ? ($item->product_id ?? ($item->product->id ?? null)) : ($item['product_id'] ?? null);
+                    $c = $counts->get($pId);
+
+                    $viewCount = $c ? (int)$c->view_count : 0;
+                    $cartCount = $c ? (int)$c->cart_count : 0;
+                    $orderCount = $c ? (int)$c->order_count : 0;
+
+                    if (is_object($item)) {
+                        $item->view_count = $viewCount;
+                        $item->cart_count = $cartCount;
+                        $item->order_count = $orderCount;
+                    } elseif (is_array($item)) {
+                        $item['view_count'] = $viewCount;
+                        $item['cart_count'] = $cartCount;
+                        $item['order_count'] = $orderCount;
+                    }
+                    return $item;
+                });
+            }
+        }
+
+        return ResponseHelper::success($data, 'Products retrieved successfully');
     }
 }

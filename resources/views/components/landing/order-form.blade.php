@@ -639,7 +639,7 @@
 @if($isMultiProductMode)
     {{-- Floating Cart Pill / Button for Multi-Product Mode --}}
     <div id="landing-floating-cart"
-        onclick="const el = document.getElementById('order'); if (el) el.scrollIntoView({ behavior: 'smooth' });"
+        onclick="const el = document.getElementById('landing-order-section') || document.getElementById('landing-order-form') || document.getElementById('order'); if (el) el.scrollIntoView({ behavior: 'smooth' });"
         class="fixed bottom-6 right-5 z-[999] hidden items-center gap-3 bg-[#0D2601] hover:bg-[#1a4a03] text-white px-4 py-3 rounded-full shadow-2xl border-2 border-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105 active:scale-95 group">
         <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#35B11E] text-white">
             <i class="fa-solid fa-cart-shopping text-sm"></i>

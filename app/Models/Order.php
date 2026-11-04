@@ -32,6 +32,7 @@ class Order extends Model
         'warehouse_id',
         'warehouse_info',
         'customer_id',
+        'landing_page_id',
         'coupon_id',
         'type',
         'source',
@@ -318,6 +319,11 @@ class Order extends Model
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    public function landingPage(): BelongsTo
+    {
+        return $this->belongsTo(LandingPage::class);
     }
 
     public function orderDetails(): HasMany

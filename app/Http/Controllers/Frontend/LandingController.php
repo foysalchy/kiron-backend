@@ -40,6 +40,12 @@ class LandingController extends FrontendController
         $product = $landing->product;
         abort_if($product === null, 404);
 
+        $sessionKey = "viewed_landing_{$landing->id}";
+        if (!$isSuperAdmin && !session()->has($sessionKey)) {
+            LandingPage::where('id', $landing->id)->increment('views');
+            session()->put($sessionKey, true);
+        }
+
         $setup = $this->resolveSiteSetting($landing->company_id ?? $companyId);
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
@@ -510,6 +516,7 @@ class LandingController extends FrontendController
             $orderData = [
                 'type'             => Order::TYPE_LANDING,
                 'company_id'       => $this->company_id,
+                'landing_page_id'  => $request->landing_page_id ?: null,
                 'warehouse_id'     => $primaryWarehouseId,
                 'warehouse_info'   => $warehouseInfoList,
                 'customer_id'      => $customer->id,
@@ -565,6 +572,7 @@ class LandingController extends FrontendController
                 }
 
                 $draftOrder->update([
+                    'landing_page_id'  => $request->landing_page_id ?: $draftOrder->landing_page_id,
                     'warehouse_id'     => $primaryWarehouseId,
                     'warehouse_info'   => $warehouseInfoList,
                     'customer_id'      => $customer->id,
@@ -956,6 +964,7 @@ class LandingController extends FrontendController
                 }
 
                 $draftOrder->update([
+                    'landing_page_id'  => $request->landing_page_id ?: $draftOrder->landing_page_id,
                     'warehouse_id'     => $primaryWarehouseId,
                     'warehouse_info'   => $warehouseInfoList,
                     'customer_id'      => $customer->id,
@@ -978,6 +987,7 @@ class LandingController extends FrontendController
                 $orderData = [
                     'type'             => Order::TYPE_LANDING,
                     'company_id'       => $this->company_id,
+                    'landing_page_id'  => $request->landing_page_id ?: null,
                     'warehouse_id'     => $primaryWarehouseId,
                     'warehouse_info'   => $warehouseInfoList,
                     'customer_id'      => $customer->id,
