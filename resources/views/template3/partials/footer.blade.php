@@ -23,8 +23,8 @@
                             @endif
                         </div>
                         <div>
-                            <h4 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
-                                {{ $feature->title }}</h4>
+                            <h3 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
+                                {{ $feature->title }}</h3>
                             <p class="opacity-90 text-xs md:text-sm mt-0.5">
                                 {{ $feature->subtitle ?? $feature->text_content }}</p>
                         </div>
