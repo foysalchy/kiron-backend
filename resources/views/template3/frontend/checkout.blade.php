@@ -16,8 +16,8 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-6">
-                            <h2 class="text-2xl font-semibold text-gray-800 leading-tight">
-                                To confirm your order, enter your name, address, phone number and click confirm
+                            <h2 class="text-[20px] font-semibold text-gray-800 leading-tight">
+                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
                             </h2>
                         </div>
                         <div class="p-6 space-y-5">
@@ -37,7 +37,7 @@
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
                                     <input type="email" name="email" placeholder="Your email address"
@@ -51,7 +51,9 @@
                                         value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
-                            </div>
+                            </div> -->
+                             <input type="text" name="district" placeholder="Your city" required
+                                        value="none"/>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Address <span
                                         class="text-red-500">*</span></label>
@@ -211,7 +213,7 @@
                             @endforeach
                         </div>
                         <!-- 2.5 Coupon Section -->
-                        <div class="mb-6 border-t border-gray-100 pt-6">
+                        <div class="mb-6 border-t border-gray-100 pt-6 hidden">
                             <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
                             <div class="flex gap-2">
                                 <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"

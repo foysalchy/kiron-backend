@@ -202,7 +202,7 @@
                     </div>
                     @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
                     <!-- 2.5 Coupon Section -->
-                    <div class="mb-6 border-t border-gray-100 pt-6">
+                    <div class="mb-6 border-t border-gray-100 pt-6 hidden">
                         <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
                         <div class="flex gap-2">
                             <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"

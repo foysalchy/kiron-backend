@@ -16,8 +16,8 @@
                 <!-- 1. Customer Information Card -->
                 <div class="bg-white rounded-xl  shadow-xs overflow-hidden">
                     <div class="p-6">
-                        <h2 class="text-2xl font-semibold text-gray-800 leading-tight">
-                            To confirm your order, enter your name, address, phone number and click confirm
+                        <h2 class="text-[20px] font-semibold text-gray-800 leading-tight">
+                            অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
                         </h2>
                     </div>
                     <div class="p-6 space-y-5">
@@ -210,7 +210,7 @@
                         @endforeach
                     </div>
                     <!-- 2.5 Coupon Section -->
-                    <div class="mb-6 border-t border-gray-100 pt-6">
+                    <div class="mb-6 border-t border-gray-100 pt-6 hidden">
                         <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
                         <div class="flex gap-2">
                             <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
