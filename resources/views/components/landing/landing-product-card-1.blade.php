@@ -105,7 +105,7 @@
         </div>
 
         {{-- Title --}}
-        <h3 class="font-bold text-gray-800 text-base md:text-lg mt-4 line-clamp-2 leading-snug group-hover:text-[#0D2601] transition-colors">
+        <h3 class="  text-gray-800 text-[13px] md:text-lg mt-4 line-clamp-2 leading-snug group-hover:text-[#0D2601] transition-colors">
             {{ $product->title }}
         </h3>
     </div>

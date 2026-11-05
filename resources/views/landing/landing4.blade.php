@@ -396,7 +396,7 @@
                             @endif
 
                             <div
-                                class="grid grid-cols-2 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3' }} gap-6">
+                                class="grid grid-cols-2 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3' }} md:gap-6 gap-2">
                                 @foreach($multiProducts as $p)
                                     <x-landing.landing-product-card-1 :product="$p" :setup="$setup" :landing="$landing" />
                                 @endforeach
