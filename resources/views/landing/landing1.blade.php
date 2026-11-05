@@ -587,23 +587,47 @@
         @endif
 
 
-        @php
-            $desc = !empty($landing->description) ? $landing->description : ($isPreviewMode ? $previewDescription : null);
-        @endphp
-        @if(!empty($desc))
-            {{-- ══ SECTION 4: PRODUCT BANNER ══ --}}
-            <section class="py-12 md:py-16 px-4 bg-white">
-                <div class="max-w-4xl mx-auto text-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                    @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -15px; left: 10px; z-index: 50;">Details</span>@endif
-                    <div class="Landing__34__Banner2 max-w-3xl mx-auto">
-                        <article class="prose prose-slate max-w-none text-center">
-                            {!! $desc !!}
-                        </article>
-                    </div>
-                </div>
-            </section>
-        @endif
+       
+@php
+    $desc = !empty($landing->description)
+        ? $landing->description
+        : ($isPreviewMode ? $previewDescription : null);
+
+    // HTML tags, whitespace এবং &nbsp; remove করে text check
+    $plainText = trim(
+        preg_replace('/[\s\x{00A0}\x{200B}]+/u', ' ',
+            html_entity_decode(strip_tags($desc ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        )
+    );
+
+    // Text অথবা meaningful media আছে কিনা
+    $hasMedia = preg_match('/<(img|video|iframe|svg)\b/i', $desc ?? '');
+
+    $hasDescription = $plainText !== '' || $hasMedia;
+@endphp
+
+@if($hasDescription)
+    {{-- SECTION 4: PRODUCT BANNER --}}
+    <section class="py-12 md:py-16 px-4 bg-white">
+        <div class="max-w-4xl mx-auto text-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+
+            @if($isPreviewMode)
+                <span class="preview-badge"
+                      style="top: -15px; left: 10px; z-index: 50;">
+                    Details
+                </span>
+            @endif
+
+            <div class="Landing__34__Banner2 max-w-3xl mx-auto">
+                <article class="prose prose-slate max-w-none text-center">
+                    {!! $desc !!}
+                </article>
+            </div>
+
+        </div>
+    </section>
+@endif
+
 
 
         @php
