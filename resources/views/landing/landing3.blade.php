@@ -120,6 +120,13 @@
             }
         }
 
+        /* Gallery Swiper flex lock */
+        .landing3-gallery-swiper .swiper-wrapper {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+        }
+
         /* Dashed Border Box */
         .price-box-dashed {
             border: 3px dashed #7DF9FF;
@@ -320,24 +327,19 @@
                     }
 
                     $displayGalleries = $heroGalleries;
-                    if (count($heroGalleries) > 1) {
-                        while (count($displayGalleries) < 12) {
-                            $displayGalleries = array_merge($displayGalleries, $heroGalleries);
-                        }
-                    }
                 @endphp
 
                 @if(count($heroGalleries) > 1)
                     <div class="relative max-w-4xl mx-auto px-2 mt-6">
                         {{-- Left Arrow --}}
                         <button type="button" aria-label="Scroll product images left"
-                            class="l3-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
+                            class="l3-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 4 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
                         </button>
 
-                        {{-- Swiper Container (Pure 1-direction infinite loop) --}}
-                        <div class="swiper landing3-gallery-swiper w-full">
-                            <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 2 ? '!justify-center' : '' }} {{ count($heroGalleries) <= 5 ? 'md:!justify-center' : 'md:!justify-start' }}">
+                        {{-- Swiper Container --}}
+                        <div class="swiper t3-product-thumb-swiper landing3-gallery-swiper w-full">
+                            <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 3 ? '!justify-center' : '' }}">
                                 @foreach ($displayGalleries as $index => $imgUrl)
                                     <div class="swiper-slide !w-auto !flex-shrink-0">
                                         <button type="button" aria-label="View product image {{ $index + 1 }}"
@@ -354,7 +356,7 @@
 
                         {{-- Right Arrow --}}
                         <button type="button" aria-label="Scroll product images right"
-                            class="l3-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
+                            class="l3-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 4 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#00D05E] text-[#0D2601] shadow-lg items-center justify-center hover:bg-[#00B853] transition-all cursor-pointer">
                             <i class="fa-solid fa-chevron-right text-sm"></i>
                         </button>
                     </div>
@@ -817,21 +819,23 @@
 
                     // Hero Product Gallery Swiper
                     if (galSwiperEl && !galSwiperEl.swiper) {
+                        const totalGal = galSwiperEl.querySelectorAll('.swiper-slide').length;
                         new SwiperClass(galSwiperEl, {
                             slidesPerView: 'auto',
                             spaceBetween: 12,
-                            loop: true,
+                            loop: totalGal > 2,
                             loopPreventsSliding: false,
+                            watchOverflow: false,
                             grabCursor: true,
                             observer: true,
                             observeParents: true,
                             preventClicks: false,
                             preventClicksPropagation: false,
-                            autoplay: {
+                            autoplay: totalGal > 2 ? {
                                 delay: 2500,
                                 disableOnInteraction: false,
                                 pauseOnMouseEnter: false,
-                            },
+                            } : false,
                             navigation: {
                                 nextEl: '.l3-gal-next',
                                 prevEl: '.l3-gal-prev',

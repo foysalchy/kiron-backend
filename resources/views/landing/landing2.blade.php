@@ -160,6 +160,13 @@
         .bounce {
             animation: bounce-down 1.4s ease-in-out infinite;
         }
+
+        /* Gallery Swiper flex lock */
+        .landing2-gallery-swiper .swiper-wrapper {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+        }
     </style>
     <style>
         @if(isset($isPreview) && $isPreview)
@@ -294,24 +301,19 @@
                             }
 
                             $displayGalleries = $heroGalleries;
-                            if (count($heroGalleries) > 1) {
-                                while (count($displayGalleries) < 12) {
-                                    $displayGalleries = array_merge($displayGalleries, $heroGalleries);
-                                }
-                            }
                         @endphp
 
                         @if(count($heroGalleries) > 1)
                             <div class="relative max-w-3xl mx-auto px-2 mb-10">
                                 {{-- Left Arrow --}}
                                 <button type="button" aria-label="Scroll product images left"
-                                    class="l2-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
+                                    class="l2-gal-prev {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 4 ? 'md:hidden' : 'md:flex' }} absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
                                     <i class="fa-solid fa-chevron-left text-sm"></i>
                                 </button>
 
-                                {{-- Swiper Container (Pure 1-direction infinite loop) --}}
-                                <div class="swiper rv-swiper landing2-gallery-swiper w-full">
-                                    <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 2 ? '!justify-center' : '' }} {{ count($heroGalleries) <= 5 ? 'md:!justify-center' : 'md:!justify-start' }}">
+                                {{-- Swiper Container --}}
+                                <div class="swiper t2-product-thumb-swiper landing2-gallery-swiper w-full">
+                                    <div class="swiper-wrapper py-2 {{ count($heroGalleries) <= 3 ? '!justify-center' : '' }}">
                                         @foreach ($displayGalleries as $index => $imgUrl)
                                             <div class="swiper-slide !w-auto !flex-shrink-0">
                                                 <button type="button" aria-label="View product image {{ $index + 1 }}"
@@ -327,7 +329,7 @@
 
                                 {{-- Right Arrow --}}
                                 <button type="button" aria-label="Scroll product images right"
-                                    class="l2-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 5 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
+                                    class="l2-gal-next {{ count($heroGalleries) > 2 ? 'flex' : 'hidden' }} {{ count($heroGalleries) <= 4 ? 'md:hidden' : 'md:flex' }} absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#005EFF] text-white shadow-lg items-center justify-center hover:bg-[#003A9C] transition-all cursor-pointer">
                                     <i class="fa-solid fa-chevron-right text-sm"></i>
                                 </button>
                             </div>
@@ -721,21 +723,23 @@
                     if (!SwiperClass || !galSwiperEl) return;
                     if (galSwiperEl.swiper) return;
 
+                    const totalGal = galSwiperEl.querySelectorAll('.swiper-slide').length;
                     new SwiperClass(galSwiperEl, {
                         slidesPerView: 'auto',
                         spaceBetween: 12,
-                        loop: true,
+                        loop: totalGal > 2,
                         loopPreventsSliding: false,
+                        watchOverflow: false,
                         grabCursor: true,
                         observer: true,
                         observeParents: true,
                         preventClicks: false,
                         preventClicksPropagation: false,
-                        autoplay: {
+                        autoplay: totalGal > 2 ? {
                             delay: 2500,
                             disableOnInteraction: false,
                             pauseOnMouseEnter: false,
-                        },
+                        } : false,
                         navigation: {
                             nextEl: '.l2-gal-next',
                             prevEl: '.l2-gal-prev',
