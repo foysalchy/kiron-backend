@@ -181,7 +181,7 @@
                 <span class="btn-label">{{ $cardTrans['out_of_stock'] }}</span>
             </button>
         @else
-            <div class="card-btn-group grid grid-cols-2 gap-2">
+            <div class="card-btn-group grid lg:grid-cols-2 grid-cols-1 gap-2">
                 {{-- Add to Cart (stays on same place) --}}
                 <button type="button"
                     onclick="addProductToLandingOrder({{ $product->id }}, false)"

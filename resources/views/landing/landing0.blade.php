@@ -88,7 +88,7 @@
         // Render all product cards grid html
         $productCardsHtml = '';
         if ($multiProducts->isNotEmpty()) {
-            $productCardsHtml = '<div id="landing-products-section" class="my-8 max-w-6xl mx-auto px-4"><div class="grid grid-cols-1 ' . ($multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3') . ' gap-6">';
+            $productCardsHtml = '<div id="landing-products-section" class="my-8 max-w-6xl mx-auto px-4"><div class="grid grid-cols-2 ' . ($multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3') . ' gap-6">';
             foreach($multiProducts as $p) {
                 $productCardsHtml .= view('components.landing.landing-product-card-1', [
                     'product' => $p,
