@@ -21,7 +21,9 @@ class LandingPageService
     {
         try {
             $query = LandingPage::with(['product:id,title,slug,thumbnail'])
-                ->withCount('orders');
+                ->withCount(['orders' => function ($q) {
+                    $q->where('status', '!=', Status::Draft->value);
+                }]);
 
             // Apply filters
             if (isset($filters['status'])) {
@@ -565,6 +567,129 @@ class LandingPageService
         } catch (\Exception $e) {
             Log::error('Landing page status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle landing page status');
+        }
+    }
+
+    /**
+     * Get analytics and statistics for a specific landing page
+     */
+    public function getLandingPageAnalytics(int $id): array
+    {
+        try {
+            $landingPage = LandingPage::with(['product:id,title,slug,thumbnail'])->find($id);
+
+            if (!$landingPage) {
+                throw ApiException::notFound('Landing Page');
+            }
+
+            $landingPage->append(['products', 'product_ids']);
+
+            $ordersQuery = \App\Models\Order::withoutGlobalScopes()
+                ->where('landing_page_id', $id)
+                ->whereNull('deleted_at');
+
+            $allOrders = $ordersQuery->get();
+
+            // Filter out draft orders for all metrics, stats, pipeline and conversion rate calculations
+            $confirmedOrders = $allOrders->where('status', '!=', Status::Draft->value);
+
+            $totalOrders = $confirmedOrders->count();
+            $views = (int)($landingPage->views ?? 0);
+            $conversionRate = $views > 0 ? round(($totalOrders / $views) * 100, 2) : 0;
+
+            // Financials (exclude Cancelled, Fake and Draft)
+            $totalRevenue = (float)$confirmedOrders->whereNotIn('status', [Status::Cancelled->value, Status::Fake->value])->sum('grand_total');
+            $paidAmount = (float)$confirmedOrders->whereNotIn('status', [Status::Cancelled->value, Status::Fake->value])->sum('payment_amount');
+            $dueAmount = max(0, $totalRevenue - $paidAmount);
+
+            // Order Status Pipeline (similar to OrderDetails customer stats, excluding draft)
+            $deliveredOrders = $confirmedOrders->where('status', Status::Delivered->value)->count();
+            $cancelledOrders = $confirmedOrders->whereIn('status', [Status::Cancelled->value, Status::Fake->value])->count();
+            $returnedOrders = $confirmedOrders->whereIn('status', [Status::Returned->value, Status::ReturnReceived->value, Status::ReturnRequest->value, Status::ReturntoCourier->value])->count();
+            $inProgressOrders = $confirmedOrders->whereIn('status', [
+                Status::Pending->value,
+                Status::Confirmed->value,
+                Status::Processing->value,
+                Status::ReadyToShipped->value,
+                Status::Shipped->value,
+                Status::HandovertoCourier->value,
+                Status::InTransit->value,
+                Status::Hold->value
+            ])->count();
+
+            $completedForRatio = $deliveredOrders + $returnedOrders + $cancelledOrders;
+            $successRatio = $completedForRatio > 0 ? round(($deliveredOrders / $completedForRatio) * 100, 1) : 0;
+
+            // Recent 10 Orders with customer & item info (includes all orders including draft leads)
+            $recentOrders = \App\Models\Order::withoutGlobalScopes()
+                ->where('landing_page_id', $id)
+                ->whereNull('deleted_at')
+                ->select([
+                    'id', 'order_no', 'order_date', 'status', 'payment_status',
+                    'grand_total', 'payment_amount', 'shipping_address', 'created_at'
+                ])
+                ->with(['orderDetails:id,order_id,product_id,quantity,unit_price,total'])
+                ->orderBy('id', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($o) {
+                    $shipping = is_array($o->shipping_address) ? $o->shipping_address : json_decode($o->shipping_address ?? '[]', true);
+                    return [
+                        'id' => $o->id,
+                        'order_no' => $o->order_no,
+                        'order_date' => $o->order_date,
+                        'created_at' => $o->created_at,
+                        'status' => $o->status,
+                        'status_label' => $o->status_label,
+                        'payment_status' => $o->payment_status,
+                        'payment_status_label' => $o->payment_status_label,
+                        'grand_total' => (float)$o->grand_total,
+                        'paid_amount' => (float)$o->payment_amount,
+                        'due_amount' => max(0, (float)$o->grand_total - (float)$o->payment_amount),
+                        'customer_name' => $shipping['name'] ?? $shipping['customer_name'] ?? 'N/A',
+                        'customer_phone' => $shipping['phone'] ?? $shipping['customer_phone'] ?? 'N/A',
+                        'customer_city' => $shipping['city'] ?? $shipping['address'] ?? 'N/A',
+                        'items_count' => $o->orderDetails->sum('quantity'),
+                    ];
+                });
+
+            return [
+                'landing_page' => [
+                    'id' => $landingPage->id,
+                    'name' => $landingPage->name,
+                    'title' => $landingPage->title,
+                    'slug' => $landingPage->slug,
+                    'template_id' => $landingPage->template_id,
+                    'status' => $landingPage->status,
+                    'thumbnail' => $landingPage->thumbnail,
+                    'thumbnail_url' => $landingPage->thumbnail_url,
+                    'created_at' => $landingPage->created_at,
+                    'product' => $landingPage->product,
+                    'products' => $landingPage->products,
+                ],
+                'metrics' => [
+                    'views' => $views,
+                    'total_orders' => $totalOrders,
+                    'conversion_rate' => $conversionRate,
+                    'total_revenue' => $totalRevenue,
+                    'paid_amount' => $paidAmount,
+                    'due_amount' => $dueAmount,
+                ],
+                'order_stats' => [
+                    'total' => $totalOrders,
+                    'delivered' => $deliveredOrders,
+                    'in_progress' => $inProgressOrders,
+                    'returned' => $returnedOrders,
+                    'cancelled' => $cancelledOrders,
+                    'success_ratio' => $successRatio,
+                ],
+                'recent_orders' => $recentOrders,
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Landing page analytics failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch landing page analytics');
         }
     }
 }
