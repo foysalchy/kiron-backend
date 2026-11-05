@@ -47,12 +47,12 @@
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">City <span
                                             class="text-red-500">*</span></label>
-                                    <input type="text" name="district" placeholder="Your city" required
+                                    <input type="hidden" name="district" placeholder="Your city" required
                                         value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div> -->
-                             <input type="text" name="district" placeholder="Your city" required
+                             <input type="hidden" name="district" placeholder="Your city" required
                                         value="none"/>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Address <span
@@ -159,7 +159,7 @@
                         <!-- Product Row in Summary -->
                         <div class="space-y-4 mb-8">
                             @foreach ($cartContent as $item)
-                                <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
+                                <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4 border border-gray">
                                     <!-- Actual Product Image -->
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
