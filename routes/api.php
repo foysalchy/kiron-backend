@@ -913,6 +913,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/', [LandingPageController::class, 'index']);
                     Route::post('/', [LandingPageController::class, 'store']);
                     Route::get('/{id}', [LandingPageController::class, 'show']);
+                    Route::get('/{id}/analytics', [LandingPageController::class, 'analytics']);
                     Route::get('/slug/{slug}', [LandingPageController::class, 'showBySlug']);
                     Route::post('/update/{id}', [LandingPageController::class, 'update']);
                     Route::patch('/{id}', [LandingPageController::class, 'update']);

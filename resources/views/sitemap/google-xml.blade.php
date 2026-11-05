@@ -26,8 +26,11 @@
                         <g:additional_image_link>{{ $gallery->image_url }}</g:additional_image_link>
                     @endforeach
 
+                    @php
+                        $isOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock ? ($product->available_stock <= 0) : false);
+                    @endphp
                     <g:condition>new</g:condition>
-                    <g:availability>{{ $product->available_stock > 0 ? 'in_stock' : 'out_of_stock' }}</g:availability>
+                    <g:availability>{{ $isOutOfStock ? 'out_of_stock' : 'in_stock' }}</g:availability>
                     <g:price>{{ number_format($product->regular_price, 2, '.', '') }} {{ $setup->currency ?: 'BDT' }}</g:price>
                     @if($product->discount > 0)
                         <g:sale_price>{{ number_format($product->sale_price, 2, '.', '') }} {{ $setup->currency ?: 'BDT' }}
@@ -68,8 +71,13 @@
                             @endforeach
                         @endif
 
+                        @php
+                            $isVarOutOfStock = ($product->stock_status === 'out_of_stock')
+                                || ($variant->stock_status === 'out_of_stock')
+                                || ($product->manage_stock ? ($variant->available_stock <= 0) : false);
+                        @endphp
                         <g:condition>new</g:condition>
-                        <g:availability>{{ $variant->available_stock > 0 ? 'in_stock' : 'out_of_stock' }}</g:availability>
+                        <g:availability>{{ $isVarOutOfStock ? 'out_of_stock' : 'in_stock' }}</g:availability>
                         <g:price>{{ number_format($variant->regular_price, 2, '.', '') }} {{ $setup->currency ?: 'BDT' }}</g:price>
                         @if($variant->discount > 0)
                             <g:sale_price>{{ number_format($variant->final_price, 2, '.', '') }} {{ $setup->currency ?: 'BDT' }}

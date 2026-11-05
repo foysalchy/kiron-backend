@@ -326,11 +326,13 @@ ROBOTS;
                     [$price, $salePrice] = $formatPrice($product->regular_price, $product->sale_price);
                     [$mainImage, $additionalImages] = $formatImages($product->thumbnail_url, $product->galleries);
                     
+                    $isOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock ? ($product->available_stock <= 0) : false);
+
                     fputcsv($file, [
                         'PRD-' . $product->id,
                         $productTitle,
                         $description,
-                        $product->available_stock > 0 ? 'in stock' : 'out of stock',
+                        $isOutOfStock ? 'out of stock' : 'in stock',
                         'new',
                         $price,
                         $salePrice,
@@ -354,11 +356,15 @@ ROBOTS;
                         [$price, $salePrice] = $formatPrice($variant->regular_price, $variant->final_price);
                         [$mainImage, $additionalImages] = $formatImages($variantImage, $vGallery);
 
+                        $isVarOutOfStock = ($product->stock_status === 'out_of_stock')
+                            || ($variant->stock_status === 'out_of_stock')
+                            || ($product->manage_stock ? ($variant->available_stock <= 0) : false);
+
                         fputcsv($file, [
                             'VAR-' . $variant->id,
                             $productTitle . ' - ' . $variant->display_name,
                             $description,
-                            $variant->available_stock > 0 ? 'in stock' : 'out of stock',
+                            $isVarOutOfStock ? 'out of stock' : 'in stock',
                             'new',
                             $price,
                             $salePrice,
@@ -428,6 +434,8 @@ ROBOTS;
 
                 if ($product->type === 'single') {
                     // ─── Single Product ───
+                    $isOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock ? ($product->available_stock <= 0) : false);
+
                     fputcsv($file, [
                         'PRD-' . $product->id, // sku_id
                         $product->title,       // product_name
@@ -435,13 +443,17 @@ ROBOTS;
                         $product->thumbnail_url, // product_image_url
                         number_format($product->regular_price, 2, '.', '') . ' ' . $currency, // price
                         $product->discount > 0 ? number_format($product->sale_price, 2, '.', '') . ' ' . $currency : '', // sale_price
-                        $product->available_stock > 0 ? 'in stock' : 'out of stock', // availability
+                        $isOutOfStock ? 'out of stock' : 'in stock', // availability
                         'new', // condition
                         $product->brand->name ?? $setup->shop_name ?? 'Guitar', // brand
                         $commonDescription // description
                     ]);
                 } else {
                     foreach ($product->variations as $variant) {
+                        $isVarOutOfStock = ($product->stock_status === 'out_of_stock')
+                            || ($variant->stock_status === 'out_of_stock')
+                            || ($product->manage_stock ? ($variant->available_stock <= 0) : false);
+
                         fputcsv($file, [
                             'VAR-' . $variant->id,
                             $product->title . ' - ' . $variant->display_name, // product_name
@@ -449,7 +461,7 @@ ROBOTS;
                             $variant->image_url ?: $product->thumbnail_url, // product_image_url
                             number_format($variant->regular_price, 2, '.', '') . ' ' . $currency, // price
                             $variant->discount > 0 ? number_format($variant->final_price, 2, '.', '') . ' ' . $currency : '', // sale_price
-                            $variant->available_stock > 0 ? 'in stock' : 'out of stock', // availability
+                            $isVarOutOfStock ? 'out of stock' : 'in stock', // availability
                             'new', // condition
                             $product->brand->name ?? $setup->shop_name ?? 'Guitar', // brand
                             $commonDescription // description
