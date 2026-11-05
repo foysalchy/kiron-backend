@@ -70,6 +70,7 @@
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                         <img id="mainImage"
                             src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                            alt="{{ $product->name ?? 'Product Image' }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div class="relative mt-3 px-8">
@@ -217,11 +218,12 @@
                     <!-- Quantity -->
                     <div class="flex items-center gap-6 mb-8 mt-4">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-10">
-                            <button onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
+                            <button type="button" aria-label="Decrease quantity" onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>
                             <input type="number" id="main-qty" value="1" readonly
+                                aria-label="Quantity"
                                 class="w-10 text-center font-bold border-none outline-none">
-                            <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
+                            <button type="button" aria-label="Increase quantity" onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         @php
@@ -406,7 +408,7 @@
                         <!-- Section: Description  -->
                         <div id="tab-content-description"
                             class="tab-content {{ $firstTab === 'description' ? 'block' : 'hidden' }}">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
+                            <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
                             <div class="text-[18px] prose prose-orange max-w-none">
                                 {!! $product->full_description !!}
                             </div>
@@ -417,7 +419,7 @@
                         <!-- Section: Specification  -->
                         <div id="tab-content-specification"
                             class="tab-content {{ $firstTab === 'specification' ? 'block' : 'hidden' }}">
-                            <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
+                            <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
                                 @if(!empty($product->brand))
@@ -461,7 +463,7 @@
 
                     <!-- Section: Review -->
                     <div id="tab-content-review" class="tab-content hidden px-2">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h2>
 
                         @php
                             $reviews = $product->reviews;
@@ -506,9 +508,9 @@
                                         <div class="flex-1">
                                             <!-- Header Line: Name, Stars, Date -->
                                             <div class="flex items-center gap-3 mb-2">
-                                                <h4 class="text-md font-bold text-gray-900">
+                                                <h3 class="text-md font-bold text-gray-900">
                                                     {{ $review->customer->name ?? 'Customer' }}
-                                                </h4>
+                                                </h3>
 
                                                 <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                                     @for ($i = 1; $i <= 5; $i++)
@@ -800,7 +802,7 @@
                     if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
                 });
 
-                let groupHtml = `<div class="mb-4"><h3 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+                let groupHtml = `<div class="mb-4"><h2 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h2><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const isFilterActive = (activeFilters[groupName] == valId);
@@ -812,7 +814,7 @@
 
                     // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" alt="${valName}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;
