@@ -273,6 +273,31 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+    public function bulkDeleteOrders(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:orders,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($validated['ids'] as $orderId) {
+                $this->orderService->deleteOrder($orderId);
+            }
+
+            DB::commit();
+
+            return ResponseHelper::success(null, 'Selected orders deleted permanently.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk delete orders failed: ' . $e->getMessage());
+
+            return ResponseHelper::error($e->getMessage() ?: 'Failed to delete selected orders.', 500);
+        }
+    }
     public function checkCourier(Request $request)
     {
         $phone = $request->query('phone');

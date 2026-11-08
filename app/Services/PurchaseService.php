@@ -57,8 +57,23 @@ class PurchaseService
                 $query->whereDate('purchase_date', '<=', $filters['date_to']);
             }
 
-            if (isset($filters['search'])) {
-                $query->where('reference_no', 'like', "%{$filters['search']}%");
+            if (!empty($filters['search'])) {
+                $search = trim($filters['search']);
+                $query->where(function ($q) use ($search) {
+                    $q->where('reference_no', 'like', "%{$search}%")
+                        ->orWhere('note', 'like', "%{$search}%")
+                        ->orWhereHas('supplier', function ($sq) use ($search) {
+                            $sq->where('name', 'like', "%{$search}%")
+                               ->orWhere('phone', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('warehouse', function ($wq) use ($search) {
+                            $wq->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('purchaseDetails.product', function ($pq) use ($search) {
+                            $pq->where('title', 'like', "%{$search}%")
+                               ->orWhere('sku_code', 'like', "%{$search}%");
+                        });
+                });
             }
 
             $sortBy = $filters['sort_by'] ?? 'created_at';

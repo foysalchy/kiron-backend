@@ -59,12 +59,13 @@ class InventoryAuditController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'company_id' => 'required|exists:companies,id',
             'warehouse_id' => 'required|exists:warehouses,id',
             'audit_date' => 'required|date',
             'audit_type' => 'required|in:full,partial,cycle',
             'notes' => 'nullable|string',
         ]);
+
+        $validated['company_id'] = $request->user()?->company_id ?? $request->input('company_id');
 
         try {
             $audit = $this->inventoryAuditService->createAudit($validated);

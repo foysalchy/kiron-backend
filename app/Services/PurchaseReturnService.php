@@ -61,8 +61,24 @@ class PurchaseReturnService
                 $query->whereDate('return_date', '<=', $filters['date_to']);
             }
 
-            if (isset($filters['search'])) {
-                $query->where('return_no', 'like', "%{$filters['search']}%");
+            if (!empty($filters['search'])) {
+                $search = trim($filters['search']);
+                $query->where(function ($q) use ($search) {
+                    $q->where('return_no', 'like', "%{$search}%")
+                        ->orWhere('reason', 'like', "%{$search}%")
+                        ->orWhere('note', 'like', "%{$search}%")
+                        ->orWhereHas('purchase', function ($pq) use ($search) {
+                            $pq->where('reference_no', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('supplier', function ($sq) use ($search) {
+                            $sq->where('name', 'like', "%{$search}%")
+                               ->orWhere('phone', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('purchaseReturnDetails.product', function ($prodQ) use ($search) {
+                            $prodQ->where('title', 'like', "%{$search}%")
+                                  ->orWhere('sku_code', 'like', "%{$search}%");
+                        });
+                });
             }
 
             $sortBy = $filters['sort_by'] ?? 'return_date';
@@ -142,7 +158,11 @@ class PurchaseReturnService
             $data = array_merge($data, $totals);
 
 
-            $refundAmount = round((float) $data['refund_amount'], 2);
+            $data['refund_amount'] = isset($data['refund_amount']) && $data['refund_amount'] !== null
+                ? round((float) $data['refund_amount'], 2)
+                : 0;
+
+            $refundAmount = $data['refund_amount'];
             $paymentsTotal = round(array_sum(array_column($payments, 'amount')), 2);
 
             if ($paymentsTotal > $refundAmount) {
@@ -215,7 +235,7 @@ class PurchaseReturnService
             DB::rollBack();
 
             Log::error('Purchase return creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create purchase return: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create purchase return. Please verify the information and try again.');
         }
     }
 
@@ -268,8 +288,14 @@ class PurchaseReturnService
             }
 
             // If payments provided, replace old payments and adjust supplier due_amount
+            if (array_key_exists('refund_amount', $data)) {
+                $data['refund_amount'] = $data['refund_amount'] !== null
+                    ? round((float) $data['refund_amount'], 2)
+                    : 0;
+            }
+
             if ($payments !== null) {
-                $refundAmount = round((float) ($data['refund_amount'] ?? $purchaseReturn->refund_amount), 2);
+                $refundAmount = round((float) ($data['refund_amount'] ?? $purchaseReturn->refund_amount ?? 0), 2);
                 $newPaymentsTotal = round(array_sum(array_column($payments, 'amount')), 2);
 
                 if ($newPaymentsTotal > $refundAmount) {
