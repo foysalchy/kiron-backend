@@ -100,13 +100,13 @@
                         </div>
 
                         <!-- Thumbnails Container (Vertical on mobile, horizontal on desktop) -->
-                        <div id="t3-thumb-wrapper" class="w-[76px] sm:w-20 md:w-full flex-shrink-0 relative py-7 px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
+                        @php
+                            $videoData = $product->video_data;
+                            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
+                        @endphp
+                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative py-7 px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
                         <div class="swiper t3-product-thumb-swiper w-full">
                             <div id="thumbnail-container" class="swiper-wrapper">
-                                @php
-                                    $videoData = $product->video_data;
-                                @endphp
-
                                 @foreach ($allProductImages as $imgUrl)
                                     <div class="swiper-slide">
                                         <button onclick="changeImage('{{ $imgUrl }}', this)"
@@ -358,20 +358,6 @@
                         </button>
                     </div>
 
-                    <!-- Product Custom Block (Notice/Announcement/Policy) -->
-                    @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
-                        <div class="my-5">
-                            @if(!empty($activePreviewTheme))
-                                <div class="mb-1">
-                                    <x-preview-badge name="Product Custom Block" :isDummy="!empty($productCustomBlock->is_dummy)" />
-                                </div>
-                            @endif
-                            <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
-                                {!! $productCustomBlock->text_content !!}
-                            </div>
-                        </div>
-                    @endif
-
                     <div class="bg-gray-100 py-3 px-3 rounded">
                         <div class="flex items-center justify-between mb-4">
                             <div class="text-center flex-1 text-gray-700">Call or WhatsApp to order directly</div>
@@ -417,6 +403,20 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Product Custom Block (Notice/Announcement/Policy) -->
+                    @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
+                        <div class="my-5">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Product Custom Block" :isDummy="!empty($productCustomBlock->is_dummy)" />
+                                </div>
+                            @endif
+                            <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                                {!! $productCustomBlock->text_content !!}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -1221,7 +1221,7 @@
             const mainWrap = document.getElementById('t3-main-image-wrap');
             const thumbWrap = document.getElementById('t3-thumb-wrapper');
             const swiperEl = document.querySelector('.t3-product-thumb-swiper');
-            if (!mainWrap || !thumbWrap || !swiperEl) return;
+            if (!mainWrap || !thumbWrap || !swiperEl || thumbWrap.classList.contains('hidden')) return;
 
             if (window.innerWidth < 768) {
                 const height = mainWrap.offsetHeight;
@@ -1236,6 +1236,8 @@
         }
 
         function initT3ThumbSwiper(SwiperClass) {
+            const thumbWrap = document.getElementById('t3-thumb-wrapper');
+            if (thumbWrap && thumbWrap.classList.contains('hidden')) return;
             const el = document.querySelector('.t3-product-thumb-swiper');
             if (SwiperClass && el) {
                 if (window.t3ThumbSwiper && typeof window.t3ThumbSwiper.destroy === 'function') {

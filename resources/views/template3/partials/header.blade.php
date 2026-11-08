@@ -8,19 +8,19 @@
 @endphp
 <header class="w-full header-custom-bg sticky top-0 z-50 shadow-sm">
     <!-- 1. Main Header (Logo, Search, User Actions) -->
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-10">
+    <div class="container mx-auto px-3 sm:px-4 py-3 md:py-4 flex items-center justify-between gap-2 sm:gap-4 lg:gap-10">
 
         <!-- Mobile Menu Toggle -->
         <button onclick="toggleMobileMenu()" aria-label="Open menu"
-            class="md:hidden text-header text-2xl focus:outline-none">
+            class="md:hidden text-header text-xl sm:text-2xl focus:outline-none flex-shrink-0">
             <i class="fas fa-bars"></i>
         </button>
 
         <!-- Logo -->
-        <a href="{{ route('home') }}" class="flex-shrink-0">
+        <a href="{{ route('home') }}" class="flex-shrink min-w-0">
             @if ($setup && $setup->logo)
                 <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
-                    alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-12 md:h-16 w-auto object-contain" />
+                    alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-10 sm:h-12 md:h-16 max-w-full w-auto object-contain" />
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
                         class="text-blue-600">ZONE</span></span>
@@ -98,7 +98,7 @@
         </form>
 
         <!-- Right Side Icons -->
-        <div class="flex items-center gap-5 lg:gap-8">
+        <div class="flex items-center gap-3 sm:gap-5 lg:gap-8 flex-shrink-0">
             <!-- Account -->
             <div class="relative group hidden md:block" id="desktop-account-wrapper">
                 @auth('customer')
