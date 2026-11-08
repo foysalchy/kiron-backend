@@ -145,6 +145,13 @@
     font-size: 16px;
     line-height: 1.6;
 }
+@media(max-width:576px){
+    .prose.prose-short p{
+        font-size:13px !important;
+    margin-bottom: 4px;
+
+    }
+}
 
 .prose h1+p,
 .prose h2+p,

@@ -104,7 +104,7 @@
                             $videoData = $product->video_data;
                             $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
                         @endphp
-                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative py-7 px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
+                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} {{ $totalGalleryCount <= 5 ? 'py-7' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative  px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
                         <div class="swiper t3-product-thumb-swiper w-full">
                             <div id="thumbnail-container" class="swiper-wrapper">
                                 @foreach ($allProductImages as $imgUrl)
@@ -203,7 +203,7 @@
                     @endif
 
                     <div
-                        class="prose prose-slate max-w-none mb-4 text-xs md:text-lg leading-relaxed font-medium overflow-visible relative">
+                        class="prose prose-short prose-slate max-w-none mb-4 text-xs md:text-lg leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
                     </div>
 
