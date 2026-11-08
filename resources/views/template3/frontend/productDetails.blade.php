@@ -243,6 +243,33 @@
                         <div id="dynamic-attributes-container" class="mb-5"></div>
                     @endif
 
+                    {{-- Free Shipping Notice (Mobile: Above Quantity) --}}
+                    @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
+                        <div class="md:hidden mb-4">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Shipping Charge Rule" />
+                                </div>
+                            @endif
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>{{ $setup->free_shipping_text }}</span>
+                            </div>
+                        </div>
+                    @elseif(!empty($activePreviewTheme))
+                        <div class="md:hidden mb-4">
+                            <div class="mb-1">
+                                <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
+                            </div>
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>Free shipping on orders over ৳1500 (Sample Preview)</span>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Quantity -->
                     <div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8 mt-4">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-11 md:h-10 shrink-0">
@@ -273,9 +300,9 @@
                     <!-- Hidden Input for Selected Variation -->
                     <input type="hidden" id="selected-variation-id" value="">
 
-                    {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
+                    {{-- Free Shipping Notice (Desktop: Below Quantity) --}}
                     @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                        <div class="mb-4">
+                        <div class="hidden md:block mb-4">
                             @if(!empty($activePreviewTheme))
                                 <div class="mb-1">
                                     <x-preview-badge name="Shipping Charge Rule" />
@@ -289,7 +316,7 @@
                         </div>
                     @elseif(!empty($activePreviewTheme))
                         {{-- In Preview mode show dummy shipping text if empty --}}
-                        <div class="mb-4">
+                        <div class="hidden md:block mb-4">
                             <div class="mb-1">
                                 <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
                             </div>
