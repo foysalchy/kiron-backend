@@ -50,7 +50,7 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="flex items-center gap-2 text-[10px] md:text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
+            class="flex items-center gap-2 text-[10px] md:text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-0 md:pt-2">
 
             <a href="{{ route('home') }}"
                 class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
@@ -104,7 +104,7 @@
                             $videoData = $product->video_data;
                             $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
                         @endphp
-                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} {{ $totalGalleryCount <= 5 ? 'py-7' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative  px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
+                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} {{ $totalGalleryCount > 5 ? 'py-7' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative  px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
                         <div class="swiper t3-product-thumb-swiper w-full">
                             <div id="thumbnail-container" class="swiper-wrapper">
                                 @foreach ($allProductImages as $imgUrl)
@@ -166,17 +166,7 @@
                         </span>
                     @endif
 
-                    @php
-                        $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
-                    @endphp
-
-                    <span id="discount-badge"
-                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
-                        @if ($hasDiscount)
-                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
-                            OFF
-                        @endif
-                    </span>
+         
 
                     <h1 class="text-lg md:text-2xl font-semibold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
                     @php
@@ -229,6 +219,17 @@
                                 {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
                             @endif
                         </span>
+                                   @php
+                        $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                    @endphp
+
+                    <span id="discount-badge"
+                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
+                        @if ($hasDiscount)
+                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
+                            OFF
+                        @endif
+                    </span>
 
                         @if ($product->is_free_delivery == 1)
                             <span
@@ -287,7 +288,7 @@
 
                         <!-- Mobile Add to Cart Button (Beside Quantity on Mobile) -->
                         <button onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="md:hidden flex-1 primary-bg hover:bg-green-700 text-primary h-11 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm">
+                            class="md:hidden flex-1 primary-bg hover:bg-green-700 text-primary h-11 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}
                         </button>
 
@@ -345,11 +346,11 @@
 
                         <!-- ২. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
+                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
 
                         <!-- ৩. Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
+                            class="flex-1 border-2 h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all
                                                             {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
