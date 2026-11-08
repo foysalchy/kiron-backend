@@ -163,6 +163,16 @@
                 @endauth
             </div>
 
+            <!-- Mobile Search Trigger Button -->
+            <button type="button" onclick="toggleMobileSearch()" aria-label="Toggle search"
+                class="md:hidden flex items-center justify-center text-header outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-header" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+
             <!-- Cart Section -->
             <button onclick="toggleCartDrawer()" class="relative group outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header" fill="none"
@@ -369,7 +379,7 @@
     </div>
 
     <!-- Mobile Search Bar (Updated with Suggestions) -->
-    <div class="md:hidden px-4 pb-4 relative" id="mobile-search-container">
+    <div class="hidden md:hidden px-4 pb-4 relative" id="mobile-search-container">
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-gray-300 rounded-md overflow-hidden bg-white relative z-30">
             <input type="text" name="search" id="mobile-search-input" autocomplete="off" value="{{ request('search') }}"
@@ -733,6 +743,17 @@
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
         document.body.classList.toggle('overflow-hidden');
+    }
+
+    function toggleMobileSearch() {
+        const container = document.getElementById('mobile-search-container');
+        if (container) {
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) {
+                const input = document.getElementById('mobile-search-input');
+                if (input) input.focus();
+            }
+        }
     }
 
     // Toggle Desktop Account Dropdown
