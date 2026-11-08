@@ -53,7 +53,19 @@ class FrontendOrderService
         }
 
         if (!empty($filters['customer_phone'])) {
-            $query->where('parties.phone', 'like', '%' . $filters['customer_phone'] . '%');
+            $rawPhone = trim($filters['customer_phone']);
+            $cleanPhone = preg_replace('/[^0-9]/', '', $rawPhone);
+            if (str_starts_with($cleanPhone, '880') && strlen($cleanPhone) === 13) {
+                $cleanPhone = '0' . substr($cleanPhone, 3);
+            }
+
+            $query->where(function ($q) use ($rawPhone, $cleanPhone) {
+                $q->where('parties.phone', 'like', '%' . $rawPhone . '%');
+                if (!empty($cleanPhone)) {
+                    $q->orWhere('parties.phone', 'like', '%' . $cleanPhone . '%')
+                      ->orWhere('orders.shipping_address', 'like', '%' . $cleanPhone . '%');
+                }
+            });
         }
 
         if (!empty($filters['order_no'])) {
@@ -93,12 +105,23 @@ class FrontendOrderService
 
         // Search functionality
         if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
+            $searchTerm = trim($filters['search']);
+            $cleanPhone = preg_replace('/[^0-9]/', '', $searchTerm);
+            if (str_starts_with($cleanPhone, '880') && strlen($cleanPhone) === 13) {
+                $cleanPhone = '0' . substr($cleanPhone, 3);
+            }
+
+            $query->where(function ($q) use ($searchTerm, $cleanPhone) {
                 $q->where('orders.order_no', 'like', '%' . $searchTerm . '%')
                     ->orWhere('orders.reference_no', 'like', '%' . $searchTerm . '%')
                     ->orWhere('parties.name', 'like', '%' . $searchTerm . '%')
                     ->orWhere('parties.phone', 'like', '%' . $searchTerm . '%');
+
+                // If user searched with formatted phone (e.g. 01703-236221, +8801703-236221)
+                if (!empty($cleanPhone) && strlen($cleanPhone) >= 4) {
+                    $q->orWhere('parties.phone', 'like', '%' . $cleanPhone . '%')
+                      ->orWhere('orders.shipping_address', 'like', '%' . $cleanPhone . '%');
+                }
             });
         }
 
