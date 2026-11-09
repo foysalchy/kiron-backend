@@ -3,6 +3,19 @@
     @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
 @endsection
 @section('content')
+<style>
+    @media(max-width:576px){
+        .fixed-co{
+            position: fixed;
+  left: 0;
+  right: 0;
+  width: 90%;
+  margin: auto;
+  bottom: 20px;
+  z-index: 999;
+        }
+    }
+</style>
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
 
@@ -277,7 +290,7 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full fixed-co primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
                             Confirm Order
                         </button>
                     </div>
