@@ -49,6 +49,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],
                 'login_required_for_checkout' => ['nullable', 'in:0,1'],
+                'products_page_cta' => ['nullable', 'string', 'in:both,wp,call'],
                 'allow_search_engine_index' => ['nullable', 'boolean'],
                 'watermark_status' => ['nullable', 'boolean'],
                 'watermark_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

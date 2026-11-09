@@ -43,6 +43,7 @@ class SiteSetting extends Model
         'copy_right',
         'sms_forget_password',
         'login_required_for_checkout',
+        'products_page_cta',
         'allow_search_engine_index',
         'status',
         'meta_image',
