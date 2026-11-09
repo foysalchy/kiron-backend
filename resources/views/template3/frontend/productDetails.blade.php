@@ -333,14 +333,14 @@
                     <!-- Mobile: Order Now & Quick Order Buttons -->
                     <div class="md:hidden mb-6 space-y-2.5">
                         <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
                         </button>
-                        <button type="button" id="btn-quick-order-mobile" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                        <!-- <button type="button" id="btn-quick-order-mobile" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
                             <i class="fas fa-bolt"></i>
                             <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order' }}</span>
-                        </button>
+                        </button> -->
                     </div>
 
                     <!-- Desktop: 3 Buttons Grid -->
@@ -365,13 +365,13 @@
                     </div>
 
                     <!-- Desktop: Quick Order Button (Below Order Now) -->
-                    <div class="hidden md:block mb-8">
+                    <!-- <div class="hidden md:block mb-8">
                         <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
                             <i class="fas fa-bolt"></i>
                             <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
                         </button>
-                    </div>
+                    </div> -->
 
                     @php
                         $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
@@ -422,7 +422,7 @@
                         <div class="my-2">
                             <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                                 target="_blank"
-                                class="w-full bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                class="w-full bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-semibold transition-colors px-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
