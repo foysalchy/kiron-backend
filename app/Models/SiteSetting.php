@@ -228,4 +228,21 @@ class SiteSetting extends Model
 
         return false;
     }
+
+    public function showCallCta(): bool
+    {
+        $cta = $this->products_page_cta ?? 'both';
+        return in_array($cta, ['both', 'call']);
+    }
+
+    public function showWpCta(): bool
+    {
+        $cta = $this->products_page_cta ?? 'both';
+        return in_array($cta, ['both', 'wp']);
+    }
+
+    public function isBothCta(): bool
+    {
+        return ($this->products_page_cta ?? 'both') === 'both';
+    }
 }

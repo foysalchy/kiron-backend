@@ -307,18 +307,68 @@
                         </div>
                     @endif
 
-                    <div class="bg-gray-100 py-3 px-3 rounded">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="text-center flex-1 text-gray-700">Call or WhatsApp to order directly</div>
-                            @if(!empty($activePreviewTheme))
-                                <x-preview-badge name="Social Setting" />
-                            @endif
+                    @php
+                        $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
+                        if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
+                            $waPhone = '88' . $rawPhone;
+                        } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
+                            $waPhone = '880' . $rawPhone;
+                        } else {
+                            $waPhone = $rawPhone;
+                        }
+                    @endphp
+
+                    @if(!empty($setup) && $setup->isBothCta())
+                        <div class="bg-gray-100 py-3 px-3 rounded">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="text-center flex-1 text-gray-700">Call or WhatsApp to order directly</div>
+                                @if(!empty($activePreviewTheme))
+                                    <x-preview-badge name="Social Setting" />
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 md:gap-3">
+                                <a href="tel:{{ $setup->phone }}"
+                                    class="bg-[#EE4D2D] hover:bg-red-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
+                                        <path
+                                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                        </path>
+                                    </svg>
+                                    Call Now
+                                </a>
+
+                                <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                                    target="_blank"
+                                    class="bg-[#25D366] hover:bg-green-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                    </svg>
+                                    WhatsApp
+                                </a>
+                            </div>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-2 md:gap-3">
-
+                    @elseif(!empty($setup) && $setup->showWpCta())
+                        <div class="my-2">
+                            <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                                target="_blank"
+                                class="w-full bg-[#25D366] hover:bg-green-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                </svg>
+                                WhatsApp For order
+                            </a>
+                        </div>
+                    @elseif(!empty($setup) && $setup->showCallCta())
+                        <div class="my-2">
                             <a href="tel:{{ $setup->phone }}"
-                                class="bg-[#EE4D2D] hover:bg-red-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                class="w-full bg-[#EE4D2D] hover:bg-red-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
@@ -326,32 +376,10 @@
                                         d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                     </path>
                                 </svg>
-                                Call Now
-                            </a>
-
-                            @php
-                                $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
-                                if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
-                                    $waPhone = '88' . $rawPhone;
-                                } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
-                                    $waPhone = '880' . $rawPhone;
-                                } else {
-                                    $waPhone = $rawPhone;
-                                }
-                            @endphp
-
-                            <a href="https://wa.me/{{ $waPhone }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
-                                target="_blank"
-                                class="bg-[#25D366] hover:bg-green-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
-                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                                </svg>
-                                WhatsApp
+                                Call for order
                             </a>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
             @php

@@ -323,42 +323,61 @@
                         @endif
 
                         <!-- Contact Help -->
-                        <div class="mt-3 md:mt-4 border border-gray-200 rounded-xl p-4 md:p-5 bg-white">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="font-semibold text-gray-800 text-sm md:text-base">
-                                    Have a question?
-                                </p>
-                                @if(!empty($activePreviewTheme))
-                                    <x-preview-badge name="Social Setting" />
-                                @endif
+                        @php
+                            $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
+                            if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
+                                $waPhone = '88' . $rawPhone;
+                            } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
+                                $waPhone = '880' . $rawPhone;
+                            } else {
+                                $waPhone = $rawPhone;
+                            }
+                        @endphp
+
+                        @if(!empty($setup) && $setup->isBothCta())
+                            <div class="mt-3 md:mt-4 border border-gray-200 rounded-xl p-4 md:p-5 bg-white">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="font-semibold text-gray-800 text-sm md:text-base">
+                                        Have a question?
+                                    </p>
+                                    @if(!empty($activePreviewTheme))
+                                        <x-preview-badge name="Social Setting" />
+                                    @endif
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 md:gap-3">
+                                    <!-- Call -->
+                                    <a href="tel:{{ $setup->phone }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+                                        <i class="fa-solid fa-phone text-xs"></i>
+                                        <span>Call: {{ $setup->phone }}</span>
+                                    </a>
+
+                                    <!-- WhatsApp -->
+                                    <a href="https://wa.me/{{ $waPhone }}" target="_blank"
+                                        class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-600 transition-all duration-200">
+                                        <i class="fa-brands fa-whatsapp text-base"></i>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                </div>
                             </div>
-
-                            <div class="flex flex-wrap gap-2 md:gap-3">
-                                <!-- Call -->
-                                <a href="tel:{{ $setup->phone }}"
-                                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
-                                    <i class="fa-solid fa-phone text-xs"></i>
-                                    <span>Call: {{ $setup->phone }}</span>
-                                </a>
-
-                                <!-- WhatsApp -->
-                                @php
-                                    $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
-                                    if (str_starts_with($rawPhone, '01') && strlen($rawPhone) === 11) {
-                                        $waPhone = '88' . $rawPhone;
-                                    } elseif (str_starts_with($rawPhone, '1') && strlen($rawPhone) === 10) {
-                                        $waPhone = '880' . $rawPhone;
-                                    } else {
-                                        $waPhone = $rawPhone;
-                                    }
-                                @endphp
+                        @elseif(!empty($setup) && $setup->showWpCta())
+                            <div class="mt-3 md:mt-4">
                                 <a href="https://wa.me/{{ $waPhone }}" target="_blank"
-                                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-600 transition-all duration-200">
+                                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-green-200 rounded-lg bg-green-50 text-green-700 text-sm font-medium hover:bg-green-100 transition-all duration-200">
                                     <i class="fa-brands fa-whatsapp text-base"></i>
-                                    <span>WhatsApp</span>
+                                    <span>WhatsApp For order</span>
                                 </a>
                             </div>
-                        </div>
+                        @elseif(!empty($setup) && $setup->showCallCta())
+                            <div class="mt-3 md:mt-4">
+                                <a href="tel:{{ $setup->phone }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-all duration-200">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                    <span>Call for order</span>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
