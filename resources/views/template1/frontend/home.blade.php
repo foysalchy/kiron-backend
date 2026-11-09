@@ -118,7 +118,7 @@
                                     <picture class="block w-full h-full">
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url }}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url }}">
-                                        <img src="{{ $slider->image_url }}" class="w-full h-full object-contain rounded-lg"
+                                        <img src="{{ $slider->image_url }}" class="w-full h-full object-cover rounded-lg"
                                             alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager"
                                             @else loading="lazy" @endif>
                                     </picture>
@@ -126,7 +126,7 @@
                             </div>
                         @empty
                             <div class="min-w-full h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                    alt="default image" class="w-full h-full object-contain rounded-lg" loading="lazy" width="800"
+                                    alt="default image" class="w-full h-full object-cover rounded-lg" loading="lazy" width="800"
                                     height="800"></div>
                         @endforelse
                     </div>
@@ -406,53 +406,28 @@
                     <x-preview-badge name="Products" :isDummy="!empty($popularProducts->first()?->is_dummy)" />
                 </div>
             @endif
-            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
+            <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
                 <!-- Header -->
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">You May Like</h2>
-                    <a href="{{ route('shop.index') }}">
-                        <button aria-label="View all popular products"
-                            class="primary-bg primary-bg-hover font-semibold text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
-                            View all
-                        </button>
-                    </a>
+                <div class="mb-6">
+                    <h2 class="text-md md:text-lg font-bold mb-4 md:mb-6 uppercase tracking-tight">You May Like</h2>
                 </div>
 
-                <!-- Carousel Wrapper -->
-                <div class="relative">
+                <!-- Product Grid -->
+                <div class="grid grid-cols-2 min-[540px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
+                    @foreach ($popularProducts->take(12) as $product)
+                        <x-template1.product-card :product="$product" />
+                    @endforeach
 
-                    <!-- Left Arrow -->
-                    <button onclick="scrollPML(-280)" aria-label="left arrow"
-                        class="pml-nav-btn cursor-pointer hidden absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                            stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
-                    </button>
+                </div>
 
-                    <!-- Track -->
-                    <div id="pml-track" class="flex md:gap-4 gap-2 overflow-x-auto scroll-smooth no-scrollbar pb-4"
-                        style="-ms-overflow-style:none; scrollbar-width:none;">
-
-                        @foreach ($popularProducts as $product)
-                            <div class="flex-shrink-0 w-[165px] md:w-[240px] h-auto">
-                                <x-template1.product-card :product="$product" />
-                            </div>
-                        @endforeach
-
-                    </div><!-- /#pml-track -->
-
-                    <!-- Right Arrow -->
-                    <button onclick="scrollPML(280)" aria-label="Scroll right"
-                        class="pml-nav-btn cursor-pointer hidden absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                            stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </button>
-
-                </div><!-- /.relative -->
+                <!-- View More Button -->
+                <div class="flex justify-center mt-10">
+                    <a href="{{ route('shop.index') }}"
+                        class="primary-bg text-primary hover:bg-[var(--secondary-color)] hover:text-[var(--secondary-text)] hover:font-semibold font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                        View More
+                    </a>
+                </div>
 
             </div>
         </section>
@@ -505,7 +480,6 @@
             toggleBtns('#cat-slider', '.cat-nav-btn');
             toggleBtns('#brand-track', '.brand-nav-btn');
             toggleBtns('#na-track', '.na-nav-btn');
-            toggleBtns('#pml-track', '.pml-nav-btn');
 
             document.querySelectorAll('.group-track').forEach(function (track) {
                 const trackId = track.id;
@@ -526,16 +500,6 @@
                 left: distance,
                 behavior: 'smooth'
             });
-        }
-
-        function scrollPML(distance) {
-            const track = document.getElementById('pml-track');
-            if (track) {
-                track.scrollBy({
-                    left: distance,
-                    behavior: 'smooth'
-                });
-            }
         }
 
         function scrollBrands(distance) {
