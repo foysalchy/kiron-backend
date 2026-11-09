@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
@@ -17,8 +18,17 @@ class CancellationReportController extends Controller
             'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
         ]);
 
+        $cancellationStatuses = [
+            Status::Cancelled->value,
+            Status::Fake->value,
+            Status::Returned->value,
+            Status::ReturntoCourier->value,
+            Status::ReturnReceived->value,
+            Status::ReturnRequest->value,
+        ];
+
         $query = Order::query()
-            ->whereIn('status', ['cancelled', 'fake', 'returned', 'rts']); // self_status mapped ones
+            ->whereIn('status', $cancellationStatuses);
 
         if ($request->start_date) {
             $query->whereDate('created_at', '>=', $request->start_date);
@@ -31,20 +41,21 @@ class CancellationReportController extends Controller
 
         $report = [];
         foreach ($orders as $order) {
-            $status = strtolower($order->status);
+            $statusEnum = $order->status instanceof Status ? $order->status : Status::tryFrom((int)$order->status);
+            $statusLabel = $statusEnum ? $statusEnum->label() : 'Unknown';
 
-            if (!isset($report[$status])) {
-                $report[$status] = [
-                    'status' => ucfirst($status),
+            if (!isset($report[$statusLabel])) {
+                $report[$statusLabel] = [
+                    'status' => $statusLabel,
                     'count' => 0,
                     'lost_revenue' => 0,
                     'lost_courier_charge' => 0,
                 ];
             }
 
-            $report[$status]['count']++;
-            $report[$status]['lost_revenue'] += $order->grand_total ?? $order->total_amount ?? 0;
-            $report[$status]['lost_courier_charge'] += $order->other_charges ?? 0;
+            $report[$statusLabel]['count']++;
+            $report[$statusLabel]['lost_revenue'] += $order->grand_total ?? $order->total_amount ?? 0;
+            $report[$statusLabel]['lost_courier_charge'] += $order->other_charges ?? 0;
         }
 
         return ResponseHelper::success(array_values($report));
