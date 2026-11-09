@@ -197,7 +197,7 @@
                         {!! $product->short_description !!}
                     </div>
 
-                    <div class="flex items-baseline gap-4 mb-6">
+                    <div class="flex items-baseline gap-4 mb-0">
                         @php
                             $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
                         @endphp
@@ -272,7 +272,7 @@
                     @endif
 
                     <!-- Quantity -->
-                    <div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8 mt-4">
+                    <div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8 mt-2">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-11 md:h-10 shrink-0">
                             <button type="button" aria-label="Decrease quantity" onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>

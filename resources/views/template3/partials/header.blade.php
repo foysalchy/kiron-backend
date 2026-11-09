@@ -10,6 +10,7 @@
     <!-- 1. Main Header (Logo, Search, User Actions) -->
     <div class="container mx-auto px-3 sm:px-4 py-3 md:py-4 flex items-center justify-between gap-2 sm:gap-4 lg:gap-10">
 
+    <div class="flex gap-2">
         <!-- Mobile Menu Toggle -->
         <button onclick="toggleMobileMenu()" aria-label="Open menu"
             class="md:hidden text-header text-xl sm:text-2xl focus:outline-none flex-shrink-0">
@@ -20,12 +21,13 @@
         <a href="{{ route('home') }}" class="flex-shrink min-w-0">
             @if ($setup && $setup->nav_logo_url)
                 <img src="{{ $setup->nav_logo_url }}" height="80" width="200"
-                    alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-10 sm:h-12 md:h-16 max-w-full w-auto object-contain" />
+                    alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-8 sm:h-12 md:h-16 max-w-full w-auto object-contain" />
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
                         class="text-blue-600">ZONE</span></span>
             @endif
         </a>
+        </div>
 
         <!-- Segmented Search Bar with Suggestions -->
         <form action="{{ route('shop.index') }}" method="GET" class="hidden md:flex flex-1 max-w-3xl relative"
