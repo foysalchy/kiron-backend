@@ -441,7 +441,7 @@
                 <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="" width=""
                     alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold [var(--primary-color)]">খাঁটি ভাই</span>
+                <span class="text-xl font-bold [var(--primary-color)]">{{ $setup->shop_name ?? 'Shop' }}</span>
             @endif
             <button onclick="toggleMobileMenu()" class="[var(--primary-color)] text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
@@ -510,12 +510,12 @@
                 @endforeach
             @else
                 <a href="{{ route('home') }}"
-                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">হোমপেজ</a>
+                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Home</a>
                 <a href="{{ route('flash.sale') }}"
-                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">অফার</a>
+                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Offers</a>
 
                 <div class="pt-2 mt-2 border-t border-gray-100">
-                    <p class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">ক্যাটাগরি সমূহ
+                    <p class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Categories
                     </p>
                     @foreach ($headerCategories as $mega)
                         @php
@@ -685,7 +685,7 @@
                         defaultContent.classList.add('hidden');
                         liveResults.classList.remove('hidden');
                         liveResults.innerHTML =
-                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>খোঁজা হচ্ছে...</div>';
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
 
                         // ক্যাটাগরি স্লাগটি প্যারামিটার হিসেবে পাঠানো হচ্ছে
                         fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}&category=${selectedCategory}`, {
@@ -708,7 +708,7 @@
                                     });
                                 } else {
                                     liveResults.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">পণ্য পাওয়া যায়নি।</div>';
+                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
                                 }
                             })
                             .catch(err => {
