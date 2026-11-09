@@ -272,7 +272,7 @@
                     @endif
 
                     <!-- Quantity -->
-                    <div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8 mt-2">
+                    <div class="flex items-center gap-3 md:gap-6 mb-3 md:mb-8 mt-2">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-11 md:h-10 shrink-0">
                             <button type="button" aria-label="Decrease quantity" onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>
@@ -331,7 +331,7 @@
 
                     <!-- Action Buttons -->
                     <!-- Mobile: Order Now & Quick Order Buttons -->
-                    <div class="md:hidden mb-4 space-y-2.5">
+                    <div class="md:hidden mb-3 space-y-2.5">
                         <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
