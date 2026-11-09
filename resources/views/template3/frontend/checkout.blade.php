@@ -11,7 +11,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
-                <div class="lg:col-span-2 lg:order-1 space-y-6">
+                <div class="lg:col-span-2 lg:order-1 space-y-2">
 
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
