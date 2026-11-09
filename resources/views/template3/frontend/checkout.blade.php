@@ -73,7 +73,7 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-6 border border-gray-200 mb-0">
+                    <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-0 border border-gray-200 mb-0">
                         <h3 class="text-[14px] font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
