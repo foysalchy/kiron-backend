@@ -330,16 +330,21 @@
                     @endif
 
                     <!-- Action Buttons -->
-                    <!-- Mobile: Order Now Full-Width Button -->
-                    <div class="md:hidden mb-6">
+                    <!-- Mobile: Order Now & Quick Order Buttons -->
+                    <div class="md:hidden mb-6 space-y-2.5">
                         <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
                         </button>
+                        <button type="button" id="btn-quick-order-mobile" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                            class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fas fa-bolt"></i>
+                            <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order' }}</span>
+                        </button>
                     </div>
 
                     <!-- Desktop: 3 Buttons Grid -->
-                    <div class="hidden md:grid md:grid-cols-3 gap-3 mb-8">
+                    <div class="hidden md:grid md:grid-cols-3 gap-3 mb-3">
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
@@ -356,6 +361,15 @@
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
+                        </button>
+                    </div>
+
+                    <!-- Desktop: Quick Order Button (Below Order Now) -->
+                    <div class="hidden md:block mb-8">
+                        <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                            class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fas fa-bolt"></i>
+                            <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
                         </button>
                     </div>
 
@@ -729,6 +743,9 @@
                 </div>
             </div>
         @endif
+
+        {{-- Quick Order Popup Modal Component --}}
+        <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
 
     </section>
 @endsection
