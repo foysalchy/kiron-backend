@@ -19,6 +19,31 @@
         border-left: 4px solid #0b5abe;
   padding-left: 5px;
     }
+    .animate-shake {
+  animation:4s cubic-bezier(.35,.06,.2,.98) infinite both rsiShaker
+}
+@keyframes rsiShaker {
+  0%,
+  25%,
+  to {
+    transform:scaleX(1)
+  }
+  2.5%,
+  5% {
+    transform:scale3d(.97,.97,.97)rotate(-1deg)
+  }
+  7.5%,
+  12.5%,
+  17.5%,
+  22.5% {
+    transform:scale3d(1.03,1.03,1.03)rotate(1deg)
+  }
+  10%,
+  15%,
+  20% {
+    transform:scale3d(1.03,1.03,1.03)rotate(-1deg)
+  }
+}
 </style>
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
@@ -303,8 +328,8 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full fixed-co primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
-                            Confirm Order
+                            class="w-full animate-shak fixed-co primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            অর্ডার কনফার্ম করুন
                         </button>
                     </div>
                 </div>
