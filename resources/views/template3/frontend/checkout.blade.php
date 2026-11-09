@@ -4,7 +4,7 @@
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <h1 class="px-6 text-2xl font-bold text-gray-900 mb-8 tracking-tight">Checkout</h1>
+        <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -16,23 +16,21 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-6">
-                            <h2 class="text-[20px] font-semibold text-gray-800 leading-tight">
+                            <h2 class="text-[16px] font- text-gray-800 leading-tight">
                                 অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
                             </h2>
                         </div>
                         <div class="p-6 space-y-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Your Name <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="text" name="name" placeholder="Enter your full name" required
+                                  
+                                    <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Phone Number <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" placeholder="Your mobile number" required
+                                    
+                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
@@ -55,9 +53,8 @@
                              <input type="hidden" name="district" placeholder="Your city" required
                                         value="none"/>
                             <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">Your Address <span
-                                        class="text-red-500">*</span></label>
-                                <textarea name="address" placeholder="Your address" rows="3" required
+                               
+                                <textarea name="address" placeholder="আপনার ঠিকানা *" rows="3" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -77,17 +74,17 @@
 
                     <!-- 2. Payment Method Card -->
                     <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-6 border border-gray-200">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h3>
+                        <h3 class="text-[14px] font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
                             <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
                                 <label
-                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
+                                    class="flex items-center space-x-4 p-2 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
                                         class="w-5 h-5 accent-[var(--primary-color)]">
-                                    <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
+                                    <span class="text-sm font-medium text-gray-700 group-hover:text-blacke">{{ $method->name }}</span>
                                 </label>
 
                                 <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
@@ -137,7 +134,7 @@
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
                             <div class="mb-8">
-                                <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
+                                <h2 class="text-[14px] md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
                                     Method</h2>
                                 <div class="space-y-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
