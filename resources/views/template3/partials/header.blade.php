@@ -18,8 +18,8 @@
 
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex-shrink min-w-0">
-            @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+            @if ($setup && $setup->nav_logo_url)
+                <img src="{{ $setup->nav_logo_url }}" height="80" width="200"
                     alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-10 sm:h-12 md:h-16 max-w-full w-auto object-contain" />
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
@@ -437,8 +437,8 @@
 
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
-            @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="" width=""
+            @if ($setup && $setup->nav_logo_url)
+                <img src="{{ $setup->nav_logo_url }}" height="" width=""
                     alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold [var(--primary-color)]">{{ $setup->shop_name ?? 'Shop' }}</span>

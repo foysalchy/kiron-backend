@@ -21,7 +21,7 @@
     @include('components.frontend.notice-marquee', ['notices' => $notices])
 
     <!-- HERO SECTION -->
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 container mx-auto px-4 lg:px-0">
         @if(!empty($activePreviewTheme))
             <div class="mb-2 flex items-center gap-4">
                 <x-preview-badge name="Slider" :isDummy="!empty($mainSliders->first()?->is_dummy)" />
@@ -39,12 +39,12 @@
                     @foreach ($categories as $category)
                         <div class="group border-b border-gray-200">
                             <a href="{{ url($category->slug) }}"
-                                class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
+                                class="w-full flex items-center justify-between p-2 hover:bg-orange-50 rounded-xl transition-all">
                                 <div class="flex items-center gap-3 ">
                                     <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
-                                        class="w-8 h-8 rounded-full object-cover border border-gray-100"
+                                        class="w-[35px] h-[35px] rounded-full object-contain p-[6px] border border-[#8080802b] shrink-0"
                                         alt="{{ $category->name }}">
-                                    <span class="text-base text-gray-800">{{ $category->name }}</span>
+                                    <span class="text-sm text-gray-800">{{ $category->name }}</span>
                                 </div>
                                 @if ($category->subCategories->count() > 0)
                                     <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
@@ -54,28 +54,47 @@
                             <!-- subcategory panel -->
                             @if ($category->subCategories->count() > 0)
                                 <div
-                                    class="absolute left-full top-0 w-[240px] h-full bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 overflow-y-auto before:content-[''] before:absolute before:-left-4 before:top-0 before:w-5 before:h-full">
+                                    class="absolute left-full top-0 w-[240px] h-full bg-white shadow-xl rounded-r-lg border border-gray-100 py-2 hidden group-hover:block z-40 before:content-[''] before:absolute before:-left-4 before:top-0 before:w-5 before:h-full">
 
                                     @foreach ($category->subCategories as $subCategory)
                                         <!-- sub category -->
                                         <div class="group/sub">
                                             <a href="{{ url($subCategory->slug) }}"
                                                 class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[var(--primary-color)] transition-colors">
-                                                <span>{{ $subCategory->name }}</span>
+                                                <span class="truncate">{{ $subCategory->name }}</span>
                                                 @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
-                                                    <i class="fas fa-chevron-right text-[9px]"></i>
+                                                    <i class="fas fa-chevron-right text-[9px] text-gray-400"></i>
                                                 @endif
                                             </a>
 
                                             <!-- mini category pannel -->
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
                                                 <div
-                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 overflow-y-auto before:content-[''] before:absolute before:-left-3 before:top-0 before:w-4 before:h-full">
+                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-xl rounded-r-lg border border-gray-100 py-2 hidden group-hover/sub:block z-50 before:content-[''] before:absolute before:-left-3 before:top-0 before:w-4 before:h-full">
                                                     @foreach ($subCategory->miniCategories as $miniCategory)
-                                                        <a href="{{ url($miniCategory->slug) }}"
-                                                            class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
-                                                            {{ $miniCategory->name }}
-                                                        </a>
+                                                        <!-- mini category -->
+                                                        <div class="group/mini">
+                                                            <a href="{{ url($miniCategory->slug) }}"
+                                                                class="flex items-center justify-between px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
+                                                                <span class="truncate">{{ $miniCategory->name }}</span>
+                                                                @if ($miniCategory->extraCategories && $miniCategory->extraCategories->count() > 0)
+                                                                    <i class="fas fa-chevron-right text-[9px] text-gray-400"></i>
+                                                                @endif
+                                                            </a>
+
+                                                            <!-- extra category panel -->
+                                                            @if ($miniCategory->extraCategories && $miniCategory->extraCategories->count() > 0)
+                                                                <div
+                                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-r-lg border border-gray-100 py-2 hidden group-hover/mini:block z-[60] overflow-y-auto no-scrollbar before:content-[''] before:absolute before:-left-3 before:top-0 before:w-4 before:h-full">
+                                                                    @foreach ($miniCategory->extraCategories as $extraCategory)
+                                                                        <a href="{{ url($extraCategory->slug) }}"
+                                                                            class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors truncate">
+                                                                            {{ $extraCategory->name }}
+                                                                        </a>
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
+                                                        </div>
                                                     @endforeach
                                                 </div>
                                             @endif
@@ -99,7 +118,7 @@
                                     <picture class="block w-full h-full">
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url }}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url }}">
-                                        <img src="{{ $slider->image_url }}" class="w-full h-full object-cover"
+                                        <img src="{{ $slider->image_url }}" class="w-full h-full object-contain rounded-lg"
                                             alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager"
                                             @else loading="lazy" @endif>
                                     </picture>
@@ -107,7 +126,7 @@
                             </div>
                         @empty
                             <div class="min-w-full h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                    alt="default image" class="w-full h-full object-cover" loading="lazy" width="800"
+                                    alt="default image" class="w-full h-full object-contain rounded-lg" loading="lazy" width="800"
                                     height="800"></div>
                         @endforelse
                     </div>
@@ -127,7 +146,7 @@
 
     <!-- TOP CATEGORIES SECTION -->
     @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Menu Setting" :isDummy="!empty($featureCategory['is_dummy'])" />
@@ -173,7 +192,7 @@
     @endif
     <!-- NEW ARRIVALS SECTION -->
     @if ($newArrivals->count() > 0)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Products" :isDummy="!empty($newArrivals->first()?->is_dummy)" />
@@ -235,7 +254,7 @@
     @endif
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Product Group" :isDummy="!empty($group->is_dummy)" />
@@ -287,7 +306,7 @@
 
     <!-- DUAL BANNER SECTION -->
     @if ($middleSliders->count() > 0)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Slider" :isDummy="!empty($middleSliders->first()?->is_dummy)" />
@@ -323,7 +342,7 @@
     @endif
     <!-- POPULAR BRANDS SECTION -->
     @if ($brands->count() > 0)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Brand" :isDummy="!empty($brands->first()?->is_dummy)" />
@@ -381,47 +400,72 @@
 
     @if ($popularProducts->count() > 0)
         <!-- YOU MAY LIKE SECTION -->
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <section class="py-4 container mx-auto px-4 lg:px-0">
             @if(!empty($activePreviewTheme))
                 <div class="mb-2">
                     <x-preview-badge name="Products" :isDummy="!empty($popularProducts->first()?->is_dummy)" />
                 </div>
             @endif
-            <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
+            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
                 <!-- Header -->
-                <div class="mb-6">
-                    <h2 class="text-md md:text-lg font-bold mb-4 md:mb-6 uppercase tracking-tight">You May Like</h2>
-                </div>
-
-                <!-- Product Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
-                    @foreach ($popularProducts->take(12) as $product)
-                        <x-template1.product-card :product="$product" />
-                    @endforeach
-
-                </div>
-
-                <!-- View More Button -->
-                <div class="flex justify-center mt-10">
-                    <a href="{{ route('shop.index') }}"
-                        class="primary-bg text-primary hover:bg-[var(--secondary-color)] hover:text-[var(--secondary-text)] hover:font-semibold font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
-                        View More
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">You May Like</h2>
+                    <a href="{{ route('shop.index') }}">
+                        <button aria-label="View all popular products"
+                            class="primary-bg primary-bg-hover font-semibold text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
                     </a>
                 </div>
+
+                <!-- Carousel Wrapper -->
+                <div class="relative">
+
+                    <!-- Left Arrow -->
+                    <button onclick="scrollPML(-280)" aria-label="left arrow"
+                        class="pml-nav-btn cursor-pointer hidden absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+
+                    <!-- Track -->
+                    <div id="pml-track" class="flex md:gap-4 gap-2 overflow-x-auto scroll-smooth no-scrollbar pb-4"
+                        style="-ms-overflow-style:none; scrollbar-width:none;">
+
+                        @foreach ($popularProducts as $product)
+                            <div class="flex-shrink-0 w-[165px] md:w-[240px] h-auto">
+                                <x-template1.product-card :product="$product" />
+                            </div>
+                        @endforeach
+
+                    </div><!-- /#pml-track -->
+
+                    <!-- Right Arrow -->
+                    <button onclick="scrollPML(280)" aria-label="Scroll right"
+                        class="pml-nav-btn cursor-pointer hidden absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+
+                </div><!-- /.relative -->
 
             </div>
         </section>
     @endif
     @if (!empty($homePageData?->description))
-        <section class="w-full py-6 px-4 font-manrope">
+        <section class="w-full py-4 font-manrope">
             <div class="p-0 container mx-auto">
                 @if (!empty($activePreviewTheme))
                     <div class="mb-2">
                         <x-preview-badge name="SEO & Content" :isDummy="!empty($homePageData->is_dummy)" />
                     </div>
                 @endif
-                <div class="bg-gray-100 border border-gray-200 rounded-lg px-6 py-6 prose max-w-none">
+                <div class="bg-white border border-gray-200 rounded-lg px-6 py-6 prose max-w-none">
                     {!! $homePageData->description !!}
                 </div>
             </div>
@@ -461,6 +505,7 @@
             toggleBtns('#cat-slider', '.cat-nav-btn');
             toggleBtns('#brand-track', '.brand-nav-btn');
             toggleBtns('#na-track', '.na-nav-btn');
+            toggleBtns('#pml-track', '.pml-nav-btn');
 
             document.querySelectorAll('.group-track').forEach(function (track) {
                 const trackId = track.id;
@@ -481,6 +526,16 @@
                 left: distance,
                 behavior: 'smooth'
             });
+        }
+
+        function scrollPML(distance) {
+            const track = document.getElementById('pml-track');
+            if (track) {
+                track.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function scrollBrands(distance) {

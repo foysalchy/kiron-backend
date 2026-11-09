@@ -50,10 +50,10 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="flex items-center gap-2 text-[10px] md:text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-0 md:pt-2">
+            class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm font-medium text-gray-500 w-full min-w-0 pt-0 md:pt-2 mb-4">
 
             <a href="{{ route('home') }}"
-                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1 shrink-0">
                 <i class="fas fa-home text-xs"></i> Home
             </a>
 
@@ -63,17 +63,17 @@
                         class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                     </svg>
-                    <a href="{{ url($item['slug']) }}"
-                        class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
+                    <a href="{{ url($item['slug']) }}" title="{{ $item['name'] }}"
+                        class="hover:text-[var(--primary-color)] transition-colors truncate max-w-[80px] xs:max-w-[120px] sm:max-w-[160px] md:max-w-none shrink">{{ $item['name'] }}</a>
                 @endforeach
             @endif
 
             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
-            <span
-                class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <span title="{{ $product->title }}"
+                class="text-[var(--primary-color)] font-bold truncate flex-1 min-w-0">{{ $product->title }}</span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -224,7 +224,7 @@
                     @endphp
 
                     <span id="discount-badge"
-                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
+                        class="{{ $hasDiscount ? 'inline-block' : '!hidden' }} bg-[#FFCF00] text-black text-xs md:text-sm font-bold px-2.5 md:px-3 py-1 rounded-full self-center">
                         @if ($hasDiscount)
                             {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
                             OFF
@@ -973,9 +973,13 @@
                 if (regularPrice && regularPrice > salePrice) {
                     const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
                     badgeEl.innerText = percent + '% OFF';
+                    badgeEl.classList.remove('!hidden');
                     badgeEl.classList.remove('hidden');
+                    badgeEl.classList.add('inline-block');
                 } else {
-                    if (badgeEl) badgeEl.classList.add('hidden');
+                    badgeEl.classList.add('!hidden');
+                    badgeEl.classList.add('hidden');
+                    badgeEl.classList.remove('inline-block');
                 }
             }
         }

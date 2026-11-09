@@ -285,7 +285,7 @@
 
 
     <!-- Scroll To Top Button -->
-    <x-scroll-to-top />
+    <x-scroll-to-top bottom="bottom-52 md:bottom-8" />
 
     @stack('scripts')
     <script>

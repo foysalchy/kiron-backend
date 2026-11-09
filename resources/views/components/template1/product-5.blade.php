@@ -22,118 +22,109 @@
     $productUrl = url($product->slug ?? $product->id);
 @endphp
 
-<article
-    onclick="window.location.href='{{ $productUrl }}'"
-    class="menu-card group sear-corner bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer flex flex-col h-full">
+<article onclick="window.location.href='{{ $productUrl }}'"
+    class="menu-card group sear-corner p-3 bg-white border border-gray-100 rounded-2xl hover:shadow-md transition-all cursor-pointer flex flex-col h-full">
 
-  <div class="relative overflow-hidden aspect-square bg-[#f9f9f9]">
-    <img
-      src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
-      alt="{{ $product->title }}"
-      width="400"
-      height="320"
-      loading="lazy"
-      decoding="async"
-      class="w-full h-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-105"
-    >
+    <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
+        <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+            alt="{{ $product->title }}" width="400" height="320" loading="lazy" decoding="async"
+            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
 
-    @if ($product->status == \App\Enums\Status::Upcoming->value)
-        <div
-            class="absolute top-2.5 left-2.5 z-20 bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm leading-tight">
-            {{ \App\Enums\Status::Upcoming->label() }}
-        </div>
-    @endif
-    @if ($product->is_free_delivery)
-        <div class="absolute bottom-2.5 left-2.5 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-20">
-            Free Shipping
-        </div>
-    @endif
-
-    <button type="button"
-      onclick="event.stopPropagation(); toggleWishlist({{ $product->id }})"
-      aria-label="wishlist"
-      class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center hover:text-[var(--primary-color)] transition-colors">
-      <svg id="wish-icon-{{ $product->id }}" width="15" height="15" viewBox="0 0 24 24"
-        fill="{{ $isWishlisted ? '#D6431F' : 'none' }}"
-        stroke="{{ $isWishlisted ? '#D6431F' : 'currentColor' }}" stroke-width="2">
-        <path d="M12 21s-7-4.6-9.5-9C.7 8 2 4.5 5.3 4a4.7 4.7 0 0 1 6.7 2 4.7 4.7 0 0 1 6.7-2C21.9 4.5 23.3 8 21.5 12 19 16.4 12 21 12 21z"/>
-      </svg>
-    </button>
-  </div>
-
-  <div class="p-3 flex flex-col flex-1">
-
-    <p class="font-medium text-xs sm:text-sm text-gray-800 leading-snug line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors">
-      {{ $product->title }}
-    </p>
-
-    @if ($company->is_review == 1)
-      <div class="flex items-center gap-1 mt-1.5">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="#C99A45" stroke="#C99A45">
-          <polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 17 5.5 21 7.5 13.5 2 9 9 9"/>
-        </svg>
-        <span class="text-xs font-medium">{{ number_format($avgRating, 1) }}</span>
-        <span class="text-xs text-smoke">({{ $totalReviews }})</span>
-      </div>
-    @endif
-
-    <div class="flex items-center gap-1.5 flex-wrap mt-2">
-      <span class="font-bold text-xs sm:text-sm text-gray-900">
-        @if(($setup->currency_position ?? 'left') == 'left')
-          {{ $setup->currency }} {{ number_format($salePrice) }}
-        @else
-          {{ number_format($salePrice) }} {{ $setup->currency }}
+        @if ($product->status == \App\Enums\Status::Upcoming->value)
+            <div
+                class="absolute top-2.5 left-2.5 z-20 bg-blue-600 text-white text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full shadow-sm leading-tight">
+                {{ \App\Enums\Status::Upcoming->label() }}
+            </div>
         @endif
-      </span>
+        @if ($product->is_free_delivery)
+            <div
+                class="absolute bottom-2.5 left-2.5 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-20">
+                Free Shipping
+            </div>
+        @endif
 
-      @if ($regularPrice > $salePrice)
-        <span class="text-gray-400 line-through text-[11px] sm:text-xs">
-          @if(($setup->currency_position ?? 'left') == 'left')
-            {{ $setup->currency }} {{ number_format($regularPrice) }}
-          @else
-            {{ number_format($regularPrice) }} {{ $setup->currency }}
-          @endif
-        </span>
-      @endif
+        <button type="button" onclick="event.stopPropagation(); toggleWishlist({{ $product->id }})"
+            aria-label="wishlist"
+            class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center hover:text-[var(--primary-color)] transition-colors">
+            <svg id="wish-icon-{{ $product->id }}" width="15" height="15" viewBox="0 0 24 24"
+                fill="{{ $isWishlisted ? '#D6431F' : 'none' }}"
+                stroke="{{ $isWishlisted ? '#D6431F' : 'currentColor' }}" stroke-width="2">
+                <path
+                    d="M12 21s-7-4.6-9.5-9C.7 8 2 4.5 5.3 4a4.7 4.7 0 0 1 6.7 2 4.7 4.7 0 0 1 6.7-2C21.9 4.5 23.3 8 21.5 12 19 16.4 12 21 12 21z" />
+            </svg>
+        </button>
     </div>
 
-    <div class="flex items-center gap-2 mt-auto pt-2.5">
+    <div class="flex flex-col flex-1">
 
-      <!-- Order Now Button -->
-      <button
-          {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
-          aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}"
-          onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
-          class="flex-1 whitespace-nowrap h-9 px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
-          {{ ($isUpcoming || $isOutOfStock)
-              ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
-              : 'bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 cursor-pointer' }}"
-      >
-          {{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}
-      </button>
+        <p
+            class="font-medium text-xs sm:text-sm text-gray-800 leading-snug line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors">
+            {{ $product->title }}
+        </p>
 
-      <!-- Add to Cart Button -->
-      <button
-          {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
-          aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
-          onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-          class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
+        @if ($company->is_review == 1)
+            <div class="flex items-center gap-1 mt-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#C99A45" stroke="#C99A45">
+                    <polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 17 5.5 21 7.5 13.5 2 9 9 9" />
+                </svg>
+                <span class="text-xs font-medium">{{ number_format($avgRating, 1) }}</span>
+                <span class="text-xs text-smoke">({{ $totalReviews }})</span>
+            </div>
+        @endif
+
+        <div class="flex items-center gap-1.5 flex-wrap mt-2">
+            <span class="font-bold text-sm md:text-base text-gray-900">
+                @if(($setup->currency_position ?? 'left') == 'left')
+                    {{ $setup->currency }} {{ number_format($salePrice) }}
+                @else
+                    {{ number_format($salePrice) }} {{ $setup->currency }}
+                @endif
+            </span>
+
+            @if ($regularPrice > $salePrice)
+                <span class="text-gray-400 line-through text-xs md:text-sm">
+                    @if(($setup->currency_position ?? 'left') == 'left')
+                        {{ $setup->currency }} {{ number_format($regularPrice) }}
+                    @else
+                        {{ number_format($regularPrice) }} {{ $setup->currency }}
+                    @endif
+                </span>
+            @endif
+        </div>
+
+        <div class="flex items-center gap-2 mt-auto pt-2.5">
+
+            <!-- Order Now Button -->
+            <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
+                aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}"
+                onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
+                class="flex-1 whitespace-nowrap h-9 px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
           {{ ($isUpcoming || $isOutOfStock)
-              ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
-              : 'bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 text-white cursor-pointer' }}"
-      >
-          @if ($isOutOfStock)
-              <i class="fas fa-exclamation-circle text-xs"></i>
-          @else
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-                  <path d="M12 5v14M5 12h14"/>
-              </svg>
-          @endif
-      </button>
+    ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
+    : 'bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 cursor-pointer' }}">
+                {{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}
+            </button>
+
+            <!-- Add to Cart Button -->
+            <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
+                aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
+                onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
+                class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
+          {{ ($isUpcoming || $isOutOfStock)
+    ? 'bg-smoke-300 text-white cursor-not-allowed opacity-50'
+    : 'bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 text-white cursor-pointer' }}">
+                @if ($isOutOfStock)
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                @else
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
+                @endif
+            </button>
+
+        </div>
 
     </div>
-
-  </div>
 </article>
 @once
     @push('scripts')
@@ -187,8 +178,8 @@
                     let unitText = (pos === 'left') ? currency + " " + unitPrice.toLocaleString() : unitPrice.toLocaleString() + " " + currency;
                     let totalText = (pos === 'left') ? currency + " " + total.toLocaleString() : total.toLocaleString() + " " + currency;
 
-                    if(unitPriceDisplay) unitPriceDisplay.innerText = unitText;
-                    if(totalDisplay) totalDisplay.innerText = totalText;
+                    if (unitPriceDisplay) unitPriceDisplay.innerText = unitText;
+                    if (totalDisplay) totalDisplay.innerText = totalText;
                 }
             }
 
@@ -203,7 +194,7 @@
                 }
             }
 
-    function openVariationModal(id) {
+            function openVariationModal(id) {
                 modalSelectedIds = []; // শুরুতে ক্লিয়ার
                 const modal = document.getElementById('variation-modal');
                 const contentArea = document.getElementById('modal-content-area');
@@ -238,7 +229,7 @@
                 }
             }
 
-          function processAddVariation() {
+            function processAddVariation() {
                 if (modalSelectedIds.length === 0) {
                     toastr.warning("Please select at least one option."); return;
                 }
