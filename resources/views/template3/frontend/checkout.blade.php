@@ -20,7 +20,7 @@
                                 অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
                             </h2>
                         </div>
-                        <div class="p-6 space-y-3 mt-0">
+                        <div class="p-6 space-y-3 pt-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                   
