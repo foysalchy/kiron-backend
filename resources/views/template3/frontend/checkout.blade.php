@@ -236,7 +236,7 @@
                         </div>
 
                         <!-- 3. Cost Breakdown -->
-                        <div class="space-y-4 border-t border-gray-100 pt-6">
+                        <div class="space-y-1 border-t border-gray-100 pt-1">
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Subtotal:</span>
                                 <span class="text-md font-bold text-gray-900">
@@ -268,7 +268,7 @@
                                     @endif
                                 </span>
                             </div>
-                            <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                            <div class="flex justify-between items-center border-t border-gray-100 pt-0">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
                                 <span class="text-xl font-bold text-[var(--primary-color)]">
                                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span

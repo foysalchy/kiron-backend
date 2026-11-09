@@ -77,7 +77,7 @@
                                 <textarea name="address" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার পূর্ণ ঠিকানা লিখুন (বাসা/রোড, এলাকা, থানা, জেলা)' : 'Your full address' }}" rows="2" required
                                     class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-2 focus:ring-green-50 text-sm transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
-                            @guest('customer')
+                            <!-- @guest('customer')
                                 <div class="pt-1">
                                     <label class="flex items-center gap-2.5 cursor-pointer">
                                         <input type="checkbox" name="create_account" class="w-4 h-4 accent-[var(--primary-color)] rounded">
@@ -86,7 +86,7 @@
                                         </span>
                                     </label>
                                 </div>
-                            @endguest
+                            @endguest -->
                         </div>
 
                         <!-- 2. Payment Method Card -->

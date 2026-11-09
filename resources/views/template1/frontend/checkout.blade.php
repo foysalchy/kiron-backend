@@ -228,7 +228,7 @@
                         </div>
 
                         <!-- 3. Cost Breakdown -->
-                        <div class="space-y-4 border-t border-gray-100 pt-6">
+                        <div class="space-y-1 border-t border-gray-100 pt-1">
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Subtotal:</span>
                                 <span class="text-md font-bold text-gray-900">
