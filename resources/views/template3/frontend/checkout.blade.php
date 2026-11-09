@@ -26,15 +26,15 @@
                 <!-- LEFT COLUMN: Customer & Payment Info -->
                 <div class="lg:col-span-2 lg:order-1 space-y-2">
                      <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
-                        <div class="p-6">
+                        <div class="p-4">
                             <h2 class="text-[16px] font- text-gray-800 leading-tight">
                                আপনার অর্ডার আইটেম
                             </h2>
                         </div>
                         <!-- Product Row in Summary -->
-                        <div class="space-y-4 mb-8">
+                        <div class="space-y-2 mb-8">
                             @foreach ($cartContent as $item)
-                                <div class="bg-white rounded-xl p-4 flex items-center gap-4">
+                                <div class="bg-white border border-b border-gray-300 p-4 flex items-center gap-4">
                                     <!-- Actual Product Image -->
                                     <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
@@ -84,12 +84,12 @@
 
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
-                        <div class="p-6">
+                        <div class="p-4">
                             <h2 class="text-[16px] font- text-gray-800 leading-tight">
                                ডেলিভারি ঠিকানা
                             </h2>
                         </div>
-                        <div class="p-6 space-y-3 pt-0">
+                        <div class="p-4 space-y-3 pt-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                   
@@ -142,7 +142,7 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-0 border border-gray-200 mb-0">
+                    <div class="space-y-3 p-4 bg-white rounded-xl shadow-sm mt-0 border border-gray-200 mb-0">
                         <h3 class="text-[14px] font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
@@ -173,7 +173,7 @@
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
                 <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
-                    <div class="bg-gray-100 rounded-lg border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-gray-100 rounded-lg border border-gray-200 shadow-xs p-5 md:p-4 lg:sticky lg:top-24">
 
                         @php
                             $freeProductText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
