@@ -25,12 +25,68 @@
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
                 <div class="lg:col-span-2 lg:order-1 space-y-2">
+                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
+                        <div class="p-6">
+                            <h2 class="text-[16px] font- text-gray-800 leading-tight">
+                               আপনার অর্ডার আইটেম
+                            </h2>
+                        </div>
+                        <!-- Product Row in Summary -->
+                        <div class="space-y-4 mb-8">
+                            @foreach ($cartContent as $item)
+                                <div class="bg-white rounded-xl p-4 flex items-center gap-4">
+                                    <!-- Actual Product Image -->
+                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                            alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-1">
+                                            {{ $item->name }}
+                                        </h3>
+
+                                        @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
+                                            <div class="flex flex-wrap gap-1 mb-1">
+                                                @foreach ($item->options->attributes as $key => $value)
+                                                    <span
+                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        {{ $value }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @elseif($item->options->has('variant'))
+                                            <p class="text-[11px] text-gray-500 font-medium mb-1">
+                                                {{ $item->options->variant }}
+                                            </p>
+                                        @endif
+
+                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Quantity Display -->
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
+                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
+                                            aria-label="Remove item" title="Remove item"
+                                            class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer">
+                                            <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
+                                            <span class="sr-only">Remove item</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                    </div>
 
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-6">
                             <h2 class="text-[16px] font- text-gray-800 leading-tight">
-                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
+                               ডেলিভারি ঠিকানা
                             </h2>
                         </div>
                         <div class="p-6 space-y-3 pt-0">
@@ -146,7 +202,7 @@
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
-                            <div class="mb-8">
+                            <div class="mb-3">
                                 <h2 class="text-[14px] md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
                                     Method</h2>
                                 <div class="space-y-2">
@@ -174,54 +230,7 @@
                             </div>
                         @endif
 
-                        <!-- Product Row in Summary -->
-                        <div class="space-y-4 mb-8">
-                            @foreach ($cartContent as $item)
-                                <div class="bg-white rounded-xl p-4 flex items-center gap-4">
-                                    <!-- Actual Product Image -->
-                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
-                                            alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
-                                    </div>
-
-                                    <div class="flex-1">
-                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">
-                                            {{ $item->name }}
-                                        </h3>
-
-                                        @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
-                                            <div class="flex flex-wrap gap-1 mb-1">
-                                                @foreach ($item->options->attributes as $key => $value)
-                                                    <span
-                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
-                                                        {{ $value }}
-                                                    </span>
-                                                @endforeach
-                                            </div>
-                                        @elseif($item->options->has('variant'))
-                                            <p class="text-[11px] text-gray-500 font-medium mb-1">
-                                                {{ $item->options->variant }}
-                                            </p>
-                                        @endif
-
-                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                        </p>
-                                    </div>
-
-                                    <!-- Quantity Display -->
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
-                                            aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer">
-                                            <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
-                                            <span class="sr-only">Remove item</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+                        
                         <!-- 2.5 Coupon Section -->
                         <div class="mb-6 border-t border-gray-100 pt-6 hidden">
                             <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
