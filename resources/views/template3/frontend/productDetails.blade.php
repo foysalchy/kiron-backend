@@ -331,7 +331,7 @@
 
                     <!-- Action Buttons -->
                     <!-- Mobile: Order Now & Quick Order Buttons -->
-                    <div class="md:hidden mb-6 space-y-2.5">
+                    <div class="md:hidden mb-4 space-y-2.5">
                         <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
