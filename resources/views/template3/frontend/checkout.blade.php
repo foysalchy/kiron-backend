@@ -15,6 +15,10 @@
   z-index: 999;
         }
     }
+    h2{
+        border-left: 4px solid #0b5abe;
+  padding-left: 5px;
+    }
 </style>
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
@@ -32,11 +36,11 @@
                             </h2>
                         </div>
                         <!-- Product Row in Summary -->
-                        <div class="space-y-2 mb-8">
+                        <div class="space-y-0 mb-0">
                             @foreach ($cartContent as $item)
-                                <div class="bg-white border border-b border-gray-300 p-4 flex items-center gap-4">
+                                <div class="bg-white   border-b border-gray-300 p-4 py-2 flex items-center gap-4">
                                     <!-- Actual Product Image -->
-                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                    <div class="w-12 h-12 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
                                     </div>
