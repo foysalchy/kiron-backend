@@ -17,99 +17,175 @@
 @endphp
 
 <!-- Quick Order Popup Modal Component -->
+<style>
+    /* Scoped height & spacing optimization for Quick Order Modal */
+    #quick-order-modal #quick-order-summary-container > div {
+        padding: 0.75rem !important;
+        border-radius: 0.75rem !important;
+        background-color: #f9fafb !important;
+    }
+    #quick-order-modal #quick-order-summary-container .mb-8 {
+        margin-bottom: 0.5rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .mb-5 {
+        margin-bottom: 0.4rem !important;
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.75rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container h2 {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.35rem !important;
+        font-weight: 700 !important;
+    }
+    #quick-order-modal #quick-order-summary-container .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0.25rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container label {
+        font-size: 0.8rem !important;
+    }
+    /* Cart items list: compact and scrollable */
+    #quick-order-modal #quick-order-summary-container .space-y-4.mb-8 {
+        max-height: 135px !important;
+        overflow-y: auto !important;
+        margin-bottom: 0.5rem !important;
+        padding-right: 0.25rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0.35rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .bg-white.rounded-xl.p-4 {
+        padding: 0.4rem 0.5rem !important;
+        border-radius: 0.5rem !important;
+        gap: 0.5rem !important;
+        border: 1px solid #f3f4f6 !important;
+    }
+    #quick-order-modal #quick-order-summary-container .w-16.h-16 {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        border-radius: 0.375rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container h3.text-sm {
+        font-size: 0.75rem !important;
+        line-height: 1rem !important;
+        margin-bottom: 0.15rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container p.text-sm {
+        font-size: 0.75rem !important;
+    }
+    /* Cost breakdown: compact rows */
+    #quick-order-modal #quick-order-summary-container .border-t.border-gray-100.pt-6 {
+        padding-top: 0.4rem !important;
+        margin-top: 0.4rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .space-y-4.border-t {
+        gap: 0.25rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .space-y-4.border-t > div {
+        font-size: 0.8rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .border-t.border-gray-100.pt-4 {
+        padding-top: 0.35rem !important;
+        margin-top: 0.35rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .text-lg.font-black {
+        font-size: 0.875rem !important;
+    }
+    #quick-order-modal #quick-order-summary-container .text-xl.font-bold {
+        font-size: 1rem !important;
+    }
+    /* Confirm order button: compact */
+    #quick-order-modal #quick-order-summary-container button[type="submit"] {
+        margin-top: 0.5rem !important;
+        padding-top: 0.55rem !important;
+        padding-bottom: 0.55rem !important;
+        font-size: 0.875rem !important;
+        border-radius: 0.5rem !important;
+    }
+</style>
+
 <div id="quick-order-modal" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4">
-    <div class="relative bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto" onclick="event.stopPropagation()">
+    <div class="relative bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto" onclick="event.stopPropagation()">
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/80">
+        <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50/80">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">
+                <span class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
                     <i class="fas fa-bolt"></i>
                 </span>
-                <h3 class="text-lg font-bold text-gray-800">
+                <h3 class="text-sm sm:text-base font-bold text-gray-800">
                     {{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার কনফার্ম করুন' : 'Quick Order Checkout' }}
                 </h3>
             </div>
             <button type="button" onclick="closeQuickOrderModal()" aria-label="Close"
-                class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center transition-colors">
-                <i class="fas fa-times text-sm"></i>
+                class="w-7 h-7 rounded-full bg-white border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center transition-colors">
+                <i class="fas fa-times text-xs"></i>
             </button>
         </div>
 
         <!-- Modal Body (Form) -->
-        <div class="overflow-y-auto p-4 sm:p-6 flex-1">
+        <div class="overflow-y-auto p-3 sm:p-4 flex-1">
             <form id="quick-order-form" action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
                     <!-- LEFT COLUMN: Customer & Payment Info -->
-                    <div class="lg:col-span-7 space-y-5">
+                    <div class="lg:col-span-7 space-y-3">
                         <!-- 1. Customer Information Card -->
-                        <div class="bg-gray-50/60 rounded-xl p-4 sm:p-5 border border-gray-200 space-y-4">
-                            <h4 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <div class="bg-gray-50/60 rounded-lg p-3 sm:p-3.5 border border-gray-200 space-y-2.5">
+                            <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5">
                                 <i class="fas fa-user-edit text-[var(--primary-color)]"></i>
                                 {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার তথ্য দিন' : 'Customer Information' }}
                             </h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="space-y-1.5">
-                                    <label class="text-xs font-semibold text-gray-700">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-semibold text-gray-700">
                                         {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার নাম' : 'Your Name' }}
                                         <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="name" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'পুরো নাম লিখুন' : 'Enter your full name' }}" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-2 focus:ring-green-50 text-sm transition-all">
+                                        class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">
                                 </div>
-                                <div class="space-y-1.5">
-                                    <label class="text-xs font-semibold text-gray-700">
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-semibold text-gray-700">
                                         {{ isset($setup->lang) && $setup->lang == 'bn' ? 'মোবাইল নাম্বার' : 'Phone Number' }}
                                         <span class="text-red-500">*</span>
                                     </label>
                                     <input type="tel" name="phone" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? '১১ ডিজিটের মোবাইল নাম্বার' : 'Your mobile number' }}" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-2 focus:ring-green-50 text-sm transition-all">
+                                        class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">
                                 </div>
                             </div>
                             <input type="hidden" name="district" value="none" required />
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-semibold text-gray-700">
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-semibold text-gray-700">
                                     {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পূর্ণাঙ্গ ঠিকানা' : 'Your Address' }}
                                     <span class="text-red-500">*</span>
                                 </label>
-                                <textarea name="address" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার পূর্ণ ঠিকানা লিখুন (বাসা/রোড, এলাকা, থানা, জেলা)' : 'Your full address' }}" rows="2" required
-                                    class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-2 focus:ring-green-50 text-sm transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
+                                <textarea name="address" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'বাসা/রোড, এলাকা, থানা, জেলা' : 'Your full address' }}" rows="2" required
+                                    class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
-                            <!-- @guest('customer')
-                                <div class="pt-1">
-                                    <label class="flex items-center gap-2.5 cursor-pointer">
-                                        <input type="checkbox" name="create_account" class="w-4 h-4 accent-[var(--primary-color)] rounded">
-                                        <span class="text-xs font-medium text-gray-600">
-                                            {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অ্যাকাউন্ট তৈরি করতে চান?' : 'Create an account?' }}
-                                        </span>
-                                    </label>
-                                </div>
-                            @endguest -->
                         </div>
 
                         <!-- 2. Payment Method Card -->
-                        <div class="bg-gray-50/60 rounded-xl p-4 sm:p-5 border border-gray-200 space-y-3">
-                            <h4 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <div class="bg-gray-50/60 rounded-lg p-3 sm:p-3.5 border border-gray-200 space-y-2">
+                            <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5">
                                 <i class="fas fa-credit-card text-[var(--primary-color)]"></i>
                                 {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Select Payment Method' }}
                             </h4>
 
-                            <div class="space-y-2">
+                            <div class="space-y-1.5">
                                 @foreach ($paymentMethods as $method)
                                     @php $slug = strtolower(trim($method->name)); @endphp
-                                    <div class="payment-option border-b border-gray-100 last:border-0 pb-2">
+                                    <div class="payment-option border-b border-gray-100 last:border-0 pb-1.5">
                                         <label
-                                            class="flex items-center space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all">
+                                            class="flex items-center space-x-2.5 p-2 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all">
                                             <input type="radio" name="payment_method" value="{{ $method->name }}"
                                                 onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
-                                                class="w-4 h-4 accent-[var(--primary-color)]">
-                                                <span class="text-sm font-semibold text-gray-700 capitalize">{{ $method->name }}</span>
+                                                class="w-3.5 h-3.5 accent-[var(--primary-color)]">
+                                            <span class="text-xs font-semibold text-gray-700 capitalize">{{ $method->name }}</span>
                                         </label>
 
-                                        <div id="checkout-anchor-{{ $slug }}" class="mt-3 hidden transition-all">
-                                            <div class="bg-white p-3.5 rounded-lg border border-orange-200 shadow-xs">
+                                        <div id="checkout-anchor-{{ $slug }}" class="mt-2 hidden transition-all">
+                                            <div class="bg-white p-2.5 rounded-lg border border-orange-200 shadow-xs">
                                                 <div class="form-injection-point"></div>
                                             </div>
                                         </div>
@@ -120,11 +196,11 @@
                     </div>
 
                     <!-- RIGHT COLUMN: Delivery & Summary -->
-                    <div class="lg:col-span-5 space-y-4">
+                    <div class="lg:col-span-5 space-y-3">
                         <div id="quick-order-summary-container">
-                            <div class="p-8 text-center text-gray-400">
-                                <i class="fas fa-spinner fa-spin text-2xl text-[var(--primary-color)] mb-2"></i>
-                                <p class="text-sm">Loading order details...</p>
+                            <div class="p-6 text-center text-gray-400">
+                                <i class="fas fa-spinner fa-spin text-xl text-[var(--primary-color)] mb-1.5"></i>
+                                <p class="text-xs">Loading order details...</p>
                             </div>
                         </div>
                     </div>
