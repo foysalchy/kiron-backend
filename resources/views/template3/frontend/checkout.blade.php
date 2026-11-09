@@ -8,7 +8,7 @@
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
                 <div class="lg:col-span-2 lg:order-1 space-y-6">
@@ -20,8 +20,8 @@
                                 অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
                             </h2>
                         </div>
-                        <div class="p-6 space-y-5">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-6 space-y-3 mt-0">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                   
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
@@ -73,12 +73,12 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-6 border border-gray-200">
+                    <div class="space-y-3 p-6 bg-white rounded-xl shadow-sm mt-6 border border-gray-200 mb-0">
                         <h3 class="text-[14px] font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
-                            <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
+                            <div class="payment-option border-b border-gray-50 last:border-0 pb-0">
                                 <label
                                     class="flex items-center space-x-4 p-2 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
