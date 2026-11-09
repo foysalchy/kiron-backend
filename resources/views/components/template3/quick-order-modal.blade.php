@@ -162,20 +162,20 @@
                         <!-- Hidden Payment Method (Default: Cash on Delivery) -->
                         <input type="hidden" name="payment_method" value="{{ $defaultPaymentMethod }}">
 
-                        <!-- 2. Delivery Method Card (Flex in one row) -->
+                        <!-- 2. Delivery Area Card (2 lines) -->
                         <div class="bg-gray-50/60 rounded-xl p-3 sm:p-3.5 border border-gray-200">
                             <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5 mb-2">
                                 <i class="fas fa-truck text-[var(--primary-color)]"></i>
-                                {{ isset($setup->lang) && $setup->lang == 'bn' ? 'ডেলিভারি এলাকা নির্বাচন করুন' : 'Select Delivery Method' }}
+                                {{ isset($setup->lang) && $setup->lang == 'bn' ? 'ডেলিভারি এলাকা' : 'Delivery Area' }}
                             </h4>
-                            <div class="flex gap-2">
-                                <label class="flex-1 flex items-center gap-2 p-2 sm:p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
+                            <div class="space-y-1.5">
+                                <label class="w-full flex items-center gap-2.5 p-2 sm:p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
                                     <input type="radio" name="delivery_area" value="inside" onchange="updateCheckoutShipping(this.value)" checked class="w-3.5 h-3.5 accent-[var(--primary-color)] shrink-0">
-                                    <span class="truncate">Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->inside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
+                                    <span>Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->inside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
                                 </label>
-                                <label class="flex-1 flex items-center gap-2 p-2 sm:p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
+                                <label class="w-full flex items-center gap-2.5 p-2 sm:p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
                                     <input type="radio" name="delivery_area" value="outside" onchange="updateCheckoutShipping(this.value)" class="w-3.5 h-3.5 accent-[var(--primary-color)] shrink-0">
-                                    <span class="truncate">Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->outside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
+                                    <span>Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->outside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
                                 </label>
                             </div>
                         </div>
