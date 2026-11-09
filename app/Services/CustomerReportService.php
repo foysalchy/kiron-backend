@@ -46,32 +46,7 @@ class CustomerReportService
         // ── 4. Range এর orders group by customer ──
         $grouped = $ordersInRange->groupBy('customer_id');
 
-        // ── New Customers — date range এ যাদের কোনো order নেই ──
-        $customersWithOrdersInRange = Order::whereBetween('order_date', [$startDate, $endDate])
-            ->whereIn('status', $this->deliveredStatuses)
-            ->pluck('customer_id')
-            ->unique();
-
-        // সব customer থেকে যাদের range এ order নেই
-        $newCustomerIds = Party::where('type', 2)
-            ->whereNotIn('id', $customersWithOrdersInRange)
-            ->pluck('id');
-
-        $newCustomers = Party::whereIn('id', $newCustomerIds)
-            ->where('type', 2)
-            ->select('id', 'name', 'phone', 'district')
-            ->get()
-            ->map(fn($c) => [
-                'customer_id'     => $c->id,
-                'name'            => $c->name,
-                'phone'           => $c->phone,
-                'district'        => $c->district ?? '-',
-                'order_count'     => 0,
-                'total_spent'     => 0,
-                'avg_order_value' => 0,
-            ])
-            ->values()
-            ->toArray();
+        $newCustomers    = [];
         $repeatCustomers = [];
         $returnCustomers = [];
 
@@ -92,8 +67,8 @@ class CustomerReportService
                 'avg_order_value' => $avgOrderValue,
             ];
 
-            // New = date range এ প্রথমবার (আগে কোনো order নেই)
-            if (!$isReturn) {
+            // New = date range এ প্রথমবার order করেছে (আগে কোনো order ছিল না)
+            if (!$isReturn && $orderCount > 0) {
                 $newCustomers[] = $row;
             }
 
