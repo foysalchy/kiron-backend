@@ -20,8 +20,8 @@
   padding-left: 5px;
     }
     .animate-shake {
-  animation:4s cubic-bezier(.35,.06,.2,.98) infinite both rsiShaker
-}
+        animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
+    }
 @keyframes rsiShaker {
   0%,
   25%,
@@ -124,13 +124,13 @@
                                   
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 p-4 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     
                                     <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 p-4 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
                             <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -138,21 +138,21 @@
                                     <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
                                     <input type="email" name="email" placeholder="Your email address"
                                         value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 p-4 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">City <span
                                             class="text-red-500">*</span></label>
                                     <input type="hidden" name="district" placeholder="Your city" required
                                         value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 p-4 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div> -->
                              <input type="hidden" name="district" placeholder="Your city" required
                                         value="none"/>
                             <div class="space-y-2">
                                
-                                <textarea name="address" placeholder="আপনার ঠিকানা *" rows="3" required
+                                <textarea name="address" placeholder="আপনার ঠিকানা *" rows="2" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -172,7 +172,7 @@
 
                     <!-- 2. Payment Method Card -->
                     <div class="space-y-3 p-4 bg-white rounded-xl shadow-sm mt-0 border border-gray-200 mb-0">
-                        <h3 class="text-[14px] font-bold text-gray-800 mb-4">Select Payment Method</h3>
+                        <h3 class="text-[14px] font-bold text-gray-800 mb-2">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
@@ -328,7 +328,7 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full animate-shak fixed-co primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full animate-shake fixed-co primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
                             অর্ডার কনফার্ম করুন
                         </button>
                     </div>
