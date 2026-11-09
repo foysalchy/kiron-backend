@@ -28,7 +28,7 @@
             </div>
         @endif
         <!-- Main 3-Column Layout -->
-        <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
+        <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
             <div class="relative flex h-full min-h-0 w-[250px] flex-col rounded-lg bg-white pb-2 shadow-xs hidden lg:flex">
@@ -109,29 +109,29 @@
             </div>
 
             <!-- 2. CENTER: Main Horizontal Auto-Slider -->
-            <div class="flex-1 min-w-0 h-full">
-                <div class="relative h-full w-full rounded-lg overflow-hidden shadow-xs  bg-white">
-                    <div id="main-slider" class="flex transition-transform duration-700 ease-in-out h-full w-full">
+            <div class="flex-1 min-w-0 lg:h-full">
+                <div class="relative lg:h-full w-full rounded-lg overflow-hidden shadow-xs bg-white">
+                    <div id="main-slider" class="flex transition-transform duration-700 ease-in-out lg:h-full w-full">
                         @forelse($mainSliders as $slider)
-                            <div class="min-w-full h-full">
-                                <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
-                                    <picture class="block w-full h-full">
+                            <div class="min-w-full lg:h-full">
+                                <a href="{{ $slider->url ?? '#' }}" class="block w-full lg:h-full">
+                                    <picture class="block w-full lg:h-full">
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url }}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url }}">
-                                        <img src="{{ $slider->image_url }}" class="w-full h-full object-cover rounded-lg"
+                                        <img src="{{ $slider->image_url }}" class="w-full h-auto lg:h-full object-contain lg:object-cover rounded-lg"
                                             alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager"
                                             @else loading="lazy" @endif>
                                     </picture>
                                 </a>
                             </div>
                         @empty
-                            <div class="min-w-full h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                    alt="default image" class="w-full h-full object-cover rounded-lg" loading="lazy" width="800"
+                            <div class="min-w-full lg:h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
+                                    alt="default image" class="w-full h-auto lg:h-full object-contain lg:object-cover rounded-lg" loading="lazy" width="800"
                                     height="800"></div>
                         @endforelse
                     </div>
 
-                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    <div class="absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
                         @foreach ($mainSliders as $index => $slider)
                             <div onclick="goToSlide({{ $index }})"
                                 class="main-dot cursor-pointer {{ $index == 0 ? 'w-6 bg-[var(--primary-color)]' : 'w-2 bg-white/50' }} h-1 rounded-full transition-all">
@@ -414,7 +414,7 @@
                 </div>
 
                 <!-- Product Grid -->
-                <div class="grid grid-cols-2 min-[540px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
+                <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-5">
                     @foreach ($popularProducts->take(12) as $product)
                         <x-template1.product-card :product="$product" />
                     @endforeach
