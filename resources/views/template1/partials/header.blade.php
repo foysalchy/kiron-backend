@@ -50,8 +50,8 @@
 
             <!-- Logo Section -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200"
+                @if ($setup && $setup->nav_logo_url)
+                    <img src="{{ $setup->nav_logo_url }}" alt="{{ $setup->shop_name }}" width="200"
                         height="80" class="h-8 md:h-12 w-auto object-contain">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header tracking-tight">

@@ -18,20 +18,18 @@
             height: auto;
         }
 
-        @media (max-width: 767px) {
-            .t1-product-thumb-swiper.swiper-vertical .swiper-wrapper {
-                flex-direction: column !important;
-                align-items: stretch !important;
-            }
-            .t1-product-thumb-swiper.swiper-vertical .swiper-slide {
-                width: 100% !important;
-                height: auto !important;
-            }
-            .t1-thumb-prev i,
-            .t1-thumb-next i {
-                transform: rotate(90deg);
-                display: inline-block;
-            }
+        .t1-product-thumb-swiper.swiper-vertical .swiper-wrapper {
+            flex-direction: column !important;
+            align-items: stretch !important;
+        }
+        .t1-product-thumb-swiper.swiper-vertical .swiper-slide {
+            width: 100% !important;
+            height: auto !important;
+        }
+        .t1-thumb-prev i,
+        .t1-thumb-next i {
+            transform: rotate(90deg);
+            display: inline-block;
         }
     </style>
 @endpush
@@ -50,10 +48,10 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="flex items-center gap-2 text-[10px] md:text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-0 md:pt-2 mb-4">
+            class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm font-medium text-gray-500 w-full min-w-0 pt-0 md:pt-2 mb-4">
 
             <a href="{{ route('home') }}"
-                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1 shrink-0">
                 <i class="fas fa-home text-xs"></i> Home
             </a>
 
@@ -63,8 +61,8 @@
                         class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                     </svg>
-                    <a href="{{ url($item['slug']) }}"
-                        class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
+                    <a href="{{ url($item['slug']) }}" title="{{ $item['name'] }}"
+                        class="hover:text-[var(--primary-color)] transition-colors truncate max-w-[80px] xs:max-w-[120px] sm:max-w-[160px] md:max-w-none shrink">{{ $item['name'] }}</a>
                 @endforeach
             @endif
 
@@ -72,8 +70,8 @@
                 class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
-            <span
-                class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <span title="{{ $product->title }}"
+                class="text-[var(--primary-color)] font-bold truncate flex-1 min-w-0">{{ $product->title }}</span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -82,10 +80,64 @@
 
                 <!-- Left: Image Gallery -->
                 <div class="p-2 sm:p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
-                    <div class="flex flex-row-reverse md:flex-col gap-2.5 sm:gap-4 md:gap-0 items-start md:items-stretch">
+                    <div class="flex flex-row gap-2.5 sm:gap-4 items-start">
+                        <!-- Thumbnails Container (Vertical on both mobile and desktop) -->
+                        @php
+                            $videoData = $product->video_data;
+                            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
+                        @endphp
+                        <div id="t1-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-14 sm:w-16 md:w-20 shrink-0 relative py-7 px-0 flex flex-col">
+                            <div class="swiper t1-product-thumb-swiper w-full">
+                                <div id="thumbnail-container" class="swiper-wrapper">
+                                    @foreach ($allProductImages as $imgUrl)
+                                        <div class="swiper-slide">
+                                            <button onclick="changeImage('{{ $imgUrl }}', this)"
+                                                class="thumb-btn w-full aspect-square rounded-lg border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer block">
+                                                <img src="{{ $imgUrl }}"
+                                                    onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                                    class="w-full h-full object-contain pointer-events-none" alt="Product Image"
+                                                    loading="lazy" width="800" height="800">
+                                            </button>
+                                        </div>
+                                    @endforeach
+
+                                    @if ($videoData)
+                                        <div class="swiper-slide">
+                                            <button type="button"
+                                                onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                                aria-label="Play Product Video"
+                                                class="thumb-btn w-full aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer block">
+                                                <img src="{{ $videoData['thumbnail_url'] ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                                    onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                                    class="w-full h-full object-contain pointer-events-none"
+                                                    alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                                                <div
+                                                    class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                                    <span
+                                                        class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                                        <i class="fas fa-play text-xs ml-0.5"></i>
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Navigation Arrows (Outside slider: top/bottom) -->
+                            <button type="button" aria-label="Previous image"
+                                class="t1-thumb-prev absolute left-1/2 -translate-x-1/2 top-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                <i class="fas fa-chevron-left text-xs"></i>
+                            </button>
+                            <button type="button" aria-label="Next image"
+                                class="t1-thumb-next absolute left-1/2 -translate-x-1/2 bottom-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+
                         <!-- Main Image Container -->
                         <div id="t1-main-image-wrap"
-                            class="flex-1 min-w-0 aspect-square overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group md:mb-4 md:w-full">
+                            class="flex-1 min-w-0 aspect-square overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                             <img id="mainImage"
                                 src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                 alt="{{ $product->title ?? 'Product Image' }}"
@@ -97,60 +149,6 @@
                                 <i id="wish-icon-mobile"
                                     class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500' }} text-sm"></i>
                             </button>
-                        </div>
-
-                        <!-- Thumbnails Container (Vertical on mobile, horizontal on desktop) -->
-                        @php
-                            $videoData = $product->video_data;
-                            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
-                        @endphp
-                        <div id="t1-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative py-7 px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
-                        <div class="swiper t1-product-thumb-swiper w-full">
-                            <div id="thumbnail-container" class="swiper-wrapper">
-                                @foreach ($allProductImages as $imgUrl)
-                                    <div class="swiper-slide">
-                                        <button onclick="changeImage('{{ $imgUrl }}', this)"
-                                            class="thumb-btn w-full aspect-square rounded-lg border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer block">
-                                            <img src="{{ $imgUrl }}"
-                                                onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
-                                                class="w-full h-full object-contain pointer-events-none" alt="Product Image"
-                                                loading="lazy" width="800" height="800">
-                                        </button>
-                                    </div>
-                                @endforeach
-
-                                @if ($videoData)
-                                    <div class="swiper-slide">
-                                        <button type="button"
-                                            onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
-                                            aria-label="Play Product Video"
-                                            class="thumb-btn w-full aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer block">
-                                            <img src="{{ $videoData['thumbnail_url'] ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
-                                                onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
-                                                class="w-full h-full object-contain pointer-events-none"
-                                                alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
-                                            <div
-                                                class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                                                <span
-                                                    class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                                    <i class="fas fa-play text-xs ml-0.5"></i>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Navigation Arrows (Outside slider: top/bottom on mobile, left/right on desktop) -->
-                        <button type="button" aria-label="Previous image"
-                            class="t1-thumb-prev absolute left-1/2 -translate-x-1/2 top-0 md:top-1/2 md:left-0 md:translate-x-0 md:-translate-y-1/2 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
-                            <i class="fas fa-chevron-left text-xs"></i>
-                        </button>
-                        <button type="button" aria-label="Next image"
-                            class="t1-thumb-next absolute left-1/2 -translate-x-1/2 bottom-0 md:bottom-auto md:top-1/2 md:right-0 md:left-auto md:translate-x-0 md:-translate-y-1/2 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
-                            <i class="fas fa-chevron-right text-xs"></i>
-                        </button>
                         </div>
                     </div>
                 </div>
@@ -165,18 +163,6 @@
                             {{ \App\Enums\Status::Upcoming->label() }}
                         </span>
                     @endif
-
-                    @php
-                        $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
-                    @endphp
-
-                    <span id="discount-badge"
-                        class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
-                        @if ($hasDiscount)
-                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
-                            OFF
-                        @endif
-                    </span>
 
                     <h1 class="text-lg md:text-2xl font-semibold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
 
@@ -212,7 +198,7 @@
                             $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
                         @endphp
                         <span id="regular-price"
-                            class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-400 text-lg line-through">
+                            class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-400 text-xl line-through">
                             @if ($hasRegPrice)
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
@@ -222,11 +208,23 @@
                             @endif
                         </span>
 
-                        <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
+                        <span id="sale-price" class="text-2xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
                                 {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
                             @else
                                 {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
+                            @endif
+                        </span>
+
+                        @php
+                            $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                        @endphp
+
+                        <span id="discount-badge"
+                            class="{{ $hasDiscount ? 'inline-block' : '!hidden' }} bg-[#FFCF00] text-black text-xs md:text-sm font-bold px-2.5 md:px-3 py-1 rounded-full self-center">
+                            @if ($hasDiscount)
+                                {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
+                                OFF
                             @endif
                         </span>
 
@@ -1021,9 +1019,13 @@
                 if (regularPrice && regularPrice > salePrice) {
                     const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
                     badgeEl.innerText = percent + '% OFF';
+                    badgeEl.classList.remove('!hidden');
                     badgeEl.classList.remove('hidden');
+                    badgeEl.classList.add('inline-block');
                 } else {
-                    if (badgeEl) badgeEl.classList.add('hidden');
+                    badgeEl.classList.add('!hidden');
+                    badgeEl.classList.add('hidden');
+                    badgeEl.classList.remove('inline-block');
                 }
             }
         }
@@ -1312,15 +1314,10 @@
             const swiperEl = document.querySelector('.t1-product-thumb-swiper');
             if (!mainWrap || !thumbWrap || !swiperEl || thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden')) return;
 
-            if (window.innerWidth < 768) {
-                const height = mainWrap.offsetHeight;
-                if (height > 0) {
-                    thumbWrap.style.height = height + 'px';
-                    swiperEl.style.height = Math.max(height - 56, 120) + 'px';
-                }
-            } else {
-                thumbWrap.style.height = '';
-                swiperEl.style.height = '';
+            const height = mainWrap.offsetHeight;
+            if (height > 0) {
+                thumbWrap.style.height = height + 'px';
+                swiperEl.style.height = Math.max(height - 56, 120) + 'px';
             }
         }
 
@@ -1333,29 +1330,16 @@
                     window.t1ThumbSwiper.destroy(true, true);
                 }
                 syncT1ThumbHeight();
-                const isMobile = window.innerWidth < 768;
                 window.t1ThumbSwiper = new SwiperClass(el, {
-                    direction: isMobile ? 'vertical' : 'horizontal',
-                    slidesPerView: isMobile ? 'auto' : 4,
-                    spaceBetween: isMobile ? 6 : 8,
+                    direction: 'vertical',
+                    slidesPerView: 'auto',
+                    spaceBetween: 8,
                     watchSlidesProgress: true,
                     observer: true,
                     observeParents: true,
                     navigation: {
                         nextEl: '.t1-thumb-next',
                         prevEl: '.t1-thumb-prev',
-                    },
-                    breakpoints: {
-                        768: {
-                            direction: 'horizontal',
-                            slidesPerView: 4,
-                            spaceBetween: 8,
-                        },
-                        1024: {
-                            direction: 'horizontal',
-                            slidesPerView: 6,
-                            spaceBetween: 10,
-                        }
                     }
                 });
             }

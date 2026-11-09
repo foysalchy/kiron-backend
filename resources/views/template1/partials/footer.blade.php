@@ -48,8 +48,8 @@
                         </div>
                     @endif
                     <div class="flex items-center gap-3 mb-5">
-                        @if ($setup && $setup->logo)
-                            <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                        @if ($setup && $setup->footer_logo_url)
+                            <img src="{{ $setup->footer_logo_url }}" height="80" width="200"
                             alt="{{ $setup->shop_name ?? 'Shop' }} Logo"
                             class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
                         @else

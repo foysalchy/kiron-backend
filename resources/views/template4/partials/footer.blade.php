@@ -12,9 +12,13 @@
                         </div>
                     @endif
                     <a href="{{ route('home') }}" aria-label="Little Joy Home">
-                        <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
-                            alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
-                            class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
+                        @if ($setup && $setup->footer_logo_url)
+                            <img src="{{ $setup->footer_logo_url }}" height="80" width="200"
+                                alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
+                                class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
+                        @else
+                            <span class="text-xl md:text-2xl font-bold">{{ $setup->shop_name ?? 'Shop' }}</span>
+                        @endif
                     </a>
                 </div>
                 <p class="text-base font-light leading-relaxed max-w-[280px]">

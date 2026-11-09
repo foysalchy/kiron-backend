@@ -130,7 +130,11 @@ class HomeController extends FrontendController
             $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
                 $cats = MegaCategory::where('company_id', $companyId)
                     ->select('id', 'name', 'company_id', 'slug', 'image')
-                    ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
+                    ->with([
+                        'subCategories:id,mega_category_id,name,slug',
+                        'subCategories.miniCategories:id,sub_category_id,name,slug',
+                        'subCategories.miniCategories.extraCategories:id,mini_category_id,name,slug'
+                    ])->get();
 
                 $cats->map(function ($cat) use ($companyId) {
                     $cat->product_count = \App\Models\Product::where('status', 1)
@@ -400,7 +404,11 @@ class HomeController extends FrontendController
         $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
             $cats = MegaCategory::where('company_id', $companyId)
                 ->select('id', 'name', 'company_id', 'slug', 'image')
-                ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')
+                ->with([
+                    'subCategories:id,mega_category_id,name,slug',
+                    'subCategories.miniCategories:id,sub_category_id,name,slug',
+                    'subCategories.miniCategories.extraCategories:id,mini_category_id,name,slug'
+                ])
                 ->get();
 
             $cats->map(function ($cat) use ($companyId) {
