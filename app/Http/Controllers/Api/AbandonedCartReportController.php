@@ -62,4 +62,28 @@ class AbandonedCartReportController extends Controller
 
         return ResponseHelper::success(array_values($report));
     }
+
+    public function flush(Request $request): JsonResponse
+    {
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $query = Cart::where('status', Cart::ADDED)
+            ->where('updated_at', '<=', Carbon::now()->subHours(2));
+
+        if ($request->start_date) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->end_date) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        $deletedCount = $query->delete();
+
+        return ResponseHelper::success([
+            'deleted_count' => $deletedCount
+        ], 'Abandoned carts deleted successfully');
+    }
 }

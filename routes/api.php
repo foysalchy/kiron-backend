@@ -1820,6 +1820,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/reports/cancellation', [\App\Http\Controllers\Api\CancellationReportController::class, 'generate']);
                 Route::get('/reports/marketing-roi', [\App\Http\Controllers\Api\MarketingRoiReportController::class, 'generate']);
                 Route::get('/reports/abandoned-cart', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'generate']);
+                Route::delete('/reports/abandoned-cart/flush', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'flush']);
 
                 Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);

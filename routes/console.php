@@ -24,3 +24,7 @@ Schedule::command('referral:release-commissions')
 Schedule::command('parties:recalculate-dues')
     ->dailyAt('02:00');
 
+Schedule::command('carts:clean-abandoned')
+    ->dailyAt('03:00');
+
+
