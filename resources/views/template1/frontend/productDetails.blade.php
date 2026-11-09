@@ -17,6 +17,22 @@
             flex-shrink: 0;
             height: auto;
         }
+
+        @media (max-width: 767px) {
+            .t1-product-thumb-swiper.swiper-vertical .swiper-wrapper {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .t1-product-thumb-swiper.swiper-vertical .swiper-slide {
+                width: 100% !important;
+                height: auto !important;
+            }
+            .t1-thumb-prev i,
+            .t1-thumb-next i {
+                transform: rotate(90deg);
+                display: inline-block;
+            }
+        }
     </style>
 @endpush
 @section('meta')
@@ -34,7 +50,7 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
+            class="flex items-center gap-2 text-[10px] md:text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-0 md:pt-2 mb-4">
 
             <a href="{{ route('home') }}"
                 class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
@@ -44,7 +60,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                        class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                     </svg>
                     <a href="{{ url($item['slug']) }}"
@@ -53,7 +69,7 @@
             @endif
 
             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                class="w-3 md:w-4 h-3 md:h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
             <span
@@ -65,21 +81,32 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-lg shadow-xs ">
 
                 <!-- Left: Image Gallery -->
-                <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
-                    <div
-                        class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage"
-                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
-                            alt="{{ $product->title ?? 'Product Image' }}"
-                            class="w-full h-full object-contain transition-transform duration-500">
-                    </div>
-                    <div class="relative mt-3 px-8">
+                <div class="p-2 sm:p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
+                    <div class="flex flex-row-reverse md:flex-col gap-2.5 sm:gap-4 md:gap-0 items-start md:items-stretch">
+                        <!-- Main Image Container -->
+                        <div id="t1-main-image-wrap"
+                            class="flex-1 min-w-0 aspect-square overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group md:mb-4 md:w-full">
+                            <img id="mainImage"
+                                src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                alt="{{ $product->title ?? 'Product Image' }}"
+                                class="w-full h-full object-contain transition-transform duration-500">
+
+                            <!-- Mobile Floating Wishlist Button -->
+                            <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="Add to wishlist"
+                                class="md:hidden absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/90 shadow-sm border border-gray-100 flex items-center justify-center active:scale-90 transition-transform">
+                                <i id="wish-icon-mobile"
+                                    class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500' }} text-sm"></i>
+                            </button>
+                        </div>
+
+                        <!-- Thumbnails Container (Vertical on mobile, horizontal on desktop) -->
+                        @php
+                            $videoData = $product->video_data;
+                            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
+                        @endphp
+                        <div id="t1-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative py-7 px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
                         <div class="swiper t1-product-thumb-swiper w-full">
                             <div id="thumbnail-container" class="swiper-wrapper">
-                                @php
-                                    $videoData = $product->video_data;
-                                @endphp
-
                                 @foreach ($allProductImages as $imgUrl)
                                     <div class="swiper-slide">
                                         <button onclick="changeImage('{{ $imgUrl }}', this)"
@@ -115,24 +142,26 @@
                             </div>
                         </div>
 
-                        <!-- Navigation Arrows (Always visible outside slider) -->
+                        <!-- Navigation Arrows (Outside slider: top/bottom on mobile, left/right on desktop) -->
                         <button type="button" aria-label="Previous image"
-                            class="t1-thumb-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                            class="t1-thumb-prev absolute left-1/2 -translate-x-1/2 top-0 md:top-1/2 md:left-0 md:translate-x-0 md:-translate-y-1/2 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
                             <i class="fas fa-chevron-left text-xs"></i>
                         </button>
                         <button type="button" aria-label="Next image"
-                            class="t1-thumb-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                            class="t1-thumb-next absolute left-1/2 -translate-x-1/2 bottom-0 md:bottom-auto md:top-1/2 md:right-0 md:left-auto md:translate-x-0 md:-translate-y-1/2 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
                             <i class="fas fa-chevron-right text-xs"></i>
                         </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Right: Product Purchase Details -->
-                <div class="p-6 md:p-8">
+                <div class="p-4 md:p-8">
                     @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
 
                     @if ($isUpcoming)
-                        <span class="inline-block bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full mb-4">
+                        <span
+                            class="inline-block bg-blue-600 text-white text-sm md:text-base font-bold px-3 py-1 rounded-full mb-4">
                             {{ \App\Enums\Status::Upcoming->label() }}
                         </span>
                     @endif
@@ -149,7 +178,7 @@
                         @endif
                     </span>
 
-                    <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
+                    <h1 class="text-lg md:text-2xl font-semibold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
 
                     @php
                         $skus = [];
@@ -174,7 +203,7 @@
                         </div>
                     @endif
                     <div
-                        class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                        class="prose prose-short prose-slate max-w-none mb-4 text-xs md:text-lg leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
                     </div>
 
@@ -183,7 +212,7 @@
                             $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
                         @endphp
                         <span id="regular-price"
-                            class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-500 text-lg line-through">
+                            class="{{ $hasRegPrice ? '' : 'hidden ' }}text-gray-400 text-lg line-through">
                             @if ($hasRegPrice)
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
@@ -193,7 +222,7 @@
                             @endif
                         </span>
 
-                        <span id="sale-price" class="text-xl md:text-3xl font-semibold md:font-black secondary-text">
+                        <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
                                 {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
                             @else
@@ -214,22 +243,56 @@
                         <div id="dynamic-attributes-container" class="mb-5"></div>
                     @endif
 
+                    {{-- Free Shipping Notice (Mobile: Above Quantity) --}}
+                    @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
+                        <div class="md:hidden mb-4">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Shipping Charge Rule" />
+                                </div>
+                            @endif
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>{{ $setup->free_shipping_text }}</span>
+                            </div>
+                        </div>
+                    @elseif(!empty($activePreviewTheme))
+                        <div class="md:hidden mb-4">
+                            <div class="mb-1">
+                                <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
+                            </div>
+                            <div
+                                class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                                <i class="fa-solid fa-gift text-amber-600"></i>
+                                <span>Free shipping on orders over ৳1500 (Sample Preview)</span>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Quantity -->
-                    <div class="flex items-center gap-6 mb-8 mt-4">
-                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-10">
-                            <button onclick="changeQty(-1)" aria-label="Decrease quantity" class="px-3 hover:bg-gray-50"><i
+                    <div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8 mt-4">
+                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-11 md:h-10 shrink-0">
+                            <button type="button" aria-label="Decrease quantity" onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>
-                            <input type="number" id="main-qty" aria-label="Quantity" value="1" readonly
+                            <input type="number" id="main-qty" value="1" readonly
+                                aria-label="Quantity"
                                 class="w-10 text-center font-bold border-none outline-none">
-                            <button onclick="changeQty(1)" aria-label="Increase quantity" class="px-3 hover:bg-gray-50"><i
+                            <button type="button" aria-label="Increase quantity" onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                        {{-- এই অংশটুকু রিপ্লেস করুন --}}
                         @php
                             $isProductOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock && $product->available_stock <= 0);
                         @endphp
+
+                        <!-- Mobile Add to Cart Button (Beside Quantity on Mobile) -->
+                        <button onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                            class="md:hidden flex-1 primary-bg hover:bg-green-700 text-primary h-11 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm">
+                            {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}
+                        </button>
+
                         <span
-                            class="text-sm {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
+                            class="hidden md:inline text-sm {{ !$isProductOutOfStock ? 'text-green-600' : 'text-red-500' }}">
                             {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
                         </span>
                     </div>
@@ -237,9 +300,9 @@
                     <!-- Hidden Input for Selected Variation -->
                     <input type="hidden" id="selected-variation-id" value="">
 
-                    {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
+                    {{-- Free Shipping Notice (Desktop: Below Quantity) --}}
                     @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                        <div class="mb-4">
+                        <div class="hidden md:block mb-4">
                             @if(!empty($activePreviewTheme))
                                 <div class="mb-1">
                                     <x-preview-badge name="Shipping Charge Rule" />
@@ -253,7 +316,7 @@
                         </div>
                     @elseif(!empty($activePreviewTheme))
                         {{-- In Preview mode show dummy shipping text if empty --}}
-                        <div class="mb-4">
+                        <div class="hidden md:block mb-4">
                             <div class="mb-1">
                                 <x-preview-badge name="Shipping Charge Rule" :isDummy="true" />
                             </div>
@@ -266,7 +329,16 @@
                     @endif
 
                     <!-- Action Buttons -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
+                    <!-- Mobile: Order Now Full-Width Button -->
+                    <div class="md:hidden mb-6">
+                        <button onclick="handleAddToCart(true)" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                            class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
+                        </button>
+                    </div>
+
+                    <!-- Desktop: 3 Buttons Grid -->
+                    <div class="hidden md:grid md:grid-cols-3 gap-3 mb-8">
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
@@ -289,20 +361,6 @@
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
-
-                    <!-- Product Custom Block (Notice/Announcement/Policy) -->
-                    @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
-                        <div class="my-5">
-                            @if(!empty($activePreviewTheme))
-                                <div class="mb-1">
-                                    <x-preview-badge name="Product Custom Block" :isDummy="!empty($productCustomBlock->is_dummy)" />
-                                </div>
-                            @endif
-                            <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
-                                {!! $productCustomBlock->text_content !!}
-                            </div>
-                        </div>
-                    @endif
 
                     @php
                         $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
@@ -375,6 +433,20 @@
                                 </svg>
                                 Call for order
                             </a>
+                        </div>
+                    @endif
+
+                    <!-- Product Custom Block (Notice/Announcement/Policy) -->
+                    @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
+                        <div class="my-5">
+                            @if(!empty($activePreviewTheme))
+                                <div class="mb-1">
+                                    <x-preview-badge name="Product Custom Block" :isDummy="!empty($productCustomBlock->is_dummy)" />
+                                </div>
+                            @endif
+                            <div class="product-custom-block p-4 rounded-xl border border-gray-200 bg-white shadow-xs prose max-w-none text-gray-700 leading-relaxed text-sm">
+                                {!! $productCustomBlock->text_content !!}
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -853,7 +925,20 @@
                         </div>`;
             }
 
+            const totalCount = images.length + ((productVideoData && productVideoData.embed_url) ? 1 : 0);
+            const thumbWrap = document.getElementById('t1-thumb-wrapper');
+            if (thumbWrap) {
+                if (totalCount <= 1) {
+                    thumbWrap.classList.add('!hidden');
+                    thumbWrap.classList.add('hidden');
+                } else {
+                    thumbWrap.classList.remove('!hidden');
+                    thumbWrap.classList.remove('hidden');
+                }
+            }
+
             if (window.t1ThumbSwiper) {
+                if (typeof syncT1ThumbHeight === 'function') syncT1ThumbHeight();
                 window.t1ThumbSwiper.update();
                 window.t1ThumbSwiper.slideTo(0);
             }
@@ -1198,6 +1283,13 @@
                             toastr.info(data.message);
                         }
 
+                        const mobileWishIcon = document.getElementById('wish-icon-mobile');
+                        if (mobileWishIcon) {
+                            mobileWishIcon.className = (data.status === 'added')
+                                ? 'fas fa-heart text-red-500 text-sm'
+                                : 'far fa-heart text-gray-500 text-sm';
+                        }
+
                         // update all icons with the same product id (in case there are multiple wishlist buttons for the same product)
                         const icons = document.querySelectorAll(`[id="wish-icon-${productId}"]`);
                         icons.forEach(icon => {
@@ -1214,15 +1306,38 @@
         }
     </script>
     <script>
+        function syncT1ThumbHeight() {
+            const mainWrap = document.getElementById('t1-main-image-wrap');
+            const thumbWrap = document.getElementById('t1-thumb-wrapper');
+            const swiperEl = document.querySelector('.t1-product-thumb-swiper');
+            if (!mainWrap || !thumbWrap || !swiperEl || thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden')) return;
+
+            if (window.innerWidth < 768) {
+                const height = mainWrap.offsetHeight;
+                if (height > 0) {
+                    thumbWrap.style.height = height + 'px';
+                    swiperEl.style.height = Math.max(height - 56, 120) + 'px';
+                }
+            } else {
+                thumbWrap.style.height = '';
+                swiperEl.style.height = '';
+            }
+        }
+
         function initT1ThumbSwiper(SwiperClass) {
+            const thumbWrap = document.getElementById('t1-thumb-wrapper');
+            if (thumbWrap && (thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden'))) return;
             const el = document.querySelector('.t1-product-thumb-swiper');
             if (SwiperClass && el) {
                 if (window.t1ThumbSwiper && typeof window.t1ThumbSwiper.destroy === 'function') {
                     window.t1ThumbSwiper.destroy(true, true);
                 }
+                syncT1ThumbHeight();
+                const isMobile = window.innerWidth < 768;
                 window.t1ThumbSwiper = new SwiperClass(el, {
-                    slidesPerView: 4,
-                    spaceBetween: 8,
+                    direction: isMobile ? 'vertical' : 'horizontal',
+                    slidesPerView: isMobile ? 'auto' : 4,
+                    spaceBetween: isMobile ? 6 : 8,
                     watchSlidesProgress: true,
                     observer: true,
                     observeParents: true,
@@ -1231,11 +1346,13 @@
                         prevEl: '.t1-thumb-prev',
                     },
                     breakpoints: {
-                        640: {
-                            slidesPerView: 5,
-                            spaceBetween: 10,
+                        768: {
+                            direction: 'horizontal',
+                            slidesPerView: 4,
+                            spaceBetween: 8,
                         },
                         1024: {
+                            direction: 'horizontal',
                             slidesPerView: 6,
                             spaceBetween: 10,
                         }
@@ -1252,6 +1369,34 @@
                     initT1ThumbSwiper(SwiperClass || window.Swiper);
                 });
             }
+        }
+
+        let t1LastWidth = window.innerWidth;
+        window.addEventListener('resize', function () {
+            const currentWidth = window.innerWidth;
+            const crossedBreakpoint = (t1LastWidth < 768 && currentWidth >= 768) || (t1LastWidth >= 768 && currentWidth < 768);
+            t1LastWidth = currentWidth;
+            if (crossedBreakpoint) {
+                checkAndInitSwiper();
+            } else {
+                syncT1ThumbHeight();
+                if (window.t1ThumbSwiper) {
+                    window.t1ThumbSwiper.update();
+                }
+            }
+        });
+
+        window.addEventListener('load', function () {
+            syncT1ThumbHeight();
+            if (window.t1ThumbSwiper) window.t1ThumbSwiper.update();
+        });
+
+        const t1MainImg = document.getElementById('mainImage');
+        if (t1MainImg) {
+            t1MainImg.addEventListener('load', function () {
+                syncT1ThumbHeight();
+                if (window.t1ThumbSwiper) window.t1ThumbSwiper.update();
+            });
         }
 
         if (document.readyState === 'loading') {

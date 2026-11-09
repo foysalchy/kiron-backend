@@ -34,7 +34,8 @@
             <div class="relative flex h-full min-h-0 w-[250px] flex-col rounded-lg bg-white pb-2 shadow-xs hidden lg:flex">
                 <div class="primary-bg text-primary shrink-0 py-3 text-lg text-center font-semibold">
                     Explore Categories</div>
-                <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
+                <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar"
+                    style="-ms-overflow-style: none; scrollbar-width: none;">
                     @foreach ($categories as $category)
                         <div class="group border-b border-gray-200">
                             <a href="{{ url($category->slug) }}"
@@ -43,7 +44,7 @@
                                     <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
                                         class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                         alt="{{ $category->name }}">
-                                    <span class="text-lg text-gray-800">{{ $category->name }}</span>
+                                    <span class="text-base text-gray-800">{{ $category->name }}</span>
                                 </div>
                                 @if ($category->subCategories->count() > 0)
                                     <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
@@ -121,23 +122,6 @@
                 </div>
             </div>
 
-            <!-- 3. RIGHT SIDEBAR: Vertical Banner Slider -->
-            <div class="hidden lg:block w-[260px] shrink-0">
-                <div class="relative h-full rounded-lg  overflow-hidden bg-white">
-                    <div id="vertical-slider"
-                        class="flex flex-col transition-transform duration-700 ease-in-out h-full w-full">
-                        @foreach ($sidebarSliders as $slider)
-                            <div class="min-h-full w-full">
-                                <a href="{{ $slider->url ?? '#' }}">
-                                    <img src="{{ $slider->image_url }}" class="w-full h-full object-cover rounded-lg"
-                                        alt="{{ $slider->title }}">
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
@@ -181,45 +165,6 @@
                                     </span>
                                 </a>
                             @endif
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </section>
-    @elseif (isset($categories) && $categories->count() > 0)
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-            @if(!empty($activePreviewTheme))
-                <div class="mb-2">
-                    <x-preview-badge name="Categories" />
-                </div>
-            @endif
-            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
-                <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
-                    Top Categories
-                </h2>
-                <div class="relative group">
-                    <button onclick="scrollCats(-200)" aria-label="Scroll left"
-                        class="cat-nav-btn hidden absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                        <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
-                    </button>
-                    <button onclick="scrollCats(200)" aria-label="Scroll right"
-                        class="cat-nav-btn hidden absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                        <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
-                    </button>
-                    <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
-                        @foreach ($categories as $category)
-                            <a href="{{ url($category->slug) }}" class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
-                                <div
-                                    class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
-                                    <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
-                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        alt="{{ $category->name }}"
-                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
-                                </div>
-                                <span class="md:text-md text-sm text-gray-800 text-center w-full px-1">
-                                    {{ $category->name ?? '' }}
-                                </span>
-                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -468,50 +413,17 @@
             </div>
         </section>
     @endif
-    @if ($faqs->count() > 0)
-        <!-- FAQ SECTION (Styled like You May Like) -->
-        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-            @if(!empty($activePreviewTheme))
-                <div class="mb-2">
-                    <x-preview-badge name="Knowledge Base" :isDummy="!empty($faqs->first()?->is_dummy)" />
+    @if (!empty($homePageData?->description))
+        <section class="w-full py-6 px-4 font-manrope">
+            <div class="p-0 container mx-auto">
+                @if (!empty($activePreviewTheme))
+                    <div class="mb-2">
+                        <x-preview-badge name="SEO & Content" :isDummy="!empty($homePageData->is_dummy)" />
+                    </div>
+                @endif
+                <div class="bg-gray-100 border border-gray-200 rounded-lg px-6 py-6 prose max-w-none">
+                    {!! $homePageData->description !!}
                 </div>
-            @endif
-            <div class="bg-white rounded-lg shadow-xs p-4 md:p-10 border border-gray-50">
-
-                <!-- Section Header -->
-                <div class="mb-10 border-b border-gray-100 pb-4">
-                    <h2 class="text-lg md:text-3xl font-bold uppercase tracking-tight text-gray-900">
-                        Frequently Asked Questions
-                    </h2>
-                </div>
-
-                <!-- FAQ Items Container -->
-                <div class="space-y-10">
-                    @forelse($faqs as $faq)
-                        <div class="faq-item">
-                            <!-- Question -->
-                            <h3
-                                class="text-base md:text-xl font-semibold md:font-bold text-gray-800 mb-4 uppercase tracking-wide flex items-start gap-3">
-                                <span class="text-blue-600">Q.</span>
-                                {{ $faq->title ?? '' }}
-                            </h3>
-
-                            <!-- Answer -->
-                            <div class="text-gray-600 text-sm md:text-base leading-relaxed blog-content-area pl-0 md:pl-8">
-                                {!! $faq->content !!}
-                            </div>
-
-                            @if (!$loop->last)
-                                <hr class="md:mt-10 border-gray-200">
-                            @endif
-                        </div>
-                    @empty
-                        <div class="text-center py-10">
-                            <p class="text-gray-600 italic">No information found.</p>
-                        </div>
-                    @endforelse
-                </div>
-
             </div>
         </section>
     @endif
@@ -642,18 +554,6 @@
 
             // Start the slider
             startInterval();
-        }
-
-        const verticalSlider = document.getElementById('vertical-slider');
-        if (verticalSlider) {
-            let vertIdx = 0;
-            const totalVert = verticalSlider.children.length;
-
-            function slideVertical() {
-                vertIdx = (vertIdx + 1) % totalVert;
-                verticalSlider.style.transform = `translateY(-${vertIdx * 100}%)`;
-            }
-            setInterval(slideVertical, 5000);
         }
 
         function scrollGroup(trackId, distance) {
