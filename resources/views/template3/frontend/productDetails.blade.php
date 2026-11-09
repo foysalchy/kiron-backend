@@ -104,7 +104,7 @@
                             $videoData = $product->video_data;
                             $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
                         @endphp
-                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? 'hidden' : '' }} {{ $totalGalleryCount > 5 ? 'py-7' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative  px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
+                        <div id="t3-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} {{ $totalGalleryCount > 5 ? 'py-7' : '' }} w-14 sm:w-16 md:w-full flex-shrink-0 relative  px-0 md:py-0 md:px-8 md:mt-3 flex flex-col md:block">
                         <div class="swiper t3-product-thumb-swiper w-full">
                             <div id="thumbnail-container" class="swiper-wrapper">
                                 @foreach ($allProductImages as $imgUrl)
@@ -880,6 +880,18 @@
                         </div>`;
             }
 
+            const totalCount = images.length + ((productVideoData && productVideoData.embed_url) ? 1 : 0);
+            const thumbWrap = document.getElementById('t3-thumb-wrapper');
+            if (thumbWrap) {
+                if (totalCount <= 1) {
+                    thumbWrap.classList.add('!hidden');
+                    thumbWrap.classList.add('hidden');
+                } else {
+                    thumbWrap.classList.remove('!hidden');
+                    thumbWrap.classList.remove('hidden');
+                }
+            }
+
             if (window.t3ThumbSwiper) {
                 if (typeof syncT3ThumbHeight === 'function') syncT3ThumbHeight();
                 window.t3ThumbSwiper.update();
@@ -1250,7 +1262,7 @@
             const mainWrap = document.getElementById('t3-main-image-wrap');
             const thumbWrap = document.getElementById('t3-thumb-wrapper');
             const swiperEl = document.querySelector('.t3-product-thumb-swiper');
-            if (!mainWrap || !thumbWrap || !swiperEl || thumbWrap.classList.contains('hidden')) return;
+            if (!mainWrap || !thumbWrap || !swiperEl || thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden')) return;
 
             if (window.innerWidth < 768) {
                 const height = mainWrap.offsetHeight;
@@ -1266,7 +1278,7 @@
 
         function initT3ThumbSwiper(SwiperClass) {
             const thumbWrap = document.getElementById('t3-thumb-wrapper');
-            if (thumbWrap && thumbWrap.classList.contains('hidden')) return;
+            if (thumbWrap && (thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden'))) return;
             const el = document.querySelector('.t3-product-thumb-swiper');
             if (SwiperClass && el) {
                 if (window.t3ThumbSwiper && typeof window.t3ThumbSwiper.destroy === 'function') {

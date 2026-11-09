@@ -205,8 +205,8 @@
             </div>
 
             <!-- Cart -->
-            <a href="{{ route('cart.index') }}"
-                class="lg:flex flex hidden items-center gap-1.5 hover-text transition-colors relative">
+            <button onclick="toggleCartDrawer()"
+                class="lg:flex flex hidden items-center gap-1.5 hover-text transition-colors relative cursor-pointer outline-none bg-transparent border-none">
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>
                     <span
@@ -215,7 +215,7 @@
                     </span>
                 </div>
                 <span class="hidden lg:block  text-[16px]">Cart</span>
-            </a>
+            </button>
 
         </div>
     </div>
@@ -393,9 +393,9 @@
             @else
                 <div class="flex gap-3 px-5 py-4 border-b border-gray-100">
                     <a href="{{ route('user.login') }}"
-                        class="flex-1 text-center py-2 border border-[var(--primary-color)] text-primary rounded-lg text-sm font-bold">Login</a>
+                        class="flex-1 text-center py-2 border border-[var(--primary-color)] text-black rounded-lg text-sm font-bold">Login</a>
                     <a href="{{ route('user.register') }}"
-                        class="flex-1 text-center py-2 primary-bg text-primary text-primary rounded-lg text-sm font-bold">Register</a>
+                        class="flex-1 text-center py-2 primary-bg text-primary rounded-lg text-sm font-bold">Register</a>
                 </div>
             @endauth
 
@@ -528,7 +528,8 @@
         </button>
 
         <!-- Cart -->
-        <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-1 text-gray-700 relative">
+        <button onclick="toggleCartDrawer()"
+            class="flex flex-col items-center gap-1 text-gray-700 relative cursor-pointer outline-none bg-transparent border-none">
             <img src="{{ asset('./images/template1/frontend/sell.png') }}" alt="Cart" height="24px" width="24px"
                 loading="lazy">
             <span
@@ -536,7 +537,7 @@
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
             </span>
             <span class="text-xs font-medium">Cart</span>
-        </a>
+        </button>
 
         <!-- Profile -->
         <a href="{{ route('user.dashboard') }}" class="flex flex-col items-center gap-1 text-gray-700">
@@ -647,9 +648,9 @@
                                             link.className =
                                                 "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                             link.innerHTML = `
-                                                    <img src="${item.thumbnail_95_url}" class="w-7 h-7 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'" loading="lazy" width="800" height="800">
-                                                    <span class="truncate">${item.title}</span>
-                                                `;
+                                                        <img src="${item.thumbnail_95_url}" class="w-7 h-7 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'" loading="lazy" width="800" height="800">
+                                                        <span class="truncate">${item.title}</span>
+                                                    `;
                                             config.results.appendChild(link);
                                         });
                                     } else {
