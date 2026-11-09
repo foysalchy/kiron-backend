@@ -62,6 +62,8 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'manage_warehouse'     => ['nullable'],
                 'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
                 'dark_logo'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+                'header_logo_source'  => ['nullable', 'string', 'in:primary,dark'],
+                'footer_logo_source'  => ['nullable', 'string', 'in:primary,dark'],
                 'founder_name'        => ['nullable', 'string', 'max:255'],
                 'founder_designation' => ['nullable', 'string', 'max:255'],
                 'established'         => ['nullable', 'date'],

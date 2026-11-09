@@ -56,6 +56,8 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'tags'              => ['nullable', 'string'],
                 'manage_warehouse'     => ['nullable'],
                 'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
+                'header_logo_source'  => ['nullable', 'string', 'in:primary,dark'],
+                'footer_logo_source'  => ['nullable', 'string', 'in:primary,dark'],
                 'founder_name'        => ['nullable', 'string', 'max:255'],
                 'founder_designation' => ['nullable', 'string', 'max:255'],
                 'established'         => ['nullable', 'date'],

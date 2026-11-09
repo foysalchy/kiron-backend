@@ -48,6 +48,8 @@ class SiteSetting extends Model
         'status',
         'meta_image',
         'dark_logo',
+        'header_logo_source',
+        'footer_logo_source',
         'founder_name',
         'founder_designation',
         'established',
@@ -64,7 +66,7 @@ class SiteSetting extends Model
     ];
 
 
-    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url', 'watermark_logo_url', 'active_free_shipping_rule', 'google_map_url'];
+    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url', 'nav_logo_url', 'footer_logo_url', 'watermark_logo_url', 'active_free_shipping_rule', 'google_map_url'];
     public static function homepageCacheKeys(): array
     {
         return ['site_settings_cart', 'site_settings'];
@@ -127,6 +129,22 @@ class SiteSetting extends Model
         return $this->dark_logo
             ? Storage::disk('r2')->url($this->dark_logo)
             : null;
+    }
+
+    public function getNavLogoUrlAttribute(): ?string
+    {
+        if ($this->header_logo_source === 'dark' && $this->dark_logo) {
+            return $this->dark_logo_url;
+        }
+        return $this->logo_url;
+    }
+
+    public function getFooterLogoUrlAttribute(): ?string
+    {
+        if ($this->footer_logo_source === 'dark' && $this->dark_logo) {
+            return $this->dark_logo_url;
+        }
+        return $this->logo_url;
     }
 
     public function getGoogleMapUrlAttribute(): ?string
