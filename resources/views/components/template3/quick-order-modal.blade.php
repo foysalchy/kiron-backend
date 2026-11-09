@@ -129,68 +129,89 @@
                     <!-- LEFT COLUMN: Customer & Payment Info -->
                     <div class="lg:col-span-7 space-y-3">
                         <!-- 1. Customer Information Card -->
-                        <div class="bg-gray-50/60 rounded-lg p-3 sm:p-3.5 border border-gray-200 space-y-2.5">
+                        <div class="bg-gray-50/60 rounded-xl p-3 sm:p-3.5 border border-gray-200 space-y-2.5">
                             <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5">
                                 <i class="fas fa-user-edit text-[var(--primary-color)]"></i>
                                 {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার তথ্য দিন' : 'Customer Information' }}
                             </h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div class="space-y-1">
-                                    <label class="text-[11px] font-semibold text-gray-700">
+                                    <label class="text-xs font-semibold text-gray-700">
                                         {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার নাম' : 'Your Name' }}
                                         <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="name" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'পুরো নাম লিখুন' : 'Enter your full name' }}" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">
+                                        class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm font-medium transition-all h-10">
                                 </div>
                                 <div class="space-y-1">
-                                    <label class="text-[11px] font-semibold text-gray-700">
+                                    <label class="text-xs font-semibold text-gray-700">
                                         {{ isset($setup->lang) && $setup->lang == 'bn' ? 'মোবাইল নাম্বার' : 'Phone Number' }}
                                         <span class="text-red-500">*</span>
                                     </label>
                                     <input type="tel" name="phone" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? '১১ ডিজিটের মোবাইল নাম্বার' : 'Your mobile number' }}" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">
+                                        class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm font-medium transition-all h-10">
                                 </div>
                             </div>
                             <input type="hidden" name="district" value="none" required />
                             <div class="space-y-1">
-                                <label class="text-[11px] font-semibold text-gray-700">
+                                <label class="text-xs font-semibold text-gray-700">
                                     {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পূর্ণাঙ্গ ঠিকানা' : 'Your Address' }}
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <textarea name="address" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'বাসা/রোড, এলাকা, থানা, জেলা' : 'Your full address' }}" rows="2" required
-                                    class="w-full px-3 py-1.5 rounded-md border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-xs transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
+                                    class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
                         </div>
 
-                        <!-- 2. Payment Method Card -->
-                        <div class="bg-gray-50/60 rounded-lg p-3 sm:p-3.5 border border-gray-200 space-y-2">
-                            <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5">
-                                <i class="fas fa-credit-card text-[var(--primary-color)]"></i>
-                                {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Select Payment Method' }}
-                            </h4>
+                        <!-- 2. Combined Card: Delivery & Payment Method -->
+                        <div class="bg-gray-50/60 rounded-xl p-3 sm:p-3.5 border border-gray-200 space-y-3">
+                            <!-- Delivery Method -->
+                            <div>
+                                <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5 mb-2">
+                                    <i class="fas fa-truck text-[var(--primary-color)]"></i>
+                                    {{ isset($setup->lang) && $setup->lang == 'bn' ? 'ডেলিভারি এলাকা নির্বাচন করুন' : 'Select Delivery Method' }}
+                                </h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <label class="flex items-center gap-2.5 p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
+                                        <input type="radio" name="delivery_area" value="inside" onchange="updateCheckoutShipping(this.value)" checked class="w-3.5 h-3.5 accent-[var(--primary-color)]">
+                                        <span>Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->inside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 p-2.5 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all text-xs font-semibold text-gray-700">
+                                        <input type="radio" name="delivery_area" value="outside" onchange="updateCheckoutShipping(this.value)" class="w-3.5 h-3.5 accent-[var(--primary-color)]">
+                                        <span>Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($setup->outside_charge, 2) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})</span>
+                                    </label>
+                                </div>
+                            </div>
 
-                            <div class="space-y-1.5">
-                                @foreach ($paymentMethods as $method)
-                                    @php $slug = strtolower(trim($method->name)); @endphp
-                                    <div class="payment-option border-b border-gray-100 last:border-0 pb-1.5">
-                                        <label
-                                            class="flex items-center space-x-2.5 p-2 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all">
-                                            <input type="radio" name="payment_method" value="{{ $method->name }}"
-                                                onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
-                                                class="w-3.5 h-3.5 accent-[var(--primary-color)]">
-                                            <span class="text-xs font-semibold text-gray-700 capitalize">{{ $method->name }}</span>
-                                        </label>
+                            <!-- Payment Method -->
+                            <div class="border-t border-gray-200 pt-2.5">
+                                <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5 mb-2">
+                                    <i class="fas fa-credit-card text-[var(--primary-color)]"></i>
+                                    {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Select Payment Method' }}
+                                </h4>
 
-                                        <div id="checkout-anchor-{{ $slug }}" class="mt-2 hidden transition-all">
-                                            <div class="bg-white p-2.5 rounded-lg border border-orange-200 shadow-xs">
-                                                <div class="form-injection-point"></div>
+                                <div class="space-y-1.5">
+                                    @foreach ($paymentMethods as $method)
+                                        @php $slug = strtolower(trim($method->name)); @endphp
+                                        <div class="payment-option border-b border-gray-100 last:border-0 pb-1.5">
+                                            <label
+                                                class="flex items-center space-x-2.5 p-2 border-2 border-gray-200 rounded-lg cursor-pointer bg-white hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50/50 transition-all">
+                                                <input type="radio" name="payment_method" value="{{ $method->name }}"
+                                                    onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
+                                                    class="w-3.5 h-3.5 accent-[var(--primary-color)]">
+                                                <span class="text-xs font-semibold text-gray-700 capitalize">{{ $method->name }}</span>
+                                            </label>
+
+                                            <div id="checkout-anchor-{{ $slug }}" class="mt-2 hidden transition-all">
+                                                <div class="bg-white p-2.5 rounded-lg border border-orange-200 shadow-xs">
+                                                    <div class="form-injection-point"></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -362,6 +383,12 @@
             const summaryContainer = document.getElementById('quick-order-summary-container');
 
             if (newSummary && summaryContainer) {
+                // Remove duplicate delivery block from right summary (as it's in the unified card on the left)
+                const deliveryBlock = newSummary.querySelector('input[name="delivery_area"]')?.closest('.mb-8');
+                if (deliveryBlock) {
+                    deliveryBlock.remove();
+                }
+
                 summaryContainer.innerHTML = newSummary.innerHTML;
 
                 const match = html.match(/let _checkoutTotal = (.*?);/);
