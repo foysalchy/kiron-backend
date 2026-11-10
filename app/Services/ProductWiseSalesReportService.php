@@ -30,13 +30,29 @@ public function generate(array $filters): array
     $sortBy          = $filters['sort_by'] ?? 'quantity';
 
     // ── 1. Load Orders Once ──
-    $statuses = $statusFilter === 'delivered'
-        ? $this->deliveredStatuses
-        : array_merge($this->deliveredStatuses, $this->returnedStatuses);
+    $query = Order::whereBetween('order_date', [$startDate, $endDate]);
 
-    $orders = Order::whereBetween('order_date', [$startDate, $endDate])
-        ->whereIn('status', $statuses)
-        ->get(['id', 'status']);
+    if ($statusFilter === 'all' || $statusFilter === 'all_statuses') {
+        $query->where('status', '!=', Status::Draft->value);
+    } elseif ($statusFilter === 'delivered') {
+        $query->whereIn('status', $this->deliveredStatuses);
+    } elseif ($statusFilter === 'delivered_returns') {
+        $query->whereIn('status', array_merge($this->deliveredStatuses, $this->returnedStatuses));
+    } elseif (is_numeric($statusFilter)) {
+        $query->where('status', (int) $statusFilter);
+    } elseif (!empty($statusFilter)) {
+        // match by name if passed as string e.g. 'pending', 'cancelled'
+        $enumCase = collect(Status::cases())->first(fn($c) => strtolower($c->name) === strtolower($statusFilter));
+        if ($enumCase) {
+            $query->where('status', $enumCase->value);
+        } else {
+            $query->where('status', '!=', Status::Draft->value);
+        }
+    } else {
+        $query->where('status', '!=', Status::Draft->value);
+    }
+
+    $orders = $query->get(['id', 'status']);
 
     $orderStatusMap = $orders->pluck('status', 'id');
 

@@ -23,30 +23,51 @@ class SalesReportService
             Status::ReturnReceived->value,
             Status::ReturnRequest->value,
             Status::Cancelled->value,
+            Status::Fake->value,
         ];
 
+        // Specific Status Groups
+        $processingStatuses = [
+            Status::Pending->value,
+            Status::Confirmed->value,
+            Status::Processing->value,
+            Status::ReadyToShipped->value,
+        ];
+        $shippingStatuses   = [
+            Status::Shipped->value,
+            Status::HandovertoCourier->value,
+            Status::InTransit->value,
+        ];
         $deliveredStatuses  = [Status::Delivered->value];
+        $returnedStatuses   = [
+            Status::ReturntoCourier->value,
+            Status::ReturnReceived->value,
+            Status::ReturnRequest->value,
+        ];
         $cancelledStatuses  = [Status::Cancelled->value];
-        $returnedStatuses   = [Status::ReturntoCourier->value, Status::ReturnReceived->value, Status::ReturnRequest->value];
+        $fakeStatuses       = [Status::Fake->value];
 
-        // Order Summary
-        $total     = $this->orderSummary($startDate, $endDate, $allStatuses);
-        $delivered = $this->orderSummary($startDate, $endDate, $deliveredStatuses);
-        $cancelled = $this->orderSummary($startDate, $endDate, $cancelledStatuses);
-        $returned  = $this->orderSummary($startDate, $endDate, $returnedStatuses);
-        $returnReceived = $this->orderSummary($startDate, $endDate, [Status::ReturnReceived->value]);
+        // Order Summary Groups
+        $total            = $this->orderSummary($startDate, $endDate, $allStatuses);
+        $processingGroup  = $this->orderSummary($startDate, $endDate, $processingStatuses);
+        $shippingGroup    = $this->orderSummary($startDate, $endDate, $shippingStatuses);
+        $delivered        = $this->orderSummary($startDate, $endDate, $deliveredStatuses);
+        $returned         = $this->orderSummary($startDate, $endDate, $returnedStatuses);
+        $returnReceived   = $this->orderSummary($startDate, $endDate, [Status::ReturnReceived->value]);
+        $cancelled        = $this->orderSummary($startDate, $endDate, $cancelledStatuses);
+        $fake             = $this->orderSummary($startDate, $endDate, $fakeStatuses);
 
         // Sales Summary (delivered only)
         $deliveredOrders = Order::whereBetween('order_date', [$startDate, $endDate])
             ->whereIn('status', $deliveredStatuses);
 
-        $totalSales    = $deliveredOrders->sum('grand_total');
-        $totalDiscount = $deliveredOrders->selectRaw('SUM(discount_on_all + coupon_discount) as total')->value('total') ?? 0;
-        $totalShipping = $deliveredOrders->sum('other_charges');
+        $totalSales    = (float) $deliveredOrders->sum('grand_total');
+        $totalDiscount = (float) ($deliveredOrders->selectRaw('SUM(discount_on_all + coupon_discount) as total')->value('total') ?? 0);
+        $totalShipping = (float) $deliveredOrders->sum('other_charges');
         $netSales      = $totalSales;
 
         // Payment
-        $totalCollected = $deliveredOrders->sum('payment_amount');
+        $totalCollected = (float) $deliveredOrders->sum('payment_amount');
         $totalDue       = $netSales - $totalCollected;
 
         // Rates
@@ -56,10 +77,13 @@ class SalesReportService
             'date_range'    => ['start' => $startDate, 'end' => $endDate],
             'order_summary' => [
                 'total_orders'     => $total,
+                'processing_group' => $processingGroup,
+                'shipping_group'   => $shippingGroup,
                 'delivered_orders' => $delivered,
-                'cancelled_orders' => $cancelled,
                 'return_orders'    => $returned,
-                'return_received'    => $returnReceived,
+                'return_received'  => $returnReceived,
+                'cancelled_orders' => $cancelled,
+                'fake_orders'      => $fake,
             ],
             'sales_summary' => [
                 'total_sales'       => round($totalSales, 2),

@@ -367,13 +367,20 @@ class OrderController extends FrontendController
                     $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
                     return redirect()->route('order.thankyou', $p);
                 }
-                // 4. Address update
+                $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+                $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
+
                 $sourceInfo = [
                     'ip' => request()->ip(),
                     'user_agent' => request()->userAgent(),
                     'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
-                    'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null,
-                    'url' => request()->headers->get('referer') ?? config('app.url'),
+                    'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                    'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
+                    'source' => $marketingSource ?? 'Direct/Organic',
+                    'utm_source' => session('utm_source'),
+                    'utm_medium' => session('utm_medium'),
+                    'utm_campaign' => session('utm_campaign'),
+                    'utm_content' => session('utm_content'),
                 ];
 
                 $order->update([
@@ -385,6 +392,8 @@ class OrderController extends FrontendController
                         'address' => $request->address,
                         'payment_method' => $request->payment_method,
                     ],
+                    'source' => $order->source ?: $finalSource,
+                    'source_info' => $sourceInfo,
                     'pixel_source_info' => $sourceInfo,
                     'status' => Status::Pending->value,
                 ]);
