@@ -43,6 +43,9 @@ class SiteSetting extends Model
         'copy_right',
         'sms_forget_password',
         'login_required_for_checkout',
+        'checkout_show_email',
+        'checkout_show_city',
+        'product_details_quick_order',
         'products_page_cta',
         'allow_search_engine_index',
         'status',
@@ -61,6 +64,9 @@ class SiteSetting extends Model
     protected $casts = [
         'sms_forget_password' => 'boolean',
         'login_required_for_checkout' => 'integer',
+        'checkout_show_email' => 'boolean',
+        'checkout_show_city' => 'boolean',
+        'product_details_quick_order' => 'boolean',
         'allow_search_engine_index' => 'boolean',
         'free_shipping_rules' => 'array',
     ];
