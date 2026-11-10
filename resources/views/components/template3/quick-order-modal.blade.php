@@ -211,7 +211,8 @@
             return;
         }
         const token = document.querySelector('meta[name="csrf-token"]').content;
-        const qty = document.getElementById('main-qty').value;
+        const qtyEl = document.getElementById('main-qty');
+        const qty = qtyEl ? (qtyEl.value || qtyEl.innerText || 1) : 1;
         let items = [];
 
         let varIds = document.getElementById('selected-variation-id').value;
@@ -397,7 +398,7 @@
             }
             refreshQuickOrderSummary();
             if (typeof refreshMiniCart === 'function') refreshMiniCart();
-            if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed');
         })
         .catch(err => {
             console.error(err);

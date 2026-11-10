@@ -2,8 +2,34 @@
 @section('meta')
     @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
 @endsection
+
+@push('styles')
+<style>
+    @media(max-width:576px){
+        .fixed-co{
+            position: fixed;
+            left: 0;
+            right: 0;
+            width: 90%;
+            margin: auto;
+            bottom: 20px;
+            z-index: 999;
+        }
+    }
+    .animate-shake {
+        animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
+    }
+    @keyframes rsiShaker {
+      0%, 25%, to { transform:scaleX(1) }
+      2.5%, 5% { transform:scale3d(.97,.97,.97)rotate(-1deg) }
+      7.5%, 12.5%, 17.5%, 22.5% { transform:scale3d(1.03,1.03,1.03)rotate(1deg) }
+      10%, 15%, 20% { transform:scale3d(1.03,1.03,1.03)rotate(-1deg) }
+    }
+</style>
+@endpush
+
 @section('content')
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
         <h1 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
@@ -11,52 +37,125 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
-                <div class="lg:col-span-2 lg:order-1 space-y-6">
+                <div class="lg:col-span-2 lg:order-1 space-y-4 md:space-y-6">
 
-                    <!-- 1. Customer Information Card -->
-                    <div class="bg-white rounded-xl  shadow-xs overflow-hidden">
-                        <div class="p-6">
-                            <h2 class="text-[20px] md:text-2xl font-semibold text-gray-800 leading-tight">
-                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
+                    <!-- Mobile Order Items Card (Template 3 Style with Template 5 Qty Controls) -->
+                    <div id="checkout-mobile-items-container" class="block lg:hidden bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
+                        <div class="p-4 border-b border-gray-100">
+                            <h2 class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
+                                আপনার অর্ডার আইটেম
                             </h2>
                         </div>
-                        <div class="p-6 space-y-5">
+                        <div class="space-y-0">
+                            @foreach ($cartContent as $item)
+                                <div class="bg-white border-b border-gray-100 last:border-0 p-3 flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                            class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">
+                                            {{ $item->name }}
+                                        </h3>
+                                        @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
+                                            <div class="flex flex-wrap gap-1 mb-1">
+                                                @foreach ($item->options->attributes as $key => $value)
+                                                    <span class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        {{ $value }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @elseif($item->options->has('variant'))
+                                            <p class="text-[11px] text-gray-500 font-medium mb-1">
+                                                {{ $item->options->variant }}
+                                            </p>
+                                        @endif
+                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
+                                        </p>
+                                    </div>
+                                    <!-- Quantity Controls (cart.blade.php rounded-lg style) -->
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                                aria-label="Decrease quantity"
+                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
+                                            <span class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                                aria-label="Increase quantity"
+                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
+                                        </div>
+                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
+                                            aria-label="Remove item" title="Remove item"
+                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
+                                            <i class="far fa-trash-alt text-[10px]" aria-hidden="true"></i>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- 1. Customer Information Card -->
+                    <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
+                        <div class="p-4 md:p-6 border-b border-gray-100">
+                            <h2 class="text-[16px] md:text-2xl font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
+                                ডেলিভারি ঠিকানা
+                            </h2>
+                            <p class="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
+                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
+                            </p>
+                        </div>
+                        <div class="p-4 md:p-6 space-y-4 md:space-y-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">Your Name <span
                                             class="text-red-500">*</span></label>
                                     <input type="text" name="name" placeholder="Enter your full name" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">Phone Number <span
                                             class="text-red-500">*</span></label>
                                     <input type="tel" name="phone" placeholder="Your mobile number" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                    <input type="email" name="email" placeholder="Your email address"
-                                        value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                            @php
+                                $showEmail = $setup->checkout_show_email ?? true;
+                                $showCity = $setup->checkout_show_city ?? true;
+                            @endphp
+
+                            @if($showEmail || $showCity)
+                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5">
+                                    @if($showEmail)
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
+                                            <input type="email" name="email" placeholder="Your email address"
+                                                value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                                class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        </div>
+                                    @endif
+
+                                    @if($showCity)
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700">City <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="text" name="district" placeholder="Your city" required
+                                                value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                                class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">City <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="hidden" name="district" placeholder="Your city" required
-                                        value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
-                                </div>
-                            </div>
+                            @endif
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Address <span
                                         class="text-red-500">*</span></label>
                                 <textarea name="address" placeholder="Your address" rows="3" required
-                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
                             <!-- Checkboxes -->
@@ -74,8 +173,8 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-6 bg-white rounded-xl   shadow-sm mt-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h3>
+                    <div class="space-y-3 p-4 md:p-6 bg-white rounded-xl shadow-xs mt-6 border border-gray-200">
+                        <h3 class="text-base md:text-lg font-bold text-gray-800 mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
@@ -105,7 +204,7 @@
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
                 <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
-                    <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-gray-100 rounded-lg border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         @php
                             $freeProductText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
@@ -135,7 +234,7 @@
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
                             <div class="mb-8">
-                                <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
+                                <h2 class="text-base md:text-xl font-semibold leading-none tracking-tight mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Delivery
                                     Method</h2>
                                 <div class="space-y-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
@@ -158,10 +257,10 @@
                             </div>
                         @endif
 
-                        <!-- Product Row in Summary -->
-                        <div class="space-y-4 mb-8">
+                        <!-- Product Row in Summary (Desktop) -->
+                        <div class="space-y-3 mb-8 hidden lg:block">
                             @foreach ($cartContent as $item)
-                                <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
+                                <div class="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200">
                                     <!-- Actual Product Image -->
                                     <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
@@ -193,14 +292,22 @@
                                         </p>
                                     </div>
 
-                                    <!-- Quantity Display -->
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
+                                    <!-- Quantity Controls (cart.blade.php rounded-lg style) -->
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                                aria-label="Decrease quantity"
+                                                class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">-</button>
+                                            <span class="qty-{{ $item->rowId }} w-8 text-center text-xs sm:text-sm font-bold text-gray-800">{{ $item->qty }}</span>
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                                aria-label="Increase quantity"
+                                                class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">+</button>
+                                        </div>
                                         <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                             aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer">
+                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
                                             <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
-                                            <span class="sr-only">Remove item</span>
+                                            <span>Remove</span>
                                         </button>
                                     </div>
                                 </div>
@@ -271,8 +378,8 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
-                            Confirm Order
+                            class="w-full animate-shake fixed-co primary-bg primary-bg-hover text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            অর্ডার কনফার্ম করুন
                         </button>
                     </div>
                 </div>
@@ -311,9 +418,65 @@
                         }
                     } else if (currentContainer && !newContainer) {
                         window.location.href = "{{ route('shop.index') }}";
+                        return;
+                    }
+
+                    const newMobile = temp.querySelector('#checkout-mobile-items-container');
+                    const currentMobile = document.getElementById('checkout-mobile-items-container');
+                    if (newMobile && currentMobile) {
+                        currentMobile.innerHTML = newMobile.innerHTML;
                     }
                 })
                 .catch(err => console.error('Checkout refresh failed:', err));
+        }
+
+        function updateCheckoutQty(rowId, change, btnEl) {
+            const qtySpans = document.querySelectorAll('.qty-' + rowId);
+            if (!qtySpans || qtySpans.length === 0) return;
+
+            const currentQty = parseInt(qtySpans[0].innerText);
+            const newQty = currentQty + change;
+
+            if (newQty < 1) return;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            if (btnEl) btnEl.disabled = true;
+
+            fetch("{{ route('cart.update') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    rowId: rowId,
+                    qty: newQty
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.cart_count !== undefined) {
+                        document.querySelectorAll('.cart-count-nav').forEach(el => {
+                            el.innerText = data.cart_count;
+                            el.parentElement.classList.remove('hidden');
+                        });
+                    }
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                    if (typeof toastr !== 'undefined') toastr.success('Quantity updated');
+                } else {
+                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Failed to update quantity');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to update quantity');
+            })
+            .finally(() => {
+                if (btnEl) btnEl.disabled = false;
+            });
         }
 
         function removeCheckoutItem(rowId) {
@@ -336,7 +499,7 @@
                 }
                 refreshCartUI();
                 if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+                if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed');
             })
             .catch(err => {
                 console.error(err);

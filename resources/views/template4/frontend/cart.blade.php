@@ -186,7 +186,7 @@
 
                         <div class="mt-2 md:mt-4">
                             <a href="{{ route('checkout.index') }}"
-                                class="block w-full bg-[var(--primary-color)] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl text-center text-base md:text-lg lg:text-xl shadow-md focus:outline-none">
+                                class="block w-full bg-[var(--primary-color)] hover:bg-[var(--secondary-color)] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl text-center text-base md:text-lg lg:text-xl shadow-md focus:outline-none">
                                 Checkout Now
                             </a>
                         </div>
@@ -289,7 +289,7 @@
                         });
                         refreshCartUI();
                         if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed from cart');
                     } else if (typeof toastr !== 'undefined') {
                         toastr.error(data.message || 'Error removing item');
                     }

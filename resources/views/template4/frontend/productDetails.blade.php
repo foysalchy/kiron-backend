@@ -204,6 +204,7 @@
 
                             @php
                                 $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                                $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
                             @endphp
                             <span id="regular-price"
                                 class="{{ $hasRegPrice ? '' : 'hidden ' }}text-lg md:text-xl text-gray-600 line-through">
@@ -213,6 +214,13 @@
                                     @else
                                         {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                                     @endif
+                                @endif
+                            </span>
+
+                            <span id="discount-badge"
+                                class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-xs md:text-sm font-bold px-2.5 md:px-3 py-1 rounded-full self-center">
+                                @if ($hasDiscount)
+                                    {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% OFF
                                 @endif
                             </span>
 
@@ -296,6 +304,17 @@
                                     class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
+
+                        <!-- Quick Order Button -->
+                        @if($setup->product_details_quick_order ?? true)
+                            <div class="mt-3">
+                                <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                                    class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
+                                </button>
+                            </div>
+                        @endif
                         <p
                             class="text-sm mt-4 {{ !$isProductOutOfStock ? 'text-green-700' : 'text-red-500' }}">
                             <i
@@ -592,6 +611,10 @@
     {{-- Hidden input for JS --}}
     <input type="hidden" id="main-qty" value="1">
     <input type="hidden" id="selected-variation-id" value="">
+    {{-- Quick Order Popup Modal Component --}}
+    @if($setup->product_details_quick_order ?? true)
+        <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
+    @endif
 @endsection
 
 @push('scripts')

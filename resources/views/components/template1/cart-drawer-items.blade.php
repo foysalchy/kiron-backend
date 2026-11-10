@@ -173,7 +173,7 @@
                 }
 
                 if (typeof refreshCartUI === 'function') refreshCartUI();
-                toastr.success((data && data.message) || customMessage || 'The item has been removed from the cart.');
+                toastr.error((data && data.message) || customMessage || 'The item has been removed from the cart.');
             })
             .catch(err => {
                 console.error('Error removing item:', err);

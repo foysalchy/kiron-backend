@@ -326,7 +326,7 @@
                 }
                 refreshCartUI();
                 if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+                if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed');
             })
             .catch(err => {
                 console.error(err);

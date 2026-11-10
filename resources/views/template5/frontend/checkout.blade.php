@@ -37,21 +37,33 @@
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-[var(--primary-color)]/20 transition-all">
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                <input type="email" name="email" placeholder="Your email address"
-                                    value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all">
+                        @php
+                            $showEmail = $setup->checkout_show_email ?? true;
+                            $showCity = $setup->checkout_show_city ?? true;
+                        @endphp
+
+                        @if($showEmail || $showCity)
+                            <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5 mt-5">
+                                @if($showEmail)
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
+                                        <input type="email" name="email" placeholder="Your email address"
+                                            value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                            class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all">
+                                    </div>
+                                @endif
+
+                                @if($showCity)
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">City <span
+                                                class="text-[var(--primary-color)]">*</span></label>
+                                        <input type="text" name="district" placeholder="Your city" required
+                                            value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                            class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all">
+                                    </div>
+                                @endif
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">City <span
-                                        class="text-[var(--primary-color)]">*</span></label>
-                                <input type="hidden" name="district" placeholder="Your city" required
-                                    value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all">
-                            </div>
-                        </div>
+                        @endif
                         <div class="space-y-2 mt-5">
                             <label class="text-sm font-medium text-gray-700">Your Address <span
                                     class="text-[var(--primary-color)]">*</span></label>
