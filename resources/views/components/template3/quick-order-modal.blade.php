@@ -168,7 +168,7 @@
                         <input type="hidden" name="payment_method" value="{{ $defaultPaymentMethod }}">
 
                         <!-- 2. Delivery Area Card (2 lines) -->
-                        <div class="bg-gray-50/60 rounded-xl p-3 sm:p-3.5 border border-gray-200">
+                        <div id="quick-delivery-area-container" class="bg-gray-50/60 rounded-xl p-3 sm:p-3.5 border border-gray-200 {{ !empty($product->is_free_delivery) ? 'hidden' : '' }}">
                             <h4 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center gap-1.5 mb-2">
                                 <i class="fas fa-truck text-[var(--primary-color)]"></i>
                                 {{ isset($setup->lang) && $setup->lang == 'bn' ? 'ডেলিভারি এলাকা' : 'Delivery Area' }}
@@ -354,10 +354,26 @@
             const summaryContainer = document.getElementById('quick-order-summary-container');
 
             if (newSummary && summaryContainer) {
-                // Remove duplicate delivery block from right summary (as it's in the unified card on the left)
-                const deliveryBlock = newSummary.querySelector('input[name="delivery_area"]')?.closest('.mb-8');
-                if (deliveryBlock) {
-                    deliveryBlock.remove();
+                // Check if delivery area is present in checkout summary or if free shipping is active
+                const deliveryInput = newSummary.querySelector('input[name="delivery_area"]');
+                const isFreeShipping = !deliveryInput;
+
+                // Sync left delivery area card visibility with free shipping state
+                const quickDeliveryEl = document.getElementById('quick-delivery-area-container');
+                if (quickDeliveryEl) {
+                    if (isFreeShipping) {
+                        quickDeliveryEl.classList.add('hidden');
+                    } else {
+                        quickDeliveryEl.classList.remove('hidden');
+                    }
+                }
+
+                // Remove duplicate delivery block from right summary (as delivery area is on the left)
+                if (deliveryInput) {
+                    const deliveryBlock = deliveryInput.closest('.mb-8, .mb-6, .mb-3, .space-y-2') || deliveryInput.parentElement;
+                    if (deliveryBlock) {
+                        deliveryBlock.remove();
+                    }
                 }
 
                 // Ensure product items are visible on all screen sizes in quick order modal
