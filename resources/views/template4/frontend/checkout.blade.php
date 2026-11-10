@@ -25,7 +25,7 @@
                         class="block lg:hidden bg-white p-4 sm:p-5 border border-gray-200 rounded-lg shadow-sm">
                         <h2
                             class="text-base md:text-lg font-bold text-[#0f172a] mb-3 border-l-4 border-[var(--primary-color)] pl-2">
-                            {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার অর্ডার আইটেম' : 'Your Order Items' }}
+                            Your Order Items
                         </h2>
                         <div class="space-y-3">
                             @foreach ($cartContent as $item)
@@ -91,16 +91,12 @@
                         <div class="space-y-4 md:space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1">Full Name
-                                        *</label>
-                                    <input type="text" name="name" placeholder="Enter your full name" required
+                                    <input type="text" name="name" placeholder="Your name *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1">Phone
-                                        *</label>
-                                    <input type="tel" name="phone" id="customer-phone" placeholder="Enter your Number"
+                                    <input type="tel" name="phone" id="customer-phone" placeholder="Phone number *"
                                         required value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
@@ -112,11 +108,10 @@
 
                             @if($showEmail || $showCity)
                                 <div
-                                    class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5 mt-5">
+                                    class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5 mt-4">
                                     @if($showEmail)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                            <input type="email" name="email" placeholder="Your email address"
+                                            <input type="email" name="email" placeholder="Email (Optional)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
                                                 class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
@@ -124,18 +119,14 @@
 
                                     @if($showCity)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">City <span
-                                                    class="text-red-500">*</span></label>
-                                            <input type="text" name="district" placeholder="Your city" required
+                                            <input type="text" name="district" placeholder="City *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                                 class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
                                 </div>
                             @endif
-                            <div class="space-y-2 mt-5">
-                                <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1">Full Address
-                                    *</label>
+                            <div class="mt-4">
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 md:pl-4 text-gray-400">
                                         <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor"
@@ -143,7 +134,7 @@
                                             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </span>
-                                    <input type="text" name="address" placeholder="Search and enter address detail" required
+                                    <input type="text" name="address" placeholder="Your address *" required
                                         value="{{ old('address', auth('customer')->user()->address ?? '') }}"
                                         class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
@@ -243,8 +234,8 @@
                                         alt="{{ $item->name }}" class="w-full h-full object-cover">
                                 </div>
 
-                                <div class="flex-1">
-                                    <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">
                                         {{ $item->name }}
                                     </h4>
 
