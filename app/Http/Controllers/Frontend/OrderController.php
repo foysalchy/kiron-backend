@@ -319,7 +319,7 @@ class OrderController extends FrontendController
             'name'           => 'required',
             'phone'          => 'required',
             'email'          => 'nullable|email',
-            'district'       => 'required|string',
+            'district'       => ($setup->checkout_show_city ?? true) ? 'required|string' : 'nullable|string',
             'address'        => 'required',
             'payment_method' => 'required|string',
             'transaction_id' => $isCOD ? 'nullable' : 'required|string|unique:order_payments,transaction_id',

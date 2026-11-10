@@ -289,7 +289,7 @@
                         });
                         refreshCartUI();
                         if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                        if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed from cart');
                     } else if (typeof toastr !== 'undefined') {
                         toastr.error(data.message || 'Error removing item');
                     }

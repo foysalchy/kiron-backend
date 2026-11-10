@@ -9,7 +9,8 @@
 
 @font-face {
     font-family: "Hind Siliguri";
-    src: url("../fonts/hind-siliguri/HindSiliguri-Regular-Bengali.woff2") format("woff2");
+    src: url("../fonts/hind-siliguri/HindSiliguri-Regular-Bengali.woff2")
+        format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -18,7 +19,8 @@
 
 @font-face {
     font-family: "Hind Siliguri";
-    src: url("../fonts/hind-siliguri/HindSiliguri-Bold-Bengali.woff2") format("woff2");
+    src: url("../fonts/hind-siliguri/HindSiliguri-Bold-Bengali.woff2")
+        format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -94,11 +96,11 @@
 }
 
 .font-storefront {
-    font-family: "Poppins", "Hind Siliguri", sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 .font-storefront :is(h1, h2, h3, h4, h5, h6) {
-    font-family: "Poppins", "Hind Siliguri", sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 .font-manrope-bengali {
@@ -193,23 +195,23 @@ h6 {
     right: 20px !important;
 }
 
-#toast-container>.toast-success {
-    background-color: #ff6a00 !important;
+#toast-container > .toast-success {
+    background-color: #10b981 !important;
     opacity: 1;
 }
 
-#toast-container>.toast-error {
+#toast-container > .toast-error {
     background-color: #e11d48 !important;
     opacity: 1;
 }
 
-#toast-container>.toast-warning,
-#toast-container>.toast-info {
+#toast-container > .toast-warning,
+#toast-container > .toast-info {
     background-color: #f59e0b !important;
     opacity: 1 !important;
 }
 
-#toast-container>.toast .toast-progress {
+#toast-container > .toast .toast-progress {
     background-color: #ffffff;
     opacity: 0.3;
 }

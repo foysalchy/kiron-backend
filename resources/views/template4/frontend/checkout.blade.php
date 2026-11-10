@@ -12,7 +12,7 @@
         </nav>
     </section>
 
-    <div class="container mx-auto px-4 py-4 md:py-10">
+    <div class="container mx-auto px-4 py-4">
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" id="checkout-main-form">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
@@ -20,8 +20,73 @@
                 <!-- ════════ LEFT COLUMN (Shipping & Payment) ════════ -->
                 <div class="lg:col-span-8 flex flex-col gap-6">
 
+                    <!-- Mobile Order Items Card -->
+                    <div id="checkout-mobile-items-container"
+                        class="block lg:hidden bg-white p-4 sm:p-5 border border-gray-200 rounded-lg shadow-sm">
+                        <h2
+                            class="text-base md:text-lg font-bold text-[#0f172a] mb-3 border-l-4 border-[var(--primary-color)] pl-2">
+                            {{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার অর্ডার আইটেম' : 'Your Order Items' }}
+                        </h2>
+                        <div class="space-y-3">
+                            @foreach ($cartContent as $item)
+                                <div class="bg-[#F9FAFB] rounded-xl p-3 sm:p-4 flex items-center gap-3 border border-gray-100">
+                                    <div class="w-14 h-14 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                            alt="{{ $item->name }}" class="w-full h-full object-cover">
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">
+                                            {{ $item->name }}
+                                        </h4>
+
+                                        @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
+                                            <div class="flex flex-wrap gap-1 mb-1">
+                                                @foreach ($item->options->attributes as $key => $value)
+                                                    <span
+                                                        class="bg-purple-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        {{ $value }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @elseif($item->options->has('variant'))
+                                            <p class="text-[11px] text-gray-500 font-medium mb-1">
+                                                {{ $item->options->variant }}
+                                            </p>
+                                        @endif
+
+                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Quantity Controls -->
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <div
+                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                                aria-label="Decrease quantity"
+                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
+                                            <span
+                                                class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
+                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                                aria-label="Increase quantity"
+                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
+                                        </div>
+                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
+                                            aria-label="Remove {{ $item->name }} from cart" title="Remove item"
+                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
+                                            <i class="far fa-trash-alt text-[10px]" aria-hidden="true"></i>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <!-- Card 1: Shipping Address -->
-                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-100 rounded-lg shadow-sm">
+                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-200 rounded-lg shadow-sm">
                         <h2 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Shipping Address</h2>
                         <div class="space-y-4 md:space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -40,21 +105,34 @@
                                         class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                    <input type="email" name="email" placeholder="Your email address"
-                                        value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                            @php
+                                $showEmail = $setup->checkout_show_email ?? true;
+                                $showCity = $setup->checkout_show_city ?? true;
+                            @endphp
+
+                            @if($showEmail || $showCity)
+                                <div
+                                    class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5 mt-5">
+                                    @if($showEmail)
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
+                                            <input type="email" name="email" placeholder="Your email address"
+                                                value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        </div>
+                                    @endif
+
+                                    @if($showCity)
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-700">City <span
+                                                    class="text-red-500">*</span></label>
+                                            <input type="text" name="district" placeholder="Your city" required
+                                                value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">City <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="hidden" name="district" placeholder="Your city" required
-                                        value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
-                                </div>
-                            </div>
+                            @endif
                             <div class="space-y-2 mt-5">
                                 <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1">Full Address
                                     *</label>
@@ -84,7 +162,7 @@
                     </section>
 
                     <!-- Card 2: Select Payment Method (Design Preserved) -->
-                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-100 rounded-lg shadow-sm">
+                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-200 rounded-lg shadow-sm">
                         <h2 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Select Payment method</h2>
                         <div class="space-y-3 md:space-y-4">
                             @foreach ($paymentMethods as $method)
@@ -126,7 +204,8 @@
 
                 <!-- ════════ RIGHT COLUMN (Order Summary) ════════ -->
                 <aside id="checkout-order-summary"
-                    class="lg:col-span-4 bg-white p-4 sm:p-5 md:p-6 border border-gray-100 rounded-lg shadow-sm lg:sticky lg:top-24">
+                    style="background: #f0f0f0; border: 1px solid gainsboro;"
+                    class="lg:col-span-4 p-4 sm:p-5 md:p-6 rounded-lg shadow-sm lg:sticky lg:top-24">
                     <h3 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Order Summary</h3>
 
                     @php
@@ -154,9 +233,10 @@
                         @endif
                     @endif
 
-                    <div class="space-y-4 mb-8">
+                    <!-- Product Row in Summary (Desktop) -->
+                    <div class="space-y-4 mb-8 hidden lg:block">
                         @foreach ($cartContent as $item)
-                            <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
+                            <div class="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200">
                                 <!-- Actual Product Image -->
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                     <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
@@ -172,7 +252,7 @@
                                         <div class="flex flex-wrap gap-1 mb-1">
                                             @foreach ($item->options->attributes as $key => $value)
                                                 <span
-                                                    class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                    class="bg-purple-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                                                     {{ $value }}
                                                 </span>
                                             @endforeach
@@ -188,13 +268,24 @@
                                     </p>
                                 </div>
 
-                                <!-- Quantity Display -->
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
+                                <!-- Quantity Controls (cart.blade.php rounded-lg style) -->
+                                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                    <div
+                                        class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                            aria-label="Decrease quantity"
+                                            class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">-</button>
+                                        <span
+                                            class="qty-{{ $item->rowId }} w-8 text-center text-xs sm:text-sm font-bold text-gray-800">{{ $item->qty }}</span>
+                                        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                            aria-label="Increase quantity"
+                                            class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">+</button>
+                                    </div>
                                     <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
-                                        aria-label="Remove {{ $item->name }} from cart"
-                                        class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer p-0">
+                                        aria-label="Remove {{ $item->name }} from cart" title="Remove item"
+                                        class="checkout-cart-remove text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
                                         <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
+                                        <span>Remove</span>
                                     </button>
                                 </div>
                             </div>
@@ -537,6 +628,86 @@
             }
         });
 
+        function refreshCartUI() {
+            fetch(window.location.href)
+                .then(r => r.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newSummary = doc.getElementById('checkout-order-summary');
+                    const currentSummary = document.getElementById('checkout-order-summary');
+                    if (newSummary && currentSummary) {
+                        currentSummary.innerHTML = newSummary.innerHTML;
+                    }
+                    const newMobile = doc.getElementById('checkout-mobile-items-container');
+                    const currentMobile = document.getElementById('checkout-mobile-items-container');
+                    if (newMobile && currentMobile) {
+                        currentMobile.innerHTML = newMobile.innerHTML;
+                    }
+                    const newTotal = doc.getElementById('total-display');
+                    if (newTotal) {
+                        const rawVal = parseFloat(newTotal.innerText.replace(/[^0-9.]/g, ''));
+                        if (!isNaN(rawVal)) {
+                            _checkoutTotal = rawVal;
+                            const activePaymentForm = document.querySelector('.payment-form:not(.hidden)');
+                            if (activePaymentForm) {
+                                const amountInput = activePaymentForm.querySelector('[name="amount"]');
+                                if (amountInput) amountInput.value = Math.round(_checkoutTotal);
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error('Cart refresh failed:', err));
+        }
+
+        function updateCheckoutQty(rowId, change, btnEl) {
+            const qtySpans = document.querySelectorAll('.qty-' + rowId);
+            if (!qtySpans || qtySpans.length === 0) return;
+
+            const currentQty = parseInt(qtySpans[0].innerText);
+            const newQty = currentQty + change;
+
+            if (newQty < 1) return;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            if (btnEl) btnEl.disabled = true;
+
+            fetch("{{ route('cart.update') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    rowId: rowId,
+                    qty: newQty
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (data.cart_count !== undefined) {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => {
+                                el.innerText = data.cart_count;
+                            });
+                        }
+                        refreshCartUI();
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        if (typeof toastr !== 'undefined') toastr.success('Quantity updated');
+                    } else {
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Failed to update quantity');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to update quantity');
+                })
+                .finally(() => {
+                    if (btnEl) btnEl.disabled = false;
+                });
+        }
+
         function removeCheckoutItem(rowId) {
             fetch(`{{ url('cart/remove') }}/${rowId}`, {
                 headers: {
@@ -544,48 +715,24 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.cart_count === 0) {
-                        window.location.href = "{{ route('cart.index') }}";
-                        return;
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (data.cart_count === 0) {
+                            window.location.href = "{{ route('cart.index') }}";
+                            return;
+                        }
+                        document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+                        refreshCartUI();
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed from cart');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Error removing item');
                     }
-                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
-
-                    fetch(window.location.href)
-                        .then(r => r.text())
-                        .then(html => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            const newSummary = doc.getElementById('checkout-order-summary');
-                            const currentSummary = document.getElementById('checkout-order-summary');
-                            if (newSummary && currentSummary) {
-                                currentSummary.innerHTML = newSummary.innerHTML;
-                            }
-                            const newTotal = doc.getElementById('total-display');
-                            if (newTotal) {
-                                const rawVal = parseFloat(newTotal.innerText.replace(/[^0-9.]/g, ''));
-                                if (!isNaN(rawVal)) {
-                                    _checkoutTotal = rawVal;
-                                    const activePaymentForm = document.querySelector('.payment-form:not(.hidden)');
-                                    if (activePaymentForm) {
-                                        const amountInput = activePaymentForm.querySelector('[name="amount"]');
-                                        if (amountInput) amountInput.value = Math.round(_checkoutTotal);
-                                    }
-                                }
-                            }
-                        });
-
-                    if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed from cart');
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(data.message || 'Error removing item');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
-            });
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+                });
         }
 
         const checkoutCustomerFields = ['name', 'phone', 'email', 'district', 'address'];

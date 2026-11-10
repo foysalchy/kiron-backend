@@ -336,11 +336,13 @@
                             class="w-full secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
                         </button>
-                        <!-- <button type="button" id="btn-quick-order-mobile" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i class="fas fa-bolt"></i>
-                            <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order' }}</span>
-                        </button> -->
+                        @if($setup->product_details_quick_order ?? true)
+                            <button type="button" id="btn-quick-order-mobile" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                                class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fas fa-bolt"></i>
+                                <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order' }}</span>
+                            </button>
+                        @endif
                     </div>
 
                     <!-- Desktop: 3 Buttons Grid -->
@@ -365,13 +367,15 @@
                     </div>
 
                     <!-- Desktop: Quick Order Button (Below Order Now) -->
-                    <!-- <div class="hidden md:block mb-8">
-                        <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
-                            class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
-                            <i class="fas fa-bolt"></i>
-                            <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
-                        </button>
-                    </div> -->
+                    @if($setup->product_details_quick_order ?? true)
+                        <div class="hidden md:block mb-8">
+                            <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                                class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fas fa-bolt"></i>
+                                <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
+                            </button>
+                        </div>
+                    @endif
 
                     @php
                         $rawPhone = preg_replace('/[^0-9]/', '', $setup->phone ?? '');
@@ -745,7 +749,9 @@
         @endif
 
         {{-- Quick Order Popup Modal Component --}}
-        <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
+        @if($setup->product_details_quick_order ?? true)
+            <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
+        @endif
 
     </section>
 @endsection

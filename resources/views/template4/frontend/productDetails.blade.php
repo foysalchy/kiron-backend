@@ -296,6 +296,17 @@
                                     class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
+
+                        <!-- Quick Order Button -->
+                        @if($setup->product_details_quick_order ?? true)
+                            <div class="mt-3">
+                                <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                                    class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
+                                </button>
+                            </div>
+                        @endif
                         <p
                             class="text-sm mt-4 {{ !$isProductOutOfStock ? 'text-green-700' : 'text-red-500' }}">
                             <i
@@ -592,6 +603,10 @@
     {{-- Hidden input for JS --}}
     <input type="hidden" id="main-qty" value="1">
     <input type="hidden" id="selected-variation-id" value="">
+    {{-- Quick Order Popup Modal Component --}}
+    @if($setup->product_details_quick_order ?? true)
+        <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
+    @endif
 @endsection
 
 @push('scripts')

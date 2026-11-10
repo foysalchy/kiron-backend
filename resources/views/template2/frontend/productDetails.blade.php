@@ -273,7 +273,7 @@
                     @endif
 
                     <!-- Action Buttons -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-3">
                         <!-- 1. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                             class="order-2 md:order-1 col-span-1 md:col-span-1 flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
@@ -292,6 +292,17 @@
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
+
+                    <!-- Quick Order Button -->
+                    @if($setup->product_details_quick_order ?? true)
+                        <div class="mb-8">
+                            <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
+                                class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fas fa-bolt"></i>
+                                <span>{{ isset($setup->lang) && $setup->lang == 'bn' ? 'দ্রুত অর্ডার করুন' : 'Quick Order' }}</span>
+                            </button>
+                        </div>
+                    @endif
 
                     <!-- Product Custom Block (Notice/Announcement/Policy) -->
                     @if (!empty($productCustomBlock) && !empty($productCustomBlock->text_content))
@@ -713,6 +724,11 @@
                     </div>
                 </div>
             @endif
+
+        {{-- Quick Order Popup Modal Component --}}
+        @if($setup->product_details_quick_order ?? true)
+            <x-template3.quick-order-modal :product="$product" :setup="$setup" :isUpcoming="$isUpcoming ?? false" />
+        @endif
 
     </section>
 @endsection
