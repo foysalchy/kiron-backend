@@ -57,8 +57,8 @@
                     <!-- Mobile Order Items Card -->
                     <div id="checkout-mobile-items-container" class="block lg:hidden bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4">
-                            <h2 class="text-[16px] font- text-gray-800 leading-tight">
-                               আপনার অর্ডার আইটেম
+                            <h2 class="text-[16px] font-bold text-gray-800 leading-tight">
+                                Your Order Items
                             </h2>
                         </div>
                         <!-- Product Row in Summary -->
@@ -123,21 +123,21 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4">
-                            <h2 class="text-[16px] font- text-gray-800 leading-tight">
-                               ডেলিভারি ঠিকানা
+                            <h2 class="text-[16px] font-bold text-gray-800 leading-tight">
+                                Delivery Address
                             </h2>
                         </div>
                         <div class="p-4 space-y-3 pt-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                   
-                                    <input type="text" name="name" placeholder="আপনার নাম *" required
+                                    <input type="text" name="name" placeholder="Your Name *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     
-                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
+                                    <input type="tel" name="phone" placeholder="Phone Number *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
@@ -171,7 +171,7 @@
                             @endif
                             <div class="space-y-2">
                                
-                                <textarea name="address" placeholder="আপনার ঠিকানা *" rows="2" required
+                                <textarea name="address" placeholder="Your Address *" rows="2" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -405,7 +405,7 @@
                         <!-- 4. Confirm Button -->
                         <button type="submit"
                             class="w-full animate-shake fixed-co primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
-                            অর্ডার কনফার্ম করুন
+                            Confirm Order
                         </button>
                     </div>
                 </div>
@@ -570,7 +570,7 @@
                 return;
             }
 
-            // Modal open করো
+            // Open modal
             openPaymentModal(_activeDraftOrderId, _checkoutTotal);
 
 

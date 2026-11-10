@@ -43,7 +43,7 @@
                     <div id="checkout-mobile-items-container" class="block lg:hidden bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4 border-b border-gray-100">
                             <h2 class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
-                                আপনার অর্ডার আইটেম
+                                Your Order Items
                             </h2>
                         </div>
                         <div class="space-y-0">
@@ -101,25 +101,21 @@
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4 md:p-6 border-b border-gray-100">
                             <h2 class="text-[16px] md:text-2xl font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
-                                ডেলিভারি ঠিকানা
+                                Delivery Address
                             </h2>
                             <p class="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
-                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নাম্বার, লিখে অর্ডার কনফার্ম করুন বাটনে ক্লিক করুন
+                                To confirm your order, enter your name, address, phone number and click confirm order
                             </p>
                         </div>
                         <div class="p-4 md:p-6 space-y-4 md:space-y-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Your Name <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="text" name="name" placeholder="Enter your full name" required
+                                    <input type="text" name="name" placeholder="Your name *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">Phone Number <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" placeholder="Your mobile number" required
+                                    <input type="tel" name="phone" placeholder="Phone number *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
@@ -133,8 +129,7 @@
                                 <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5">
                                     @if($showEmail)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                            <input type="email" name="email" placeholder="Your email address"
+                                            <input type="email" name="email" placeholder="Email (Optional)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
                                                 class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
@@ -142,9 +137,7 @@
 
                                     @if($showCity)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">City <span
-                                                    class="text-red-500">*</span></label>
-                                            <input type="text" name="district" placeholder="Your city" required
+                                            <input type="text" name="district" placeholder="City *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                                 class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
@@ -152,9 +145,7 @@
                                 </div>
                             @endif
                             <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">Your Address <span
-                                        class="text-red-500">*</span></label>
-                                <textarea name="address" placeholder="Your address" rows="3" required
+                                <textarea name="address" placeholder="Your address *" rows="3" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -267,8 +258,8 @@
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
 
-                                    <div class="flex-1">
-                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">
                                             {{ $item->name }}
                                         </h3>
 
@@ -379,7 +370,7 @@
                         <!-- 4. Confirm Button -->
                         <button type="submit"
                             class="w-full animate-shake fixed-co primary-bg primary-bg-hover text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
-                            অর্ডার কনফার্ম করুন
+                            Confirm Order
                         </button>
                     </div>
                 </div>
@@ -544,7 +535,7 @@
                 return;
             }
 
-            // Modal open করো
+            // Open modal
             openPaymentModal(_activeDraftOrderId, _checkoutTotal);
 
 
