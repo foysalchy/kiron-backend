@@ -204,7 +204,7 @@
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
                 <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
-                    <div class="bg-gray-100 rounded-lg border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         @php
                             $freeProductText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
@@ -260,9 +260,9 @@
                         <!-- Product Row in Summary (Desktop) -->
                         <div class="space-y-3 mb-8 hidden lg:block">
                             @foreach ($cartContent as $item)
-                                <div class="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200">
+                                <div class="bg-gray-50 rounded-xl p-4 flex items-center gap-4 border border-gray-200">
                                     <!-- Actual Product Image -->
-                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                    <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-200 shrink-0">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
