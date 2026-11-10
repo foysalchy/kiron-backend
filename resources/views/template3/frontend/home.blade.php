@@ -219,10 +219,10 @@
 
                     <!-- Track: ID -->
                     <div id="track-{{ $group->id }}"
-                        class="group-track flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
+                        class="group-track flex gap-2 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
                         style="-ms-overflow-style:none; scrollbar-width:none;">
                         @foreach ($group->products as $product)
-                            <div class="flex-shrink-0 w-[165px] md:w-[350px] h-auto">
+                            <div class="flex-shrink-0 w-[calc((100%-8px)/2)] sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-32px)/3)] lg:w-[calc((100%-64px)/5)] h-auto">
                                 <x-template1.product-card :product="$product" />
                             </div>
                         @endforeach
@@ -260,7 +260,7 @@
         </div>
 
         <!-- Product Grid (Responsive 2 to 6 columns) -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4">
             @foreach ($allProducts->take(12) as $product)
                 <x-template1.product-card :product="$product" />
             @endforeach
