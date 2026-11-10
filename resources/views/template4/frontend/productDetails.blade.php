@@ -204,6 +204,7 @@
 
                             @php
                                 $hasRegPrice = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
+                                $hasDiscount = ($product->display_price_data->regular_price > $product->display_price_data->sale_price);
                             @endphp
                             <span id="regular-price"
                                 class="{{ $hasRegPrice ? '' : 'hidden ' }}text-lg md:text-xl text-gray-600 line-through">
@@ -213,6 +214,13 @@
                                     @else
                                         {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                                     @endif
+                                @endif
+                            </span>
+
+                            <span id="discount-badge"
+                                class="{{ $hasDiscount ? '' : 'hidden ' }}inline-block bg-[#FFCF00] text-black text-xs md:text-sm font-bold px-2.5 md:px-3 py-1 rounded-full self-center">
+                                @if ($hasDiscount)
+                                    {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% OFF
                                 @endif
                             </span>
 
