@@ -96,7 +96,17 @@ class FrontendOrderService
         }
 
         if (!empty($filters['source'])) {
-            $query->where('orders.source', $filters['source']);
+            $sourceFilter = strtolower($filters['source']);
+            $query->where(function ($q) use ($sourceFilter) {
+                $q->where('orders.source', $sourceFilter)
+                  ->orWhere('orders.source_info->source', 'like', '%' . $sourceFilter . '%')
+                  ->orWhere('orders.pixel_source_info->source', 'like', '%' . $sourceFilter . '%');
+
+                if ($sourceFilter === 'facebook') {
+                    $q->orWhereNotNull('orders.pixel_source_info->fbc')
+                      ->orWhere('orders.pixel_source_info->url', 'like', '%fbclid=%');
+                }
+            });
         }
 
         if (!empty($filters['warehouse_id'])) {
@@ -231,7 +241,7 @@ class FrontendOrderService
                 'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'source_info' => $order->source_info,
-                'source' => $order->source,
+                'source' => $this->resolveOrderDisplaySource($order),
                 'items' => $order->orderDetails->map(function ($detail) {
                     $item = [
                         'id' => $detail->id,
@@ -519,7 +529,7 @@ class FrontendOrderService
             'totalorder' => $customerTotalOrders,
             'status' => $this->getStatusLabel($order->status),
             'order_status' => $order->status,
-            'source' => $order->source,
+            'source' => $this->resolveOrderDisplaySource($order),
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
                 $item = [
@@ -727,5 +737,31 @@ class FrontendOrderService
             Log::error('Order status update failed: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    protected function resolveOrderDisplaySource(Order $order): string
+    {
+        if (!empty($order->source) && !in_array(strtolower($order->source), ['sales', 'landing'])) {
+            return ucfirst($order->source);
+        }
+
+        $sourceInfo = is_array($order->source_info) ? $order->source_info : (is_string($order->source_info) ? json_decode($order->source_info, true) : []);
+        $pixelInfo = is_array($order->pixel_source_info) ? $order->pixel_source_info : (is_string($order->pixel_source_info) ? json_decode($order->pixel_source_info, true) : []);
+        $merged = array_merge($pixelInfo ?? [], $sourceInfo ?? []);
+
+        $source = $merged['source'] ?? $merged['utm_source'] ?? null;
+        if (!empty($source) && strtolower($source) !== 'direct/organic') {
+            return ucfirst($source);
+        }
+
+        if (!empty($merged['fbc']) || (isset($merged['url']) && str_contains($merged['url'], 'fbclid='))) {
+            return 'Facebook';
+        }
+
+        if (!empty($merged['_ttp']) || (isset($merged['url']) && str_contains($merged['url'], 'ttclid='))) {
+            return 'TikTok';
+        }
+
+        return !empty($order->source) ? ucfirst($order->source) : ($order->type ? ucfirst($order->type) : 'Website');
     }
 }

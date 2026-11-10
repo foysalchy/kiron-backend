@@ -24,7 +24,7 @@ class SalesReportController extends Controller
 
         $data = $this->service->generate(
             $request->start_date,
-            $request->end_date,
+            $request->end_date
         );
 
         return ResponseHelper::success($data);

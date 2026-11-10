@@ -9,30 +9,28 @@ use Illuminate\Support\Collection;
 
 class CustomerReportService
 {
-    private array $deliveredStatuses = [Status::Delivered->value];
-
     public function generate(array $filters): array
     {
         $startDate       = $filters['start_date'];
         $endDate         = $filters['end_date'];
         $repeatThreshold = (int) ($filters['repeat_threshold'] ?? 3);
 
-        // ── 1. Date range  delivered orders ──
+        // ── 1. Date range orders (except Draft) ──
         $ordersInRange = Order::whereBetween('order_date', [$startDate, $endDate])
-            ->whereIn('status', $this->deliveredStatuses)
-            ->select('id', 'customer_id', 'grand_total', 'order_date')
+            ->where('status', '!=', Status::Draft->value)
+            ->select('id', 'customer_id', 'grand_total', 'order_date', 'status')
             ->get();
 
-        $customerIdsInRange = $ordersInRange->pluck('customer_id')->unique();
+        $customerIdsInRange = $ordersInRange->pluck('customer_id')->filter()->unique();
 
         if ($customerIdsInRange->isEmpty()) {
             return $this->emptyResponse($startDate, $endDate, $repeatThreshold);
         }
 
-        // ── 2. Date range এর আগে order আছে এমন customer_ids ──
+        // ── 2. Customers who had orders before date range ──
         $returningCustomerIds = Order::where('order_date', '<', $startDate)
             ->whereIn('customer_id', $customerIdsInRange)
-            ->whereIn('status', $this->deliveredStatuses)
+            ->where('status', '!=', Status::Draft->value)
             ->pluck('customer_id')
             ->unique();
 
@@ -43,7 +41,7 @@ class CustomerReportService
             ->get()
             ->keyBy('id');
 
-        // ── 4. Range এর orders group by customer ──
+        // ── 4. Range orders group by customer ──
         $grouped = $ordersInRange->groupBy('customer_id');
 
         $newCustomers    = [];
@@ -57,14 +55,23 @@ class CustomerReportService
             $isReturn      = $returningCustomerIds->contains($customerId);
             $customer      = $customers->get($customerId);
 
+            // Status breakdown calculation
+            $statusBreakdown = [];
+            foreach ($orders as $ord) {
+                $statusEnum = $ord->status instanceof Status ? $ord->status : Status::tryFrom((int)$ord->status);
+                $statusLabel = $statusEnum ? $statusEnum->label() : 'Unknown';
+                $statusBreakdown[$statusLabel] = ($statusBreakdown[$statusLabel] ?? 0) + 1;
+            }
+
             $row = [
-                'customer_id'     => $customerId,
-                'name'            => $customer?->name ?? 'Unknown',
-                'phone'           => $customer?->phone ?? '-',
-                'district'        => $customer?->district ?? '-',
-                'order_count'     => $orderCount,
-                'total_spent'     => round($totalSpent, 2),
-                'avg_order_value' => $avgOrderValue,
+                'customer_id'      => $customerId,
+                'name'             => $customer?->name ?? 'Unknown',
+                'phone'            => $customer?->phone ?? '-',
+                'district'         => $customer?->district ?? '-',
+                'order_count'      => $orderCount,
+                'status_breakdown' => $statusBreakdown,
+                'total_spent'      => round($totalSpent, 2),
+                'avg_order_value'  => $avgOrderValue,
             ];
 
             // New = date range এ প্রথমবার order করেছে (আগে কোনো order ছিল না)
@@ -84,30 +91,40 @@ class CustomerReportService
         }
 
         // ── 5. CLV — avg order value × lifetime order count ──
-        $lifetimeData = Order::whereIn('customer_id', $customerIdsInRange)
-            ->whereIn('status', $this->deliveredStatuses)
-            ->selectRaw('customer_id, COUNT(*) as lifetime_orders, SUM(grand_total) as lifetime_spent')
-            ->groupBy('customer_id')
-            ->get();
+        $lifetimeOrders = Order::whereIn('customer_id', $customerIdsInRange)
+            ->where('status', '!=', Status::Draft->value)
+            ->select('id', 'customer_id', 'grand_total', 'status')
+            ->get()
+            ->groupBy('customer_id');
 
-        $clvList = $lifetimeData->map(function ($row) use ($customers) {
-            $avgOrderValue = $row->lifetime_orders > 0
-                ? $row->lifetime_spent / $row->lifetime_orders
-                : 0;
-            $clv      = round($avgOrderValue * $row->lifetime_orders, 2); // = lifetime_spent
-            $customer = $customers->get($row->customer_id);
+        $clvList = [];
+        foreach ($lifetimeOrders as $cId => $allCustomerOrders) {
+            $lifetimeCount = $allCustomerOrders->count();
+            $lifetimeSpent = (float) $allCustomerOrders->sum('grand_total');
+            $avgOrderValue = $lifetimeCount > 0 ? round($lifetimeSpent / $lifetimeCount, 2) : 0;
+            $customer = $customers->get($cId);
 
-            return [
-                'customer_id'     => $row->customer_id,
-                'name'            => $customer?->name ?? 'Unknown',
-                'phone'           => $customer?->phone ?? '-',
-                'district'        => $customer?->district ?? '-',
-                'lifetime_orders' => $row->lifetime_orders,
-                'lifetime_spent'  => round($row->lifetime_spent, 2),
-                'avg_order_value' => round($avgOrderValue, 2),
-                'clv'             => $clv,
+            $lifetimeBreakdown = [];
+            foreach ($allCustomerOrders as $cord) {
+                $statusEnum = $cord->status instanceof Status ? $cord->status : Status::tryFrom((int)$cord->status);
+                $statusLabel = $statusEnum ? $statusEnum->label() : 'Unknown';
+                $lifetimeBreakdown[$statusLabel] = ($lifetimeBreakdown[$statusLabel] ?? 0) + 1;
+            }
+
+            $clvList[] = [
+                'customer_id'      => $cId,
+                'name'             => $customer?->name ?? 'Unknown',
+                'phone'            => $customer?->phone ?? '-',
+                'district'         => $customer?->district ?? '-',
+                'lifetime_orders'  => $lifetimeCount,
+                'status_breakdown' => $lifetimeBreakdown,
+                'lifetime_spent'   => round($lifetimeSpent, 2),
+                'avg_order_value'  => $avgOrderValue,
+                'clv'              => round($lifetimeSpent, 2),
             ];
-        })->sortByDesc('clv')->values()->toArray();
+        }
+
+        usort($clvList, fn($a, $b) => $b['clv'] <=> $a['clv']);
 
         $avgCLV = count($clvList) > 0
             ? round(array_sum(array_column($clvList, 'clv')) / count($clvList), 2)

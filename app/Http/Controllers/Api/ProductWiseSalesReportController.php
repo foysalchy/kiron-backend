@@ -22,7 +22,7 @@ class ProductWiseSalesReportController extends Controller
             'mega_category_id' => ['nullable', 'integer', 'exists:mega_categories,id'],
             'brand_id'         => ['nullable', 'integer', 'exists:brands,id'],
             'product_id'       => ['nullable', 'integer', 'exists:products,id'],
-            'status_filter'    => ['nullable', 'in:delivered,all'],
+            'status_filter'    => ['nullable', 'string'],
             'sort_by'          => ['nullable', 'in:quantity,sales,profit'],
         ]);
 

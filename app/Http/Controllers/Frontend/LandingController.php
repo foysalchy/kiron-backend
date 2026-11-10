@@ -513,8 +513,25 @@ class LandingController extends FrontendController
                 }
             }
 
+            $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+            $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'landing';
+
+            $sourceInfo = [
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? request()->fullUrl(),
+                'source' => $marketingSource ?? 'Direct/Organic',
+                'utm_source' => session('utm_source'),
+                'utm_medium' => session('utm_medium'),
+                'utm_campaign' => session('utm_campaign'),
+                'utm_content' => session('utm_content'),
+            ];
+
             $orderData = [
                 'type'             => Order::TYPE_LANDING,
+                'source'           => $finalSource,
                 'company_id'       => $this->company_id,
                 'landing_page_id'  => $request->landing_page_id ?: null,
                 'warehouse_id'     => $primaryWarehouseId,
@@ -528,6 +545,8 @@ class LandingController extends FrontendController
                     'address' => $request->address,
                 ],
                 'items'            => $orderItems,
+                'source_info'      => $sourceInfo,
+                'pixel_source_info'=> $sourceInfo,
                 'status'           => Status::Pending->value,
             ];
 

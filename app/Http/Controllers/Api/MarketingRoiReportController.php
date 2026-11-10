@@ -18,7 +18,10 @@ class MarketingRoiReportController extends Controller
         ]);
 
         $query = Order::query()
-            ->whereNotNull('source_info');
+            ->where(function ($q) {
+                $q->whereNotNull('source_info')
+                  ->orWhereNotNull('pixel_source_info');
+            });
 
         if ($request->start_date) {
             $query->whereDate('created_at', '>=', $request->start_date);
@@ -31,19 +34,51 @@ class MarketingRoiReportController extends Controller
 
         $report = [];
         foreach ($orders as $order) {
-            $sourceInfo = is_array($order->source_info) ? $order->source_info : json_decode($order->source_info, true);
-            $utmSource = $sourceInfo['utm_source'] ?? $sourceInfo['source'] ?? 'Direct/Organic';
+            $sourceInfo = is_array($order->source_info) 
+                ? $order->source_info 
+                : (is_string($order->source_info) ? json_decode($order->source_info, true) : null);
 
-            if (!isset($report[$utmSource])) {
-                $report[$utmSource] = [
-                    'source' => $utmSource,
+            $pixelInfo = is_array($order->pixel_source_info) 
+                ? $order->pixel_source_info 
+                : (is_string($order->pixel_source_info) ? json_decode($order->pixel_source_info, true) : null);
+
+            $info = array_merge($pixelInfo ?? [], $sourceInfo ?? []);
+
+            // Source determination
+            $utmSource = $info['utm_source'] ?? $info['source'] ?? null;
+
+            if (empty($utmSource) || $utmSource === 'Direct/Organic') {
+                if (!empty($info['fbc']) || (isset($info['url']) && str_contains($info['url'], 'fbclid='))) {
+                    $utmSource = 'Facebook Ads';
+                } elseif (!empty($info['fbp'])) {
+                    $utmSource = 'Facebook (Meta Pixel)';
+                } elseif (!empty($info['_ttp']) || (isset($info['url']) && str_contains($info['url'], 'ttclid='))) {
+                    $utmSource = 'TikTok Ads';
+                } else {
+                    $utmSource = 'Direct/Organic';
+                }
+            }
+
+            // Normalization
+            $displaySource = match (strtolower(trim($utmSource))) {
+                'facebook', 'fb', 'facebook ads' => 'Facebook Ads',
+                'instagram', 'ig' => 'Instagram',
+                'google', 'google ads', 'cpc' => 'Google Ads',
+                'tiktok', 'tiktok ads' => 'TikTok Ads',
+                'youtube' => 'YouTube',
+                default => ucfirst($utmSource),
+            };
+
+            if (!isset($report[$displaySource])) {
+                $report[$displaySource] = [
+                    'source' => $displaySource,
                     'total_orders' => 0,
                     'total_revenue' => 0,
                 ];
             }
 
-            $report[$utmSource]['total_orders']++;
-            $report[$utmSource]['total_revenue'] += $order->grand_total ?? $order->total_amount ?? 0;
+            $report[$displaySource]['total_orders']++;
+            $report[$displaySource]['total_revenue'] += (float) ($order->grand_total ?? $order->total_amount ?? 0);
         }
 
         return ResponseHelper::success(array_values($report));

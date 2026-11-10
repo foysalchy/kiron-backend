@@ -26,6 +26,47 @@ class BalanceSheetReportService
             ->selectRaw('COUNT(*) as count, COALESCE(SUM(grand_total), 0) as amount')
             ->first();
 
+        // Specific Status Groups for Order Lifecycle Summary
+        $processingStatuses = [
+            Status::Pending->value,
+            Status::Confirmed->value,
+            Status::Processing->value,
+            Status::ReadyToShipped->value,
+        ];
+        $shippingStatuses   = [
+            Status::Shipped->value,
+            Status::HandovertoCourier->value,
+            Status::InTransit->value,
+        ];
+        $deliveredStatuses  = [Status::Delivered->value];
+        $returnedStatuses   = [
+            Status::ReturntoCourier->value,
+            Status::ReturnReceived->value,
+            Status::ReturnRequest->value,
+        ];
+        $cancelledStatuses  = [Status::Cancelled->value];
+        $fakeStatuses       = [Status::Fake->value];
+
+        $allOrderStatuses = array_merge(
+            $processingStatuses,
+            $shippingStatuses,
+            $deliveredStatuses,
+            $returnedStatuses,
+            $cancelledStatuses,
+            $fakeStatuses
+        );
+
+        $orderSummary = [
+            'total_orders'     => $this->orderSummaryCountAmount($startDate, $endDate, $allOrderStatuses),
+            'processing_group' => $this->orderSummaryCountAmount($startDate, $endDate, $processingStatuses),
+            'shipping_group'   => $this->orderSummaryCountAmount($startDate, $endDate, $shippingStatuses),
+            'delivered_orders' => $this->orderSummaryCountAmount($startDate, $endDate, $deliveredStatuses),
+            'return_orders'    => $this->orderSummaryCountAmount($startDate, $endDate, $returnedStatuses),
+            'return_received'  => $this->orderSummaryCountAmount($startDate, $endDate, [Status::ReturnReceived->value]),
+            'cancelled_orders' => $this->orderSummaryCountAmount($startDate, $endDate, $cancelledStatuses),
+            'fake_orders'      => $this->orderSummaryCountAmount($startDate, $endDate, $fakeStatuses),
+        ];
+
         // 2. Transaction incomes (Approved)
         $transactionIncomes = TransactionIncome::whereBetween('date', [$startDate, $endDate])
             ->where('status', Status::Approved->value)
@@ -79,6 +120,7 @@ class BalanceSheetReportService
                 'start' => $startDate,
                 'end'   => $endDate,
             ],
+            'order_summary' => $orderSummary,
             'income' => [
                 'order_income' => [
                     'label'  => 'Delivered Order Income',
@@ -108,6 +150,19 @@ class BalanceSheetReportService
             ],
             'net_balance' => round($netBalance, 2),
             'is_profit'   => $netBalance >= 0,
+        ];
+    }
+
+    private function orderSummaryCountAmount(string $start, string $end, array $statuses): array
+    {
+        $result = Order::whereBetween('order_date', [$start, $end])
+            ->whereIn('status', $statuses)
+            ->selectRaw('COUNT(*) as count, COALESCE(SUM(grand_total), 0) as amount')
+            ->first();
+
+        return [
+            'count'  => (int) ($result->count  ?? 0),
+            'amount' => (float) ($result->amount ?? 0),
         ];
     }
 }
