@@ -4,45 +4,69 @@
 @endsection
 
 @push('styles')
-<style>
-    @media(max-width:576px){
-        .fixed-co{
-            position: fixed;
-            left: 0;
-            right: 0;
-            width: 90%;
-            margin: auto;
-            bottom: 20px;
-            z-index: 999;
+    <style>
+        @media(max-width:576px) {
+            .fixed-co {
+                position: fixed;
+                left: 0;
+                right: 0;
+                width: 90%;
+                margin: auto;
+                bottom: 20px;
+                z-index: 999;
+            }
         }
-    }
-    .animate-shake {
-        animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
-    }
-    @keyframes rsiShaker {
-      0%, 25%, to { transform:scaleX(1) }
-      2.5%, 5% { transform:scale3d(.97,.97,.97)rotate(-1deg) }
-      7.5%, 12.5%, 17.5%, 22.5% { transform:scale3d(1.03,1.03,1.03)rotate(1deg) }
-      10%, 15%, 20% { transform:scale3d(1.03,1.03,1.03)rotate(-1deg) }
-    }
-</style>
+
+        .animate-shake {
+            animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
+        }
+
+        @keyframes rsiShaker {
+
+            0%,
+            25%,
+            to {
+                transform: scaleX(1)
+            }
+
+            2.5%,
+            5% {
+                transform: scale3d(.97, .97, .97)rotate(-1deg)
+            }
+
+            7.5%,
+            12.5%,
+            17.5%,
+            22.5% {
+                transform: scale3d(1.03, 1.03, 1.03)rotate(1deg)
+            }
+
+            10%,
+            15%,
+            20% {
+                transform: scale3d(1.03, 1.03, 1.03)rotate(-1deg)
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
-        <h1 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Checkout</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
-                <div class="lg:col-span-2 lg:order-1 space-y-4 md:space-y-6">
+                <div class="lg:col-span-2 lg:order-1 space-y-2">
 
                     <!-- Mobile Order Items Card (Template 3 Style with Template 5 Qty Controls) -->
-                    <div id="checkout-mobile-items-container" class="block lg:hidden bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
+                    <div id="checkout-mobile-items-container"
+                        class="block lg:hidden bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4 border-b border-gray-100">
-                            <h2 class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
+                            <h2
+                                class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
                                 Your Order Items
                             </h2>
                         </div>
@@ -60,7 +84,8 @@
                                         @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
                                             <div class="flex flex-wrap gap-1 mb-1">
                                                 @foreach ($item->options->attributes as $key => $value)
-                                                    <span class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                    <span
+                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                                                         {{ $value }}
                                                     </span>
                                                 @endforeach
@@ -76,11 +101,13 @@
                                     </div>
                                     <!-- Quantity Controls (cart.blade.php rounded-lg style) -->
                                     <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                        <div
+                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
                                             <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
                                                 aria-label="Decrease quantity"
                                                 class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
-                                            <span class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
+                                            <span
+                                                class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
                                             <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
                                                 aria-label="Increase quantity"
                                                 class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
@@ -100,24 +127,25 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
                         <div class="p-4 md:p-6 border-b border-gray-100">
-                            <h2 class="text-[16px] md:text-2xl font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
+                            <h2
+                                class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
                                 Delivery Address
                             </h2>
                             <p class="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
                                 To confirm your order, enter your name, address, phone number and click confirm order
                             </p>
                         </div>
-                        <div class="p-4 md:p-6 space-y-4 md:space-y-5">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-4 md:p-6 space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
-                                    <input type="text" name="name" placeholder="Your name *" required
+                                    <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <input type="tel" name="phone" placeholder="Phone number *" required
+                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
                             @php
@@ -126,26 +154,26 @@
                             @endphp
 
                             @if($showEmail || $showCity)
-                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5">
+                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-3">
                                     @if($showEmail)
                                         <div class="space-y-2">
-                                            <input type="email" name="email" placeholder="Email (Optional)"
+                                            <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
 
                                     @if($showCity)
                                         <div class="space-y-2">
-                                            <input type="text" name="district" placeholder="City *" required
+                                            <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
                                 </div>
                             @endif
                             <div class="space-y-2">
-                                <textarea name="address" placeholder="Your address *" rows="3" required
+                                <textarea name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" rows="2" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -164,18 +192,18 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-4 md:p-6 bg-white rounded-xl shadow-xs mt-6 border border-gray-200">
-                        <h3 class="text-base md:text-lg font-bold text-gray-800 mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Payment Method</h3>
+                    <div class="space-y-3 p-4 bg-white rounded-xl shadow-xs mt-0 border border-gray-200">
+                        <h3 class="text-[14px] font-bold text-gray-800 mb-2">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
-                            <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
+                            <div class="payment-option">
                                 <label
-                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
+                                    class="flex items-center space-x-4 p-2 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
                                         class="w-5 h-5 accent-[var(--primary-color)]">
-                                    <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
+                                    <span class="text-sm font-medium text-gray-700 capitalize">{{ $method->name }}</span>
                                 </label>
 
                                 <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
@@ -225,7 +253,9 @@
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
                             <div class="mb-8">
-                                <h2 class="text-base md:text-xl font-semibold leading-none tracking-tight mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Delivery
+                                <h2
+                                    class="text-base md:text-xl font-semibold leading-none tracking-tight mb-4 border-l-4 border-[var(--primary-color)] pl-2">
+                                    Select Delivery
                                     Method</h2>
                                 <div class="space-y-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
@@ -285,11 +315,13 @@
 
                                     <!-- Quantity Controls (cart.blade.php rounded-lg style) -->
                                     <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                        <div
+                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
                                             <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
                                                 aria-label="Decrease quantity"
                                                 class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">-</button>
-                                            <span class="qty-{{ $item->rowId }} w-8 text-center text-xs sm:text-sm font-bold text-gray-800">{{ $item->qty }}</span>
+                                            <span
+                                                class="qty-{{ $item->rowId }} w-8 text-center text-xs sm:text-sm font-bold text-gray-800">{{ $item->qty }}</span>
                                             <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
                                                 aria-label="Increase quantity"
                                                 class="px-2.5 py-1 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-base">+</button>
@@ -445,29 +477,29 @@
                     qty: newQty
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.cart_count !== undefined) {
-                        document.querySelectorAll('.cart-count-nav').forEach(el => {
-                            el.innerText = data.cart_count;
-                            el.parentElement.classList.remove('hidden');
-                        });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (data.cart_count !== undefined) {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => {
+                                el.innerText = data.cart_count;
+                                el.parentElement.classList.remove('hidden');
+                            });
+                        }
+                        refreshCartUI();
+                        if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                        if (typeof toastr !== 'undefined') toastr.success('Quantity updated');
+                    } else {
+                        if (typeof toastr !== 'undefined') toastr.error(data.message || 'Failed to update quantity');
                     }
-                    refreshCartUI();
-                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                    if (typeof toastr !== 'undefined') toastr.success('Quantity updated');
-                } else {
-                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Failed to update quantity');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                if (typeof toastr !== 'undefined') toastr.error('Failed to update quantity');
-            })
-            .finally(() => {
-                if (btnEl) btnEl.disabled = false;
-            });
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to update quantity');
+                })
+                .finally(() => {
+                    if (btnEl) btnEl.disabled = false;
+                });
         }
 
         function removeCheckoutItem(rowId) {
@@ -477,25 +509,25 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.cart_count !== undefined) {
-                    if (data.cart_count === 0) {
-                        window.location.href = "{{ route('shop.index') }}";
-                        return;
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.cart_count !== undefined) {
+                        if (data.cart_count === 0) {
+                            window.location.href = "{{ route('shop.index') }}";
+                            return;
+                        }
+                        document.querySelectorAll('.cart-count-nav').forEach(el => {
+                            el.innerText = data.cart_count;
+                        });
                     }
-                    document.querySelectorAll('.cart-count-nav').forEach(el => {
-                        el.innerText = data.cart_count;
-                    });
-                }
-                refreshCartUI();
-                if (typeof refreshMiniCart === 'function') refreshMiniCart();
-                if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed');
-            })
-            .catch(err => {
-                console.error(err);
-                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
-            });
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Item removed');
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+                });
         }
 
         let _activeDraftOrderId = @json($draftOrderId ?? null);
@@ -726,7 +758,7 @@
             @auth('customer')
                 saveDraft();
             @endauth
-            });
+                });
     </script>
     <script>
         function updateCheckoutShipping(value) {
@@ -769,8 +801,8 @@
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                    <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-                </div>`;
+                        <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
+                    </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);
 

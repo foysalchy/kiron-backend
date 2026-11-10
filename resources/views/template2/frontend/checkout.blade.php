@@ -30,14 +30,14 @@
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
-        <h1 class="text-2xl font-bold text-gray-900 md:mb-8 tracking-tight">Checkout</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
-                <div class="lg:col-span-2 lg:order-1 space-y-4 md:space-y-6">
+                <div class="lg:col-span-2 lg:order-1 space-y-2">
 
                     <!-- Mobile Order Items Card -->
                     <div id="checkout-mobile-items-container" class="block lg:hidden bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
@@ -100,24 +100,24 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
                         <div class="p-4 md:p-6 border-b border-gray-100">
-                            <h2 class="text-[16px] md:text-2xl font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
+                            <h2 class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
                                 Delivery Address
                             </h2>
                             <p class="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
                                 To confirm your order, enter your name, address, phone number and click confirm order
                             </p>
                         </div>
-                        <div class="p-4 md:p-6 space-y-4 md:space-y-5">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-4 md:p-6 space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
-                                    <input type="text" name="name" placeholder="Your name *" required
+                                    <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <input type="tel" name="phone" placeholder="Phone number *" required
+                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
                             @php
@@ -126,26 +126,26 @@
                             @endphp
 
                             @if($showEmail || $showCity)
-                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5">
+                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-3">
                                     @if($showEmail)
                                         <div class="space-y-2">
-                                            <input type="email" name="email" placeholder="Email (Optional)"
+                                            <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
 
                                     @if($showCity)
                                         <div class="space-y-2">
-                                            <input type="text" name="district" placeholder="City *" required
+                                            <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
                                 </div>
                             @endif
                             <div class="space-y-2">
-                                <textarea name="address" placeholder="Your address *" rows="3" required
+                                <textarea name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" rows="2" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -164,18 +164,18 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-4 md:p-6 bg-white rounded-xl shadow-sm mt-6 border border-gray">
-                        <h3 class="text-base md:text-lg font-bold text-gray-800 mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Payment Method</h3>
+                    <div class="space-y-3 p-4 bg-white rounded-xl shadow-xs mt-0 border border-gray-200">
+                        <h3 class="text-[14px] font-bold text-gray-800 mb-2">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
                             @php $slug = strtolower(trim($method->name)); @endphp
-                            <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
+                            <div class="payment-option">
                                 <label
-                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
+                                    class="flex items-center space-x-4 p-2 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
                                         class="w-5 h-5 accent-[var(--primary-color)]">
-                                    <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
+                                    <span class="text-sm font-medium text-gray-700 capitalize">{{ $method->name }}</span>
                                 </label>
 
                                 <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">

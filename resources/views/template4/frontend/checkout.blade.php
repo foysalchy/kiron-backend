@@ -18,7 +18,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
 
                 <!-- ════════ LEFT COLUMN (Shipping & Payment) ════════ -->
-                <div class="lg:col-span-8 flex flex-col gap-6">
+                <div class="lg:col-span-8 flex flex-col gap-2">
 
                     <!-- Mobile Order Items Card -->
                     <div id="checkout-mobile-items-container"
@@ -86,19 +86,19 @@
                     </div>
 
                     <!-- Card 1: Shipping Address -->
-                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-200 rounded-lg shadow-sm">
-                        <h2 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Shipping Address</h2>
-                        <div class="space-y-4 md:space-y-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <section class="bg-white p-4 md:p-6 border border-gray-200 rounded-lg shadow-sm">
+                        <h2 class="text-[16px] font-bold text-gray-800 mb-3">Shipping Address</h2>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <input type="text" name="name" placeholder="Your name *" required
+                                    <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                                 <div>
-                                    <input type="tel" name="phone" id="customer-phone" placeholder="Phone number *"
+                                    <input type="tel" name="phone" id="customer-phone" placeholder="আপনার মোবাইল নম্বর *"
                                         required value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
                             @php
@@ -108,35 +108,35 @@
 
                             @if($showEmail || $showCity)
                                 <div
-                                    class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5 mt-4">
+                                    class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-3">
                                     @if($showEmail)
-                                        <div class="space-y-2">
-                                            <input type="email" name="email" placeholder="Email (Optional)"
+                                        <div>
+                                            <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                         </div>
                                     @endif
 
                                     @if($showCity)
-                                        <div class="space-y-2">
-                                            <input type="text" name="district" placeholder="City *" required
+                                        <div>
+                                            <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
-                                                class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                                class="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                         </div>
                                     @endif
                                 </div>
                             @endif
-                            <div class="mt-4">
+                            <div>
                                 <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 md:pl-4 text-gray-400">
-                                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor"
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                             stroke-width="2" viewBox="0 0 24 24">
                                             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </span>
-                                    <input type="text" name="address" placeholder="Your address *" required
+                                    <input type="text" name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" required
                                         value="{{ old('address', auth('customer')->user()->address ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
+                                        class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
                             @guest('customer')
@@ -152,27 +152,27 @@
                         </div>
                     </section>
 
-                    <!-- Card 2: Select Payment Method (Design Preserved) -->
-                    <section class="bg-white p-4 sm:p-5 md:p-6 border border-gray-200 rounded-lg shadow-sm">
-                        <h2 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Select Payment method</h2>
-                        <div class="space-y-3 md:space-y-4">
+                    <!-- Card 2: Select Payment Method -->
+                    <section class="bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+                        <h3 class="text-[14px] font-bold text-gray-800 mb-2">Select Payment Method</h3>
+                        <div class="space-y-2">
                             @foreach ($paymentMethods as $method)
                                 @php $slug = strtolower(trim($method->name)); @endphp
                                 <div class="payment-option-wrapper">
                                     <label id="label-{{ $slug }}"
-                                        class="payment-option-label flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-xl cursor-pointer transition hover:border-[var(--primary-color)]"
+                                        class="payment-option-label flex items-center justify-between p-2 border border-gray-200 rounded-xl cursor-pointer transition hover:border-[var(--primary-color)]"
                                         onclick="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')">
 
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="radio-ring w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0">
-                                                <div class="radio-dot w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-transparent">
+                                                class="radio-ring w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0">
+                                                <div class="radio-dot w-2 h-2 rounded-full bg-transparent">
                                                 </div>
                                             </div>
                                             <input type="radio" name="payment_method" value="{{ $method->name }}"
                                                 class="hidden">
                                             <span
-                                                class="text-sm md:text-base font-bold text-[#0f172a] capitalize">{{ $method->name }}</span>
+                                                class="text-sm font-medium text-gray-700 capitalize">{{ $method->name }}</span>
                                         </div>
 
                                         @if ($method->icon)
