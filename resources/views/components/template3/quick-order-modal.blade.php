@@ -50,6 +50,11 @@
         font-size: 0.8rem !important;
     }
     /* Cart items list: compact and scrollable */
+    #quick-order-modal #quick-order-summary-container .hidden.lg\:block,
+    #quick-order-modal #quick-order-summary-container [class*="hidden lg:block"] {
+        display: block !important;
+    }
+    #quick-order-modal #quick-order-summary-container .space-y-3.mb-8,
     #quick-order-modal #quick-order-summary-container .space-y-4.mb-8 {
         max-height: 135px !important;
         overflow-y: auto !important;
@@ -355,6 +360,11 @@
                     deliveryBlock.remove();
                 }
 
+                // Ensure product items are visible on all screen sizes in quick order modal
+                newSummary.querySelectorAll('.hidden.lg\\:block, [class*="hidden lg:block"]').forEach(el => {
+                    el.classList.remove('hidden', 'lg:block');
+                });
+
                 summaryContainer.innerHTML = newSummary.innerHTML;
 
                 const match = html.match(/let _checkoutTotal = (.*?);/);
@@ -403,6 +413,55 @@
         .catch(err => {
             console.error(err);
             if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+        });
+    }
+
+    function updateCheckoutQty(rowId, change, btnEl) {
+        const qtySpans = document.querySelectorAll('#quick-order-modal .qty-' + rowId);
+        if (!qtySpans || qtySpans.length === 0) return;
+
+        const currentQty = parseInt(qtySpans[0].innerText);
+        const newQty = currentQty + change;
+
+        if (newQty < 1) return;
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        if (btnEl) btnEl.disabled = true;
+
+        fetch("{{ route('cart.update') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                rowId: rowId,
+                qty: newQty
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                if (data.cart_count !== undefined) {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                        el.parentElement?.classList.remove('hidden');
+                    });
+                }
+                refreshQuickOrderSummary();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success('Quantity updated');
+            } else {
+                if (typeof toastr !== 'undefined') toastr.error(data.message || 'Failed to update quantity');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            if (typeof toastr !== 'undefined') toastr.error('Failed to update quantity');
+        })
+        .finally(() => {
+            if (btnEl) btnEl.disabled = false;
         });
     }
 
