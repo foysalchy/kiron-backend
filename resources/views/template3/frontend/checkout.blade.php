@@ -131,13 +131,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                   
-                                    <input type="text" name="name" placeholder="Your Name *" required
+                                    <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     
-                                    <input type="tel" name="phone" placeholder="Phone Number *" required
+                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
@@ -148,11 +148,10 @@
                             @endphp
 
                             @if($showEmail || $showCity)
-                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-5">
+                                <div class="grid grid-cols-1 {{ ($showEmail && $showCity) ? 'md:grid-cols-2' : '' }} gap-3">
                                     @if($showEmail)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
-                                            <input type="email" name="email" placeholder="Your email address"
+                                            <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
@@ -160,9 +159,7 @@
 
                                     @if($showCity)
                                         <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-700">City <span
-                                                    class="text-red-500">*</span></label>
-                                            <input type="text" name="district" placeholder="Your city" required
+                                            <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
@@ -171,7 +168,7 @@
                             @endif
                             <div class="space-y-2">
                                
-                                <textarea name="address" placeholder="Your Address *" rows="2" required
+                                <textarea name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" rows="2" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
