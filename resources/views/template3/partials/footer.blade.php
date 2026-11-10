@@ -117,6 +117,7 @@
                 </div>
 
                 <!-- Column 3: Pages -->
+                @if(isset($footerPages) && count($footerPages) > 0)
                 <div>
                     <div class="flex items-center gap-2 mb-4 md:mb-4">
                         <h3 class="text-base md:text-lg font-bold">Pages</h3>
@@ -135,6 +136,7 @@
                         @endforeach
                     </ul>
                 </div>
+                @endif
 
                 <!-- Column 4: Newsletter -->
                 <div>

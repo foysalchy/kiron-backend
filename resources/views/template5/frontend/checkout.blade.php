@@ -5,18 +5,6 @@
 
 @push('styles')
     <style>
-        @media(max-width:576px) {
-            .fixed-co {
-                position: fixed;
-                left: 0;
-                right: 0;
-                width: 90%;
-                margin: auto;
-                bottom: 20px;
-                z-index: 999;
-            }
-        }
-
         .animate-shake {
             animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
         }
@@ -51,7 +39,7 @@
 @endpush
 
 @section('content')
-<section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
+<section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-6">
     <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
     <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
@@ -385,7 +373,7 @@
 
                     <!-- 4. Confirm Button -->
                     <button type="submit"
-                        class="w-full animate-shake fixed-co primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                        class="w-full animate-shake primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
                         Confirm Order
                     </button>
                 </div>

@@ -5,18 +5,6 @@
 
 @push('styles')
     <style>
-        @media(max-width:576px) {
-            .fixed-co {
-                position: fixed;
-                left: 0;
-                right: 0;
-                width: 90%;
-                margin: auto;
-                bottom: 20px;
-                z-index: 999;
-            }
-        }
-
         .animate-shake {
             animation: rsiShaker 4s cubic-bezier(.35, .06, .2, .98) infinite both;
         }
@@ -51,7 +39,7 @@
 @endpush
 
 @section('content')
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
@@ -85,7 +73,7 @@
                                             <div class="flex flex-wrap gap-1 mb-1">
                                                 @foreach ($item->options->attributes as $key => $value)
                                                     <span
-                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        class="bg-gray-100 text-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                                                         {{ $value }}
                                                     </span>
                                                 @endforeach
@@ -114,7 +102,7 @@
                                         </div>
                                         <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                             aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
+                                            class="checkout-cart-remove text-red-700 hover:text-red-900 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
                                             <i class="far fa-trash-alt text-[10px]" aria-hidden="true"></i>
                                             <span>Remove</span>
                                         </button>
@@ -297,7 +285,7 @@
                                             <div class="flex flex-wrap gap-1 mb-1">
                                                 @foreach ($item->options->attributes as $key => $value)
                                                     <span
-                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        class="bg-gray-100 text-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                                                         {{ $value }}
                                                     </span>
                                                 @endforeach
@@ -328,7 +316,7 @@
                                         </div>
                                         <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                             aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
+                                            class="checkout-cart-remove text-red-700 hover:text-red-900 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
                                             <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
                                             <span>Remove</span>
                                         </button>
@@ -401,7 +389,7 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full animate-shake fixed-co primary-bg primary-bg-hover text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full animate-shake primary-bg primary-bg-hover text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
                             Confirm Order
                         </button>
                     </div>
@@ -758,7 +746,7 @@
             @auth('customer')
                 saveDraft();
             @endauth
-                });
+                    });
     </script>
     <script>
         function updateCheckoutShipping(value) {
@@ -801,8 +789,8 @@
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                        <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-                    </div>`;
+                            <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
+                        </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);
 
