@@ -372,7 +372,7 @@
 
                     <!-- Desktop: Quick Order Button (Below Order Now) -->
                     @if($setup->product_details_quick_order ?? true)
-                        <div class="hidden md:block mb-8">
+                        <div class="hidden md:block mb-3">
                             <button type="button" id="btn-quick-order" onclick="handleQuickOrder()" {{ ($isUpcoming || $isProductOutOfStock) ? 'disabled' : '' }}
                                 class="w-full bg-[#FF6A00] hover:bg-[#e05d00] text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">
                                 <i class="fas fa-bolt"></i>
