@@ -479,12 +479,62 @@
                     @if (isset($headerCategories) && $headerCategories->count())
                         <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 mt-3 tracking-wider">Categories
                         </p>
-                        @foreach ($headerCategories as $cat)
-                            <a href="{{ url($cat->slug ?? $cat->id) }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
-                                <i class="fas fa-chevron-right text-[10px] text-gray-300 w-4"></i>
-                                {{ $cat->name }}
-                            </a>
+                        @foreach ($headerCategories as $mega)
+                            @php
+                                $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
+                            @endphp
+                            <div>
+                                <div class="flex items-center gap-1 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
+                                    @if ($hasSub)
+                                        <button type="button" class="accordion-arrow p-1 -ml-1 text-gray-400 focus:outline-none flex items-center justify-center cursor-pointer"
+                                            data-target="m1-cat-{{ $mega->id }}">
+                                            <i class="fas fa-chevron-right text-[10px] text-gray-300 w-4 transition-transform duration-200"></i>
+                                        </button>
+                                    @else
+                                        <i class="fas fa-chevron-right text-[10px] text-gray-300 w-4"></i>
+                                    @endif
+                                    <a href="{{ url($mega->slug ?? $mega->id) }}" class="flex-1">
+                                        {{ $mega->name }}
+                                    </a>
+                                </div>
+
+                                @if ($hasSub)
+                                    <div id="m1-cat-{{ $mega->id }}" class="hidden pl-5 pr-1 py-1 space-y-0.5">
+                                        @foreach ($mega->subCategories as $sub)
+                                            @php
+                                                $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
+                                            @endphp
+                                            <div>
+                                                <div class="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-orange-50/60 text-xs font-medium text-gray-600 hover-text transition-colors">
+                                                    @if ($hasMini)
+                                                        <button type="button" class="accordion-arrow p-1 -ml-1 text-gray-400 focus:outline-none flex items-center justify-center cursor-pointer"
+                                                            data-target="m1-sub-{{ $sub->id }}">
+                                                            <i class="fas fa-chevron-right text-[9px] text-gray-300 w-4 transition-transform duration-200"></i>
+                                                        </button>
+                                                    @else
+                                                        <i class="fas fa-chevron-right text-[9px] text-gray-300 w-4"></i>
+                                                    @endif
+                                                    <a href="{{ url($sub->slug ?? $sub->id) }}" class="flex-1">
+                                                        {{ $sub->name }}
+                                                    </a>
+                                                </div>
+
+                                                @if ($hasMini)
+                                                    <div id="m1-sub-{{ $sub->id }}" class="hidden pl-7 pr-1 py-1 space-y-0.5">
+                                                        @foreach ($sub->miniCategories as $mini)
+                                                            <a href="{{ url($mini->slug ?? $mini->id) }}"
+                                                                class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-orange-50/60 text-[11px] font-normal text-gray-500 hover-text transition-colors">
+                                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                                                {{ $mini->name }}
+                                                            </a>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @endforeach
                     @endif
                 @endif
@@ -676,7 +726,7 @@
             });
         });
         // Mobile Sidebar Accordion logic (for subcategories & mini-categories)
-        document.querySelectorAll(".accordion-btn").forEach((btn) => {
+        document.querySelectorAll(".accordion-arrow").forEach((btn) => {
             btn.addEventListener("click", function (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -687,8 +737,7 @@
                 if (target) {
                     target.classList.toggle("hidden");
                     if (icon) {
-                        icon.classList.toggle("fa-plus");
-                        icon.classList.toggle("fa-minus");
+                        icon.classList.toggle("rotate-90");
                     }
                 }
             });
