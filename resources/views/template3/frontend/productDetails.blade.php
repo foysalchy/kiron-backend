@@ -166,7 +166,7 @@
                         </span>
                     @endif
 
-         
+
 
                     <h1 class="text-lg md:text-2xl font-semibold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
                     @php
@@ -276,14 +276,14 @@
                         <div class="flex items-center primary-bg rounded-xl p-1 gap-1 h-11 md:h-10 shrink-0 select-none shadow-sm">
                             <button type="button" id="btn-decrease-qty" aria-label="Decrease quantity" onclick="changeQty(-1)"
                                 class="w-8 h-8 rounded-lg secondary-bg flex items-center justify-center font-bold text-sm transition-opacity opacity-40 cursor-not-allowed">
-                                <i class="fas fa-minus text-[11px] text-brand"></i>
+                                <i class="fas fa-minus text-[11px] text-secondary"></i>
                             </button>
                             <input type="number" id="main-qty" value="1" readonly
                                 aria-label="Quantity"
                                 class="w-10 text-center font-bold bg-transparent text-primary border-none outline-none focus:ring-0 cursor-default">
                             <button type="button" id="btn-increase-qty" aria-label="Increase quantity" onclick="changeQty(1)"
                                 class="w-8 h-8 rounded-lg secondary-bg flex items-center justify-center font-bold text-sm hover:opacity-90 transition-opacity">
-                                <i class="fas fa-plus text-[11px] text-brand"></i>
+                                <i class="fas fa-plus text-[11px] text-secondary"></i>
                             </button>
                         </div>
                         @php
