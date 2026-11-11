@@ -273,14 +273,18 @@
 
                     <!-- Quantity -->
                     <div class="flex items-center gap-3 md:gap-6 mb-3 md:mb-8 mt-2">
-                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-11 md:h-10 shrink-0">
-                            <button type="button" aria-label="Decrease quantity" onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
-                                    class="fas fa-minus text-[10px]"></i></button>
+                        <div class="flex items-center primary-bg rounded-xl p-1 gap-1 h-11 md:h-10 shrink-0 select-none shadow-sm">
+                            <button type="button" id="btn-decrease-qty" aria-label="Decrease quantity" onclick="changeQty(-1)"
+                                class="w-8 h-8 rounded-lg secondary-bg flex items-center justify-center font-bold text-sm transition-opacity opacity-40 cursor-not-allowed">
+                                <i class="fas fa-minus text-[11px] text-brand"></i>
+                            </button>
                             <input type="number" id="main-qty" value="1" readonly
                                 aria-label="Quantity"
-                                class="w-10 text-center font-bold border-none outline-none">
-                            <button type="button" aria-label="Increase quantity" onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
-                                    class="fas fa-plus text-[10px]"></i></button>
+                                class="w-10 text-center font-bold bg-transparent text-primary border-none outline-none focus:ring-0 cursor-default">
+                            <button type="button" id="btn-increase-qty" aria-label="Increase quantity" onclick="changeQty(1)"
+                                class="w-8 h-8 rounded-lg secondary-bg flex items-center justify-center font-bold text-sm hover:opacity-90 transition-opacity">
+                                <i class="fas fa-plus text-[11px] text-brand"></i>
+                            </button>
                         </div>
                         @php
                             $isProductOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock && $product->available_stock <= 0);
@@ -846,6 +850,7 @@
 
         function changeQty(amount) {
             let mainQty = document.getElementById('main-qty');
+            let btnDecrease = document.getElementById('btn-decrease-qty');
 
             if (mainQty) {
                 let currentQty = parseInt(mainQty.value) || 1;
@@ -856,6 +861,16 @@
                 }
 
                 mainQty.value = newQty;
+
+                if (btnDecrease) {
+                    if (newQty <= 1) {
+                        btnDecrease.classList.add('opacity-40', 'cursor-not-allowed');
+                        btnDecrease.classList.remove('opacity-100');
+                    } else {
+                        btnDecrease.classList.remove('opacity-40', 'cursor-not-allowed');
+                        btnDecrease.classList.add('opacity-100');
+                    }
+                }
             }
         }
 
