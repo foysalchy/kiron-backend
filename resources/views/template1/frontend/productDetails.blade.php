@@ -277,7 +277,7 @@
                             </button>
                             <input type="number" id="main-qty" value="1" readonly
                                 aria-label="Quantity"
-                                class="w-10 text-center font-bold bg-transparent text-primary border-none outline-none focus:ring-0 cursor-default">
+                                class="w-10 text-center font-bold bg-transparent text-primary border-none outline-none focus:ring-0 cursor-default [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                             <button type="button" id="btn-increase-qty" aria-label="Increase quantity" onclick="changeQty(1)"
                                 class="w-8 h-8 rounded-lg secondary-bg flex items-center justify-center font-bold text-sm hover:opacity-90 transition-opacity">
                                 <i class="fas fa-plus text-[11px] text-secondary"></i>
