@@ -236,7 +236,7 @@
 
                         <!-- Dynamic Variations Container (বিকাশের মতো ভ্যারিয়েশন লজিক এখানে আসবে) -->
                         @if ($product->type === 'variation')
-                            <div id="dynamic-attributes-container" class="mb-5"></div>
+                            <div id="dynamic-attributes-container" class="mb-4"></div>
                         @endif
 
                         <!-- Short Description / Features List -->
@@ -753,7 +753,16 @@
                     if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
                 });
 
-                let groupHtml = `<div class="mb-4"><p class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</p><div class="flex flex-wrap gap-2">`;
+                // Find selected value name(s) to show beside group title (supports single & multiple selections)
+                let selectedValNames = [];
+                for (const [vId, vName] of Object.entries(availableValues)) {
+                    if (activeFilters[groupName] == vId || checkIsSelected(groupName, vId)) {
+                        selectedValNames.push(vName);
+                    }
+                }
+                const selectedText = selectedValNames.join(', ');
+
+                let groupHtml = `<div><h3 class="text-base font-semibold text-gray-700 mb-2">Choose ${groupName}:${selectedText ? ` <span class="text-[var(--primary-color)] text-[15px] font-medium">${selectedText}</span>` : ''}</h3><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const isFilterActive = (activeFilters[groupName] == valId);
@@ -763,12 +772,16 @@
                         'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
                         'border-gray-200 bg-white text-gray-700';
 
-                    // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
+                    // If image exists, show exact 46px x 46px image with no side gap
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" alt="${valName}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" alt="${valName}" style="width:46px;height:46px;" class="rounded-md object-cover block" loading="lazy" width="46" height="46">`
                         : valName;
 
-                    groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;
+                    const btnSizeClass = valueImages[valId]
+                        ? 'p-0.5 overflow-hidden shrink-0'
+                        : 'min-h-[50px] px-4 py-2 text-base font-bold';
+
+                    groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center justify-center ${btnSizeClass} rounded-lg border transition-all ${activeClass}">${btnContent}</button>`;
                 }
                 groupHtml += `</div></div>`;
                 container.innerHTML += groupHtml;
