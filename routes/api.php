@@ -1825,6 +1825,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
                 Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
+                Route::get('/reports/status-wise-orders', [\App\Http\Controllers\Api\StatusWiseOrderReportController::class, 'generate']);
                 Route::get('/reports/inventory-stock', [InventoryStockReportController::class, 'generate']);
 
                 // AI Integration Routes
