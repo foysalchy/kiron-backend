@@ -57,11 +57,13 @@ class OrderController extends Controller
 
             $orders = $this->frontendOrderService->getOrders($filters);
             $statusCounts = $this->frontendOrderService->getOrderCountsByStatus();
+            $statusAmounts = $this->frontendOrderService->getOrderAmountsByStatus();
 
             return response()->json([
                 'success' => true,
                 'data' => $orders->items(),
                 'status_counts' => $statusCounts,
+                'status_amounts' => $statusAmounts,
                 'pagination' => [
                     'total' => $orders->total(),
                     'per_page' => $orders->perPage(),
@@ -245,6 +247,12 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            $customerIds = Order::whereIn('id', $validated['ids'])
+                ->whereNotNull('customer_id')
+                ->pluck('customer_id')
+                ->unique()
+                ->toArray();
+
             Order::whereIn('id', $validated['ids'])
                 ->update(['status' => $validated['status']]);
 
@@ -254,6 +262,11 @@ class OrderController extends Controller
                     app(\App\Services\StatusSyncService::class)->syncOrderStatus($order);
                 }
                 LogHelper::statusChanged('orders', $orderId, auth()->user()->company_id);
+            }
+
+            $partyDueService = app(\App\Services\PartyDueService::class);
+            foreach ($customerIds as $customerId) {
+                $partyDueService->recalculatePartyDue($customerId);
             }
 
             DB::commit();

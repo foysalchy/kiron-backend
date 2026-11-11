@@ -324,6 +324,15 @@ class FrontendOrderService
             ->pluck('count', 'status');
     }
 
+    public function getOrderAmountsByStatus()
+    {
+        return Order::query()
+            ->whereNot('status', Status::Draft->value)
+            ->select('status', DB::raw('COALESCE(SUM(grand_total), 0) as total_amount'))
+            ->groupBy('status')
+            ->pluck('total_amount', 'status');
+    }
+
     /**
      * Get order by ID with all details
      */
@@ -678,6 +687,11 @@ class FrontendOrderService
                     implode(', ', $changes)
                 );
             }
+
+            if ($order->customer_id) {
+                app(\App\Services\PartyDueService::class)->recalculatePartyDue($order->customer_id);
+            }
+
             DB::commit();
 
             Log::info('Order status updated', [
@@ -723,6 +737,11 @@ class FrontendOrderService
                     implode(', ', $changes)
                 );
             }
+
+            if ($order->customer_id) {
+                app(\App\Services\PartyDueService::class)->recalculatePartyDue($order->customer_id);
+            }
+
             DB::commit();
 
             Log::info('Order status updated', [
