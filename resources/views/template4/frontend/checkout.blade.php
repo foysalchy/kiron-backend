@@ -29,8 +29,8 @@
                         </h2>
                         <div class="space-y-3">
                             @foreach ($cartContent as $item)
-                                <div class="bg-[#F9FAFB] rounded-xl p-3 sm:p-4 flex items-center gap-3 border border-gray-100">
-                                    <div class="w-14 h-14 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                <div class="bg-[#F9FAFB] rounded-xl p-3 sm:p-4 flex items-start gap-3 border border-gray-100">
+                                    <div class="w-14 h-14 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0 mt-0.5">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             alt="{{ $item->name }}" class="w-full h-full object-cover">
                                     </div>
@@ -55,28 +55,30 @@
                                             </p>
                                         @endif
 
-                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
-                                        </p>
+                                        <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+                                            <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
+                                            </p>
+
+                                            <!-- Quantity Controls (Beside Price) -->
+                                            <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                                <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                                    aria-label="Decrease quantity"
+                                                    class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
+                                                <span class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
+                                                <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                                    aria-label="Increase quantity"
+                                                    class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Quantity Controls -->
-                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                        <div
-                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
-                                                aria-label="Decrease quantity"
-                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
-                                            <span
-                                                class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
-                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
-                                                aria-label="Increase quantity"
-                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
-                                        </div>
+                                    <!-- Remove Button (Top-Right) -->
+                                    <div class="shrink-0 self-start pl-1 pt-0.5">
                                         <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                             aria-label="Remove {{ $item->name }} from cart" title="Remove item"
-                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
-                                            <i class="far fa-trash-alt text-[10px]" aria-hidden="true"></i>
+                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0.5">
+                                            <i class="far fa-trash-alt text-[11px]" aria-hidden="true"></i>
                                             <span>Remove</span>
                                         </button>
                                     </div>

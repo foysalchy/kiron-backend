@@ -34,14 +34,14 @@
 @endphp
 
 <div
-    class="group relative flex flex-col p-3 bg-white border border-gray-200 rounded-2xl hover:shadow-xl transition-all duration-300 h-full">
+    class="group relative flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
 
     <!-- Image Section -->
-    <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
+    <div class="relative w-full aspect-square overflow-hidden mb-3 shrink-0 bg-gray-50">
         <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full">
             <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                 height="350" width="300" loading="lazy"
-                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
         </a>
 
@@ -81,7 +81,7 @@
     </div>
 
     <!-- Product Info Area -->
-    <div class="flex flex-col flex-grow px-1">
+    <div class="flex flex-col flex-grow px-3">
         <a href="{{ url($product->slug ?? $product->id) }}" class="block group/title">
             <h3
                 class="hind-siliguri-medium md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <div class="flex items-center gap-2 mt-auto">
+    <div class="flex items-center gap-2 mt-auto px-3 pb-3">
         <!-- Order Now Button -->
         <button {{ ($isUpcoming || $isOutOfStock) ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"

@@ -4,6 +4,30 @@
 @endsection
 @section('content')
 <style>
+    @media (max-width: 640px) {
+        .fixed-co {
+            position: fixed !important;
+            left: 0;
+            right: 0;
+            width: 90% !important;
+            margin: 0 auto !important;
+            bottom: 16px !important;
+            z-index: 9999 !important;
+            box-sizing: border-box !important;
+            animation: smoothFloatIn 0.25s ease-out;
+        }
+
+        @keyframes smoothFloatIn {
+            from {
+                opacity: 0.6;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
     h2{
         border-left: 4px solid #0b5abe;
   padding-left: 5px;
@@ -34,7 +58,7 @@
   }
 }
 </style>
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-6">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
         <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
@@ -53,15 +77,15 @@
                         <!-- Product Row in Summary -->
                         <div class="space-y-0 mb-0">
                             @foreach ($cartContent as $item)
-                                <div class="bg-white border-b border-gray-300 p-4 py-2 flex items-center gap-4">
+                                <div class="bg-white border-b border-gray-300 p-4 py-2 flex items-start gap-3">
                                     <!-- Actual Product Image -->
-                                    <div class="w-12 h-12 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                    <div class="w-12 h-12 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0 mt-0.5">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
                                     </div>
 
-                                    <div class="flex-1">
-                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1 line-clamp-1">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1 truncate">
                                             {{ $item->name }}
                                         </h3>
 
@@ -80,26 +104,30 @@
                                             </p>
                                         @endif
 
-                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                        </p>
+                                        <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+                                            <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                            </p>
+
+                                            <!-- Quantity Controls (Beside Price) -->
+                                            <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                                <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                                    aria-label="Decrease quantity"
+                                                    class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
+                                                <span class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
+                                                <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                                    aria-label="Increase quantity"
+                                                    class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Quantity Controls -->
-                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
-                                                aria-label="Decrease quantity"
-                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">-</button>
-                                            <span class="qty-{{ $item->rowId }} w-6 text-center text-xs font-bold text-gray-800">{{ $item->qty }}</span>
-                                            <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
-                                                aria-label="Increase quantity"
-                                                class="px-2 py-0.5 text-gray-600 hover:text-[var(--primary-color)] bg-transparent transition-colors cursor-pointer font-bold text-sm">+</button>
-                                        </div>
+                                    <!-- Remove Button (Top-Right as marked) -->
+                                    <div class="shrink-0 self-start pl-1 pt-0.5">
                                         <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                             aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-[11px] font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer">
-                                            <i class="far fa-trash-alt text-[10px]" aria-hidden="true"></i>
+                                            class="checkout-cart-remove text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0.5">
+                                            <i class="far fa-trash-alt text-[11px]" aria-hidden="true"></i>
                                             <span>Remove</span>
                                         </button>
                                     </div>
@@ -389,10 +417,12 @@
                         </div>
 
                         <!-- 4. Confirm Button -->
-                        <button type="submit"
-                            class="w-full animate-shake primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
-                            Confirm Order
-                        </button>
+                        <div id="confirm-btn-container" class="mt-8 min-h-[58px]">
+                            <button type="submit" id="confirm-order-btn"
+                                class="w-full animate-shake fixed-co primary-bg hover:bg-[#e65f00] text-primary font-semibold py-4 text-md rounded-lg shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                                Confirm Order
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -826,6 +856,35 @@
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
                 }, 50);
             });
+
+        // Floating Confirm Button on Mobile: in normal flow when summary is in view; floating when above or below
+        let _isFloating = true;
+        function updateFloatingConfirmButton() {
+            if (window.innerWidth > 640) {
+                const b = document.getElementById('confirm-order-btn');
+                if (b) b.classList.remove('fixed-co');
+                return;
+            }
+            const container = document.getElementById('confirm-btn-container');
+            const btn = document.getElementById('confirm-order-btn');
+            if (!container || !btn) return;
+
+            const rect = container.getBoundingClientRect();
+            const triggerThreshold = window.innerHeight - 30;
+
+            // Hysteresis buffer to eliminate stuttering/flicker around transition edge
+            if (_isFloating && rect.top <= triggerThreshold && rect.bottom >= 0) {
+                _isFloating = false;
+                btn.classList.remove('fixed-co');
+            } else if (!_isFloating && (rect.top > triggerThreshold + 30 || rect.bottom < -30)) {
+                _isFloating = true;
+                btn.classList.add('fixed-co');
+            }
+        }
+
+        window.addEventListener('scroll', updateFloatingConfirmButton, { passive: true });
+        window.addEventListener('resize', updateFloatingConfirmButton);
+        document.addEventListener('DOMContentLoaded', updateFloatingConfirmButton);
     </script>
 @endpush
 @push('scripts')
