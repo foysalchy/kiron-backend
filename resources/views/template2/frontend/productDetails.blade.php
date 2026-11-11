@@ -887,7 +887,7 @@
                 }
                 const selectedText = selectedValNames.join(', ');
 
-                let groupHtml = `<div><h3 class="text-base font-semibold text-gray-700 mb-2">Choose ${groupName}:${selectedText ? ` <span class="text-[var(--primary-color)] text-[15px] font-medium">${selectedText}</span>` : ''}</h3><div class="flex flex-wrap gap-2">`;
+                let groupHtml = `<div style="margin-top: 12px;"><h3 class="text-base font-semibold text-gray-700 mb-2">Choose ${groupName}:${selectedText ? ` <span class="text-[var(--primary-color)] text-[15px] font-medium">${selectedText}</span>` : ''}</h3><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const isFilterActive = (activeFilters[groupName] == valId);
