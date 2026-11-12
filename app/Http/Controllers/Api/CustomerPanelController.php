@@ -31,7 +31,14 @@ class CustomerPanelController extends Controller
         ]);
 
         $label = \App\Models\Label::findOrFail($data['label_id']);
-        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
+        $party = Party::with(['labels', 'crmNotes'])
+            ->where(function ($q) use ($id) {
+                $q->where('fb_psid', $id)
+                  ->orWhere('id', $id)
+                  ->orWhere('phone', $id)
+                  ->orWhere('phone', 'like', "%{$id}%");
+            })
+            ->first();
 
         $party->labels()->syncWithoutDetaching([$label->id]);
 
@@ -51,8 +58,18 @@ class CustomerPanelController extends Controller
         $data = $request->validate([
             'text' => 'required|string'
         ]);
-        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
+        $party = Party::with(['labels', 'crmNotes'])
+            ->where(function ($q) use ($id) {
+                $q->where('fb_psid', $id)
+                  ->orWhere('id', $id)
+                  ->orWhere('phone', $id)
+                  ->orWhere('phone', 'like', "%{$id}%");
+            })
+            ->first();
 
+        if (!$party) {
+            return response()->json(['error' => 'Customer not found'], 404);
+        }
 
         $note = $party->crmNotes()->create([
             'text' => $data['text'],
@@ -72,7 +89,14 @@ class CustomerPanelController extends Controller
     }
     public function show($id)
     {
-        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
+        $party = Party::with(['labels', 'crmNotes'])
+            ->where(function ($q) use ($id) {
+                $q->where('fb_psid', $id)
+                  ->orWhere('id', $id)
+                  ->orWhere('phone', $id)
+                  ->orWhere('phone', 'like', "%{$id}%");
+            })
+            ->first();
 
         if (!$party) {
             return response()->json([

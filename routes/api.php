@@ -1717,6 +1717,7 @@ Route::prefix('v1')->group(function () {
                 // WhatsApp Web QR connection routes
                 Route::get('/inbox/whatsapp/qr', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getQrCode']);
                 Route::get('/inbox/whatsapp/status', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'checkStatus']);
+                Route::post('/inbox/whatsapp/find-or-create', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'findOrCreateConversation']);
                 Route::delete('/inbox/whatsapp/channels/{channelId}', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'disconnect']);
                 Route::get('/inbox/whatsapp/{channelId}/conversations', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getConversations']);
                 Route::get('/inbox/whatsapp/{channelId}/threads/{threadId}/messages', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getMessages']);

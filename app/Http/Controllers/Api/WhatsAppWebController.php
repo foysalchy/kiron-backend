@@ -124,11 +124,19 @@ class WhatsAppWebController extends Controller
             ->where('company_id', $request->user()->company_id)
             ->firstOrFail();
 
-        $conversations = Conversation::where('channel_id', $channel->id)
+        $query = Conversation::where('channel_id', $channel->id)
             ->where('company_id', $channel->company_id)
-            ->with(['customer', 'assignedUser', 'messages' => fn($q) => $q->latest()->limit(1)])
-            ->orderByDesc('last_activity_at')
-            ->get();
+            ->with(['customer', 'assignedUser', 'messages' => fn($q) => $q->latest()->limit(1)]);
+
+        // Optional search query by customer name or phone
+        if ($search = $request->input('search')) {
+            $query->whereHas('customer', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $conversations = $query->orderByDesc('last_activity_at')->get();
 
         $formatted = $conversations->map(function ($convo) {
             $lastMsg = $convo->messages->first();
@@ -158,6 +166,66 @@ class WhatsAppWebController extends Controller
             'data' => $formatted,
             'next_cursor' => null,
             'has_more' => false,
+        ]);
+    }
+
+    /**
+     * Find or initiate a WhatsApp conversation by phone number
+     */
+    public function findOrCreateConversation(Request $request)
+    {
+        $companyId = $request->user()->company_id;
+        $phone = $request->input('phone');
+
+        if (!$phone) {
+            return response()->json(['error' => 'Phone number is required.'], 422);
+        }
+
+        // Clean phone digits
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($digits, '880')) {
+            $normalizedPhone = $digits;
+        } elseif (str_starts_with($digits, '0')) {
+            $normalizedPhone = '880' . substr($digits, 1);
+        } else {
+            $normalizedPhone = '880' . $digits;
+        }
+
+        $channel = Channel::where('company_id', $companyId)->where('type', 'whatsapp')->first();
+        if (!$channel) {
+            return response()->json(['error' => 'No active WhatsApp channel found.'], 404);
+        }
+
+        // Find or create customer party
+        $party = Party::where('company_id', $companyId)
+            ->where(function ($q) use ($normalizedPhone, $phone) {
+                $q->where('phone', $normalizedPhone)
+                  ->orWhere('phone', $phone)
+                  ->orWhere('phone', 'like', "%{$normalizedPhone}%");
+            })
+            ->first();
+
+        if (!$party) {
+            $party = Party::create([
+                'company_id' => $companyId,
+                'name' => "WhatsApp ({$normalizedPhone})",
+                'phone' => "{$normalizedPhone}@s.whatsapp.net",
+                'type' => 2, // Customer
+                'status' => Status::Active->value,
+            ]);
+        }
+
+        $conversation = Conversation::firstOrCreate(
+            ['company_id' => $companyId, 'channel_id' => $channel->id, 'customer_id' => $party->id],
+            ['status' => 'open', 'last_activity_at' => now()]
+        );
+
+        return response()->json([
+            'conversation_id' => (string)$conversation->id,
+            'channel_id' => $channel->id,
+            'channel_slug' => $channel->slug,
+            'customer_name' => $party->name,
+            'customer_phone' => $party->phone,
         ]);
     }
 
