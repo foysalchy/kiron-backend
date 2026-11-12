@@ -11,7 +11,12 @@ use Illuminate\Support\Facades\Log;
 
 class WhatsAppWebController extends Controller
 {
-    private string $gatewayUrl = 'http://127.0.0.1:3001';
+    private string $gatewayUrl;
+
+    public function __construct()
+    {
+        $this->gatewayUrl = env('WHATSAPP_GATEWAY_URL', 'http://127.0.0.1:3001');
+    }
 
     /**
      * Get or generate QR code for WhatsApp Web connect
