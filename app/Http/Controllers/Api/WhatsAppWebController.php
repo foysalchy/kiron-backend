@@ -627,7 +627,7 @@ class WhatsAppWebController extends Controller
 
             if (!empty($aiReply)) {
                 $sessionId = "comp_{$channel->company_id}";
-                $cleanReply = trim($aiReply);
+                $cleanReply = trim($aiReply) . "\n\n— 🤖 AI Assistant";
 
                 // Send to WhatsApp Gateway
                 $postData = [

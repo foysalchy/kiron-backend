@@ -323,10 +323,11 @@ class MetaWebhookController extends Controller
             $aiReply = \App\Services\AI\AiService::generate($channel->company_id, $promptParams);
 
             if (!empty($aiReply)) {
+                $finalReply = trim($aiReply) . "\n\n— 🤖 AI Assistant";
                 $response = Http::post("https://graph.facebook.com/v20.0/me/messages", [
                     'access_token' => $channel->page_token,
                     'recipient' => ['id' => $customerPsid],
-                    'message' => ['text' => trim($aiReply)],
+                    'message' => ['text' => $finalReply],
                     'messaging_type' => 'RESPONSE',
                 ]);
 
