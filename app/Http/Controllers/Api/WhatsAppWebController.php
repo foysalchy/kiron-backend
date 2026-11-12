@@ -555,24 +555,44 @@ class WhatsAppWebController extends Controller
             $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
             $shopAddress = $siteSetting->address ?? null;
 
-            // Check if customer message contains a product link or slug (e.g. littlebaby.com.bd/product-slug)
-            $targetedProduct = null;
-            if (preg_match('/(?:https?:\/\/[^\/]+\/)?([a-zA-Z0-9_\-]+(?:-[a-zA-Z0-9_\-]+)+)/', $customerText, $matches)) {
-                $possibleSlug = trim($matches[1], '/');
-                $targetedProduct = \App\Models\Product::where('company_id', $channel->company_id)
+            // Smart Product Search in Database based on Customer Query (Title, Description, Slug, Keywords)
+            $targetedProducts = collect();
+            $cleanKeywords = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $customerText);
+            $words = array_filter(explode(' ', $cleanKeywords), fn($w) => mb_strlen($w) >= 3);
+
+            if (!empty($words)) {
+                $searchQuery = \App\Models\Product::where('company_id', $channel->company_id)
+                    ->where('status', \App\Enums\Status::Active->value)
+                    ->where(function ($q) use ($words) {
+                        foreach ($words as $w) {
+                            $q->orWhere('title', 'like', "%{$w}%")
+                              ->orWhere('slug', 'like', "%{$w}%")
+                              ->orWhere('short_description', 'like', "%{$w}%");
+                        }
+                    });
+                $targetedProducts = $searchQuery->limit(10)->get();
+            }
+
+            // Also check for direct URL or slug
+            if (preg_match('/(?:https?:\/\/[^\/]+\/)?([^\s\?\#]+)/', $customerText, $urlMatches)) {
+                $possibleSlug = trim($urlMatches[1], '/');
+                $slugProduct = \App\Models\Product::where('company_id', $channel->company_id)
                     ->where('slug', $possibleSlug)
                     ->first();
+                if ($slugProduct) {
+                    $targetedProducts->push($slugProduct);
+                }
             }
 
-            // Product catalog summary with discount pricing (include targeted product if found)
-            $productsQuery = \App\Models\Product::where('company_id', $channel->company_id)
-                ->where('status', \App\Enums\Status::Active->value);
+            // General active products
+            $generalProducts = \App\Models\Product::where('company_id', $channel->company_id)
+                ->where('status', \App\Enums\Status::Active->value)
+                ->latest()
+                ->limit(35)
+                ->get();
 
-            // If customer linked a specific product, make sure it is prioritized in context
-            $products = $productsQuery->latest()->limit(50)->get();
-            if ($targetedProduct && !$products->contains('id', $targetedProduct->id)) {
-                $products->prepend($targetedProduct);
-            }
+            // Merge search results first, then general products (unique by id)
+            $products = $targetedProducts->merge($generalProducts)->unique('id');
 
             $productSummary = $products->map(function ($p) {
                 $pTitle = $p->title ?? $p->name ?? 'Product';
