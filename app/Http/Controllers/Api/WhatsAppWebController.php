@@ -557,6 +557,22 @@ class WhatsAppWebController extends Controller
 
             // Smart Product Search in Database based on Customer Query (Title, Description, Slug, Keywords)
             $targetedProducts = collect();
+
+            // 1. Direct URL extraction (supports full URL or slug path)
+            if (preg_match('/(?:https?:\/\/[^\/\s]+\/)([^\s\?\#]+)/i', $customerText, $urlMatches)) {
+                $possibleSlug = trim(urldecode($urlMatches[1]), '/');
+                $slugProduct = \App\Models\Product::where('company_id', $channel->company_id)
+                    ->where(function ($q) use ($possibleSlug) {
+                        $q->where('slug', $possibleSlug)
+                          ->orWhere('slug', 'like', "%{$possibleSlug}%");
+                    })
+                    ->first();
+                if ($slugProduct) {
+                    $targetedProducts->push($slugProduct);
+                }
+            }
+
+            // 2. Keyword Search
             $cleanKeywords = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $customerText);
             $words = array_filter(explode(' ', $cleanKeywords), fn($w) => mb_strlen($w) >= 3);
 
@@ -570,29 +586,20 @@ class WhatsAppWebController extends Controller
                               ->orWhere('short_description', 'like', "%{$w}%");
                         }
                     });
-                $targetedProducts = $searchQuery->limit(10)->get();
-            }
-
-            // Also check for direct URL or slug
-            if (preg_match('/(?:https?:\/\/[^\/]+\/)?([^\s\?\#]+)/', $customerText, $urlMatches)) {
-                $possibleSlug = trim($urlMatches[1], '/');
-                $slugProduct = \App\Models\Product::where('company_id', $channel->company_id)
-                    ->where('slug', $possibleSlug)
-                    ->first();
-                if ($slugProduct) {
-                    $targetedProducts->push($slugProduct);
-                }
+                $targetedProducts = $targetedProducts->merge($searchQuery->limit(10)->get());
             }
 
             // General active products
             $generalProducts = \App\Models\Product::where('company_id', $channel->company_id)
                 ->where('status', \App\Enums\Status::Active->value)
                 ->latest()
-                ->limit(35)
+                ->limit(40)
                 ->get();
 
             // Merge search results first, then general products (unique by id)
             $products = $targetedProducts->merge($generalProducts)->unique('id');
+
+            Log::info("WhatsApp AI Products Found for Customer: " . $products->pluck('title')->implode(', '));
 
             $productSummary = $products->map(function ($p) {
                 $pTitle = $p->title ?? $p->name ?? 'Product';
