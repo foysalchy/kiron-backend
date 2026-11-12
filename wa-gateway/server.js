@@ -52,7 +52,7 @@ async function initWASession(sessionId) {
     printQRInTerminal: false,
     auth: state,
     browser: ["Kiron Omni Channel", "Chrome", "1.0.0"],
-    syncFullHistory: false,
+    syncFullHistory: true,
   });
 
   sessionData.sock = sock;
@@ -104,6 +104,39 @@ async function initWASession(sessionId) {
     }
   });
 
+  // Listen to incoming messages and chat sync
+  sock.ev.on("messaging-history.set", async ({ chats, contacts, messages, isLatest }) => {
+    try {
+      for (const msg of messages || []) {
+        if (!msg.message) continue;
+        const remoteJid = msg.key.remoteJid;
+        if (!remoteJid || remoteJid.endsWith("@g.us")) continue;
+
+        const isFromMe = msg.key.fromMe;
+        const senderPhone = remoteJid.split("@")[0];
+        const text =
+          msg.message.conversation ||
+          msg.message.extendedTextMessage?.text ||
+          msg.message.imageMessage?.caption ||
+          "";
+
+        notifyLaravelWebhook({
+          event: "message.received",
+          sessionId,
+          messageId: msg.key.id,
+          fromMe: isFromMe,
+          senderPhone,
+          remoteJid,
+          text,
+          timestamp: msg.messageTimestamp,
+          pushName: msg.pushName || senderPhone,
+        });
+      }
+    } catch (e) {
+      console.error("History sync error:", e);
+    }
+  });
+
   // Listen to incoming messages
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify") return;
@@ -144,7 +177,7 @@ async function initWASession(sessionId) {
 
 async function notifyLaravelWebhook(data) {
   try {
-    const webhookUrl = process.env.LARAVEL_WEBHOOK_URL || "http://127.0.0.1:8000/api/v1/webhook/whatsapp-qr";
+    const webhookUrl = process.env.LARAVEL_WEBHOOK_URL || (process.env.APP_URL ? `${process.env.APP_URL}/api/v1/webhook/whatsapp-qr` : "http://127.0.0.1:8000/api/v1/webhook/whatsapp-qr");
     const postData = JSON.stringify(data);
     const parsed = new URL(webhookUrl);
 
