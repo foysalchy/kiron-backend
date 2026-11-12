@@ -10,6 +10,11 @@ import QRCode from "qrcode";
 import fs from "fs";
 import path from "path";
 import http from "http";
+import dotenv from "dotenv";
+
+// Load environment from ../.env if exists, or local .env
+dotenv.config({ path: path.resolve("../.env") });
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -139,12 +144,12 @@ async function initWASession(sessionId) {
 
   // Listen to incoming messages
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
-    if (type !== "notify") return;
+    console.log(`[WA Gateway] messages.upsert received ${messages?.length} messages (type: ${type})`);
 
-    for (const msg of messages) {
+    for (const msg of messages || []) {
       if (!msg.message) continue;
       const remoteJid = msg.key.remoteJid;
-      if (remoteJid.endsWith("@g.us")) continue; // Ignore groups for now
+      if (!remoteJid || remoteJid.endsWith("@g.us")) continue; // Ignore groups for now
 
       const isFromMe = msg.key.fromMe;
       const senderPhone = remoteJid.split("@")[0];
@@ -153,6 +158,8 @@ async function initWASession(sessionId) {
         msg.message.extendedTextMessage?.text ||
         msg.message.imageMessage?.caption ||
         "";
+
+      console.log(`[WA Gateway] New Message from: ${senderPhone}, fromMe: ${isFromMe}, text: ${text}`);
 
       const payload = {
         sessionId,
@@ -177,7 +184,15 @@ async function initWASession(sessionId) {
 
 async function notifyLaravelWebhook(data) {
   try {
-    const webhookUrl = process.env.LARAVEL_WEBHOOK_URL || (process.env.APP_URL ? `${process.env.APP_URL}/api/v1/webhook/whatsapp-qr` : "http://127.0.0.1:8000/api/v1/webhook/whatsapp-qr");
+    const rawUrl =
+      process.env.LARAVEL_WEBHOOK_URL ||
+      (process.env.APP_URL
+        ? `${process.env.APP_URL}/api/v1/webhook/whatsapp-qr`
+        : "http://127.0.0.1:8000/api/v1/webhook/whatsapp-qr");
+
+    const webhookUrl = rawUrl.replace(/\/+api\/v1/, "/api/v1");
+    console.log(`[WA Gateway] Sending webhook to: ${webhookUrl} (event: ${data.event})`);
+
     const postData = JSON.stringify(data);
     const parsed = new URL(webhookUrl);
 
@@ -195,13 +210,19 @@ async function notifyLaravelWebhook(data) {
       },
     };
 
-    const req = client.request(options, (res) => {});
-    req.on("error", (e) => {
-      // Laravel might be running on a different port or offline
+    const req = client.request(options, (res) => {
+      console.log(`[WA Gateway] Webhook response status: ${res.statusCode}`);
     });
+
+    req.on("error", (e) => {
+      console.error(`[WA Gateway] Webhook request error: ${e.message}`);
+    });
+
     req.write(postData);
     req.end();
-  } catch (err) {}
+  } catch (err) {
+    console.error(`[WA Gateway] notifyLaravelWebhook caught: ${err.message}`);
+  }
 }
 
 // REST API Endpoints for Laravel
