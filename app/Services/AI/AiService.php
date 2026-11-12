@@ -135,6 +135,7 @@ class AiService
                 $prompt .= "আপনার নামঃ [Name]\nমোবাইল নম্বরঃ [Phone]\nডেলিভারি ঠিকানাঃ [Address]\n\n🛍️ পণ্যের মূল্য: ৳[Product Price]\n🚚 ডেলিভারি চার্জ: ৳[Delivery Charge (Dhaka 70 / Outside Dhaka 130)]\n💰 সর্বমোট: ৳[Total]\n\nআপনার নাম, ফোন ও ঠিকানা কি ঠিক আছে? অর্ডারটি কনফার্ম করব?\n";
                 $prompt .= "- ORDER COLLECTION FORMAT: When customer wants to order or product is chosen and their info is NOT yet known, ask for order details line by line in this exact clean format:\n";
                 $prompt .= "আপনার অর্ডারটি কনফার্ম করতে অনুগ্রহ করে দিন:\nআপনার নামঃ \nমোবাইল নম্বরঃ \nডেলিভারি ঠিকানাঃ \n";
+                $prompt .= "- WARRANTY, GUARANTEE & UNVERIFIED QUESTIONS: When a customer asks about warranty, guarantee, return policy, or technical specifications, NEVER guess or hallucinate an answer! Check the product description and store policies carefully. If the warranty or specific detail is NOT explicitly stated in the catalog or knowledge base, DO NOT make up an answer. Instead, politely reply: 'জি রিয়াদ ভাই, এই বিষয়ে সঠিক তথ্য নিশ্চিত হয়ে আমাদের একজন প্রতিনিধি আপনাকে খুব দ্রুত জানাচ্ছেন। অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন। 😊' and let a human agent reply.\n";
                 $prompt .= "- HUMAN TOUCH: Be friendly, natural, and concise. Do not use markdown headings (no #, ##), no HTML tags, just natural chat messages with relevant emojis.\n";
                 break;
             default:

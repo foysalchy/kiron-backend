@@ -626,8 +626,15 @@ class WhatsAppWebController extends Controller
                     $isAvailable = ($p->stock_status !== 'out_of_stock');
                 }
 
+                $desc = '';
+                if (!empty($p->short_description)) {
+                    $desc = ' | Details: ' . strip_tags($p->short_description);
+                } elseif (!empty($p->full_description)) {
+                    $desc = ' | Details: ' . mb_substr(strip_tags($p->full_description), 0, 150);
+                }
+
                 $stockText = $isAvailable ? 'In Stock (Available)' : 'Out of Stock';
-                return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stockText}";
+                return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stockText}{$desc}";
             })->implode("\n");
 
             // Fetch conversation history (entire recent thread context up to 50 messages)
