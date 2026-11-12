@@ -72,10 +72,13 @@ class GeminiProvider implements AiProviderInterface
             }
 
             $lastError = $response->json('error.message') ?? $response->body();
-            // If error is high demand / 503 / 429, try next fallback model
+            // If error is high demand / 503 / 429 / quota exceeded, try next fallback model
             $isTemporary = str_contains(strtolower($lastError), 'high demand') 
                 || str_contains(strtolower($lastError), 'temporarily')
-                || $response->status() === 503;
+                || str_contains(strtolower($lastError), 'quota')
+                || str_contains(strtolower($lastError), 'rate_limit')
+                || $response->status() === 503
+                || $response->status() === 429;
 
             if (!$isTemporary) {
                 break;
