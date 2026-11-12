@@ -291,7 +291,7 @@ app.get("/qr/:sessionId", async (req, res) => {
 
 app.post("/send/:sessionId", async (req, res) => {
   const { sessionId } = req.params;
-  const { phone, text, fileUrl } = req.body;
+  const { phone, text, fileUrl, fileUrls } = req.body;
 
   console.log(`[WA Gateway] /send request for sessionId: ${sessionId}, to phone: ${phone}, text: ${text}`);
 
@@ -311,12 +311,25 @@ app.post("/send/:sessionId", async (req, res) => {
 
     console.log(`[WA Gateway] Sending to JID: ${targetJid}`);
 
+    // Support both multiple images (fileUrls) and single image (fileUrl)
+    const imagesToSend = Array.isArray(fileUrls) && fileUrls.length > 0
+      ? fileUrls
+      : (fileUrl ? [fileUrl] : []);
+
     let sentMsg;
-    if (fileUrl) {
-      sentMsg = await session.sock.sendMessage(targetJid, {
-        image: { url: fileUrl },
-        caption: text || "",
-      });
+    if (imagesToSend.length > 0) {
+      for (let i = 0; i < imagesToSend.length; i++) {
+        const imgUrl = imagesToSend[i];
+        console.log(`[WA Gateway] Sending image (${i + 1}/${imagesToSend.length}): ${imgUrl}`);
+        sentMsg = await session.sock.sendMessage(targetJid, {
+          image: { url: imgUrl },
+          caption: (i === 0 && text) ? text : "",
+        });
+        // Small delay between multiple images to preserve delivery order
+        if (imagesToSend.length > 1 && i < imagesToSend.length - 1) {
+          await new Promise((r) => setTimeout(r, 600));
+        }
+      }
     } else {
       sentMsg = await session.sock.sendMessage(targetJid, { text: text || "" });
     }

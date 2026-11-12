@@ -13,6 +13,7 @@ use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class WhatsAppWebController extends Controller
 {
@@ -288,13 +289,33 @@ class WhatsAppWebController extends Controller
             'file_urls' => 'nullable|array',
         ]);
 
-        $filePath = $data['file_url'] ?? null;
+        $fileUrls = [];
+        if (!empty($data['file_urls'])) {
+            foreach ($data['file_urls'] as $fUrl) {
+                if ($fUrl) {
+                    if (!str_starts_with($fUrl, 'http://') && !str_starts_with($fUrl, 'https://')) {
+                        $fUrl = Storage::disk('r2')->url($fUrl);
+                    }
+                    $fileUrls[] = $fUrl;
+                }
+            }
+        } elseif (!empty($data['file_url'])) {
+            $singleUrl = $data['file_url'];
+            if (!str_starts_with($singleUrl, 'http://') && !str_starts_with($singleUrl, 'https://')) {
+                $singleUrl = Storage::disk('r2')->url($singleUrl);
+            }
+            $fileUrls[] = $singleUrl;
+        }
+
+        $filePath = !empty($fileUrls) ? $fileUrls[0] : null;
         $fileName = null;
-        $type = 'text';
+        $type = !empty($fileUrls) ? 'image' : 'text';
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filePath = FileUploadHelper::upload($file, 'inbox-attachments');
+            $rawPath = FileUploadHelper::upload($file, 'inbox-attachments', 'r2');
+            $filePath = Storage::disk('r2')->url($rawPath);
+            $fileUrls[] = $filePath;
             $fileName = $file->getClientOriginalName();
             $type = str_starts_with($file->getMimeType(), 'image/') ? 'image' : 'document';
         }
@@ -313,10 +334,11 @@ class WhatsAppWebController extends Controller
                 'phone' => $customerPhone,
                 'text' => $data['text'] ?? '',
                 'fileUrl' => $filePath,
+                'fileUrls' => $fileUrls,
             ];
 
             Log::info("WhatsApp Sending via Gateway: URL={$this->gatewayUrl}/send/{$sessionId}, Phone={$customerPhone}");
-            $gwResponse = Http::timeout(10)->post("{$this->gatewayUrl}/send/{$sessionId}", $postData);
+            $gwResponse = Http::timeout(15)->post("{$this->gatewayUrl}/send/{$sessionId}", $postData);
             Log::info("WhatsApp Gateway Send response: " . $gwResponse->body());
 
             if ($gwResponse->failed()) {
@@ -327,25 +349,44 @@ class WhatsAppWebController extends Controller
         }
 
         // Save into messages table
-        $message = $conversation->messages()->create([
-            'from' => 'agent',
-            'type' => $type,
-            'text' => $data['text'] ?? null,
-            'file_path' => $filePath,
-            'file_name' => $fileName,
-            'agent_id' => $request->user()->id,
-            'is_read' => true,
-        ]);
+        $savedMessages = [];
+        if (!empty($fileUrls)) {
+            foreach ($fileUrls as $idx => $url) {
+                $msg = $conversation->messages()->create([
+                    'from' => 'agent',
+                    'type' => 'image',
+                    'text' => ($idx === 0) ? ($data['text'] ?? null) : null,
+                    'file_path' => $url,
+                    'file_name' => $fileName,
+                    'agent_id' => $request->user()->id,
+                    'is_read' => true,
+                ]);
+                $savedMessages[] = $msg;
+            }
+        } else {
+            $msg = $conversation->messages()->create([
+                'from' => 'agent',
+                'type' => $type,
+                'text' => $data['text'] ?? null,
+                'file_path' => null,
+                'file_name' => null,
+                'agent_id' => $request->user()->id,
+                'is_read' => true,
+            ]);
+            $savedMessages[] = $msg;
+        }
 
         $conversation->update(['last_activity_at' => now()]);
 
+        $lastMessage = end($savedMessages);
+
         return response()->json([
-            'id' => (string)$message->id,
+            'id' => (string)$lastMessage->id,
             'from' => 'agent',
-            'type' => $type,
-            'text' => $message->text,
-            'file_path' => $message->file_path,
-            'created_at' => $message->created_at->toIso8601String(),
+            'type' => $lastMessage->type,
+            'text' => $lastMessage->text,
+            'file_path' => $lastMessage->file_path,
+            'created_at' => $lastMessage->created_at->toIso8601String(),
         ]);
     }
 
