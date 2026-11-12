@@ -523,17 +523,14 @@ class WhatsAppWebController extends Controller
 
             // Mode check: 'always' vs 'offline_only'
             $replyMode = $settings->ai_reply_mode ?? 'always';
-            $lastAgentMsg = $conversation->messages()->where('from', 'agent')->latest()->first();
 
             if ($replyMode === 'offline_only') {
+                $lastAgentMsg = $conversation->messages()
+                    ->where('from', 'agent')
+                    ->latest()
+                    ->first();
                 if ($lastAgentMsg && now()->diffInMinutes($lastAgentMsg->created_at) < 15) {
                     Log::info("WhatsApp AI: Skipped AI reply because human agent was active within 15 min.");
-                    return;
-                }
-            } else {
-                // 'always' mode - avoid collisions if agent replied within last 1 minute
-                if ($lastAgentMsg && now()->diffInMinutes($lastAgentMsg->created_at) < 1) {
-                    Log::info("WhatsApp AI: Skipped reply because human agent just replied.");
                     return;
                 }
             }
