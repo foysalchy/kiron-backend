@@ -1713,6 +1713,11 @@ Route::prefix('v1')->group(function () {
                 Route::put('/inbox/crm-notes/{id}', [CustomerPanelController::class, 'noteUpdate']);
                 Route::delete('/inbox/crm-notes/{id}', [CustomerPanelController::class, 'noteDestroy']);
 
+                // WhatsApp Web QR connection routes
+                Route::get('/inbox/whatsapp/qr', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getQrCode']);
+                Route::get('/inbox/whatsapp/status', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'checkStatus']);
+                Route::delete('/inbox/whatsapp/channels/{channelId}', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'disconnect']);
+
                 Route::post('/inbox/channels/direct-connect', [MetaConnectController::class, 'directConnect']);
                 // routes/api.php
                 Route::prefix('/inbox/meta')->group(function () {
