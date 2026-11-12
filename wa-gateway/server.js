@@ -144,11 +144,17 @@ async function initWASession(sessionId) {
 
 async function notifyLaravelWebhook(data) {
   try {
+    const webhookUrl = process.env.LARAVEL_WEBHOOK_URL || "http://127.0.0.1:8000/api/v1/webhook/whatsapp-qr";
     const postData = JSON.stringify(data);
+    const parsed = new URL(webhookUrl);
+
+    const isHttps = parsed.protocol === "https:";
+    const client = isHttps ? (await import("https")).default : http;
+
     const options = {
-      hostname: "127.0.0.1",
-      port: 8000,
-      path: "/api/v1/webhook/whatsapp-qr",
+      hostname: parsed.hostname,
+      port: parsed.port || (isHttps ? 443 : 80),
+      path: parsed.pathname + parsed.search,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -156,7 +162,7 @@ async function notifyLaravelWebhook(data) {
       },
     };
 
-    const req = http.request(options, (res) => {});
+    const req = client.request(options, (res) => {});
     req.on("error", (e) => {
       // Laravel might be running on a different port or offline
     });

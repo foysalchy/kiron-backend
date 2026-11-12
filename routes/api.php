@@ -213,6 +213,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/inbox/meta/callback', [MetaConnectController::class, 'callback']);
     Route::get('/webhook/meta', [MetaWebhookController::class, 'verify']);
     Route::post('/webhook/meta', [MetaWebhookController::class, 'handle']);
+    Route::post('/webhook/whatsapp-qr', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'handleWebhook']);
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
@@ -1717,6 +1718,9 @@ Route::prefix('v1')->group(function () {
                 Route::get('/inbox/whatsapp/qr', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getQrCode']);
                 Route::get('/inbox/whatsapp/status', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'checkStatus']);
                 Route::delete('/inbox/whatsapp/channels/{channelId}', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'disconnect']);
+                Route::get('/inbox/whatsapp/{channelId}/conversations', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getConversations']);
+                Route::get('/inbox/whatsapp/{channelId}/threads/{threadId}/messages', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'getMessages']);
+                Route::post('/inbox/whatsapp/{channelId}/threads/{threadId}/send', [\App\Http\Controllers\Api\WhatsAppWebController::class, 'sendMessage']);
 
                 Route::post('/inbox/channels/direct-connect', [MetaConnectController::class, 'directConnect']);
                 // routes/api.php
