@@ -293,8 +293,15 @@ class MetaWebhookController extends Controller
                     $priceText = "Regular Price: ৳{$regPrice}, Special Offer/Discount Price: ৳{$salePrice} ({$discountStr})";
                 }
 
-                $stock = $p->stock_quantity ?? 'Available';
-                return "- {$pTitle} | {$priceText} | In Stock: {$stock}";
+                $isAvailable = true;
+                if ($p->manage_stock) {
+                    $isAvailable = ($p->stock_status === 'in_stock' && ($p->stock_quantity > 0 || $p->stock_quantity === null));
+                } else {
+                    $isAvailable = ($p->stock_status !== 'out_of_stock');
+                }
+                $stockText = $isAvailable ? 'In Stock (Available)' : 'Out of Stock';
+
+                return "- {$pTitle} | {$priceText} | Stock: {$stockText}";
             })->implode("\n");
 
             $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';

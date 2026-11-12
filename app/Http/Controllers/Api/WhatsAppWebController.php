@@ -607,8 +607,16 @@ class WhatsAppWebController extends Controller
                     $priceText = "Regular Price: ৳{$regPrice}, Special Offer/Discount Price: ৳{$salePrice} ({$discountStr})";
                 }
 
-                $stock = $p->stock_quantity ?? 'Available';
-                return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stock}";
+                // Stock status evaluation: if manage_stock is off or stock_status is in_stock, it is available
+                $isAvailable = true;
+                if ($p->manage_stock) {
+                    $isAvailable = ($p->stock_status === 'in_stock' && ($p->stock_quantity > 0 || $p->stock_quantity === null));
+                } else {
+                    $isAvailable = ($p->stock_status !== 'out_of_stock');
+                }
+
+                $stockText = $isAvailable ? 'In Stock (Available)' : 'Out of Stock';
+                return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stockText}";
             })->implode("\n");
 
             // Fetch recent conversation history so AI remembers the context (e.g. what product customer asked for)
