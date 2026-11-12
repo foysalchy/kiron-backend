@@ -559,12 +559,14 @@ class WhatsAppWebController extends Controller
             $targetedProducts = collect();
 
             // 1. Direct URL extraction (supports full URL or slug path)
-            if (preg_match('/(?:https?:\/\/[^\/\s]+\/)([^\s\?\#]+)/i', $customerText, $urlMatches)) {
+            if (preg_match('/(?:https?:\/\/[^\/\s]+\/)?([a-zA-Z0-9_\-\&\%]+(?:-[a-zA-Z0-9_\-\&\%]+)+)/i', $customerText, $urlMatches)) {
                 $possibleSlug = trim(urldecode($urlMatches[1]), '/');
-                $slugProduct = \App\Models\Product::where('company_id', $channel->company_id)
+                $slugProduct = \App\Models\Product::withoutGlobalScopes()
+                    ->where('company_id', $channel->company_id)
                     ->where(function ($q) use ($possibleSlug) {
                         $q->where('slug', $possibleSlug)
-                          ->orWhere('slug', 'like', "%{$possibleSlug}%");
+                          ->orWhere('slug', 'like', "%{$possibleSlug}%")
+                          ->orWhere('slug', 'like', '%' . str_replace('&', '%', $possibleSlug) . '%');
                     })
                     ->first();
                 if ($slugProduct) {
@@ -577,7 +579,8 @@ class WhatsAppWebController extends Controller
             $words = array_filter(explode(' ', $cleanKeywords), fn($w) => mb_strlen($w) >= 3);
 
             if (!empty($words)) {
-                $searchQuery = \App\Models\Product::where('company_id', $channel->company_id)
+                $searchQuery = \App\Models\Product::withoutGlobalScopes()
+                    ->where('company_id', $channel->company_id)
                     ->where('status', \App\Enums\Status::Active->value)
                     ->where(function ($q) use ($words) {
                         foreach ($words as $w) {
@@ -590,7 +593,8 @@ class WhatsAppWebController extends Controller
             }
 
             // General active products
-            $generalProducts = \App\Models\Product::where('company_id', $channel->company_id)
+            $generalProducts = \App\Models\Product::withoutGlobalScopes()
+                ->where('company_id', $channel->company_id)
                 ->where('status', \App\Enums\Status::Active->value)
                 ->latest()
                 ->limit(40)
