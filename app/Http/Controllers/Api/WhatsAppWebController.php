@@ -555,15 +555,28 @@ class WhatsAppWebController extends Controller
             $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
             $shopAddress = $siteSetting->address ?? null;
 
-            // Product catalog summary with discount pricing
-            $products = \App\Models\Product::where('company_id', $channel->company_id)
-                ->where('status', \App\Enums\Status::Active->value)
-                ->latest()
-                ->limit(40)
-                ->get();
+            // Check if customer message contains a product link or slug (e.g. littlebaby.com.bd/product-slug)
+            $targetedProduct = null;
+            if (preg_match('/(?:https?:\/\/[^\/]+\/)?([a-zA-Z0-9_\-]+(?:-[a-zA-Z0-9_\-]+)+)/', $customerText, $matches)) {
+                $possibleSlug = trim($matches[1], '/');
+                $targetedProduct = \App\Models\Product::where('company_id', $channel->company_id)
+                    ->where('slug', $possibleSlug)
+                    ->first();
+            }
+
+            // Product catalog summary with discount pricing (include targeted product if found)
+            $productsQuery = \App\Models\Product::where('company_id', $channel->company_id)
+                ->where('status', \App\Enums\Status::Active->value);
+
+            // If customer linked a specific product, make sure it is prioritized in context
+            $products = $productsQuery->latest()->limit(50)->get();
+            if ($targetedProduct && !$products->contains('id', $targetedProduct->id)) {
+                $products->prepend($targetedProduct);
+            }
 
             $productSummary = $products->map(function ($p) {
                 $pTitle = $p->title ?? $p->name ?? 'Product';
+                $slug = $p->slug ?? '';
                 $regPrice = (float)($p->regular_price ?? 0);
                 $salePrice = (float)($p->sale_price ?? $regPrice);
                 $hasDiscount = $p->discount > 0 && $salePrice < $regPrice;
@@ -575,7 +588,7 @@ class WhatsAppWebController extends Controller
                 }
 
                 $stock = $p->stock_quantity ?? 'Available';
-                return "- {$pTitle} | {$priceText} | Stock: {$stock}";
+                return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stock}";
             })->implode("\n");
 
             // Fetch recent conversation history so AI remembers the context (e.g. what product customer asked for)

@@ -126,6 +126,8 @@ class AiService
             case 'omni_chat':
                 $prompt .= "Task: You are an intelligent, human-like e-commerce customer support & sales agent replying directly to a customer on WhatsApp / Facebook Messenger.\n";
                 $prompt .= "Guidelines:\n";
+                $prompt .= "- PROFESSIONAL RESPECT & TONE: Never mix genders like calling someone 'ভাই' and 'আপু' in the same message! Address customers respectfully (e.g., 'জি স্যার/ম্যাম' or politely by their name like 'রিয়াদ ভাই', do NOT say 'আপু' if you called them 'ভাই'). Speak politely in standard Bengali.\n";
+                $prompt .= "- PRODUCT MATCHING: When a customer sends a product link, slug, or name (e.g. 'premium-baby-carrier-bag' or 'baby carrier'), match it against 'Available Products' in the catalog. If it matches a product or slug, it IS AVAILABLE in our shop! Quote its exact name and price. Never claim a product is unavailable if it exists in the catalog.\n";
                 $prompt .= "- CONVERSATIONAL MEMORY: Pay close attention to 'Recent Chat History' and previous context. Never repeat the introductory greeting (e.g., 'Hello! Welcome...') if you already greeted the customer in this conversation.\n";
                 $prompt .= "- PRICING & DISCOUNTS FORMAT: When mentioning price, write naturally using 'রেগুলার মূল্য' and 'ডিসকাউন্ট': e.g., '(রেগুলার মূল্য ৳XXX, ডিসকাউন্ট ৳YYY)'!\n";
                 $prompt .= "- ORDER COLLECTION FORMAT: When customer wants to order or product is chosen, ask for order details line by line in this exact clean format:\n";
