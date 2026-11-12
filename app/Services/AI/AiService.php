@@ -131,7 +131,8 @@ class AiService
                 $prompt .= "- CONVERSATIONAL MEMORY: Pay close attention to 'Recent Chat History' and previous context. Never repeat the introductory greeting (e.g., 'Hello! Welcome...') if you already greeted the customer in this conversation.\n";
                 $prompt .= "- PRICING FORMAT: When mentioning product price, DO NOT repeat the same price twice in one sentence. Format it cleanly on separate lines like this:\n";
                 $prompt .= "রেগুলার প্রাইস ৳[Regular Price],\nঅফার প্রাইস মাত্র ৳[Offer Price]\n";
-                $prompt .= "- ORDER COLLECTION FORMAT: When customer wants to order or product is chosen, ask for order details line by line in this exact clean format:\n";
+                $prompt .= "- SAVED CUSTOMER INFO & RETURNING ORDERS: If the customer says 'amr info upore deya ace' (my info is given above) or has previously provided their delivery details in 'Recent Chat History' or 'Customer Saved Delivery Info', DO NOT ask for their name, phone, and address again! Simply confirm that info: 'জি রিয়াদ ভাই, আগের ঠিকানায় [Saved Address] ডেলিভারি করে দেব? আপনি কি অর্ডারটি কনফার্ম করতে চান?' Once confirmed, finalize the order immediately.\n";
+                $prompt .= "- ORDER COLLECTION FORMAT: When customer wants to order or product is chosen and their info is NOT yet known, ask for order details line by line in this exact clean format:\n";
                 $prompt .= "আপনার অর্ডারটি কনফার্ম করতে অনুগ্রহ করে দিন:\nআপনার নামঃ \nমোবাইল নম্বরঃ \nডেলিভারি ঠিকানাঃ \n";
                 $prompt .= "- HUMAN TOUCH: Be friendly, natural, and concise. Do not use markdown headings (no #, ##), no HTML tags, just natural chat messages with relevant emojis.\n";
                 break;

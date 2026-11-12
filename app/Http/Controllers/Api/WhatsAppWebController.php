@@ -630,10 +630,10 @@ class WhatsAppWebController extends Controller
                 return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stockText}";
             })->implode("\n");
 
-            // Fetch recent conversation history so AI remembers the context (e.g. what product customer asked for)
+            // Fetch recent conversation history (up to last 12 messages) so AI remembers previous customer information & context
             $recentMessages = $conversation->messages()
                 ->latest()
-                ->take(6)
+                ->take(12)
                 ->get()
                 ->reverse()
                 ->map(function ($m) {
@@ -642,6 +642,26 @@ class WhatsAppWebController extends Controller
                 })
                 ->implode("\n");
 
+            // Look up customer's existing profile / previous order shipping address
+            $savedCustomerInfo = null;
+            $lastOrder = \App\Models\Order::withoutGlobalScopes()
+                ->where('company_id', $channel->company_id)
+                ->where('customer_id', $customer->id)
+                ->latest()
+                ->first();
+
+            if ($lastOrder && !empty($lastOrder->shipping_address)) {
+                $ship = is_array($lastOrder->shipping_address) ? $lastOrder->shipping_address : json_decode($lastOrder->shipping_address, true);
+                $savedName = $ship['name'] ?? $customer->name;
+                $savedPhone = $ship['phone'] ?? $customer->phone;
+                $savedAddress = $ship['address'] ?? ($ship['delivery_address'] ?? null);
+                if ($savedAddress) {
+                    $savedCustomerInfo = "Name: {$savedName}, Phone: {$savedPhone}, Address: {$savedAddress}";
+                }
+            } elseif (!empty($customer->address)) {
+                $savedCustomerInfo = "Name: {$customer->name}, Phone: {$customer->phone}, Address: {$customer->address}";
+            }
+
             $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';
 
             $promptParams = [
@@ -649,6 +669,7 @@ class WhatsAppWebController extends Controller
                 'language' => $detectLanguage,
                 'customer_message' => $customerText,
                 'recent_chat_history' => $recentMessages,
+                'customer_saved_delivery_info' => $savedCustomerInfo,
                 'shop_name' => $shopName,
                 'contact_info' => $shopPhone ? "Phone: {$shopPhone}, Address: {$shopAddress}" : null,
                 'available_products' => $productSummary,
