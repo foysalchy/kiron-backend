@@ -40,10 +40,9 @@ class GeminiProvider implements AiProviderInterface
             ];
         }
 
-        $generationConfig = [];
-        if (isset($options['max_tokens'])) {
-            $generationConfig['maxOutputTokens'] = $options['max_tokens'];
-        }
+        $generationConfig = [
+            'maxOutputTokens' => $options['max_tokens'] ?? 2048,
+        ];
         if (isset($options['temperature'])) {
             $generationConfig['temperature'] = $options['temperature'];
         }
