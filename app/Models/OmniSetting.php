@@ -21,7 +21,10 @@ class OmniSetting extends Model
         'auto_assign_agents',
         'off_days',
         'ai_auto_response',
+        'ai_reply_mode',
+        'ai_whatsapp_active',
         'ai_custom_instructions',
+        'ai_training_data',
     ];
     protected $casts = [
         'off_days'            => 'array',
@@ -29,6 +32,7 @@ class OmniSetting extends Model
         'away_mode_active' => 'boolean',
         'welcome_mode_active' => 'boolean',
         'ai_auto_response' => 'boolean',
+        'ai_whatsapp_active' => 'boolean',
         'auto_assign_agents' => 'array',
     ];
 }

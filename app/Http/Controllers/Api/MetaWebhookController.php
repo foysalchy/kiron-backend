@@ -207,15 +207,26 @@ class MetaWebhookController extends Controller
                 return;
             }
 
-            // 2. Safeguard: Human Agent Cooldown
-            // Check if human agent replied within last 15 minutes in this thread
+            // 2. Safeguard: Human Agent Cooldown & Mode Check
+            // Mode: 'always' (reply 24/7) vs 'offline_only' (reply only when human agents are offline or away)
+            $replyMode = $settings->ai_reply_mode ?? 'always';
+
             $state = MetaConversationState::where('channel_id', $channel->id)
                 ->where('customer_psid', $customerPsid)
                 ->first();
 
-            if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 15) {
-                Log::info("Meta Webhook AI: Skipped AI reply because a human agent was active within the last 15 minutes.");
-                return;
+            if ($replyMode === 'offline_only') {
+                // If offline_only mode is chosen, check if a human agent replied recently (within 15 minutes)
+                if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 15) {
+                    Log::info("Meta Webhook AI: Skipped AI reply because human agent is active (offline_only mode).");
+                    return;
+                }
+            } else {
+                // In 'always' mode, check smaller cooldown (e.g., 2 minutes) to prevent collision with immediate human reply
+                if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 2) {
+                    Log::info("Meta Webhook AI: Skipped AI reply because human agent just replied 2 mins ago.");
+                    return;
+                }
             }
 
             // Check if AI service is configured
@@ -294,6 +305,10 @@ class MetaWebhookController extends Controller
 
             if (!empty($settings->ai_custom_instructions)) {
                 $promptParams['special_company_instructions'] = $settings->ai_custom_instructions;
+            }
+
+            if (!empty($settings->ai_training_data)) {
+                $promptParams['company_knowledge_base_training'] = $settings->ai_training_data;
             }
 
             $aiReply = \App\Services\AI\AiService::generate($channel->company_id, $promptParams);

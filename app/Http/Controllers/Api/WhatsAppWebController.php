@@ -471,6 +471,11 @@ class WhatsAppWebController extends Controller
             'is_read' => $fromMe,
         ]);
 
+        // Trigger AI Auto-Response for WhatsApp if incoming from customer
+        if (!$fromMe && !empty($text)) {
+            $this->handleAiAutoResponse($channel, $conversation, $party, $text);
+        }
+
         return response()->json(['success' => true]);
     }
 
@@ -503,6 +508,112 @@ class WhatsAppWebController extends Controller
                 'color' => '#22C35E',
             ]
         );
+    }
+
+    /**
+     * AI Auto-Response for WhatsApp
+     */
+    private function handleAiAutoResponse(Channel $channel, Conversation $conversation, Party $customer, string $customerText)
+    {
+        try {
+            $settings = \App\Models\OmniSetting::where('company_id', $channel->company_id)->first();
+            if (!$settings || !$settings->ai_auto_response || !$settings->ai_whatsapp_active) {
+                return;
+            }
+
+            // Mode check: 'always' vs 'offline_only'
+            $replyMode = $settings->ai_reply_mode ?? 'always';
+            $lastAgentMsg = $conversation->messages()->where('from', 'agent')->latest()->first();
+
+            if ($replyMode === 'offline_only') {
+                if ($lastAgentMsg && now()->diffInMinutes($lastAgentMsg->created_at) < 15) {
+                    Log::info("WhatsApp AI: Skipped AI reply because human agent was active within 15 min.");
+                    return;
+                }
+            } else {
+                // 'always' mode - avoid collisions if agent replied within last 1 minute
+                if ($lastAgentMsg && now()->diffInMinutes($lastAgentMsg->created_at) < 1) {
+                    Log::info("WhatsApp AI: Skipped reply because human agent just replied.");
+                    return;
+                }
+            }
+
+            $aiSetting = \App\Models\AiSetting::where('company_id', $channel->company_id)->first();
+            if (!$aiSetting || (!$aiSetting->gemini_status && !$aiSetting->openai_status)) {
+                Log::warning("WhatsApp AI: AI enabled but no AI provider configured.");
+                return;
+            }
+
+            // Company/Shop info
+            $siteSetting = \App\Models\SiteSetting::where('company_id', $channel->company_id)->first();
+            $shopName = $siteSetting->shop_name ?? ($channel->company->name ?? 'Our Shop');
+            $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
+            $shopAddress = $siteSetting->address ?? null;
+
+            // Product catalog summary
+            $products = \App\Models\Product::where('company_id', $channel->company_id)
+                ->where('status', \App\Enums\Status::Active->value)
+                ->latest()
+                ->limit(30)
+                ->get(['id', 'title', 'regular_price', 'stock_quantity', 'short_description']);
+
+            $productSummary = $products->map(function ($p) {
+                $pTitle = $p->title ?? $p->name ?? 'Product';
+                $price = "৳" . ($p->regular_price ?? $p->selling_price ?? 0);
+                $stock = $p->stock_quantity ?? $p->current_stock ?? 'Available';
+                return "- {$pTitle} | Price: {$price} | Stock: {$stock}";
+            })->implode("\n");
+
+            $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';
+
+            $promptParams = [
+                'type' => 'omni_chat',
+                'language' => $detectLanguage,
+                'customer_message' => $customerText,
+                'shop_name' => $shopName,
+                'contact_info' => $shopPhone ? "Phone: {$shopPhone}, Address: {$shopAddress}" : null,
+                'available_products' => $productSummary,
+            ];
+
+            if (!empty($settings->ai_custom_instructions)) {
+                $promptParams['special_company_instructions'] = $settings->ai_custom_instructions;
+            }
+
+            if (!empty($settings->ai_training_data)) {
+                $promptParams['company_knowledge_base_training'] = $settings->ai_training_data;
+            }
+
+            $aiReply = \App\Services\AI\AiService::generate($channel->company_id, $promptParams);
+
+            if (!empty($aiReply)) {
+                $sessionId = "comp_{$channel->company_id}";
+                $cleanReply = trim($aiReply);
+
+                // Send to WhatsApp Gateway
+                $postData = [
+                    'phone' => $customer->phone,
+                    'text' => $cleanReply,
+                ];
+
+                $gwResponse = Http::timeout(10)->post("{$this->gatewayUrl}/send/{$sessionId}", $postData);
+
+                if ($gwResponse->successful()) {
+                    // Record in conversation messages
+                    $conversation->messages()->create([
+                        'from' => 'agent',
+                        'type' => 'text',
+                        'text' => $cleanReply,
+                        'is_read' => true,
+                    ]);
+                    $conversation->update(['last_activity_at' => now()]);
+                    Log::info("WhatsApp AI: Successfully sent auto-reply to {$customer->phone}");
+                } else {
+                    Log::error("WhatsApp AI: Failed sending to gateway: " . $gwResponse->body());
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("WhatsApp AI Auto-Response Error: " . $e->getMessage());
+        }
     }
 }
 

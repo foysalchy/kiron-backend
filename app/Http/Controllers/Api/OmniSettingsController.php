@@ -66,7 +66,10 @@ class OmniSettingsController extends Controller
             'off_days'   => 'nullable|array|max:7',
             'off_days.*' => 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',
             'ai_auto_response' => 'boolean',
+            'ai_reply_mode' => 'nullable|string|in:always,offline_only',
+            'ai_whatsapp_active' => 'boolean',
             'ai_custom_instructions' => 'nullable|string',
+            'ai_training_data' => 'nullable|string',
         ]);
 
         $settings->update($data);
