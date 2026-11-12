@@ -159,12 +159,18 @@ async function initWASession(sessionId) {
         msg.message.imageMessage?.caption ||
         "";
 
-      console.log(`[WA Gateway] New Message from: ${senderPhone}, fromMe: ${isFromMe}, text: ${text}`);
+      console.log(`[WA Gateway] New Message key: ${JSON.stringify(msg.key)}, pushName: ${msg.pushName}, text: ${text}`);
+
+      // If message is fromMe, the actual customer/chat partner is remoteJid
+      // If remoteJid contains '@lid' (WhatsApp LID format), sender or remoteJid needs resolution
+      const participant = msg.key.participant || remoteJid;
+      const actualCustomerJid = remoteJid;
+      const actualCustomerPhone = actualCustomerJid.split("@")[0];
 
       // Try to fetch profile picture if available
       let profilePicUrl = null;
       try {
-        profilePicUrl = await sock.profilePictureUrl(remoteJid, "image");
+        profilePicUrl = await sock.profilePictureUrl(actualCustomerJid, "image");
       } catch (e) {
         // Ignored if customer privacy restricts profile picture
       }
@@ -173,11 +179,11 @@ async function initWASession(sessionId) {
         sessionId,
         messageId: msg.key.id,
         fromMe: isFromMe,
-        senderPhone,
-        remoteJid,
+        senderPhone: actualCustomerPhone,
+        remoteJid: actualCustomerJid,
         text,
         timestamp: msg.messageTimestamp,
-        pushName: msg.pushName || (isFromMe ? "You" : senderPhone),
+        pushName: msg.pushName || actualCustomerPhone,
         profilePicUrl,
       };
 
@@ -296,23 +302,23 @@ app.post("/send/:sessionId", async (req, res) => {
   }
 
   try {
-    let cleanPhone = phone.replace(/\D/g, "");
-    if (!phone.includes("@")) {
-      cleanPhone = `${cleanPhone}@s.whatsapp.net`;
+    let targetJid;
+    if (phone.includes("@")) {
+      targetJid = phone;
     } else {
-      cleanPhone = phone;
+      targetJid = `${phone}@s.whatsapp.net`;
     }
 
-    console.log(`[WA Gateway] Sending to JID: ${cleanPhone}`);
+    console.log(`[WA Gateway] Sending to JID: ${targetJid}`);
 
     let sentMsg;
     if (fileUrl) {
-      sentMsg = await session.sock.sendMessage(cleanPhone, {
+      sentMsg = await session.sock.sendMessage(targetJid, {
         image: { url: fileUrl },
         caption: text || "",
       });
     } else {
-      sentMsg = await session.sock.sendMessage(cleanPhone, { text: text || "" });
+      sentMsg = await session.sock.sendMessage(targetJid, { text: text || "" });
     }
 
     console.log(`[WA Gateway] Message sent successfully (id: ${sentMsg?.key?.id})`);

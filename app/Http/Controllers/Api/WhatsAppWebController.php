@@ -305,7 +305,8 @@ class WhatsAppWebController extends Controller
             return response()->json(['error' => 'Channel not found'], 404);
         }
 
-        $senderPhone = preg_replace('/\D/', '', $payload['senderPhone'] ?? '');
+        $senderPhone = $payload['senderPhone'] ?? '';
+        $remoteJid = $payload['remoteJid'] ?? $senderPhone;
         $pushName = $payload['pushName'] ?: "WhatsApp ({$senderPhone})";
         $profilePicUrl = $payload['profilePicUrl'] ?? null;
         $text = $payload['text'] ?? '';
@@ -313,8 +314,9 @@ class WhatsAppWebController extends Controller
 
         // Ensure Party (Customer)
         $party = Party::where('company_id', $companyId)
-            ->where(function ($q) use ($senderPhone) {
+            ->where(function ($q) use ($senderPhone, $remoteJid) {
                 $q->where('phone', $senderPhone)
+                  ->orWhere('phone', $remoteJid)
                   ->orWhere('phone', 'like', "%{$senderPhone}%");
             })
             ->first();
@@ -323,18 +325,21 @@ class WhatsAppWebController extends Controller
             $party = Party::create([
                 'company_id' => $companyId,
                 'name' => $pushName,
-                'phone' => $senderPhone,
+                'phone' => $remoteJid, // Store full JID so reply reaches exact WhatsApp account
                 'image' => $profilePicUrl,
                 'type' => 2, // Customer
                 'status' => Status::Active->value,
             ]);
         } else {
             $updates = [];
-            if ($party->name === 'WhatsApp User' || empty($party->name) || $party->name === 'Littlebaby') {
+            if (!empty($pushName) && $pushName !== $senderPhone && $party->name !== $pushName) {
                 $updates['name'] = $pushName;
             }
-            if ($profilePicUrl && !$party->image) {
+            if ($profilePicUrl && $party->image !== $profilePicUrl) {
                 $updates['image'] = $profilePicUrl;
+            }
+            if (!empty($remoteJid) && !str_contains($party->phone, '@')) {
+                $updates['phone'] = $remoteJid;
             }
             if (!empty($updates)) {
                 $party->update($updates);
