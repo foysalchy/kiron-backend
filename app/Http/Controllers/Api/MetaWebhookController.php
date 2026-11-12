@@ -334,6 +334,21 @@ class MetaWebhookController extends Controller
                     Log::error("Meta Webhook AI: Failed to send AI reply to {$customerPsid}. Body: " . $response->body());
                 } else {
                     Log::info("Meta Webhook AI: Gemini AI auto-response sent to {$customerPsid}" . ($adId ? " for Ad ID: {$adId}" : ""));
+
+                    // Auto Tag 'Pending Order' if order confirmation confirmed
+                    $cleanReply = trim($aiReply);
+                    $lowerReply = mb_strtolower($cleanReply);
+                    if (str_contains($lowerReply, 'অর্ডারটি সফলভাবে কনফার্ম') || str_contains($lowerReply, 'অর্ডার কনফার্ম') || str_contains($lowerReply, 'order confirmed')) {
+                        $party = Party::where('company_id', $channel->company_id)->where('fb_psid', $customerPsid)->first();
+                        if ($party) {
+                            $label = \App\Models\Label::firstOrCreate(
+                                ['company_id' => $channel->company_id, 'name' => 'Pending Order'],
+                                ['color' => '#EAB308', 'status' => \App\Enums\Status::Active->value]
+                            );
+                            $party->labels()->syncWithoutDetaching([$label->id]);
+                            Log::info("Meta Webhook AI: Tagged Party #{$party->id} with 'Pending Order' label.");
+                        }
+                    }
                 }
             }
         } catch (\Exception $e) {

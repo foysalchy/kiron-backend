@@ -635,6 +635,17 @@ class WhatsAppWebController extends Controller
                     ]);
                     $conversation->update(['last_activity_at' => now()]);
                     Log::info("WhatsApp AI: Successfully sent auto-reply to {$customer->phone}");
+
+                    // Check if AI reply or customer message confirmed an order -> Auto Tag 'Pending Order'
+                    $lowerReply = mb_strtolower($cleanReply);
+                    if (str_contains($lowerReply, 'অর্ডারটি সফলভাবে কনফার্ম') || str_contains($lowerReply, 'অর্ডার কনফার্ম') || str_contains($lowerReply, 'order confirmed') || str_contains($lowerReply, 'order has been placed')) {
+                        $label = \App\Models\Label::firstOrCreate(
+                            ['company_id' => $channel->company_id, 'name' => 'Pending Order'],
+                            ['color' => '#EAB308', 'status' => \App\Enums\Status::Active->value] // Yellow amber badge
+                        );
+                        $customer->labels()->syncWithoutDetaching([$label->id]);
+                        Log::info("WhatsApp AI: Tagged Party #{$customer->id} with 'Pending Order' label.");
+                    }
                 } else {
                     Log::error("WhatsApp AI: Failed sending to gateway: " . $gwResponse->body());
                 }
