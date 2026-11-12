@@ -47,6 +47,7 @@ class SiteSetting extends Model
         'checkout_show_city',
         'product_details_quick_order',
         'products_page_cta',
+        'order_details_cta',
         'allow_search_engine_index',
         'status',
         'meta_image',
@@ -268,5 +269,15 @@ class SiteSetting extends Model
     public function isBothCta(): bool
     {
         return ($this->products_page_cta ?? 'both') === 'both';
+    }
+
+    public function isSimpleOrderDetailsCta(): bool
+    {
+        return ($this->order_details_cta ?? 'advanced') === 'simple';
+    }
+
+    public function isAdvancedOrderDetailsCta(): bool
+    {
+        return ($this->order_details_cta ?? 'advanced') === 'advanced';
     }
 }

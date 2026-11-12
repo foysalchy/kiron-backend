@@ -71,7 +71,7 @@ class OrderNoteService
         DB::beginTransaction();
         try {
             $note = OrderNote::create($data);
-            LogHelper::created('order_note', $note->id, $note->company_id, $note->name);
+            LogHelper::created('order_note', $note->id, $note->company_id, $note->note);
             DB::commit();
             Log::info('Order note created successfully', ['order_note_id' => $note->id]);
 
@@ -95,7 +95,7 @@ class OrderNoteService
 
             $note->update($data);
 
-            LogHelper::updated('order_note', $note->id, $note->company_id, $note->name);
+            LogHelper::updated('order_note', $note->id, $note->company_id, $note->note);
             DB::commit();
             Log::info('Area Updated Successfully', ['order_note_id' => $note->id]);
 
@@ -120,7 +120,7 @@ class OrderNoteService
 
             $note->delete();
 
-            LogHelper::deleted('order_note', $note->id, $note->company_id, $note->name);
+            LogHelper::deleted('order_note', $note->id, $note->company_id, $note->note);
             DB::commit();
             Log::info('Order Note deleted successfully', ['area_id' => $id]);
 

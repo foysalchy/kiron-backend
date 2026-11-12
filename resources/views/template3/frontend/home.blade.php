@@ -156,7 +156,7 @@
                         @foreach ($megaCat->subCategories->take(6) as $index => $sub)
                             <button onclick="categoryFilter({{ $megaCat->id }}, {{ $sub->id }}, this)"
                                 class="px-4 py-1.5 rounded-sm text-xs md:text-sm font-bold uppercase cursor-pointer transition-all
-                                            {{ $index == 0 ? 'primary-bg text-white active-tab' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                                            {{ $index == 0 ? 'primary-bg text-white active-tab' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                 {{ $sub->name }}
                             </button>
                         @endforeach
@@ -222,7 +222,8 @@
                         class="group-track flex gap-2 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
                         style="-ms-overflow-style:none; scrollbar-width:none;">
                         @foreach ($group->products as $product)
-                            <div class="flex-shrink-0 w-[calc((100%-8px)/2)] sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-32px)/3)] lg:w-[calc((100%-64px)/5)] h-auto">
+                            <div
+                                class="flex-shrink-0 w-[calc((100%-8px)/2)] sm:w-[calc((100%-16px)/3)] md:w-[calc((100%-32px)/3)] lg:w-[calc((100%-64px)/5)] h-auto">
                                 <x-template1.product-card :product="$product" />
                             </div>
                         @endforeach
@@ -261,7 +262,7 @@
 
         <!-- Product Grid (Responsive 2 to 6 columns) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4">
-            @foreach ($allProducts->take(12) as $product)
+            @foreach ($allProducts->take(15) as $product)
                 <x-template1.product-card :product="$product" />
             @endforeach
         </div>
