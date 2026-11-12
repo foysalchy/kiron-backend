@@ -630,10 +630,10 @@ class WhatsAppWebController extends Controller
                 return "- {$pTitle} (Slug/Link: {$slug}) | {$priceText} | Stock: {$stockText}";
             })->implode("\n");
 
-            // Fetch recent conversation history (up to last 12 messages) so AI remembers previous customer information & context
+            // Fetch conversation history (entire recent thread context up to 50 messages)
             $recentMessages = $conversation->messages()
                 ->latest()
-                ->take(12)
+                ->take(50)
                 ->get()
                 ->reverse()
                 ->map(function ($m) {
