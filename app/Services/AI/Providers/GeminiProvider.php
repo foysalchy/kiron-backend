@@ -52,16 +52,37 @@ class GeminiProvider implements AiProviderInterface
             $payload['generationConfig'] = $generationConfig;
         }
 
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->timeout(60)
-            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", $payload);
-
-        if ($response->failed()) {
-            $errorMsg = $response->json('error.message') ?? $response->body();
-            throw new Exception("Gemini API Error: " . $errorMsg);
+        // Fallback models if primary model is overloaded (503 High Demand)
+        $modelsToTry = [$this->model];
+        $fallbacks = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3-flash-preview'];
+        foreach ($fallbacks as $fb) {
+            if (!in_array($fb, $modelsToTry)) {
+                $modelsToTry[] = $fb;
+            }
         }
 
-        return $response->json('candidates.0.content.parts.0.text') ?? '';
+        $lastError = 'Unknown Gemini API Error';
+        foreach ($modelsToTry as $modelName) {
+            $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->timeout(60)
+                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$this->apiKey}", $payload);
+
+            if ($response->successful()) {
+                return $response->json('candidates.0.content.parts.0.text') ?? '';
+            }
+
+            $lastError = $response->json('error.message') ?? $response->body();
+            // If error is high demand / 503 / 429, try next fallback model
+            $isTemporary = str_contains(strtolower($lastError), 'high demand') 
+                || str_contains(strtolower($lastError), 'temporarily')
+                || $response->status() === 503;
+
+            if (!$isTemporary) {
+                break;
+            }
+        }
+
+        throw new Exception("Gemini API Error: " . $lastError);
     }
 
     public function testConnection(): bool
