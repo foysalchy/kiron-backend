@@ -354,115 +354,31 @@ class MetaDirectProxyController extends Controller
                 $fileUrls[] = $singleUrl;
             }
 
-            // Send all attachments to Meta
-            if ($attachmentType === 'image' && count($fileUrls) > 1) {
-                // Meta Messenger Platform: send multiple images using official image_grid template (2-6 images per grid)
-                $chunks = array_chunk($fileUrls, 6);
-
-                foreach ($chunks as $chunk) {
-                    if (count($chunk) >= 2) {
-                        $gridImages = array_map(function ($url) {
-                            return ['url' => $url];
-                        }, $chunk);
-
-                        $imagePayload = [
-                            'access_token' => $pageToken,
-                            'recipient' => ['id' => $data['recipient_psid']],
-                            'message' => [
-                                'attachment' => [
-                                    'type' => 'template',
-                                    'payload' => [
-                                        'template_type' => 'image_grid',
-                                        'elements' => [
-                                            [
-                                                'images' => $gridImages,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'messaging_type' => 'RESPONSE',
-                        ];
-
-                        $imageResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $imagePayload);
-                        Log::info("Meta Proxy: Image Grid send response. Status: {$imageResponse->status()}, Body: " . $imageResponse->body());
-
-                        if ($imageResponse->failed()) {
-                            Log::warning("Meta Proxy: Image Grid send failed, falling back to sequential single-attachment sends.");
-                            foreach ($chunk as $url) {
-                                $singlePayload = [
-                                    'access_token' => $pageToken,
-                                    'recipient' => ['id' => $data['recipient_psid']],
-                                    'message' => [
-                                        'attachment' => [
-                                            'type' => 'image',
-                                            'payload' => [
-                                                'url' => $url,
-                                                'is_reusable' => true,
-                                            ],
-                                        ],
-                                    ],
-                                    'messaging_type' => 'RESPONSE',
-                                ];
-
-                                $singleResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $singlePayload);
-                                if ($singleResponse->failed()) {
-                                    return $this->handleMetaError($singleResponse);
-                                }
-                                $results['attachments'][] = $singleResponse->json();
-                            }
-                        } else {
-                            $results['attachments'][] = $imageResponse->json();
-                        }
-                    } else {
-                        $singlePayload = [
-                            'access_token' => $pageToken,
-                            'recipient' => ['id' => $data['recipient_psid']],
-                            'message' => [
-                                'attachment' => [
-                                    'type' => 'image',
-                                    'payload' => [
-                                        'url' => $chunk[0],
-                                        'is_reusable' => true,
-                                    ],
-                                ],
-                            ],
-                            'messaging_type' => 'RESPONSE',
-                        ];
-
-                        $singleResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $singlePayload);
-                        if ($singleResponse->failed()) {
-                            return $this->handleMetaError($singleResponse);
-                        }
-                        $results['attachments'][] = $singleResponse->json();
-                    }
-                }
-            } else {
-                foreach ($fileUrls as $url) {
-                    $imagePayload = [
-                        'access_token' => $pageToken,
-                        'recipient' => ['id' => $data['recipient_psid']],
-                        'message' => [
-                            'attachment' => [
-                                'type' => $attachmentType,
-                                'payload' => [
-                                    'url' => $url,
-                                    'is_reusable' => true,
-                                ],
+            // Send all attachments to Meta as individual attachments so customers can tap/click to view in full resolution
+            foreach ($fileUrls as $url) {
+                $imagePayload = [
+                    'access_token' => $pageToken,
+                    'recipient' => ['id' => $data['recipient_psid']],
+                    'message' => [
+                        'attachment' => [
+                            'type' => $attachmentType,
+                            'payload' => [
+                                'url' => $url,
+                                'is_reusable' => true,
                             ],
                         ],
-                        'messaging_type' => 'RESPONSE',
-                    ];
+                    ],
+                    'messaging_type' => 'RESPONSE',
+                ];
 
-                    $imageResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $imagePayload);
-                    Log::info("Meta Proxy: Attachment send response. Status: {$imageResponse->status()}, Body: " . $imageResponse->body());
+                $imageResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $imagePayload);
+                Log::info("Meta Proxy: Attachment send response. Status: {$imageResponse->status()}, Body: " . $imageResponse->body());
 
-                    if ($imageResponse->failed()) {
-                        return $this->handleMetaError($imageResponse);
-                    }
-
-                    $results['attachments'][] = $imageResponse->json();
+                if ($imageResponse->failed()) {
+                    return $this->handleMetaError($imageResponse);
                 }
+
+                $results['attachments'][] = $imageResponse->json();
             }
 
             // ---- Step 2: Text thakle seta alada message hisebe pathai ----
