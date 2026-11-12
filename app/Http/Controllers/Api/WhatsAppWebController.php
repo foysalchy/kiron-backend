@@ -555,19 +555,40 @@ class WhatsAppWebController extends Controller
             $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
             $shopAddress = $siteSetting->address ?? null;
 
-            // Product catalog summary
+            // Product catalog summary with discount pricing
             $products = \App\Models\Product::where('company_id', $channel->company_id)
                 ->where('status', \App\Enums\Status::Active->value)
                 ->latest()
-                ->limit(30)
-                ->get(['id', 'title', 'regular_price', 'stock_quantity', 'short_description']);
+                ->limit(40)
+                ->get();
 
             $productSummary = $products->map(function ($p) {
                 $pTitle = $p->title ?? $p->name ?? 'Product';
-                $price = "৳" . ($p->regular_price ?? $p->selling_price ?? 0);
-                $stock = $p->stock_quantity ?? $p->current_stock ?? 'Available';
-                return "- {$pTitle} | Price: {$price} | Stock: {$stock}";
+                $regPrice = (float)($p->regular_price ?? 0);
+                $salePrice = (float)($p->sale_price ?? $regPrice);
+                $hasDiscount = $p->discount > 0 && $salePrice < $regPrice;
+
+                $priceText = "Price: ৳{$salePrice}";
+                if ($hasDiscount) {
+                    $discountStr = $p->discount_type === 'percent' ? "{$p->discount}% off" : "৳{$p->discount} off";
+                    $priceText = "Regular Price: ৳{$regPrice}, Special Offer/Discount Price: ৳{$salePrice} ({$discountStr})";
+                }
+
+                $stock = $p->stock_quantity ?? 'Available';
+                return "- {$pTitle} | {$priceText} | Stock: {$stock}";
             })->implode("\n");
+
+            // Fetch recent conversation history so AI remembers the context (e.g. what product customer asked for)
+            $recentMessages = $conversation->messages()
+                ->latest()
+                ->take(6)
+                ->get()
+                ->reverse()
+                ->map(function ($m) {
+                    $sender = $m->from === 'customer' ? 'Customer' : 'Assistant';
+                    return "{$sender}: {$m->text}";
+                })
+                ->implode("\n");
 
             $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';
 
@@ -575,6 +596,7 @@ class WhatsAppWebController extends Controller
                 'type' => 'omni_chat',
                 'language' => $detectLanguage,
                 'customer_message' => $customerText,
+                'recent_chat_history' => $recentMessages,
                 'shop_name' => $shopName,
                 'contact_info' => $shopPhone ? "Phone: {$shopPhone}, Address: {$shopAddress}" : null,
                 'available_products' => $productSummary,

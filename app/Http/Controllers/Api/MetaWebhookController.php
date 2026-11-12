@@ -274,18 +274,27 @@ class MetaWebhookController extends Controller
             $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
             $shopAddress = $siteSetting->address ?? null;
 
-            // Fetch recent / active products for catalog context
+            // Fetch recent / active products for catalog context with discount pricing
             $products = \App\Models\Product::where('company_id', $channel->company_id)
                 ->where('status', \App\Enums\Status::Active->value)
                 ->latest()
-                ->limit(30)
-                ->get(['id', 'title', 'regular_price', 'stock_quantity', 'short_description']);
+                ->limit(40)
+                ->get();
 
             $productSummary = $products->map(function ($p) {
                 $pTitle = $p->title ?? $p->name ?? 'Product';
-                $price = "৳" . ($p->regular_price ?? $p->selling_price ?? 0);
-                $stock = $p->stock_quantity ?? $p->current_stock ?? 'Available';
-                return "- {$pTitle} | Price: {$price} | In Stock: {$stock}";
+                $regPrice = (float)($p->regular_price ?? 0);
+                $salePrice = (float)($p->sale_price ?? $regPrice);
+                $hasDiscount = $p->discount > 0 && $salePrice < $regPrice;
+
+                $priceText = "Price: ৳{$salePrice}";
+                if ($hasDiscount) {
+                    $discountStr = $p->discount_type === 'percent' ? "{$p->discount}% off" : "৳{$p->discount} off";
+                    $priceText = "Regular Price: ৳{$regPrice}, Special Offer/Discount Price: ৳{$salePrice} ({$discountStr})";
+                }
+
+                $stock = $p->stock_quantity ?? 'Available';
+                return "- {$pTitle} | {$priceText} | In Stock: {$stock}";
             })->implode("\n");
 
             $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';

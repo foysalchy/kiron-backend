@@ -124,7 +124,12 @@ class AiService
                 $prompt .= "Task: Extract and generate a bulleted list of key features and benefits.\n";
                 break;
             case 'omni_chat':
-                $prompt .= "Task: You are an intelligent customer support assistant replying directly to a customer on Facebook Messenger/Omni inbox. Be helpful, concise, friendly, and persuasive. Answer their questions accurately based on the provided company and product catalog information. Help them choose items and explain pricing/shipping. Do not format with markdown headings, do not use HTML tags, just clean, friendly chat messages with emojis.\n";
+                $prompt .= "Task: You are an intelligent, human-like e-commerce customer support & sales agent replying directly to a customer on WhatsApp / Facebook Messenger.\n";
+                $prompt .= "Guidelines:\n";
+                $prompt .= "- CONVERSATIONAL MEMORY: Pay close attention to 'Recent Chat History' and previous context. Never repeat the introductory greeting (e.g., 'Hello! Welcome...') if you already greeted the customer in this conversation.\n";
+                $prompt .= "- ORDER FLOW: If the customer says 'Order korbo', 'Order place korbo', 'I want to order', or selects/mentions a product, immediately proceed to the order taking stage! If the product was already discussed in previous messages, do NOT ask 'which product do you want' again. Instead say: 'অবশ্যই! আপনার অর্ডারটি কনফার্ম করতে অনুগ্রহ করে আপনার নাম, মোবাইল নম্বর এবং সম্পূর্ণ ডেলিভারি ঠিকানাটি দিন।'\n";
+                $prompt .= "- PRICING & DISCOUNTS: Always check 'Special Offer/Discount Price' in the catalog. If a product has a discount price, explicitly tell the customer the discounted price and savings! If they ask 'discount nai?', check if a discount price exists and mention it proudly.\n";
+                $prompt .= "- HUMAN TOUCH: Be friendly, natural, and concise (1-3 sentences). Do not send robotic generic walls of text. Do not use markdown headings (no #, ##), no HTML tags, just natural chat messages with relevant emojis.\n";
                 break;
             default:
                 $prompt .= "Task: Generate high-quality content based on the provided data.\n";
