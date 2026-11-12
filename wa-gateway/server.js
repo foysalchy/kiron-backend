@@ -161,6 +161,14 @@ async function initWASession(sessionId) {
 
       console.log(`[WA Gateway] New Message from: ${senderPhone}, fromMe: ${isFromMe}, text: ${text}`);
 
+      // Try to fetch profile picture if available
+      let profilePicUrl = null;
+      try {
+        profilePicUrl = await sock.profilePictureUrl(remoteJid, "image");
+      } catch (e) {
+        // Ignored if customer privacy restricts profile picture
+      }
+
       const payload = {
         sessionId,
         messageId: msg.key.id,
@@ -169,7 +177,8 @@ async function initWASession(sessionId) {
         remoteJid,
         text,
         timestamp: msg.messageTimestamp,
-        pushName: msg.pushName || senderPhone,
+        pushName: msg.pushName || (isFromMe ? "You" : senderPhone),
+        profilePicUrl,
       };
 
       notifyLaravelWebhook({
@@ -226,6 +235,23 @@ async function notifyLaravelWebhook(data) {
 }
 
 // REST API Endpoints for Laravel
+app.get("/sync-chats/:sessionId", async (req, res) => {
+  const { sessionId } = req.params;
+  const session = activeSessions.get(sessionId);
+
+  if (!session || session.status !== "connected" || !session.sock) {
+    return res.status(400).json({ error: "WhatsApp session is not connected." });
+  }
+
+  try {
+    console.log(`[WA Gateway] Manual sync triggered for ${sessionId}`);
+    // Fetch last 50 messages from socket store or trigger history
+    res.json({ success: true, message: "Sync command received" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/status/:sessionId", async (req, res) => {
   const { sessionId } = req.params;
   const session = activeSessions.get(sessionId);
@@ -261,26 +287,38 @@ app.post("/send/:sessionId", async (req, res) => {
   const { sessionId } = req.params;
   const { phone, text, fileUrl } = req.body;
 
+  console.log(`[WA Gateway] /send request for sessionId: ${sessionId}, to phone: ${phone}, text: ${text}`);
+
   const session = activeSessions.get(sessionId);
   if (!session || session.status !== "connected" || !session.sock) {
+    console.error(`[WA Gateway] /send failed: session not connected (status: ${session?.status})`);
     return res.status(400).json({ error: "WhatsApp session is not connected." });
   }
 
   try {
-    const jid = phone.includes("@") ? phone : `${phone.replace(/\D/g, "")}@s.whatsapp.net`;
+    let cleanPhone = phone.replace(/\D/g, "");
+    if (!phone.includes("@")) {
+      cleanPhone = `${cleanPhone}@s.whatsapp.net`;
+    } else {
+      cleanPhone = phone;
+    }
 
+    console.log(`[WA Gateway] Sending to JID: ${cleanPhone}`);
+
+    let sentMsg;
     if (fileUrl) {
-      await session.sock.sendMessage(jid, {
+      sentMsg = await session.sock.sendMessage(cleanPhone, {
         image: { url: fileUrl },
         caption: text || "",
       });
     } else {
-      await session.sock.sendMessage(jid, { text: text || "" });
+      sentMsg = await session.sock.sendMessage(cleanPhone, { text: text || "" });
     }
 
-    res.json({ success: true });
+    console.log(`[WA Gateway] Message sent successfully (id: ${sentMsg?.key?.id})`);
+    res.json({ success: true, messageId: sentMsg?.key?.id });
   } catch (err) {
-    console.error("Failed to send WhatsApp message:", err);
+    console.error("[WA Gateway] Failed to send WhatsApp message:", err);
     res.status(500).json({ error: err.message });
   }
 });

@@ -134,13 +134,16 @@ class WhatsAppWebController extends Controller
             $lastMsg = $convo->messages->first();
             $customerName = $convo->customer?->name ?: 'WhatsApp User';
             $customerPhone = $convo->customer?->phone ?: '';
+            $customerImage = $convo->customer?->image ?: null;
 
             $unreadCount = $convo->messages()->where('from', 'customer')->where('is_read', false)->count();
 
             return [
                 'id' => (string)$convo->id,
-                'customer_name' => $customerName . ($customerPhone ? " ({$customerPhone})" : ''),
+                'customer_name' => $customerName,
                 'customer_id' => $customerPhone ?: (string)$convo->customer_id,
+                'customer_phone' => $customerPhone,
+                'customer_image' => $customerImage,
                 'last_message' => $lastMsg?->text ?? ($lastMsg?->type === 'image' ? '[Photo]' : 'No message'),
                 'unread_count' => $unreadCount,
                 'last_activity' => $convo->last_activity_at?->toIso8601String() ?? $convo->updated_at->toIso8601String(),
@@ -244,7 +247,10 @@ class WhatsAppWebController extends Controller
                 'fileUrl' => $filePath,
             ];
 
+            Log::info("WhatsApp Sending via Gateway: URL={$this->gatewayUrl}/send/{$sessionId}, Phone={$customerPhone}");
             $gwResponse = Http::timeout(10)->post("{$this->gatewayUrl}/send/{$sessionId}", $postData);
+            Log::info("WhatsApp Gateway Send response: " . $gwResponse->body());
+
             if ($gwResponse->failed()) {
                 Log::error("WhatsApp Gateway Send failed: " . $gwResponse->body());
             }
@@ -301,6 +307,7 @@ class WhatsAppWebController extends Controller
 
         $senderPhone = preg_replace('/\D/', '', $payload['senderPhone'] ?? '');
         $pushName = $payload['pushName'] ?: "WhatsApp ({$senderPhone})";
+        $profilePicUrl = $payload['profilePicUrl'] ?? null;
         $text = $payload['text'] ?? '';
         $fromMe = $payload['fromMe'] ?? false;
 
@@ -317,9 +324,21 @@ class WhatsAppWebController extends Controller
                 'company_id' => $companyId,
                 'name' => $pushName,
                 'phone' => $senderPhone,
+                'image' => $profilePicUrl,
                 'type' => 2, // Customer
                 'status' => Status::Active->value,
             ]);
+        } else {
+            $updates = [];
+            if ($party->name === 'WhatsApp User' || empty($party->name) || $party->name === 'Littlebaby') {
+                $updates['name'] = $pushName;
+            }
+            if ($profilePicUrl && !$party->image) {
+                $updates['image'] = $profilePicUrl;
+            }
+            if (!empty($updates)) {
+                $party->update($updates);
+            }
         }
 
         // Find or create Conversation
