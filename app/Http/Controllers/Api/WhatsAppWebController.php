@@ -115,25 +115,26 @@ class WhatsAppWebController extends Controller
      */
     private function ensureWhatsAppChannel(int $companyId, string $phone, ?string $name = null): Channel
     {
-        $group = ChannelGroup::firstOrCreate(
+        $group = ChannelGroup::withoutGlobalScopes()->firstOrCreate(
             ['platform' => 'whatsapp', 'company_id' => $companyId],
             [
-                'profile_name' => 'WhatsApp Business',
-                'profile_image' => null,
+                'profile_name' => 'WhatsApp (' . $phone . ')',
+                'profile_image' => 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+                'personal_token' => 'wa_web_session_' . $phone,
             ]
         );
 
         $displayName = $name ?: "WhatsApp ({$phone})";
         $pageId = "wa_{$phone}";
 
-        return Channel::updateOrCreate(
+        return Channel::withoutGlobalScopes()->updateOrCreate(
             ['page_id' => $pageId, 'company_id' => $companyId],
             [
                 'channel_group_id' => $group->id,
                 'name' => $displayName,
                 'type' => 'whatsapp',
                 'slug' => 'wa-' . $phone,
-                'profile_image' => null,
+                'profile_image' => 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
                 'page_token' => 'wa_web_session',
                 'color' => '#22C35E',
             ]
