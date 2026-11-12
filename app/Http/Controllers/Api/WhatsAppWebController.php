@@ -521,16 +521,33 @@ class WhatsAppWebController extends Controller
                 return;
             }
 
-            // Mode check: 'always' vs 'offline_only'
-            $replyMode = $settings->ai_reply_mode ?? 'always';
-
-            if ($replyMode === 'offline_only') {
-                $lastAgentMsg = $conversation->messages()
+            // Mode & Assignment Check
+            // Rule:
+            // 1. If assigned to a human agent ($conversation->assigned_user_id exists):
+            //    AI remains quiet, UNLESS the human agent hasn't replied to the customer for 5+ minutes.
+            // 2. If unassigned / assigned to AI:
+            //    AI responds immediately (unless agent sent a manual message in the last 2 minutes).
+            if ($conversation->assigned_user_id) {
+                $lastHumanMsg = $conversation->messages()
                     ->where('from', 'agent')
+                    ->whereNotNull('agent_id')
                     ->latest()
                     ->first();
-                if ($lastAgentMsg && now()->diffInMinutes($lastAgentMsg->created_at) < 15) {
-                    Log::info("WhatsApp AI: Skipped AI reply because human agent was active within 15 min.");
+
+                // If human replied less than 5 minutes ago, do not interfere
+                if ($lastHumanMsg && now()->diffInMinutes($lastHumanMsg->created_at) < 5) {
+                    Log::info("WhatsApp AI: Skipped AI reply because conversation is assigned to agent (User #{$conversation->assigned_user_id}) and last human reply was within 5 min.");
+                    return;
+                }
+            } else {
+                // If unassigned (AI mode), prevent overlapping with recent human message sent from inbox within 2 min
+                $recentHumanMsg = $conversation->messages()
+                    ->where('from', 'agent')
+                    ->whereNotNull('agent_id')
+                    ->latest()
+                    ->first();
+                if ($recentHumanMsg && now()->diffInMinutes($recentHumanMsg->created_at) < 2) {
+                    Log::info("WhatsApp AI: Skipped AI reply because human agent just sent a message within 2 min.");
                     return;
                 }
             }
@@ -595,11 +612,12 @@ class WhatsAppWebController extends Controller
                 $gwResponse = Http::timeout(10)->post("{$this->gatewayUrl}/send/{$sessionId}", $postData);
 
                 if ($gwResponse->successful()) {
-                    // Record in conversation messages
+                    // Record in conversation messages (agent_id null indicates AI bot)
                     $conversation->messages()->create([
                         'from' => 'agent',
                         'type' => 'text',
                         'text' => $cleanReply,
+                        'agent_id' => null,
                         'is_read' => true,
                     ]);
                     $conversation->update(['last_activity_at' => now()]);

@@ -207,22 +207,22 @@ class MetaWebhookController extends Controller
                 return;
             }
 
-            // 2. Safeguard: Human Agent Cooldown & Mode Check
-            // Mode: 'always' (reply 24/7) vs 'offline_only' (reply only when human agents are offline or away)
-            $replyMode = $settings->ai_reply_mode ?? 'always';
-
+            // 2. Safeguard: Assignment & Human Agent Cooldown Check
+            // If human agents are assigned to this thread, suppress AI unless no agent replied in the last 5 minutes.
             $state = MetaConversationState::where('channel_id', $channel->id)
                 ->where('customer_psid', $customerPsid)
                 ->first();
 
-            if ($replyMode === 'offline_only') {
-                // If offline_only mode is chosen, check if a human agent replied recently (within 15 minutes)
-                if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 15) {
-                    Log::info("Meta Webhook AI: Skipped AI reply because human agent is active (offline_only mode).");
+            $assignedCount = $state ? $state->assignedUsers()->count() : 0;
+
+            if ($assignedCount > 0) {
+                // Human is assigned: check if human agent was active within last 5 minutes
+                if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 5) {
+                    Log::info("Meta Webhook AI: Skipped AI reply because human agent is assigned and active within 5 min.");
                     return;
                 }
             } else {
-                // In 'always' mode, check smaller cooldown (e.g., 2 minutes) to prevent collision with immediate human reply
+                // Unassigned / AI mode: prevent collision if human just replied within 2 minutes
                 if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 2) {
                     Log::info("Meta Webhook AI: Skipped AI reply because human agent just replied 2 mins ago.");
                     return;
