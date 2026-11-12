@@ -15,7 +15,7 @@ class WhatsAppWebController extends Controller
 
     public function __construct()
     {
-        $this->gatewayUrl = env('WHATSAPP_GATEWAY_URL', 'http://127.0.0.1:3001');
+        $this->gatewayUrl = env('WHATSAPP_GATEWAY_URL', 'http://127.0.0.1:3001'); 
     }
 
     /**
