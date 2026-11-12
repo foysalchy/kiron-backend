@@ -67,7 +67,7 @@ class GeminiProvider implements AiProviderInterface
     public function testConnection(): bool
     {
         $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->timeout(10)
+            ->timeout(30)
             ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", [
                 'contents' => [['parts' => [['text' => 'Hello']]]]
             ]);

@@ -61,7 +61,7 @@ class OpenAIProvider implements AiProviderInterface
     public function testConnection(): bool
     {
         $response = Http::withToken($this->apiKey)
-            ->timeout(10)
+            ->timeout(30)
             ->post('https://api.openai.com/v1/chat/completions', [
                 'model' => $this->model,
                 'messages' => [['role' => 'user', 'content' => 'Hello']],
