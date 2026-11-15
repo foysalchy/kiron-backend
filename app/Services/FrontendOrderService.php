@@ -242,6 +242,7 @@ class FrontendOrderService
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'source_info' => $order->source_info,
                 'source' => $this->resolveOrderDisplaySource($order),
+                'ip_address' => $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null,
                 'items' => $order->orderDetails->map(function ($detail) {
                     $item = [
                         'id' => $detail->id,
@@ -635,6 +636,8 @@ class FrontendOrderService
             'courierMethod' => $this->getCourierMethod(),
             'assigned_users' => $assignedUsers,
             'assigned_to' => $order->assigned_to, // Raw assigned_to array (user IDs)
+            'source_info' => $order->source_info,
+            'ip_address' => $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null,
 
         ];
     }
