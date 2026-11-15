@@ -1792,7 +1792,22 @@
 
     <!-- SOLUTION SECTION -->
     <!-- DEMO & TEMPLATE SECTION -->
-    @if ($demos->isNotEmpty())
+    @php
+        $displayDemos = ($demos && $demos->isNotEmpty()) ? $demos : collect([
+            (object)['id' => 1, 'type' => 1, 'title' => 'Landing Template 1 (Classic)', 'link' => url('/landing-preview/1'), 'image_url' => 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80'],
+            (object)['id' => 2, 'type' => 1, 'title' => 'Landing Template 2 (Modern Gadget)', 'link' => url('/landing-preview/2'), 'image_url' => 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80'],
+            (object)['id' => 3, 'type' => 1, 'title' => 'Landing Template 3 (Beauty & Cosmetics)', 'link' => url('/landing-preview/3'), 'image_url' => 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80'],
+            (object)['id' => 4, 'type' => 1, 'title' => 'Landing Template 4 (Multi Product)', 'link' => url('/landing-preview/4'), 'image_url' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80'],
+            (object)['id' => 5, 'type' => 1, 'title' => 'Landing Template 5 (High Conversion)', 'link' => url('/landing-preview/5'), 'image_url' => 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&q=80'],
+            (object)['id' => 6, 'type' => 1, 'title' => 'Landing Template 6 (Mega Storefront)', 'link' => url('/landing-preview/6'), 'image_url' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80'],
+            (object)['id' => 7, 'type' => 2, 'title' => 'Theme 1 (Modern Minimalist)', 'link' => url('/theme-preview/1'), 'image_url' => asset('assets/themes/theme_1.webp')],
+            (object)['id' => 8, 'type' => 2, 'title' => 'Theme 2 (Ocean Lifestyle)', 'link' => url('/theme-preview/2'), 'image_url' => asset('assets/themes/theme_2.webp')],
+            (object)['id' => 9, 'type' => 2, 'title' => 'Theme 3 (Organic Nature)', 'link' => url('/theme-preview/3'), 'image_url' => asset('assets/themes/theme_3.webp')],
+            (object)['id' => 10, 'type' => 2, 'title' => 'Theme 4 (Urban Streetwear)', 'link' => url('/theme-preview/4'), 'image_url' => asset('assets/themes/theme_4.webp')],
+            (object)['id' => 11, 'type' => 2, 'title' => 'Theme 5 (Luxury Boutique)', 'link' => url('/theme-preview/5'), 'image_url' => asset('assets/themes/theme_5.webp')],
+        ]);
+    @endphp
+    @if ($displayDemos->isNotEmpty())
         <section class="bg-white py-10 px-4 md:px-10" id="demo-section">
             <div class="max-w-[1400px] mx-auto">
                 <!-- Section Header -->
@@ -1821,7 +1836,7 @@
 
                 <!-- Templates Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="demo-grid">
-                    @forelse($demos as $demo)
+                    @forelse($displayDemos as $demo)
                         <div class="demo-card group border border-indigo-100 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                             data-type="{{ $demo->type }}">
                             <!-- Preview Window with Smooth Vertical Scroll on Hover -->

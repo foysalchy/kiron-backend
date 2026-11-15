@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 // Partner & Referral Web Portal Routes
 Route::get('/_preview_card', [App\Http\Controllers\Frontend\FrontendController::class, 'previewCard'])->name('preview.card');
 Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('landing.direct.preview');
+Route::get('/theme-preview/{theme_id?}', [HomeController::class, 'themePreview'])->name('theme.direct.preview');
 
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('/login', [PartnerPortalController::class, 'showLoginForm'])->name('login');
@@ -77,14 +78,18 @@ Route::domain('dorja.io')->group(function () {
     Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');
     Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap.saas.index');
     Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.saas.txt');
+    Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('saas.landing.preview');
+    Route::get('/theme-preview/{theme_id?}', [HomeController::class, 'themePreview'])->name('saas.theme.preview');
 });
 
 
 Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('landing.preview');
+    Route::get('/theme-preview/{theme_id?}', [HomeController::class, 'themePreview'])->name('theme.preview');
     Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
     Route::post('/landing-order/partial', [LandingController::class, 'partialSave'])->name('landing.order.partial');
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    //  Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
     Route::get('/notice/{slug}', [HomeController::class, 'showNotice'])->name('notice.details');
     Route::get('/reservation', [App\Http\Controllers\Frontend\ReservationController::class, 'index'])->name('reservation.index');
     Route::get('/reservation/availability', [App\Http\Controllers\Frontend\ReservationController::class, 'availability'])->name('reservation.availability');
