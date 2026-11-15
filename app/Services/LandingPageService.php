@@ -8,6 +8,7 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\LandingPage;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -573,7 +574,7 @@ class LandingPageService
     /**
      * Get analytics and statistics for a specific landing page
      */
-    public function getLandingPageAnalytics(int $id): array
+    public function getLandingPageAnalytics(int $id, array $filters = []): array
     {
         try {
             $landingPage = LandingPage::with(['product:id,title,slug,thumbnail'])->find($id);
@@ -584,9 +585,37 @@ class LandingPageService
 
             $landingPage->append(['products', 'product_ids']);
 
+            $period = $filters['period'] ?? 'all_time';
+            $startDate = null;
+            $endDate = null;
+
+            if ($period === 'today') {
+                $startDate = Carbon::today()->toDateString();
+                $endDate = Carbon::today()->toDateString();
+            } elseif ($period === 'yesterday') {
+                $startDate = Carbon::yesterday()->toDateString();
+                $endDate = Carbon::yesterday()->toDateString();
+            } elseif ($period === 'last_7_days') {
+                $startDate = Carbon::today()->subDays(6)->toDateString();
+                $endDate = Carbon::today()->toDateString();
+            } elseif ($period === 'this_month') {
+                $startDate = Carbon::now()->startOfMonth()->toDateString();
+                $endDate = Carbon::now()->toDateString();
+            } elseif ($period === 'last_month') {
+                $startDate = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+                $endDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
+            } elseif ($period === 'custom' && !empty($filters['start_date']) && !empty($filters['end_date'])) {
+                $startDate = Carbon::parse($filters['start_date'])->toDateString();
+                $endDate = Carbon::parse($filters['end_date'])->toDateString();
+            }
+
             $ordersQuery = \App\Models\Order::withoutGlobalScopes()
                 ->where('landing_page_id', $id)
                 ->whereNull('deleted_at');
+
+            if ($startDate && $endDate) {
+                $ordersQuery->whereBetween('order_date', [$startDate, $endDate]);
+            }
 
             $allOrders = $ordersQuery->get();
 
@@ -621,9 +650,15 @@ class LandingPageService
             $successRatio = $completedForRatio > 0 ? round(($deliveredOrders / $completedForRatio) * 100, 1) : 0;
 
             // Recent 10 Orders with customer & item info (includes all orders including draft leads)
-            $recentOrders = \App\Models\Order::withoutGlobalScopes()
+            $recentOrdersQuery = \App\Models\Order::withoutGlobalScopes()
                 ->where('landing_page_id', $id)
-                ->whereNull('deleted_at')
+                ->whereNull('deleted_at');
+
+            if ($startDate && $endDate) {
+                $recentOrdersQuery->whereBetween('order_date', [$startDate, $endDate]);
+            }
+
+            $recentOrders = $recentOrdersQuery
                 ->select([
                     'id', 'order_no', 'order_date', 'status', 'payment_status',
                     'grand_total', 'payment_amount', 'shipping_address', 'created_at'
@@ -654,6 +689,11 @@ class LandingPageService
                 });
 
             return [
+                'period' => [
+                    'label' => $period,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ],
                 'landing_page' => [
                     'id' => $landingPage->id,
                     'name' => $landingPage->name,

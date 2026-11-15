@@ -95,9 +95,9 @@ class LandingPageController extends Controller
         return ResponseHelper::success($data, 'Landing page status updated successfully');
     }
 
-    public function analytics(int $id): JsonResponse
+    public function analytics(Request $request, int $id): JsonResponse
     {
-        $data = $this->landingPageService->getLandingPageAnalytics($id);
+        $data = $this->landingPageService->getLandingPageAnalytics($id, $request->all());
 
         return ResponseHelper::success($data, 'Landing page analytics retrieved successfully');
     }

@@ -135,6 +135,55 @@ class FrontendOrderService
             });
         }
 
+        // Duplicate orders filter: filter orders where same customer or phone has placed multiple orders
+        if (!empty($filters['is_duplicate']) && $filters['is_duplicate'] !== 'all' && $filters['is_duplicate'] != '0') {
+            $companyId = auth()->user()?->company_id;
+
+            // 1. Customer IDs that have placed > 1 orders
+            $dupCustomerIds = DB::table('orders')
+                ->whereNull('deleted_at')
+                ->whereNotNull('customer_id')
+                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                ->select('customer_id')
+                ->groupBy('customer_id')
+                ->havingRaw('COUNT(*) > 1')
+                ->pluck('customer_id');
+
+            // 2. Phone numbers (from parties.phone or shipping_address) that have > 1 orders
+            $dupPhones = DB::table('orders')
+                ->leftJoin('parties', 'orders.customer_id', '=', 'parties.id')
+                ->whereNull('orders.deleted_at')
+                ->when($companyId, fn($q) => $q->where('orders.company_id', $companyId))
+                ->select(DB::raw("COALESCE(parties.phone, JSON_UNQUOTE(JSON_EXTRACT(orders.shipping_address, '$.phone'))) as phone_no"))
+                ->groupBy(DB::raw("COALESCE(parties.phone, JSON_UNQUOTE(JSON_EXTRACT(orders.shipping_address, '$.phone')))"))
+                ->havingRaw('COUNT(*) > 1')
+                ->havingRaw("phone_no IS NOT NULL AND phone_no != ''")
+                ->pluck('phone_no');
+
+            $query->where(function ($q) use ($dupCustomerIds, $dupPhones) {
+                $hasCondition = false;
+                if ($dupCustomerIds->isNotEmpty()) {
+                    $q->whereIn('orders.customer_id', $dupCustomerIds);
+                    $hasCondition = true;
+                }
+                if ($dupPhones->isNotEmpty()) {
+                    $method = $hasCondition ? 'orWhere' : 'where';
+                    $q->$method(function ($pQ) use ($dupPhones) {
+                        $pQ->whereHas('customer', fn($cQ) => $cQ->whereIn('phone', $dupPhones))
+                           ->orWhere(function ($sQ) use ($dupPhones) {
+                               foreach ($dupPhones as $ph) {
+                                   $sQ->orWhere('orders.shipping_address', 'like', '%' . $ph . '%');
+                               }
+                           });
+                    });
+                    $hasCondition = true;
+                }
+                if (!$hasCondition) {
+                    $q->whereRaw('0 = 1');
+                }
+            });
+        }
+
         // Order by latest first
         $query->orderBy('orders.created_at', 'desc');
 
@@ -763,27 +812,68 @@ class FrontendOrderService
 
     protected function resolveOrderDisplaySource(Order $order): string
     {
-        if (!empty($order->source) && !in_array(strtolower($order->source), ['sales', 'landing'])) {
-            return ucfirst($order->source);
+        // 1. Determine destination / funnel platform
+        $isLanding = ($order->type === Order::TYPE_LANDING || $order->type === 'landing' || !empty($order->landing_page_id));
+        $isPos = ($order->type === Order::TYPE_POS || $order->type === 'pos');
+        $platform = $isPos ? 'POS' : ($isLanding ? 'Landing' : 'Website');
+
+        if ($isPos) {
+            return 'POS';
         }
 
+        // 2. Determine marketing / traffic channel
         $sourceInfo = is_array($order->source_info) ? $order->source_info : (is_string($order->source_info) ? json_decode($order->source_info, true) : []);
         $pixelInfo = is_array($order->pixel_source_info) ? $order->pixel_source_info : (is_string($order->pixel_source_info) ? json_decode($order->pixel_source_info, true) : []);
         $merged = array_merge($pixelInfo ?? [], $sourceInfo ?? []);
 
-        $source = $merged['source'] ?? $merged['utm_source'] ?? null;
-        if (!empty($source) && strtolower($source) !== 'direct/organic') {
-            return ucfirst($source);
+        $marketingChannel = null;
+
+        // Check explicit order->source first
+        $rawSource = strtolower(trim((string) $order->source));
+        if (!empty($rawSource) && !in_array($rawSource, ['sales', 'landing', 'website', 'pos'])) {
+            if (str_contains($rawSource, 'facebook')) {
+                $marketingChannel = 'Facebook';
+            } elseif (str_contains($rawSource, 'tiktok')) {
+                $marketingChannel = 'TikTok';
+            } elseif (str_contains($rawSource, 'google')) {
+                $marketingChannel = 'Google';
+            } else {
+                $marketingChannel = ucfirst($rawSource);
+            }
         }
 
-        if (!empty($merged['fbc']) || (isset($merged['url']) && str_contains($merged['url'], 'fbclid='))) {
-            return 'Facebook';
+        // Check source_info or pixel_source_info if not determined yet
+        if (!$marketingChannel) {
+            $infoSource = strtolower(trim((string) ($merged['source'] ?? $merged['utm_source'] ?? '')));
+            if (!empty($infoSource) && !in_array($infoSource, ['direct/organic', 'direct', 'sales', 'landing', 'website', 'pos'])) {
+                if (str_contains($infoSource, 'facebook')) {
+                    $marketingChannel = 'Facebook';
+                } elseif (str_contains($infoSource, 'tiktok')) {
+                    $marketingChannel = 'TikTok';
+                } elseif (str_contains($infoSource, 'google')) {
+                    $marketingChannel = 'Google';
+                } else {
+                    $marketingChannel = ucfirst($infoSource);
+                }
+            }
         }
 
-        if (!empty($merged['_ttp']) || (isset($merged['url']) && str_contains($merged['url'], 'ttclid='))) {
-            return 'TikTok';
+        // Check ad click IDs / query parameters in URL
+        if (!$marketingChannel) {
+            if (!empty($merged['fbc']) || (isset($merged['url']) && str_contains($merged['url'], 'fbclid='))) {
+                $marketingChannel = 'Facebook';
+            } elseif (!empty($merged['_ttp']) || (isset($merged['url']) && str_contains($merged['url'], 'ttclid='))) {
+                $marketingChannel = 'TikTok';
+            } elseif (isset($merged['url']) && str_contains($merged['url'], 'gclid=')) {
+                $marketingChannel = 'Google';
+            }
         }
 
-        return !empty($order->source) ? ucfirst($order->source) : ($order->type ? ucfirst($order->type) : 'Website');
+        // 3. Format combined output (e.g. "Facebook, Landing" or "Facebook, Website")
+        if ($marketingChannel) {
+            return "{$marketingChannel}, {$platform}";
+        }
+
+        return $platform;
     }
 }

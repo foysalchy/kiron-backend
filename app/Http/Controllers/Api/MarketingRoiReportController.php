@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
@@ -32,7 +33,9 @@ class MarketingRoiReportController extends Controller
 
         $orders = $query->get();
 
-        $report = [];
+        $sources = [];
+        $campaigns = [];
+
         foreach ($orders as $order) {
             $sourceInfo = is_array($order->source_info) 
                 ? $order->source_info 
@@ -69,18 +72,99 @@ class MarketingRoiReportController extends Controller
                 default => ucfirst($utmSource),
             };
 
-            if (!isset($report[$displaySource])) {
-                $report[$displaySource] = [
+            $orderAmount = (float) ($order->grand_total ?? $order->total_amount ?? 0);
+
+            // 1. Source aggregation
+            if (!isset($sources[$displaySource])) {
+                $sources[$displaySource] = [
                     'source' => $displaySource,
                     'total_orders' => 0,
                     'total_revenue' => 0,
                 ];
             }
+            $sources[$displaySource]['total_orders']++;
+            $sources[$displaySource]['total_revenue'] += $orderAmount;
 
-            $report[$displaySource]['total_orders']++;
-            $report[$displaySource]['total_revenue'] += (float) ($order->grand_total ?? $order->total_amount ?? 0);
+            // 2. Campaign extraction
+            $campaignName = trim((string)($info['utm_campaign'] ?? $info['campaign'] ?? $info['campaign_name'] ?? ''));
+            if (empty($campaignName) && !empty($info['url'])) {
+                if (preg_match('/[?&]utm_campaign=([^&#]+)/i', $info['url'], $matches)) {
+                    $campaignName = trim(urldecode($matches[1]));
+                }
+            }
+            if (empty($campaignName)) {
+                $campaignName = 'No Campaign / Direct';
+            }
+
+            $statusValue = (int) ($order->status instanceof Status ? $order->status->value : $order->status);
+            $statusLabel = $order->status_label ?? (Status::tryFrom($statusValue)?->label() ?? 'Unknown');
+
+            $campaignKey = $campaignName . '___' . $displaySource;
+            if (!isset($campaigns[$campaignKey])) {
+                $campaigns[$campaignKey] = [
+                    'campaign'       => $campaignName,
+                    'source'         => $displaySource,
+                    'total_orders'   => 0,
+                    'total_revenue'  => 0,
+                    'status_summary' => [
+                        'pending'    => 0,
+                        'confirmed'  => 0,
+                        'processing' => 0,
+                        'shipped'    => 0,
+                        'delivered'  => 0,
+                        'cancelled'  => 0,
+                        'fake'       => 0,
+                        'returned'   => 0,
+                        'other'      => 0,
+                    ],
+                    'statuses'       => [],
+                ];
+            }
+
+            $campaigns[$campaignKey]['total_orders']++;
+            $campaigns[$campaignKey]['total_revenue'] += $orderAmount;
+
+            // Categorize into summary bucket
+            $bucket = match ($statusValue) {
+                2, 13, 16, 36   => 'pending',
+                3, 4            => 'confirmed',
+                5, 27           => 'processing',
+                6, 28, 29       => 'shipped',
+                7, 8, 9         => 'delivered',
+                10, 23          => 'cancelled',
+                38              => 'fake',
+                11, 30, 31, 32  => 'returned',
+                default         => 'other',
+            };
+            $campaigns[$campaignKey]['status_summary'][$bucket]++;
+
+            // Exact status itemization
+            if (!isset($campaigns[$campaignKey]['statuses'][$statusValue])) {
+                $campaigns[$campaignKey]['statuses'][$statusValue] = [
+                    'id'      => $statusValue,
+                    'name'    => $statusLabel,
+                    'count'   => 0,
+                    'revenue' => 0,
+                ];
+            }
+            $campaigns[$campaignKey]['statuses'][$statusValue]['count']++;
+            $campaigns[$campaignKey]['statuses'][$statusValue]['revenue'] += $orderAmount;
         }
 
-        return ResponseHelper::success(array_values($report));
+        // Format statuses as indexed array sorted by count desc
+        foreach ($campaigns as &$camp) {
+            $camp['statuses'] = array_values($camp['statuses']);
+            usort($camp['statuses'], fn($a, $b) => $b['count'] <=> $a['count']);
+        }
+        unset($camp);
+
+        // Sort campaigns & sources by total_orders desc
+        uasort($campaigns, fn($a, $b) => $b['total_orders'] <=> $a['total_orders']);
+        uasort($sources, fn($a, $b) => $b['total_orders'] <=> $a['total_orders']);
+
+        return ResponseHelper::success([
+            'sources'   => array_values($sources),
+            'campaigns' => array_values($campaigns),
+        ]);
     }
 }

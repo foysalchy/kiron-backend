@@ -1832,6 +1832,13 @@ Route::prefix('v1')->group(function () {
                 Route::get('/reports/abandoned-cart', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'generate']);
                 Route::delete('/reports/abandoned-cart/flush', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'flush']);
 
+                // Search Keywords Routes
+                Route::prefix('search-keywords')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Api\SearchKeywordController::class, 'index']);
+                    Route::post('/bulk-delete', [\App\Http\Controllers\Api\SearchKeywordController::class, 'bulkDelete']);
+                    Route::delete('/{id}', [\App\Http\Controllers\Api\SearchKeywordController::class, 'destroy']);
+                });
+
                 Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
                 Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
