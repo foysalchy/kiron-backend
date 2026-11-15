@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
-
 class SubdomainMiddleware
 {
     /**
@@ -23,14 +22,10 @@ class SubdomainMiddleware
         if (str_starts_with($host, 'www.')) {
             $host = substr($host, 4);
         }
-
+    
 
         $mainDomain = 'dorja.io';
         
-        // Allow direct preview routes on dorja.io or any domain without redirection
-        if ($request->is('landing-preview*') || $request->is('theme-preview*')) {
-            return $next($request);
-        }
         
         // SaaS Domain
         if ($host === $mainDomain) {
@@ -60,7 +55,7 @@ class SubdomainMiddleware
 
             return $next($request);
         }
-        if ($host == '127.0.0.1') {
+        if($host == '127.0.0.1'){
             app()->instance('currentStore', 'babyshop');
             URL::defaults([
                 'store' => 'babyshop'
