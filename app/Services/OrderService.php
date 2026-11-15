@@ -982,7 +982,6 @@ class OrderService
                 Status::ReturntoCourier->value,
                 Status::ReturnReceived->value,
                 Status::Returned->value,
-                Status::Cancelled->value,
             ];
 
             if (in_array($order->status, $notDeletableStatuses)) {
@@ -991,8 +990,9 @@ class OrderService
                 );
             }
 
-            // Draft/Hold ছাড়া বাকি সব status এ stock আগে থেকেই deduct করা আছে, তাই restore করতে হবে
-            if (!in_array($order->status, [Status::Draft->value, Status::Hold->value])) {
+            // Draft/Hold/Cancelled ছাড়া বাকি সব status এ stock আগে থেকেই deduct করা আছে, তাই restore করতে হবে
+            // (Cancelled অর্ডারের স্টক ক্যান্সেলেশনের সময়েই restore করা হয়েছে)
+            if (!in_array($order->status, [Status::Draft->value, Status::Hold->value, Status::Cancelled->value])) {
                 $this->restoreOrderStock($order);
             }
 

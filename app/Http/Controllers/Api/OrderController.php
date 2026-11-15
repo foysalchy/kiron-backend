@@ -51,6 +51,7 @@ class OrderController extends Controller
                 'type' => $request->input('type'),
                 'warehouse_id' => $request->input('warehouse_id'),
                 'search' => $request->input('search'),
+                'is_duplicate' => $request->input('is_duplicate'),
                 'per_page' => $request->input('per_page', 20),
             ];
 
@@ -294,22 +295,37 @@ class OrderController extends Controller
             'ids.*' => 'integer|exists:orders,id',
         ]);
 
-        try {
-            DB::beginTransaction();
+        $deletedCount = 0;
+        $skippedCount = 0;
 
-            foreach ($validated['ids'] as $orderId) {
+        foreach ($validated['ids'] as $orderId) {
+            try {
                 $this->orderService->deleteOrder($orderId);
+                $deletedCount++;
+            } catch (ApiException $e) {
+                $skippedCount++;
+            } catch (\Exception $e) {
+                $skippedCount++;
+                Log::error("Bulk delete order #{$orderId} failed: " . $e->getMessage());
             }
-
-            DB::commit();
-
-            return ResponseHelper::success(null, 'Selected orders deleted permanently.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Bulk delete orders failed: ' . $e->getMessage());
-
-            return ResponseHelper::error($e->getMessage() ?: 'Failed to delete selected orders.', 500);
         }
+
+        if ($deletedCount === 0 && $skippedCount > 0) {
+            return ResponseHelper::error(
+                'Selected orders cannot be deleted because they are already shipped, handed over to courier, or delivered.',
+                400
+            );
+        }
+
+        $message = "{$deletedCount} order(s) deleted permanently.";
+        if ($skippedCount > 0) {
+            $message .= " {$skippedCount} order(s) were skipped (already shipped/handed over).";
+        }
+
+        return ResponseHelper::success([
+            'deleted_count' => $deletedCount,
+            'skipped_count' => $skippedCount,
+        ], $message);
     }
     public function checkCourier(Request $request)
     {
