@@ -39,8 +39,18 @@ class MasterDemo extends Model
     }
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image
-            ? Storage::disk('r2')->url($this->image)
-            : null;
+        if (!$this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        if (str_starts_with($this->image, 'assets/') || str_starts_with($this->image, '/assets/') || str_starts_with($this->image, 'images/')) {
+            return asset($this->image);
+        }
+
+        return Storage::disk('r2')->url($this->image);
     }
 }
