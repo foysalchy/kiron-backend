@@ -124,7 +124,8 @@
                 {{ $trans['header_subtitle'] }}</div>
         </div>
 
-        {{-- Product Selection Area --}}
+        {{-- Product Selection Area (Only shown for multi-product mode or when product has variations) --}}
+        @if ($isMultiProductMode || $mainProduct->type === 'variation')
         <div class="space-y-4 mb-10">
             <div class="flex items-center justify-between">
                 <label class="block text-lg font-bold text-gray-800">
@@ -384,26 +385,9 @@
                         </div>
                     </label>
                 @endforeach
-            @else
-                <div
-                    class="border-2 {{ $isSingleOutOfStock ? 'border-red-300 bg-red-50/50' : 'border-[#1f8a54] bg-green-50' }} rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4 w-full">
-                        <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" width="64"
-                                height="64" class="w-full h-full object-contain" alt="THUMBNAIL">
-                        </div>
-                        <div class="text-left">
-                            <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
-                            @if($isSingleOutOfStock)
-                                <span class="inline-block mt-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">{{ $trans['out_of_stock_full'] }}</span>
-                            @endif
-                        </div>
-                    </div>
-                    <span
-                        class="text-lg font-bold text-gray-900">{{ number_format($mainProduct->sale_price, 2) }}{{ $setup->currency }}</span>
-                </div>
             @endif
         </div>
+        @endif
 
         {{-- Main Grid --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
