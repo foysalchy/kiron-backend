@@ -168,8 +168,10 @@ class StorePreviewService
                 'id' => 'dummy-cat-' . ($index + 1),
                 'name' => $cat['name'],
                 'slug' => $cat['slug'],
+                'image' => null,
                 'image_url' => $defaultImg,
                 'product_count' => $cat['count'],
+                'subCategories' => collect([]),
                 'is_dummy' => true,
             ];
         });

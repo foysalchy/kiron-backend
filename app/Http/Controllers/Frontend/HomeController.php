@@ -476,4 +476,87 @@ class HomeController extends FrontendController
 
         return response()->json(['success' => true, 'message' => 'Thanks for subscribing!']);
     }
+
+    /**
+     * Direct live preview for E-Commerce themes (Isolated & Safe)
+     */
+    public function themePreview(Request $request, $theme_id = 1)
+    {
+        $themeId = in_array((string)$theme_id, ['1', '2', '3', '4', '5']) ? (string)$theme_id : '1';
+        $templateName = 'template' . $themeId;
+
+        \Illuminate\Support\Facades\View::share('activePreviewTheme', $themeId);
+
+        $defaultThemes = [
+            '1' => ['prim' => '#13565e', 'primText' => '#ffffff', 'sec' => '#f3f4f6', 'secText' => '#1f2937', 'header' => '#ffffff', 'headerText' => '#1f2937', 'footer' => '#1f2937', 'footerText' => '#ffffff'],
+            '2' => ['prim' => '#1e3a8a', 'primText' => '#ffffff', 'sec' => '#eff6ff', 'secText' => '#1e40af', 'header' => '#eff6ff', 'headerText' => '#1e40af', 'footer' => '#1e3a8a', 'footerText' => '#ffffff'],
+            '3' => ['prim' => '#064e3b', 'primText' => '#ffffff', 'sec' => '#ecfdf5', 'secText' => '#065f46', 'header' => '#ecfdf5', 'headerText' => '#065f46', 'footer' => '#064e3b', 'footerText' => '#ffffff'],
+            '4' => ['prim' => '#000000', 'primText' => '#ffffff', 'sec' => '#f97316', 'secText' => '#ffffff', 'header' => '#ffffff', 'headerText' => '#000000', 'footer' => '#000000', 'footerText' => '#ffffff'],
+            '5' => ['prim' => '#D6431F', 'primText' => '#ffffff', 'sec' => '#C99A45', 'secText' => '#18130F', 'header' => '#ffffff', 'headerText' => '#18130F', 'footer' => '#ffffff', 'footerText' => '#18130F'],
+        ];
+
+        $curDef = $defaultThemes[$themeId] ?? $defaultThemes['1'];
+
+        $themeColor = new \stdClass();
+        $themeColor->theme_template = [
+            'primary_color'        => request('primary_color') ?: $curDef['prim'],
+            'primary_text_color'   => request('primary_text_color') ?: $curDef['primText'],
+            'primary_hover_color'  => request('primary_hover_color') ?: $curDef['prim'],
+            'primary_hover_text'   => request('primary_hover_text') ?: $curDef['primText'],
+            'secondary_color'      => request('secondary_color') ?: $curDef['sec'],
+            'secondary_text_color' => request('secondary_text_color') ?: $curDef['secText'],
+            'header_color'         => request('header_color') ?: $curDef['header'],
+            'header_text_color'    => request('header_text_color') ?: $curDef['headerText'],
+            'footer_color'         => request('footer_color') ?: $curDef['footer'],
+            'footer_text_color'    => request('footer_text_color') ?: $curDef['footerText'],
+        ];
+        \Illuminate\Support\Facades\View::share('themeColor', $themeColor);
+
+        $setup = \App\Models\SiteSetting::first() ?? new \App\Models\SiteSetting();
+        \Illuminate\Support\Facades\View::share('setup', $setup);
+
+        $storeSettings = new \stdClass();
+        $storeSettings->is_review = false;
+        \Illuminate\Support\Facades\View::share('storeSettings', $storeSettings);
+
+        \Illuminate\Support\Facades\View::share('footerFeatures', \App\Services\StorePreviewService::getDummyFooterFeatures());
+        \Illuminate\Support\Facades\View::share('footerPages', \App\Services\StorePreviewService::getDummyFooterPages());
+        \Illuminate\Support\Facades\View::share('socialLinks', \App\Services\StorePreviewService::getDummySocialLinks());
+        \Illuminate\Support\Facades\View::share('footerBottomRight', \App\Services\StorePreviewService::getDummyFooterBottomRight());
+
+        // Dummy data for home page components
+        $notices = \App\Services\StorePreviewService::getDummyNotices();
+        $categories = \App\Services\StorePreviewService::getDummyCategories();
+        $featureCategory = \App\Services\StorePreviewService::getDummyFeatureCategory();
+        $popularProducts = \App\Services\StorePreviewService::getDummyProducts(8);
+        $newArrivals = \App\Services\StorePreviewService::getDummyProducts(8);
+        $allProducts = \App\Services\StorePreviewService::getDummyProducts(12);
+        $latestOffers = \App\Services\StorePreviewService::getDummyProducts(6);
+        $productGroups = \App\Services\StorePreviewService::getDummyProductGroups();
+        $mainSliders = \App\Services\StorePreviewService::getDummySliders();
+        $sidebarSliders = \App\Services\StorePreviewService::getDummySidebarSliders();
+        $middleSliders = \App\Services\StorePreviewService::getDummyMiddleSliders();
+        $brands = \App\Services\StorePreviewService::getDummyBrands();
+        $faqs = \App\Services\StorePreviewService::getDummyFaqs();
+        $allReviews = \App\Services\StorePreviewService::getDummyReviews();
+        $homePageData = \App\Services\StorePreviewService::getDummyHomeDescription();
+
+        return view($templateName . '.frontend.home', compact(
+            'notices',
+            'homePageData',
+            'faqs',
+            'categories',
+            'featureCategory',
+            'newArrivals',
+            'productGroups',
+            'brands',
+            'popularProducts',
+            'allProducts',
+            'latestOffers',
+            'mainSliders',
+            'sidebarSliders',
+            'middleSliders',
+            'allReviews'
+        ));
+    }
 }

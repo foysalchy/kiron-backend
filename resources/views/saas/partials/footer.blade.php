@@ -1,8 +1,8 @@
  <!-- FOOTER -->
- <footer class="bg-[#0a061e] text-white pt-20 pb-6 px-4 md:px-10">
+ <footer class="bg-[#030f0c] text-white pt-20 pb-6 px-4 md:px-10 border-t border-[#00555c]/20">
      <div class="container mx-auto">
          <!-- TOP SECTION: NEWSLETTER -->
-         <div class="bg-[#16112f] border border-white/10 rounded-[30px] p-8 md:p-12 mb-20">
+         <div class="bg-[#051c18] border border-[#00555c]/30 rounded-[30px] p-8 md:p-12 mb-20 shadow-xl shadow-black/20">
              <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
                  <div class="text-center lg:text-left">
                      <h2 class="text-2xl md:text-3xl font-bold mb-3">

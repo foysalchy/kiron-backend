@@ -653,7 +653,7 @@
                 'desc' =>
                     'Power your online store with automated order processing, inventory sync, and seamless customer experience.',
                 'mockup' => 'ecommerce_dashboard_preview',
-                'img' => asset('images/saas/solutions/ecommerce.jpg'),
+                'img' => asset('images/saas/solutions/ecommerce.png'),
                 'features' => [
                     ['icon' => 'fa-globe', 'text' => 'Website Integration'],
                     ['icon' => 'fa-cart-shopping', 'text' => 'Order Management'],
@@ -667,7 +667,7 @@
                 'title' => 'POS System',
                 'desc' => 'Fast and reliable POS system for retail and wholesale billing with barcode support.',
                 'mockup' => 'pos_system_preview',
-                'img' => asset('images/saas/solutions/pos.jpg'),
+                'img' => asset('images/saas/solutions/pos.png'),
                 'features' => [
                     ['icon' => 'fa-barcode', 'text' => 'Barcode Scanning'],
                     ['icon' => 'fa-receipt', 'text' => 'Instant Invoice'],
@@ -681,7 +681,7 @@
                 'title' => 'ERP Core',
                 'desc' => 'Manage your entire business operations including sales, purchase, inventory and warehouse.',
                 'mockup' => 'erp_core_system',
-                'img' => asset('images/saas/solutions/erp.jpg'),
+                'img' => asset('images/saas/solutions/erp.png'),
                 'features' => [
                     ['icon' => 'fa-layer-group', 'text' => 'Centralized System'],
                     ['icon' => 'fa-sitemap', 'text' => 'Multi Module Control'],
@@ -695,7 +695,7 @@
                 'title' => 'CRM',
                 'desc' => 'Manage leads, customers, and improve sales conversion with smart tracking.',
                 'mockup' => 'crm_dashboard',
-                'img' => asset('images/saas/solutions/crm.jpg'),
+                'img' => asset('images/saas/solutions/crm.png'),
                 'features' => [
                     ['icon' => 'fa-user', 'text' => 'Lead Management'],
                     ['icon' => 'fa-users', 'text' => 'Customer Profiles'],
@@ -709,7 +709,7 @@
                 'title' => 'Accounting',
                 'desc' => 'Complete financial management with profit, loss, cash flow and reporting tools.',
                 'mockup' => 'accounting_system',
-                'img' => asset('images/saas/solutions/accounting.jpg'),
+                'img' => asset('images/saas/solutions/accounting.png'),
                 'features' => [
                     ['icon' => 'fa-coins', 'text' => 'Income Tracking'],
                     ['icon' => 'fa-money-bill', 'text' => 'Expense Management'],
@@ -723,7 +723,7 @@
                 'title' => 'HRM',
                 'desc' => 'Employee management, attendance, payroll and leave tracking system.',
                 'mockup' => 'hrm_system',
-                'img' => asset('images/saas/solutions/hrm.jpg'),
+                'img' => asset('images/saas/solutions/hrm.png'),
                 'features' => [
                     ['icon' => 'fa-users', 'text' => 'Employee Records'],
                     ['icon' => 'fa-clock', 'text' => 'Attendance System'],
@@ -737,7 +737,7 @@
                 'title' => 'Inventory',
                 'desc' => 'Real-time stock management with warehouse control and alerts.',
                 'mockup' => 'inventory_system',
-                'img' => asset('images/saas/solutions/inventory.jpg'),
+                'img' => asset('images/saas/solutions/inventory.png'),
                 'features' => [
                     ['icon' => 'fa-boxes', 'text' => 'Stock Tracking'],
                     ['icon' => 'fa-truck', 'text' => 'Warehouse Transfer'],
@@ -751,7 +751,7 @@
                 'title' => 'Analytics',
                 'desc' => 'Get real-time business insights with charts, reports and performance tracking.',
                 'mockup' => 'analytics_dashboard',
-                'img' => asset('images/saas/solutions/analytics.jpg'),
+                'img' => asset('images/saas/solutions/analytics.png'),
                 'features' => [
                     ['icon' => 'fa-chart-line', 'text' => 'Sales Analytics'],
                     ['icon' => 'fa-chart-pie', 'text' => 'Performance Reports'],
@@ -1124,13 +1124,18 @@
                     <!-- Right Image -->
                     <div>
                         <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-600 font-mono">
+                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-600 font-mono flex items-center justify-between">
                                 <span id="sol-mockup"></span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                </div>
                             </div>
 
-                            <div class="aspect-video bg-gray-100">
+                            <div class="w-full bg-gray-50 flex items-center justify-center p-2">
                                 <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
-                                    class="w-full h-full object-cover object-top" alt="right image" />
+                                    class="w-full h-auto object-contain rounded-lg shadow-sm" alt="Dashboard Preview" />
                             </div>
                         </div>
                     </div>

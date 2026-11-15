@@ -2,7 +2,8 @@
 
 @php
     $pageData = \App\Services\Saas\SystemPageService::get(
-        \App\Enums\SystemPageType::FEATURE,$setup->company_id ?? null
+        \App\Enums\SystemPageType::FEATURE,
+        $setup->company_id ?? null
     );
 @endphp
 
@@ -38,8 +39,9 @@
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full"></div>
         <div class="container mx-auto px-6 text-center relative z-10">
             <h1 class="move-up text-white text-4xl md:text-6xl font-black mb-6">Our Features</h1>
-            <p class="text-gray-800 text-lg md:text-xl max-w-2xl mx-auto">
-                Stay updated with the latest trends, tips, and guides on business growth, modern technology, and e-commerce solutions.
+            <p class="text-white text-lg md:text-xl max-w-2xl mx-auto">
+                Stay updated with the latest trends, tips, and guides on business growth, modern technology, and e-commerce
+                solutions.
             </p>
         </div>
     </section>
@@ -49,47 +51,44 @@
         <div class="container mx-auto px-6 md:px-10">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 @foreach ($allFeatures as $feature)
-                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#00555c] transition-all duration-300">
+                    <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                        class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#00555c] transition-all duration-300">
 
-            <!-- Left Icon -->
-            <div class="flex-shrink-0">
-                  <div
-            class="w-12 h-12  bg-[#00555c21] rounded
-                   border border-white/20
-                   flex items-center justify-center">
-            <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
-        </div>
-            </div>
+                        <!-- Left Icon -->
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12  bg-[#00555c21] rounded
+                           border border-white/20
+                           flex items-center justify-center">
+                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                            </div>
+                        </div>
 
-            <!-- Right Content -->
-            <div class="flex-1 min-w-0">
-    <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#00555c]">
-        {{ $feature->title }}
-    </div>
+                        <!-- Right Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#00555c]">
+                                {{ $feature->title }}
+                            </div>
 
 
- <!-- <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                                {{ $feature->subtitle ?? '' }}
-                            </p> -->
-                <span
-                    class="inline-flex items-center gap-2 font-semibold text-[#00555c]">
-                    Read More
-                    <i
-                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </span>
-            </div>
+                            <!-- <p class="text-gray-700 text-lg leading-relaxed mb-12">
+                                        {{ $feature->subtitle ?? '' }}
+                                    </p> -->
+                            <span class="inline-flex items-center gap-2 font-semibold text-[#00555c]">
+                                Read More
+                                <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                        </div>
 
-        </a>
-                    @endforeach
+                    </a>
+                @endforeach
             </div>
 
             <div class="mt-16">
                 {{ $allFeatures->links() }}
             </div>
-              <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
-            {!! $pageData->description!!}
-        </div>
+            <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
+                {!! $pageData->description!!}
+            </div>
         </div>
     </section>
 @endsection
