@@ -8,8 +8,8 @@
                     <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 md:h-9 w-auto"
                         fetchpriority="high" loading="eager" width="180" height="45" onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
                 @else
-                    @if (file_exists(public_path('images/saas/Shopify_Logo.png')))
-                        <img src="{{ asset('images/saas/Shopify_Logo.png') }}" alt="Default Logo" fetchpriority="high" loading="eager" alt="Logo" width="180" height="45"
+                    @if (file_exists(public_path('images/saas/dorja-logo.webp')))
+                        <img src="{{ asset('images/saas/dorja-logo.webp') }}" alt="Default Logo" fetchpriority="high" loading="eager" alt="Logo" width="180" height="45"
                             class="h-8 md:h-9 w-auto" fetchpriority="high">
                     @else
                         <span class="text-xl font-bold text-gray-900">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
