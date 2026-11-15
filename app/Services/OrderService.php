@@ -350,6 +350,27 @@ class OrderService
 
             $data['order_date'] = $data['order_date'] ?? Carbon::now();
 
+            // Track client IP and User Agent for non-POS orders (Landing / Sales / Web)
+            if (!$isPOS) {
+                $sourceInfo = $data['source_info'] ?? [];
+                if (empty($sourceInfo['ip'])) {
+                    $clientIp = request()->header('CF-Connecting-IP')
+                        ?? request()->header('X-Forwarded-For')
+                        ?? request()->ip();
+
+                    if (is_string($clientIp) && str_contains($clientIp, ',')) {
+                        $clientIp = trim(explode(',', $clientIp)[0]);
+                    }
+                    if ($clientIp) {
+                        $sourceInfo['ip'] = $clientIp;
+                    }
+                }
+                if (empty($sourceInfo['user_agent'])) {
+                    $sourceInfo['user_agent'] = request()->userAgent();
+                }
+                $data['source_info'] = $sourceInfo;
+            }
+
             // Calculate totals
             $totals = $this->calculateTotals($items, $data);
             $data = array_merge($data, $totals);
