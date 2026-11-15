@@ -696,6 +696,54 @@ $solutions = [
 ],
 ],
 ];
+
+$heroSatelliteThemes = [
+    // Theme 0: E-Commerce Focus
+    [
+        'c1' => ['title' => 'E-Commerce', 'type' => 'big', 'big' => '128', 'em' => 'orders', 'bars' => [35, 55, 45, 75, 100]],
+        'c2' => ['title' => 'Accounting', 'type' => 'text', 'line1' => 'Invoice #1042 · Paid', 'line2' => 'Invoice #1043 · Due', 'line2_color' => 'text-teal-300', 'bars' => [40, 60, 50, 85, 95]],
+        'c3' => ['title' => 'HRM', 'type' => 'tags', 'line1' => 'Team roster · 24', 'tags' => ['In 18', 'Leave 2']],
+        'c4' => ['title' => 'POS System', 'type' => 'big', 'big' => 'Sales: 45K', 'sub' => 'Checkout #2217 · Done'],
+        'c5' => ['title' => 'Inventory', 'type' => 'tags', 'line1' => 'Stock: 240 in stock', 'line2' => 'Low stock alert: 12', 'line2_color' => 'text-amber-300', 'tags' => ['Auto-reorder']],
+        'c6' => ['title' => 'CRM Growth', 'type' => 'big', 'big' => '+18%', 'em' => 'active', 'bars' => [30, 45, 60, 80, 100]],
+    ],
+    // Theme 1: POS & Retail Speed
+    [
+        'c1' => ['title' => 'POS Checkout', 'type' => 'big', 'big' => '0.8s', 'em' => 'per bill', 'bars' => [50, 70, 65, 90, 100]],
+        'c2' => ['title' => 'Daily Sales', 'type' => 'text', 'line1' => 'Cash: ৳78,500', 'line2' => 'Card/MFS: ৳46,200', 'line2_color' => 'text-teal-300', 'bars' => [30, 50, 65, 80, 95]],
+        'c3' => ['title' => 'Cash Drawer', 'type' => 'tags', 'line1' => 'Opening: ৳5,000', 'tags' => ['Balanced', 'No Shortage']],
+        'c4' => ['title' => 'Barcode Scanner', 'type' => 'big', 'big' => '1,420', 'em' => 'scanned', 'sub' => 'Instant Stock Sync'],
+        'c5' => ['title' => 'Multi-Branch', 'type' => 'tags', 'line1' => '3 Branches Active', 'line2' => 'Dhanmondi, Uttara', 'line2_color' => 'text-cyan-300', 'tags' => ['Live Sync']],
+        'c6' => ['title' => 'Repeat Buyers', 'type' => 'big', 'big' => '64%', 'em' => 'loyalty', 'bars' => [40, 55, 70, 85, 100]],
+    ],
+    // Theme 2: Financial & Accounting Mastery
+    [
+        'c1' => ['title' => 'Net Profit', 'type' => 'big', 'big' => '+28.4%', 'em' => 'margin', 'bars' => [45, 60, 55, 85, 100]],
+        'c2' => ['title' => 'Automated Tax', 'type' => 'text', 'line1' => 'VAT Statement · Ready', 'line2' => 'AIT Reconciled', 'line2_color' => 'text-teal-300', 'bars' => [35, 50, 65, 75, 90]],
+        'c3' => ['title' => 'Bank Sync', 'type' => 'tags', 'line1' => '4 Accounts Linked', 'tags' => ['Reconciled', 'Audit OK']],
+        'c4' => ['title' => 'Cash Flow', 'type' => 'big', 'big' => '৳3.8M', 'em' => 'surplus', 'sub' => '99.4% Inflow Health'],
+        'c5' => ['title' => 'Expense Watch', 'type' => 'tags', 'line1' => '12% Below Budget', 'line2' => 'Zero unauthorized', 'line2_color' => 'text-emerald-300', 'tags' => ['Optimized']],
+        'c6' => ['title' => 'Receivables', 'type' => 'big', 'big' => '94%', 'em' => 'collected', 'bars' => [30, 45, 65, 80, 95]],
+    ],
+    // Theme 3: HRM, Payroll & Team Synergy
+    [
+        'c1' => ['title' => 'Attendance', 'type' => 'big', 'big' => '98.2%', 'em' => 'on time', 'bars' => [60, 75, 80, 92, 100]],
+        'c2' => ['title' => 'Payroll Cycle', 'type' => 'text', 'line1' => 'Salary Disbursed · 100%', 'line2' => 'Payslips Sent', 'line2_color' => 'text-teal-300', 'bars' => [50, 65, 75, 88, 100]],
+        'c3' => ['title' => 'Shift Roster', 'type' => 'tags', 'line1' => 'Day & Evening Shift', 'tags' => ['Active: 42', 'Leave: 2']],
+        'c4' => ['title' => 'Biometric Sync', 'type' => 'big', 'big' => 'Real-time', 'sub' => 'Device Connected'],
+        'c5' => ['title' => 'Provident Fund', 'type' => 'tags', 'line1' => 'All accounts synced', 'line2' => 'Interest calculated', 'line2_color' => 'text-amber-300', 'tags' => ['Automated']],
+        'c6' => ['title' => 'Productivity', 'type' => 'big', 'big' => '+22%', 'em' => 'output', 'bars' => [35, 50, 60, 80, 100]],
+    ],
+    // Theme 4: Inventory, Warehousing & Courier
+    [
+        'c1' => ['title' => 'Stock Accuracy', 'type' => 'big', 'big' => '99.8%', 'em' => 'counted', 'bars' => [50, 65, 75, 90, 100]],
+        'c2' => ['title' => 'Courier API', 'type' => 'text', 'line1' => 'Pathao & Steadfast', 'line2' => 'Auto Tracking Synced', 'line2_color' => 'text-teal-300', 'bars' => [40, 55, 70, 85, 95]],
+        'c3' => ['title' => 'Warehouse', 'type' => 'tags', 'line1' => 'Central Hub: Dhaka', 'tags' => ['Capacity: 74%', 'Transfer: 4']],
+        'c4' => ['title' => 'Delivery Rate', 'type' => 'big', 'big' => '96.5%', 'em' => 'success', 'sub' => 'Return Ratio: 3.5%'],
+        'c5' => ['title' => 'Purchase Order', 'type' => 'tags', 'line1' => 'Supplier: 6 Active', 'line2' => 'Auto Re-stock Triggered', 'line2_color' => 'text-teal-300', 'tags' => ['PO #482']],
+        'c6' => ['title' => 'Turnover Rate', 'type' => 'big', 'big' => '3.8x', 'em' => 'faster', 'bars' => [40, 50, 65, 85, 100]],
+    ],
+];
 @endphp
 
 <!-- HERO SECTION -->
@@ -703,6 +751,23 @@ $solutions = [
 <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
     <div class="swiper-wrapper">
         @foreach ($sliders as $key => $slider)
+        @php
+            // Intelligent theme picker based on slider title/desc keywords or cyclic index
+            $titleAndDesc = strtolower(($slider->title ?? '') . ' ' . ($slider->description ?? ''));
+            if (str_contains($titleAndDesc, 'pos') || str_contains($titleAndDesc, 'retail') || str_contains($titleAndDesc, 'point of sale')) {
+                $theme = $heroSatelliteThemes[1];
+            } elseif (str_contains($titleAndDesc, 'account') || str_contains($titleAndDesc, 'finance') || str_contains($titleAndDesc, 'tax') || str_contains($titleAndDesc, 'invoice')) {
+                $theme = $heroSatelliteThemes[2];
+            } elseif (str_contains($titleAndDesc, 'hrm') || str_contains($titleAndDesc, 'payroll') || str_contains($titleAndDesc, 'attendance') || str_contains($titleAndDesc, 'employee')) {
+                $theme = $heroSatelliteThemes[3];
+            } elseif (str_contains($titleAndDesc, 'inventory') || str_contains($titleAndDesc, 'stock') || str_contains($titleAndDesc, 'warehouse') || str_contains($titleAndDesc, 'courier')) {
+                $theme = $heroSatelliteThemes[4];
+            } elseif (str_contains($titleAndDesc, 'ecommerce') || str_contains($titleAndDesc, 'store') || str_contains($titleAndDesc, 'shop')) {
+                $theme = $heroSatelliteThemes[0];
+            } else {
+                $theme = $heroSatelliteThemes[$key % count($heroSatelliteThemes)];
+            }
+        @endphp
         <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
             <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
@@ -805,58 +870,77 @@ $solutions = [
                         <div class="hero-card c1">
                             <h3>
                                 <svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>
-                                E-Commerce
+                                {{ $theme['c1']['title'] }}
                             </h3>
-                            <div class="big">128 <em>orders</em></div>
-                            <div class="bars"><i style="height:35%"></i><i style="height:55%"></i><i style="height:45%"></i><i style="height:75%"></i><i style="height:100%"></i></div>
+                            <div class="big">{{ $theme['c1']['big'] }} @if(!empty($theme['c1']['em']))<em>{{ $theme['c1']['em'] }}</em>@endif</div>
+                            <div class="bars">
+                                @foreach($theme['c1']['bars'] as $h)
+                                    <i style="height:{{ $h }}%"></i>
+                                @endforeach
+                            </div>
                         </div>
 
                         <div class="hero-card c2">
                             <h3>
                                 <svg viewBox="0 0 24 24"><path d="M4 3h16v18l-3-2-3 2-2-2-2 2-3-2-3 2z"/><path d="M8 8h8M8 12h8"/></svg>
-                                Accounting
+                                {{ $theme['c2']['title'] }}
                             </h3>
-                            <p>Invoice #1042 · Paid</p>
-                            <p class="text-teal-300">Invoice #1043 · Due</p>
-                            <div class="bars"><i style="height:40%"></i><i style="height:60%"></i><i style="height:50%"></i><i style="height:85%"></i><i style="height:95%"></i></div>
+                            <p>{{ $theme['c2']['line1'] }}</p>
+                            <p class="{{ $theme['c2']['line2_color'] ?? 'text-teal-300' }}">{{ $theme['c2']['line2'] }}</p>
+                            <div class="bars">
+                                @foreach($theme['c2']['bars'] as $h)
+                                    <i style="height:{{ $h }}%"></i>
+                                @endforeach
+                            </div>
                         </div>
 
                         <div class="hero-card c3">
                             <h3>
                                 <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6"/><path d="M17 11l2 2 3-4"/></svg>
-                                HRM
+                                {{ $theme['c3']['title'] }}
                             </h3>
-                            <p>Team roster · 24</p>
-                            <span class="tag">In 18</span>
-                            <span class="tag">Leave 2</span>
+                            <p>{{ $theme['c3']['line1'] }}</p>
+                            @foreach($theme['c3']['tags'] as $tag)
+                                <span class="tag">{{ $tag }}</span>
+                            @endforeach
                         </div>
 
                         <div class="hero-card c4">
                             <h3>
                                 <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
-                                POS System
+                                {{ $theme['c4']['title'] }}
                             </h3>
-                            <div class="big">Sales: <em>45K</em></div>
-                            <p class="mt-1">Checkout #2217 · Done</p>
+                            <div class="big">{{ $theme['c4']['big'] }} @if(!empty($theme['c4']['em']))<em>{{ $theme['c4']['em'] }}</em>@endif</div>
+                            @if(!empty($theme['c4']['sub']))
+                                <p class="mt-1">{{ $theme['c4']['sub'] }}</p>
+                            @endif
                         </div>
 
                         <div class="hero-card c5">
                             <h3>
                                 <svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
-                                Inventory
+                                {{ $theme['c5']['title'] }}
                             </h3>
-                            <p>Stock: 240 in stock</p>
-                            <p class="text-amber-300">Low stock alert: 12</p>
-                            <span class="tag">Auto-reorder</span>
+                            <p>{{ $theme['c5']['line1'] }}</p>
+                            @if(!empty($theme['c5']['line2']))
+                                <p class="{{ $theme['c5']['line2_color'] ?? 'text-amber-300' }}">{{ $theme['c5']['line2'] }}</p>
+                            @endif
+                            @foreach($theme['c5']['tags'] as $tag)
+                                <span class="tag">{{ $tag }}</span>
+                            @endforeach
                         </div>
 
                         <div class="hero-card c6">
                             <h3>
                                 <svg viewBox="0 0 24 24"><path d="M3 20V4M3 20h18"/><path d="M7 15l4-4 3 3 6-7"/></svg>
-                                CRM Growth
+                                {{ $theme['c6']['title'] }}
                             </h3>
-                            <div class="big">+18% <em>active</em></div>
-                            <div class="bars"><i style="height:30%"></i><i style="height:45%"></i><i style="height:60%"></i><i style="height:80%"></i><i style="height:100%"></i></div>
+                            <div class="big">{{ $theme['c6']['big'] }} @if(!empty($theme['c6']['em']))<em>{{ $theme['c6']['em'] }}</em>@endif</div>
+                            <div class="bars">
+                                @foreach($theme['c6']['bars'] as $h)
+                                    <i style="height:{{ $h }}%"></i>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
