@@ -152,11 +152,6 @@
                         </div>
                     </div>
 
-                    @if ($feature->image)
-                        <img src="{{ $feature->image_url }}" class="w-full rounded-xl shadow-lg mb-8" loading="lazy"
-                            alt="{{ $feature->title }}" />
-                    @endif
-
                     <h1 class="text-3xl md:text-[36px] font-black text-gray-900 leading-[1.1] mb-6">
                         {{ $feature->title }}
                     </h1>
