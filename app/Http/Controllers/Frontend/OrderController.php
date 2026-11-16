@@ -704,10 +704,10 @@ class OrderController extends FrontendController
 
             foreach (\Cart::content() as $item) {
                 $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
-                \App\Models\CartTrack::where('session_id', session()->getId())
+                CartTrack::where('session_id', session()->getId())
                     ->where('product_id', $cleanProductId)
                     ->where('variation_id', $item->options->variation_id ?? null)
-                    ->update(['status' => \App\Models\CartTrack::PURCHASED]);
+                    ->update(['status' => CartTrack::PURCHASED]);
             }
 
             \Cart::destroy();
