@@ -44,4 +44,20 @@ class SmsRechargeController extends Controller
         $msg = $recharge->status == Status::Approved->value ? 'Recharge approved' : 'Recharge rejected';
         return ResponseHelper::success($recharge, $msg);
     }
+
+    // Reverse Approved Recharge
+    public function reverse(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        $recharge = $this->service->reverseRecharge(
+            $id,
+            $validated['reason'],
+            auth()->id()
+        );
+
+        return ResponseHelper::success($recharge, 'Recharge approval reversed successfully');
+    }
 }
