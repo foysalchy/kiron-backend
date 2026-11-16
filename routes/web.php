@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/_preview_card', [App\Http\Controllers\Frontend\FrontendController::class, 'previewCard'])->name('preview.card');
 Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('landing.direct.preview');
 Route::get('/theme-preview/{theme_id?}', [HomeController::class, 'themePreview'])->name('theme.direct.preview');
+Route::get('/features', [SaasIndexController::class, 'features'])->name('saas.feature.list');
+Route::get('/features/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');
 
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('/login', [PartnerPortalController::class, 'showLoginForm'])->name('login');
@@ -88,8 +90,9 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/theme-preview/{theme_id?}', [HomeController::class, 'themePreview'])->name('theme.preview');
     Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
     Route::post('/landing-order/partial', [LandingController::class, 'partialSave'])->name('landing.order.partial');
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-    //  Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
+    // Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
+
     Route::get('/notice/{slug}', [HomeController::class, 'showNotice'])->name('notice.details');
     Route::get('/reservation', [App\Http\Controllers\Frontend\ReservationController::class, 'index'])->name('reservation.index');
     Route::get('/reservation/availability', [App\Http\Controllers\Frontend\ReservationController::class, 'availability'])->name('reservation.availability');
@@ -124,7 +127,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
         Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
         Route::post('/order/return/{id}', [OrderController::class, 'requestReturn'])->name('order.return');
         Route::post('/order/review/store', [OrderController::class, 'storeReview'])->name('user.review.store');
-    // My Reservations page
+        // My Reservations page
         Route::get('/dashboard/reservations', [App\Http\Controllers\Frontend\ReservationDashboardController::class, 'myReservations'])->name('dashboard.reservations');
     });
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

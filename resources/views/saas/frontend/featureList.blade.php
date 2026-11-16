@@ -12,13 +12,13 @@
 
     'type' => 'CollectionPage',
 
-    'title' => $pageData->meta_title ?? ('Features | ' . $setup->shop_name),
+    'title' => $pageData?->meta_title ?? ('Features | ' . ($setup->shop_name ?? 'Dorja')),
 
-    'description' => $pageData->meta_description ?? 'Explore all features of our ERP, POS, Inventory, CRM, Accounting, HRM and Business Management Software.',
+    'description' => $pageData?->meta_description ?? 'Explore all features of our ERP, POS, Inventory, CRM, Accounting, HRM and Business Management Software.',
 
-    'keywords' => $pageData->meta_keywords ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords) : 'ERP Features, POS Features, Inventory Features, CRM Features',
+    'keywords' => $pageData?->meta_keywords ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords) : 'ERP Features, POS Features, Inventory Features, CRM Features',
 
-    'image' => $pageData->meta_image ?? asset('storage/' . $setup->logo),
+    'image' => $pageData?->meta_image ?? asset('storage/' . ($setup->logo ?? '')),
 
     'canonical' => route('saas.feature.list'),
 
@@ -86,9 +86,11 @@
             <div class="mt-16">
                 {{ $allFeatures->links() }}
             </div>
-            <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
-                {!! $pageData->description!!}
-            </div>
+            @if (!empty($pageData?->description))
+                <div class="mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
+                    {!! $pageData->description !!}
+                </div>
+            @endif
         </div>
     </section>
 @endsection

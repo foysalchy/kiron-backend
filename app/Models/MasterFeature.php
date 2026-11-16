@@ -26,6 +26,7 @@ class MasterFeature extends Model
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+    protected $appends = ['image_url'];
     public static function saasCacheKeys(): array
     {
         return ['saas_home_top_features', 'saas_home_why_choose_us'];
