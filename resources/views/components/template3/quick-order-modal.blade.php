@@ -723,74 +723,79 @@
         const quickForm = document.getElementById('quick-order-form');
         if (quickForm) {
             quickForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
                 const btn = this.querySelector('button[type="submit"]');
                 const origHtml = btn ? btn.innerHTML : '';
                 const name = this.querySelector('input[name="name"]')?.value;
                 const phone = this.querySelector('input[name="phone"]')?.value;
-                const address = this.querySelector('textarea[name="address"]')?.value;
+                const address = this.querySelector('textarea[name="address"]')?.value || this.querySelector('input[name="address"]')?.value;
 
-                if (!name || !phone || !address) return;
-
-                if (isVerify) {
-                    e.preventDefault();
-
-                    if (btn) {
-                        btn.disabled = true;
-                        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                if (!name || !phone) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning('অনুগ্রহ করে নাম এবং মোবাইল নম্বর লিখুন।');
                     }
-
-                    const formData = new FormData(this);
-
-                    fetch(this.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                        },
-                        body: formData
-                    })
-                    .then(async res => {
-                        let data = {};
-                        try { data = await res.json(); } catch(err) { data = {}; }
-
-                        if (res.ok && data.success) {
-                            if (data.requires_otp) {
-                                closeQuickOrderModal();
-                                openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
-                                    window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + data.order_id);
-                                });
-                            } else if (data.redirect_url) {
-                                window.location.href = data.redirect_url;
-                            }
-                        } else {
-                            if (typeof toastr !== 'undefined') {
-                                toastr.error(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
-                            } else {
-                                alert(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Quick Order OTP Error:', err);
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error('সার্ভারে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।');
-                        }
-                    })
-                    .finally(() => {
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = origHtml;
-                        }
-                    });
-                } else {
-                    setTimeout(() => {
-                        if (btn) {
-                            btn.disabled = true;
-                            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-                        }
-                    }, 50);
+                    return;
                 }
+
+                if (!address) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning('অনুগ্রহ করে সম্পূর্ণ ঠিকানা লিখুন।');
+                    }
+                    return;
+                }
+
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                }
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: formData
+                })
+                .then(async res => {
+                    let data = {};
+                    try { data = await res.json(); } catch(err) { data = {}; }
+
+                    if (res.ok && data.success) {
+                        if (data.requires_otp) {
+                            closeQuickOrderModal();
+                            openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
+                                window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + data.order_id);
+                            });
+                        } else if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            window.location.href = '/thank-you/' + (data.order_id || '');
+                        }
+                    } else {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
+                        } else {
+                            alert(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Quick Order OTP Error:', err);
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('সার্ভারে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।');
+                    }
+                })
+                .finally(() => {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = origHtml;
+                    }
+                });
             });
         }
     });

@@ -269,6 +269,9 @@ class SiteSettingService
             }
 
             LogHelper::updated('site_setting', $setting->id, $setting->company_id ?? null);
+            if (!empty($setting->company_id)) {
+                \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
+            }
 
             DB::commit();
             Log::info('Site setting updated successfully', ['id' => $setting->id]);

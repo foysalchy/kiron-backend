@@ -119,6 +119,7 @@ class OrderController extends FrontendController
 
         // dd($cartContent, $subtotal, $discount, $shipping, $total, $shipping_area, $paymentMethods, $draftOrderId);
         return $this->view('frontend.checkout', compact(
+            'setup',
             'cartContent',
             'subtotal',
             'discount',
@@ -613,11 +614,25 @@ class OrderController extends FrontendController
 
                 $previewTheme = request('preview_theme');
                 $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
-                return redirect()->route('order.thankyou', $thankYouParams)->with('success', 'Your order has been successfully placed.');
+                $thankYouUrl = route('order.thankyou', $thankYouParams);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success'      => true,
+                        'redirect_url' => $thankYouUrl,
+                        'order_id'     => $order->id,
+                        'message'      => 'Your order has been successfully placed.',
+                    ]);
+                }
+
+                return redirect()->to($thankYouUrl)->with('success', 'Your order has been successfully placed.');
             });
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Final Confirmation Error: ' . $e->getMessage());
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Order Error: ' . $e->getMessage()], 422);
+            }
             return back()->with('error', 'Order Error: ' . $e->getMessage());
         }
     }

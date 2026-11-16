@@ -54,6 +54,18 @@ class FrontendController extends Controller
             }
         }
 
+        if (!view()->shared('setup')) {
+            $currentCompanyId = $this->company_id ?: ($company->company_id ?? null);
+            if ($currentCompanyId) {
+                $sharedSetup = \Illuminate\Support\Facades\Cache::remember("site_settings_{$currentCompanyId}", 86400, function () use ($currentCompanyId) {
+                    return \App\Models\SiteSetting::where('company_id', $currentCompanyId)->first();
+                });
+                if ($sharedSetup) {
+                    \Illuminate\Support\Facades\View::share('setup', $sharedSetup);
+                }
+            }
+        }
+
         return view($templateName . '.' . $view, $data);
     }
 

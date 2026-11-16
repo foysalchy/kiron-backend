@@ -314,4 +314,16 @@
             }
         });
     }
+
+    @if(session('requires_otp'))
+    document.addEventListener('DOMContentLoaded', function() {
+        const orderId = @json(session('order_id'));
+        const phone = @json(session('phone'));
+        if (orderId && typeof openCheckoutOtpModal === 'function') {
+            openCheckoutOtpModal(orderId, phone, function(otpSuccessData) {
+                window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + orderId);
+            });
+        }
+    });
+    @endif
 </script>
