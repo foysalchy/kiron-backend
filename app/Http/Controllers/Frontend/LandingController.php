@@ -615,22 +615,25 @@ class LandingController extends FrontendController
                 }
 
                 $draftOrder->update([
-                    'landing_page_id'  => $request->landing_page_id ?: $draftOrder->landing_page_id,
-                    'warehouse_id'     => $primaryWarehouseId,
-                    'warehouse_info'   => $warehouseInfoList,
-                    'customer_id'      => $customer->id,
-                    'order_date'       => now(),
-                    'total_quantities' => (int) $totalQuantity,
-                    'subtotal'         => $itemTotal,
-                    'other_charges'    => $shippingCost,
-                    'grand_total'      => $grandTotal,
-                    'shipping_address' => [
+                    'landing_page_id'   => $request->landing_page_id ?: $draftOrder->landing_page_id,
+                    'warehouse_id'      => $primaryWarehouseId,
+                    'warehouse_info'    => $warehouseInfoList,
+                    'customer_id'       => $customer->id,
+                    'order_date'        => now(),
+                    'total_quantities'  => (int) $totalQuantity,
+                    'subtotal'          => $itemTotal,
+                    'other_charges'     => $shippingCost,
+                    'grand_total'       => $grandTotal,
+                    'shipping_address'  => [
                         'name'    => $request->name,
                         'phone'   => $request->phone,
                         'address' => $request->address,
                     ],
-                    'status'           => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
-                    'is_otp_verified'  => $isOtpEnabled ? false : null,
+                    'source'            => $draftOrder->source ?: $finalSource,
+                    'source_info'       => $sourceInfo,
+                    'pixel_source_info' => $sourceInfo,
+                    'status'            => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
+                    'is_otp_verified'   => $isOtpEnabled ? false : null,
                 ]);
 
                 if (!$isOtpEnabled) {

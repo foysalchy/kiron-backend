@@ -350,7 +350,7 @@ class OrderService
 
             $data['order_date'] = $data['order_date'] ?? Carbon::now();
 
-            // Track client IP and User Agent for non-POS orders (Landing / Sales / Web)
+            // Track client IP, User Agent, Device, and Network for non-POS orders (Landing / Sales / Web)
             if (!$isPOS) {
                 $sourceInfo = $data['source_info'] ?? [];
                 if (empty($sourceInfo['ip'])) {
@@ -359,7 +359,19 @@ class OrderService
                 if (empty($sourceInfo['user_agent'])) {
                     $sourceInfo['user_agent'] = request()->userAgent();
                 }
+                if (empty($sourceInfo['device']) && !empty($sourceInfo['user_agent'])) {
+                    $dev = \App\Helpers\DeviceHelper::detect($sourceInfo['user_agent']);
+                    $sourceInfo['device'] = $dev['device'];
+                    $sourceInfo['platform'] = $dev['platform'];
+                    $sourceInfo['browser'] = $dev['browser'];
+                }
+                if (empty($sourceInfo['network']) && !empty($sourceInfo['ip'])) {
+                    $net = \App\Helpers\NetworkHelper::detect($sourceInfo['ip']);
+                    $sourceInfo['network'] = $net['network'];
+                    $sourceInfo['isp'] = $net['isp'];
+                }
                 $data['source_info'] = $sourceInfo;
+                $data['pixel_source_info'] = $data['pixel_source_info'] ?? $sourceInfo;
             }
 
             // Calculate totals
