@@ -354,16 +354,7 @@ class OrderService
             if (!$isPOS) {
                 $sourceInfo = $data['source_info'] ?? [];
                 if (empty($sourceInfo['ip'])) {
-                    $clientIp = request()->header('CF-Connecting-IP')
-                        ?? request()->header('X-Forwarded-For')
-                        ?? request()->ip();
-
-                    if (is_string($clientIp) && str_contains($clientIp, ',')) {
-                        $clientIp = trim(explode(',', $clientIp)[0]);
-                    }
-                    if ($clientIp) {
-                        $sourceInfo['ip'] = $clientIp;
-                    }
+                    $sourceInfo['ip'] = \App\Helpers\NetworkHelper::getClientIp();
                 }
                 if (empty($sourceInfo['user_agent'])) {
                     $sourceInfo['user_agent'] = request()->userAgent();

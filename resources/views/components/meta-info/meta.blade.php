@@ -46,6 +46,7 @@ $organizationLogo = !empty($setup->logo_url) ? $setup->logo_url : $image;
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="title" content="{{ $title }}">
 @php
     $isNoIndexRoute = request()->is('cart*', 'checkout*');

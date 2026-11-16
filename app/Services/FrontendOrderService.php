@@ -313,7 +313,7 @@ class FrontendOrderService
                 'fake_order_count' => $fakeOrderCount,
                 'status' => $this->getStatusLabel($order->status),
                 'order_status' => $order->status,
-                'note' => $order->note,
+                'note' => $this->resolveDisplayNote($order->note, $order->is_otp_verified),
                 'is_otp_verified' => $order->is_otp_verified,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'source_info' => $order->source_info,
@@ -363,15 +363,7 @@ class FrontendOrderService
                 'roundOff' => (float) $order->round_off,
                 'totalPrice' => (float) $order->grand_total,
                 'paidAmount' => (float) $order->payment_amount,
-                'notes' => $order->orderNotes->map(function ($note) {
-                    return [
-                        'id' => $note->id,
-                        'note' => $note->note,
-                        'type' => $note->type,
-                        'created_at' => $note->created_at->format('Y-m-d H:i:s'),
-                        'time_ago' => $note->created_at->diffForHumans(),
-                    ];
-                }),
+                'notes' => $this->formatOrderNotes($order->orderNotes, $order->is_otp_verified),
                 'orderDate' => $order->order_date,
                 'timeAgo' => $order->created_at->diffForHumans(),
                 'warehouse' => $order->warehouse?->name ?? '',
@@ -633,6 +625,7 @@ class FrontendOrderService
             'totalorder' => $customerTotalOrders,
             'status' => $this->getStatusLabel($order->status),
             'order_status' => $order->status,
+            'note' => $this->resolveDisplayNote($order->note, $order->is_otp_verified),
             'source' => $this->resolveOrderDisplaySource($order),
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
@@ -682,15 +675,7 @@ class FrontendOrderService
             'roundOff' => (float) $order->round_off,
             'totalPrice' => (float) $order->grand_total,
             'paidAmount' => (float) $order->payment_amount,
-            'notes' => $order->orderNotes->map(function ($note) {
-                return [
-                    'id' => $note->id,
-                    'note' => $note->note,
-                    'type' => $note->type,
-                    'created_at' => $note->created_at->format('Y-m-d H:i:s'),
-                    'time_ago' => $note->created_at->diffForHumans(),
-                ];
-            }),
+            'notes' => $this->formatOrderNotes($order->orderNotes, $order->is_otp_verified),
             'activities' => $order->actionLogs->map(function ($log) {
                 return [
                     'id' => $log->id,
@@ -732,6 +717,11 @@ class FrontendOrderService
             'assigned_to' => $order->assigned_to, // Raw assigned_to array (user IDs)
             'source_info' => $order->source_info,
             'ip_address' => $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null,
+            'device' => is_array($order->source_info) ? ($order->source_info['device'] ?? null) : null,
+            'platform' => is_array($order->source_info) ? ($order->source_info['platform'] ?? null) : null,
+            'browser' => is_array($order->source_info) ? ($order->source_info['browser'] ?? null) : null,
+            'network' => is_array($order->source_info) ? ($order->source_info['network'] ?? (isset($order->source_info['ip']) ? \App\Helpers\NetworkHelper::detect($order->source_info['ip'])['network'] : null)) : null,
+            'isp' => is_array($order->source_info) ? ($order->source_info['isp'] ?? (isset($order->source_info['ip']) ? \App\Helpers\NetworkHelper::detect($order->source_info['ip'])['isp'] : null)) : null,
 
         ];
     }
@@ -855,6 +845,53 @@ class FrontendOrderService
         }
     }
 
+    protected function resolveDisplayNote(?string $rawNote, ?bool $isOtpVerified): ?string
+    {
+        if (empty($rawNote)) {
+            return null;
+        }
+
+        $trimmed = trim($rawNote);
+        if ($trimmed === 'Checkout done but not verify') {
+            return $isOtpVerified ? 'Verified' : 'Unverified';
+        }
+
+        return $trimmed;
+    }
+
+    protected function formatOrderNotes($orderNotes, ?bool $isOtpVerified)
+    {
+        if (!$orderNotes) {
+            return collect([]);
+        }
+
+        return $orderNotes
+            ->filter(function ($note) use ($isOtpVerified) {
+                // If order is verified, omit stale unverified notes
+                if ($isOtpVerified && in_array(trim((string) $note->note), ['Checkout done but not verify', 'Unverified'])) {
+                    return false;
+                }
+                return true;
+            })
+            ->map(function ($note) {
+                $text = trim((string) $note->note);
+                if ($text === 'Checkout done but not verify') {
+                    $text = 'Unverified';
+                } elseif (preg_match('/OTP verified successfully \((\d+)\)/i', $text, $matches)) {
+                    $text = "OTP Verified ({$matches[1]})";
+                }
+
+                return [
+                    'id' => $note->id,
+                    'note' => $text,
+                    'type' => $note->type,
+                    'created_at' => $note->created_at ? $note->created_at->format('Y-m-d H:i:s') : null,
+                    'time_ago' => $note->created_at ? $note->created_at->diffForHumans() : '',
+                ];
+            })
+            ->values();
+    }
+
     protected function resolveOrderDisplaySource(Order $order): string
     {
         // 1. Determine destination / funnel platform
@@ -877,7 +914,16 @@ class FrontendOrderService
         $rawSource = strtolower(trim((string) $order->source));
         if (!empty($rawSource) && !in_array($rawSource, ['sales', 'landing', 'website', 'pos'])) {
             if (str_contains($rawSource, 'facebook')) {
-                $marketingChannel = 'Facebook';
+                // If source_info explicitly recorded it as Direct/Organic and no fbclid/utm exists, it was falsely marked due to _fbc cookie
+                $infoSource = strtolower(trim((string) ($merged['source'] ?? '')));
+                $hasRealFbParam = (!empty($merged['utm_source']) && (str_contains(strtolower($merged['utm_source']), 'fb') || str_contains(strtolower($merged['utm_source']), 'facebook')))
+                    || (isset($merged['url']) && str_contains($merged['url'], 'fbclid='));
+
+                if ($infoSource === 'direct/organic' && !$hasRealFbParam) {
+                    $marketingChannel = null;
+                } else {
+                    $marketingChannel = 'Facebook';
+                }
             } elseif (str_contains($rawSource, 'tiktok')) {
                 $marketingChannel = 'TikTok';
             } elseif (str_contains($rawSource, 'google')) {
@@ -905,9 +951,9 @@ class FrontendOrderService
 
         // Check ad click IDs / query parameters in URL
         if (!$marketingChannel) {
-            if (!empty($merged['fbc']) || (isset($merged['url']) && str_contains($merged['url'], 'fbclid='))) {
+            if (isset($merged['url']) && str_contains($merged['url'], 'fbclid=')) {
                 $marketingChannel = 'Facebook';
-            } elseif (!empty($merged['_ttp']) || (isset($merged['url']) && str_contains($merged['url'], 'ttclid='))) {
+            } elseif (isset($merged['url']) && str_contains($merged['url'], 'ttclid=')) {
                 $marketingChannel = 'TikTok';
             } elseif (isset($merged['url']) && str_contains($merged['url'], 'gclid=')) {
                 $marketingChannel = 'Google';

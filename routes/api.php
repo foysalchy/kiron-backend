@@ -1830,6 +1830,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/reports/courier', [\App\Http\Controllers\Api\CourierReportController::class, 'generate']);
                 Route::get('/reports/cancellation', [\App\Http\Controllers\Api\CancellationReportController::class, 'generate']);
                 Route::get('/reports/marketing-roi', [\App\Http\Controllers\Api\MarketingRoiReportController::class, 'generate']);
+                Route::get('/reports/ip-wise-orders', [\App\Http\Controllers\Api\IpWiseOrderReportController::class, 'generate']);
                 Route::get('/reports/abandoned-cart', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'generate']);
                 Route::delete('/reports/abandoned-cart/flush', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'flush']);
 
