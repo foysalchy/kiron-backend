@@ -770,6 +770,7 @@ Route::prefix('v1')->group(function () {
                 Route::prefix('fetch-orders')->group(function () {
                     Route::get('/select/order-list-option', [OrderController::class, 'getSelectListOrder']);
                     Route::get('/', [OrderController::class, 'index']);
+                    Route::get('/by-ip', [OrderController::class, 'ordersByIp']);
                     Route::get('/{id}', [OrderController::class, 'show']);
                     Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
                     Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);

@@ -3,6 +3,9 @@
     @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
 @endsection
 @section('content')
+@php
+    $isVerify = (bool) ($setup->checkout_sms_verify ?? false);
+@endphp
     <section class="bg-[#F9F9F9] py-2">
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex   items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
@@ -13,8 +16,15 @@
     </section>
 
     <div class="container mx-auto px-4 py-4">
-        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" id="checkout-main-form">
+        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" id="checkout-main-form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             @csrf
+            {{-- Decoy fields to trap browser address autofill --}}
+            <div style="opacity: 0; position: absolute; top: 0; left: -9999px; height: 0; width: 0; z-index: -1; overflow: hidden;" aria-hidden="true">
+                <input type="text" name="fake_autofill_name" tabindex="-1" autocomplete="name" />
+                <input type="text" name="fake_autofill_address" tabindex="-1" autocomplete="street-address" />
+                <input type="tel" name="fake_autofill_phone" tabindex="-1" autocomplete="tel" />
+                <input type="email" name="fake_autofill_email" tabindex="-1" autocomplete="email" />
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
 
                 <!-- ════════ LEFT COLUMN (Shipping & Payment) ════════ -->
@@ -95,11 +105,15 @@
                                 <div>
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                                 <div>
                                     <input type="tel" name="phone" id="customer-phone" placeholder="আপনার মোবাইল নম্বর *"
                                         required value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
@@ -115,6 +129,8 @@
                                         <div>
                                             <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                                readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                         </div>
                                     @endif
@@ -123,6 +139,8 @@
                                         <div>
                                             <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                                readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                         </div>
                                     @endif
@@ -138,6 +156,8 @@
                                     </span>
                                     <input type="text" name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" required
                                         value="{{ old('address', auth('customer')->user()->address ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
@@ -398,6 +418,7 @@
     <div id="forms-repository" class="hidden">
         <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
     </div>
+    <x-frontend.checkout-otp-modal />
 @endsection
 
 @push('scripts')
@@ -759,6 +780,116 @@
                 createAccountField.checked = formState.create_account;
             }
             sessionStorage.removeItem(checkoutFormStateKey);
+        });
+
+        const isVerify = @json($isVerify);
+        const orderForm = document.querySelector('form[action*="order/store"], form[action*="order/confirm"]');
+
+        if (orderForm) {
+            orderForm.addEventListener('submit', function (e) {
+                const btn = this.querySelector('button[type="submit"]');
+                const origHtml = btn ? btn.innerHTML : '';
+
+                const name = this.querySelector('input[name="name"]')?.value;
+                const phone = this.querySelector('input[name="phone"]')?.value;
+                const address = this.querySelector('textarea[name="address"]')?.value;
+
+                if (!name || !phone) return;
+
+                if (isVerify) {
+                    e.preventDefault();
+
+                    if (!address) {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.warning('অনুগ্রহ করে সম্পূর্ণ ঠিকানা লিখুন।');
+                        }
+                        return;
+                    }
+
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                    }
+
+                    const formData = new FormData(this);
+
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                        },
+                        body: formData
+                    })
+                    .then(async res => {
+                        let data = {};
+                        try { data = await res.json(); } catch(err) { data = {}; }
+
+                        if (res.ok && data.success) {
+                            if (data.requires_otp) {
+                                openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
+                                    window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + data.order_id);
+                                });
+                            } else if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            }
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                            } else {
+                                alert(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Checkout OTP Error:', err);
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('সার্ভারে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                        }
+                    })
+                    .finally(() => {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    });
+                } else {
+                    setTimeout(() => {
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                        }
+                    }, 50);
+                }
+            });
+        }
+
+        // Enforce browser autocomplete / address autofill disable
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action*="order/store"], form[action*="order/confirm"]');
+            if (!form) return;
+
+            form.setAttribute('autocomplete', 'off');
+            const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="submit"]), textarea');
+            inputs.forEach(el => {
+                el.setAttribute('autocomplete', 'off');
+                el.setAttribute('autocorrect', 'off');
+                el.setAttribute('autocapitalize', 'off');
+                el.setAttribute('spellcheck', 'false');
+                el.setAttribute('data-lpignore', 'true');
+                el.setAttribute('data-form-type', 'other');
+
+                const unlock = () => { el.removeAttribute('readonly'); };
+                el.addEventListener('focus', unlock);
+                el.addEventListener('pointerdown', unlock);
+                el.addEventListener('mousedown', unlock);
+                el.addEventListener('touchstart', unlock);
+            });
+
+            form.addEventListener('submit', function() {
+                inputs.forEach(el => el.removeAttribute('readonly'));
+            });
         });
     </script>
 @endpush

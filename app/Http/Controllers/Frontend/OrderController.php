@@ -341,6 +341,121 @@ class OrderController extends FrontendController
 
         Log::info('Draft order synced', ['session_order_id' => $orderId, 'found' => $order ? $order->id : null]);
 
+        $otpService = app(\App\Services\CheckoutOtpService::class);
+        $isOtpEnabled = $otpService->isOtpEnabled($this->company_id);
+
+        if ($isOtpEnabled) {
+            if (!$otpService->hasSufficientBalance($this->company_id)) {
+                $msg = 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।';
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return back()->with('error', $msg);
+            }
+
+            try {
+                return DB::transaction(function () use ($request, $orderId, $isCOD, $otpService) {
+                    $order = Order::where('company_id', $this->company_id)
+                        ->where('id', $orderId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$order) {
+                        throw new \Exception('Order not found.');
+                    }
+
+                    $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+                    $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
+
+                    $sourceInfo = [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                        'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                        'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                        'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
+                        'source' => $marketingSource ?? 'Direct/Organic',
+                        'utm_source' => session('utm_source'),
+                        'utm_medium' => session('utm_medium'),
+                        'utm_campaign' => session('utm_campaign'),
+                        'utm_content' => session('utm_content'),
+                    ];
+
+                    $order->update([
+                        'shipping_address' => [
+                            'name'           => $request->name,
+                            'phone'          => $request->phone,
+                            'email'          => $request->email,
+                            'district'       => $request->district,
+                            'address'        => $request->address,
+                            'payment_method' => $request->payment_method,
+                        ],
+                        'source'            => $order->source ?: $finalSource,
+                        'source_info'       => $sourceInfo,
+                        'pixel_source_info' => $sourceInfo,
+                        'status'            => Status::Draft->value,
+                        'is_otp_verified'   => false,
+                    ]);
+
+                    if ($order->customer) {
+                        $order->customer->update([
+                            'name'     => $request->name,
+                            'email'    => $request->email,
+                            'district' => $request->district,
+                            'address'  => $request->address
+                        ]);
+                    }
+
+                    if (Session::has('coupon')) {
+                        $couponData = Session::get('coupon');
+                        $couponId = $couponData['coupon_id'] ?? null;
+                        $couponDiscount = $couponData['discount_amount'] ?? 0;
+
+                        if ($couponId) {
+                            $order->update([
+                                'coupon_id' => $couponId,
+                                'coupon_discount' => $couponDiscount,
+                                'grand_total' => max(0, $order->grand_total - $couponDiscount),
+                            ]);
+                        }
+                    }
+
+                    $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
+
+                    $otpResult = $otpService->sendOtp($order, $request->phone);
+
+                    if (!$otpResult['success']) {
+                        throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
+                    }
+
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success'          => true,
+                            'requires_otp'     => true,
+                            'order_id'         => $order->id,
+                            'order_code'       => $order->order_no ?? ('#' . $order->id),
+                            'phone'            => $otpResult['phone'] ?? $request->phone,
+                            'message'          => $otpResult['message'] ?? 'আপনার নাম্বারে একটি ভেরিফিকেশন ওটিপি পাঠানো হয়েছে।',
+                            'instant_purchase' => false,
+                        ]);
+                    }
+
+                    session()->put('pending_otp_order_id', $order->id);
+                    return back()->with([
+                        'requires_otp' => true,
+                        'order_id'     => $order->id,
+                        'phone'        => $otpResult['phone'] ?? $request->phone,
+                        'info'         => 'আপনার নাম্বারে একটি ভেরিফিকেশন ওটিপি পাঠানো হয়েছে।',
+                    ]);
+                });
+            } catch (\Exception $e) {
+                Log::error('OTP Order Store Error: ' . $e->getMessage());
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+                }
+                return back()->with('error', $e->getMessage());
+            }
+        }
+
         // 3. Status check
         $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
         if ($currentStatus !== Status::Draft->value) {
@@ -507,7 +622,122 @@ class OrderController extends FrontendController
         }
     }
 
-    private function finalizeOrderAndDeductStock($order)
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|integer',
+            'otp'      => 'required|string',
+        ]);
+
+        $otpService = app(\App\Services\CheckoutOtpService::class);
+        $result = $otpService->verifyOtp((int) $request->order_id, $request->otp, $this->company_id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        }
+
+        $order = $result['order'];
+
+        if ($order->type === Order::TYPE_LANDING) {
+            $productService = app(\App\Services\ProductService::class);
+            $warehouseInfoList = $order->warehouse_info ?? [];
+            foreach ($warehouseInfoList as $wInfo) {
+                $itemProdId = $wInfo['product_id'] ?? null;
+                $itemProdObj = \App\Models\Product::find($itemProdId);
+                if ($itemProdObj && $itemProdObj->manage_stock) {
+                    $stockData = [
+                        'warehouse_id'     => $wInfo['warehouse_id'],
+                        'bin_id'           => null,
+                        'quantity'         => (int) $wInfo['quantity'],
+                        'batch_number'     => null,
+                        'serial_numbers'   => null,
+                        'transaction_type' => 'sale',
+                        'reference_type'   => 'LandingOrder',
+                        'reference_id'     => $order->id,
+                        'notes'            => "Stock deducted for order: {$order->order_no}"
+                    ];
+                    if (!empty($wInfo['variation_id'])) {
+                        $stockData['variation_id'] = $wInfo['variation_id'];
+                    }
+                    $productService->removeStockFromWarehouse($itemProdId, $stockData);
+                }
+            }
+        } else {
+            $stockResult = $this->finalizeOrderAndDeductStock($order);
+            if (!$stockResult['success']) {
+                Log::warning('Stock deduction warning on verifyOtp: ' . ($stockResult['error'] ?? ''));
+            }
+
+            if (Session::has('coupon')) {
+                $couponData = Session::get('coupon');
+                $couponId = $couponData['coupon_id'] ?? null;
+                $couponDiscount = $couponData['discount_amount'] ?? 0;
+
+                if ($couponId) {
+                    app(\App\Services\CouponService::class)->applyCoupon(
+                        $couponId,
+                        $order->id,
+                        $order->subtotal ?? $order->grand_total,
+                        $couponDiscount,
+                        $order->customer_id
+                    );
+                }
+            }
+
+            foreach (\Cart::content() as $item) {
+                $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
+                \App\Models\CartTrack::where('session_id', session()->getId())
+                    ->where('product_id', $cleanProductId)
+                    ->where('variation_id', $item->options->variation_id ?? null)
+                    ->update(['status' => \App\Models\CartTrack::PURCHASED]);
+            }
+
+            \Cart::destroy();
+            Session::forget(['coupon', 'current_draft_order_id']);
+        }
+
+        $previewTheme = request('preview_theme');
+        $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
+        $thankYouUrl = route('order.thankyou', $thankYouParams);
+
+        return response()->json([
+            'success'          => true,
+            'message'          => 'আপনার অর্ডারটি সফলভাবে ভেরিফাই ও কনফার্ম হয়েছে!',
+            'order_id'         => $order->id,
+            'order_code'       => $order->order_no ?? ('#' . $order->id),
+            'redirect_url'     => $thankYouUrl,
+            'thankyou_url'     => $thankYouUrl,
+            'invoice_url'      => route('order.invoice', $order->id),
+            'instant_purchase' => true,
+        ]);
+    }
+
+    public function resendOtp(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|integer',
+        ]);
+
+        $otpService = app(\App\Services\CheckoutOtpService::class);
+        $result = $otpService->resendOtp((int) $request->order_id, $this->company_id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'] ?? 'নতুন ওটিপি পাঠানো সম্ভব হয়নি।',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'আপনার নাম্বারে নতুন একটি ওটিপি কোড পাঠানো হয়েছে।',
+        ]);
+    }
+
+    public function finalizeOrderAndDeductStock($order)
     {
         $statusVal = $order->status instanceof Status ? $order->status->value : (int)$order->status;
 
@@ -699,7 +929,9 @@ class OrderController extends FrontendController
 
         $sessionKey = 'pixel_purchase_fired_' . $order->id;
         $pixelPurchaseFired = session()->has($sessionKey);
-        if (!$pixelPurchaseFired) {
+        if ($order->is_otp_verified === false) {
+            $pixelPurchaseFired = true; // suppress purchase pixel event if unverified
+        } elseif (!$pixelPurchaseFired) {
             session()->put($sessionKey, true);
         }
 

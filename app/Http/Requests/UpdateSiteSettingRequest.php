@@ -49,6 +49,7 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'tags'              => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],
+                'checkout_sms_verify' => ['nullable'],
                 'login_required_for_checkout' => ['nullable', 'in:0,1'],
                 'checkout_show_email' => ['nullable', 'boolean'],
                 'checkout_show_city' => ['nullable', 'boolean'],

@@ -250,9 +250,31 @@ class FrontendOrderService
         $courierHistories = CourierCheckHistory::whereIn('phone', $phones)
             ->get()
             ->keyBy('phone');
+
+        // Pre-calculate order counts for each IP address to avoid N+1 queries
+        $ips = $orders->getCollection()->map(function ($order) {
+            return $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null;
+        })->filter()->unique()->values()->toArray();
+
+        $ipOrderCountMap = [];
+        if (!empty($ips)) {
+            $currentCompanyId = auth()->user()->company_id ?? null;
+            foreach ($ips as $ip) {
+                $ipQuery = Order::query();
+                if ($currentCompanyId) {
+                    $ipQuery->where('company_id', $currentCompanyId);
+                }
+                $ipOrderCountMap[$ip] = $ipQuery->where(function ($q) use ($ip) {
+                    $q->where('source_info->ip', $ip)
+                      ->orWhere('pixel_source_info->ip', $ip)
+                      ->orWhere('source_info', 'LIKE', '%"ip":"' . $ip . '"%')
+                      ->orWhere('source_info', 'LIKE', '%"ip": "' . $ip . '"%');
+                })->count();
+            }
+        }
             
         // Transform the data to include calculated fields
-        $orders->getCollection()->transform(function ($order) use ($courierHistories, $customerTotalOrdersMap, $fakeOrderCountMap) {
+        $orders->getCollection()->transform(function ($order) use ($courierHistories, $customerTotalOrdersMap, $fakeOrderCountMap, $ipOrderCountMap) {
             $customerTotalOrders = 1;
             $fakeOrderCount = 0;
             
@@ -274,6 +296,9 @@ class FrontendOrderService
             $courierHistoryPhone = $order->customer?->phone;
             $courierHistory = $courierHistoryPhone ? ($courierHistories[$courierHistoryPhone] ?? null) : null;
 
+            $orderIp = $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null;
+            $ipOrderCount = $orderIp ? ($ipOrderCountMap[$orderIp] ?? 1) : 0;
+
             return [
                 'id' => $order->id,
                 'orderNumber' => $order->order_no,
@@ -288,10 +313,13 @@ class FrontendOrderService
                 'fake_order_count' => $fakeOrderCount,
                 'status' => $this->getStatusLabel($order->status),
                 'order_status' => $order->status,
+                'note' => $order->note,
+                'is_otp_verified' => $order->is_otp_verified,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'source_info' => $order->source_info,
                 'source' => $this->resolveOrderDisplaySource($order),
-                'ip_address' => $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null,
+                'ip_address' => $orderIp,
+                'ip_order_count' => $ipOrderCount,
                 'items' => $order->orderDetails->map(function ($detail) {
                     $item = [
                         'id' => $detail->id,
@@ -444,6 +472,23 @@ class FrontendOrderService
         $order = Order::where('customer_id', $customerId)->get();
 
         return $order;
+    }
+
+    public function getOrdersByIp($ip, $companyId = null)
+    {
+        $query = Order::query();
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        return $query->where(function ($q) use ($ip) {
+            $q->where('source_info->ip', $ip)
+              ->orWhere('pixel_source_info->ip', $ip)
+              ->orWhere('source_info', 'LIKE', '%"ip":"' . $ip . '"%')
+              ->orWhere('source_info', 'LIKE', '%"ip": "' . $ip . '"%');
+        })
+        ->latest()
+        ->get();
     }
 
     /**

@@ -12,7 +12,7 @@
 @endsection
 
 @push('scripts')
-    @if(isset($pixelPurchaseFired) && !$pixelPurchaseFired)
+    @if(isset($pixelPurchaseFired) && !$pixelPurchaseFired && ($order->is_otp_verified !== false))
         @include('components.meta-info.pixel-events', [
             'event' => 'Purchase',
             'data'  => ['order' => $order]

@@ -529,6 +529,19 @@ class LandingController extends FrontendController
                 'utm_content' => session('utm_content'),
             ];
 
+            $otpService = app(\App\Services\CheckoutOtpService::class);
+            $isOtpEnabled = $otpService->isOtpEnabled($this->company_id);
+
+            if ($isOtpEnabled) {
+                if (!$otpService->hasSufficientBalance($this->company_id)) {
+                    $msg = 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।';
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
+                    return back()->with('error', $msg);
+                }
+            }
+
             $orderData = [
                 'type'             => Order::TYPE_LANDING,
                 'source'           => $finalSource,
@@ -547,7 +560,8 @@ class LandingController extends FrontendController
                 'items'            => $orderItems,
                 'source_info'      => $sourceInfo,
                 'pixel_source_info'=> $sourceInfo,
-                'status'           => Status::Pending->value,
+                'status'           => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
+                'is_otp_verified'  => $isOtpEnabled ? false : null,
             ];
 
             // Strict customer match: only update draft belonging to this specific customer
@@ -605,38 +619,67 @@ class LandingController extends FrontendController
                         'phone'   => $request->phone,
                         'address' => $request->address,
                     ],
-                    'status'           => Status::Pending->value,
+                    'status'           => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
+                    'is_otp_verified'  => $isOtpEnabled ? false : null,
                 ]);
 
-                // Deduct stock for the confirmed order
-                $productService = app(\App\Services\ProductService::class);
-                foreach ($warehouseInfoList as $wInfo) {
-                    $itemProdId = $wInfo['product_id'] ?? $productId;
-                    $itemProdObj = Product::find($itemProdId);
-                    if ($itemProdObj && $itemProdObj->manage_stock) {
-                        $stockData = [
-                            'warehouse_id'     => $wInfo['warehouse_id'],
-                            'bin_id'           => null,
-                            'quantity'         => (int) $wInfo['quantity'],
-                            'batch_number'     => null,
-                            'serial_numbers'   => null,
-                            'transaction_type' => 'sale',
-                            'reference_type'   => 'LandingOrder',
-                            'reference_id'     => $draftOrder->id,
-                            'notes'            => "Stock deducted for order: {$draftOrder->order_no}"
-                        ];
-                        if (!empty($wInfo['variation_id'])) {
-                            $stockData['variation_id'] = $wInfo['variation_id'];
+                if (!$isOtpEnabled) {
+                    // Deduct stock for the confirmed order only if OTP is not required
+                    $productService = app(\App\Services\ProductService::class);
+                    foreach ($warehouseInfoList as $wInfo) {
+                        $itemProdId = $wInfo['product_id'] ?? $productId;
+                        $itemProdObj = Product::find($itemProdId);
+                        if ($itemProdObj && $itemProdObj->manage_stock) {
+                            $stockData = [
+                                'warehouse_id'     => $wInfo['warehouse_id'],
+                                'bin_id'           => null,
+                                'quantity'         => (int) $wInfo['quantity'],
+                                'batch_number'     => null,
+                                'serial_numbers'   => null,
+                                'transaction_type' => 'sale',
+                                'reference_type'   => 'LandingOrder',
+                                'reference_id'     => $draftOrder->id,
+                                'notes'            => "Stock deducted for order: {$draftOrder->order_no}"
+                            ];
+                            if (!empty($wInfo['variation_id'])) {
+                                $stockData['variation_id'] = $wInfo['variation_id'];
+                            }
+                            $productService->removeStockFromWarehouse($itemProdId, $stockData);
                         }
-                        $productService->removeStockFromWarehouse($itemProdId, $stockData);
                     }
                 }
 
                 $order = $draftOrder;
-                session()->forget('current_landing_draft_order_id');
+                if (!$isOtpEnabled) {
+                    session()->forget('current_landing_draft_order_id');
+                }
             } else {
                 // If no draft order existed, create a new landing order directly
                 $order = $this->orderService->createLandingOrder($orderData);
+            }
+
+            if ($isOtpEnabled) {
+                $otpResult = $otpService->sendOtp($order, $request->phone);
+                DB::commit();
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success'          => true,
+                        'requires_otp'     => true,
+                        'order_id'         => $order->id,
+                        'order_code'       => $order->order_no ?? ('#' . $order->id),
+                        'phone'            => $otpResult['phone'] ?? $request->phone,
+                        'message'          => $otpResult['message'] ?? 'আপনার নাম্বারে একটি ভেরিফিকেশন ওটিপি পাঠানো হয়েছে।',
+                        'instant_purchase' => false,
+                    ]);
+                }
+
+                return redirect()->back()->with([
+                    'requires_otp' => true,
+                    'order_id'     => $order->id,
+                    'phone'        => $otpResult['phone'] ?? $request->phone,
+                    'info'         => 'আপনার নাম্বারে একটি ভেরিফিকেশন ওটিপি পাঠানো হয়েছে।',
+                ]);
             }
 
             DB::commit();

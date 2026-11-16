@@ -42,6 +42,7 @@ class SiteSetting extends Model
         'tags',
         'copy_right',
         'sms_forget_password',
+        'checkout_sms_verify',
         'login_required_for_checkout',
         'checkout_show_email',
         'checkout_show_city',
@@ -64,6 +65,7 @@ class SiteSetting extends Model
 
     protected $casts = [
         'sms_forget_password' => 'boolean',
+        'checkout_sms_verify' => 'boolean',
         'login_required_for_checkout' => 'integer',
         'checkout_show_email' => 'boolean',
         'checkout_show_city' => 'boolean',

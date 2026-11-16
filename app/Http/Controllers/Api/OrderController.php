@@ -123,6 +123,32 @@ class OrderController extends Controller
             ], 404);
         }
     }
+    public function ordersByIp(Request $request): JsonResponse
+    {
+        try {
+            $ip = $request->query('ip');
+            if (!$ip) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'IP address is required',
+                ], 400);
+            }
+
+            $companyId = auth()->user()->company_id ?? null;
+            $orders = $this->frontendOrderService->getOrdersByIp($ip, $companyId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $orders,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Orders not found for IP',
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
     public function getEditOrder(int $id): JsonResponse
     {
         $data = $this->frontendOrderService->getEditOrder($id);

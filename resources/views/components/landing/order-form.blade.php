@@ -103,10 +103,14 @@
 @endphp
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm  border border-gray-200">
-    <form @if($isPreviewMode) action="javascript:void(0);" onsubmit="event.preventDefault(); showPreviewAlert(); return false;" @else action="{{ route('landing.order.store') }}" method="POST" @endif id="landing-order-form">
-
-
+    <form @if($isPreviewMode) action="javascript:void(0);" onsubmit="event.preventDefault(); showPreviewAlert(); return false;" @else action="{{ route('landing.order.store') }}" method="POST" @endif id="landing-order-form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         @csrf
+        {{-- Decoy fields to trap browser address autofill --}}
+        <div style="opacity: 0; position: absolute; top: 0; left: -9999px; height: 0; width: 0; z-index: -1; overflow: hidden;" aria-hidden="true">
+            <input type="text" name="fake_autofill_name" tabindex="-1" autocomplete="name" />
+            <input type="text" name="fake_autofill_address" tabindex="-1" autocomplete="street-address" />
+            <input type="tel" name="fake_autofill_phone" tabindex="-1" autocomplete="tel" />
+        </div>
         <input type="hidden" name="product_id" value="{{ $landing->product_id }}">
         <input type="hidden" name="landing_page_id" value="{{ $landing->id }}">
         <input type="hidden" name="draft_order_id" id="draft-order-id" value="">
@@ -398,18 +402,24 @@
                     <label for="name" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['your_name'] }} <span
                             class="text-red-500">*</span></label>
                     <input id="name" type="text" name="name" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
                     <label for="phone" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['phone_number'] }} <span
                             class="text-red-500">*</span></label>
                     <input type="tel" id="phone" name="phone" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
                     <label for="address" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['full_address'] }} <span
                             class="text-red-500">*</span></label>
                     <input type="text" id="address" name="address" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
             </div>
@@ -599,6 +609,8 @@
         </div>
     </div>
 </div>
+
+<x-frontend.checkout-otp-modal />
 
 @if($isPreviewMode)
     {{-- Preview Alert Modal --}}
@@ -1379,6 +1391,46 @@
                 }
 
                 if (res.ok && data.success) {
+                    if (data.requires_otp) {
+                        openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
+                            closeCheckoutOtpModal();
+
+                            const orderValue = parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0);
+                            const finalOrderId = otpSuccessData.order_id || data.order_id || '';
+
+                            if (typeof fbq === 'function') {
+                                fbq('track', 'Purchase', {
+                                    content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
+                                    content_ids: ['{{ $mainProduct->id ?? "" }}'],
+                                    content_type: 'product',
+                                    value: orderValue,
+                                    currency: 'BDT'
+                                }, finalOrderId ? { eventID: 'ORDER_' + finalOrderId } : undefined);
+                            }
+
+                            if (typeof ttq !== 'undefined' && typeof ttq.track === 'function') {
+                                ttq.track('CompletePayment', {
+                                    content_id: '{{ $mainProduct->id ?? "" }}',
+                                    content_type: 'product',
+                                    value: orderValue,
+                                    currency: 'BDT'
+                                }, finalOrderId ? { event_id: 'ORDER_' + finalOrderId } : undefined);
+                            }
+
+                            showOrderSuccessModal(otpSuccessData.message || data.message, otpSuccessData.order_code || data.order_code, otpSuccessData.thankyou_url || data.thankyou_url, otpSuccessData.invoice_url || data.invoice_url, finalOrderId);
+                            try {
+                                landingForm.reset();
+                                qty = 1;
+                                if (typeof updateUI === 'function') {
+                                    updateUI();
+                                }
+                            } catch (e) {
+                                console.warn("Reset error:", e);
+                            }
+                        });
+                        return;
+                    }
+
                     const orderValue = parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0);
                     const orderId = data.order_id || '';
 
@@ -1476,4 +1528,31 @@
         }
         @endif
     })();
+
+    // Enforce browser autocomplete / address autofill disable on Landing Order Form
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('landing-order-form');
+        if (!form) return;
+
+        form.setAttribute('autocomplete', 'off');
+        const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="submit"]), textarea');
+        inputs.forEach(el => {
+            el.setAttribute('autocomplete', 'off');
+            el.setAttribute('autocorrect', 'off');
+            el.setAttribute('autocapitalize', 'off');
+            el.setAttribute('spellcheck', 'false');
+            el.setAttribute('data-lpignore', 'true');
+            el.setAttribute('data-form-type', 'other');
+
+            const unlock = () => { el.removeAttribute('readonly'); };
+            el.addEventListener('focus', unlock);
+            el.addEventListener('pointerdown', unlock);
+            el.addEventListener('mousedown', unlock);
+            el.addEventListener('touchstart', unlock);
+        });
+
+        form.addEventListener('submit', function() {
+            inputs.forEach(el => el.removeAttribute('readonly'));
+        });
+    });
 </script>

@@ -20,6 +20,7 @@
         return str_contains($slug, 'cash') || str_contains($slug, 'cod') || str_contains($slug, 'delivery');
     });
     $defaultPaymentMethod = $codMethod ? $codMethod->name : 'Cash on delivery';
+    $isVerify = (bool) ($setup->checkout_sms_verify ?? false);
 @endphp
 
 <!-- Quick Order Popup Modal Component -->
@@ -134,8 +135,14 @@
 
         <!-- Modal Body (Form) -->
         <div class="overflow-y-auto p-3 sm:p-4 flex-1">
-            <form id="quick-order-form" action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="quick-order-form" action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 @csrf
+                {{-- Decoy fields to trap browser address autofill --}}
+                <div style="opacity: 0; position: absolute; top: 0; left: -9999px; height: 0; width: 0; z-index: -1; overflow: hidden;" aria-hidden="true">
+                    <input type="text" name="fake_autofill_name" tabindex="-1" autocomplete="name" />
+                    <input type="text" name="fake_autofill_address" tabindex="-1" autocomplete="street-address" />
+                    <input type="tel" name="fake_autofill_phone" tabindex="-1" autocomplete="tel" />
+                </div>
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
                     <!-- LEFT COLUMN: Customer & Payment Info -->
                     <div class="lg:col-span-7 space-y-3">
@@ -149,17 +156,23 @@
                                 <div>
                                     <input type="text" name="name" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'আপনার নাম *' : 'Your Name *' }}" aria-label="Your Name" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm font-medium transition-all h-10">
                                 </div>
                                 <div>
                                     <input type="tel" name="phone" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'মোবাইল নাম্বার *' : 'Phone Number *' }}" aria-label="Phone Number" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm font-medium transition-all h-10">
                                 </div>
                             </div>
                             <input type="hidden" name="district" value="none" required />
                             <div>
                                 <textarea name="address" placeholder="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'পূর্ণাঙ্গ ঠিকানা (বাসা/রোড, এলাকা, জেলা) *' : 'Your Address (House/Road, Area, City) *' }}" aria-label="Your Address" rows="2" required
+                                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                    readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                     class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white outline-none focus:border-[#016738] focus:ring-1 focus:ring-green-50 text-sm transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
                         </div>
@@ -205,6 +218,8 @@
 <div id="forms-repository" class="hidden">
     <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
 </div>
+
+<x-frontend.checkout-otp-modal />
 
 <script>
     let _activeDraftOrderId = @json($draftOrderId ?? null);
@@ -704,22 +719,78 @@
             }
         });
 
+        const isVerify = @json($isVerify);
         const quickForm = document.getElementById('quick-order-form');
         if (quickForm) {
             quickForm.addEventListener('submit', function (e) {
                 const btn = this.querySelector('button[type="submit"]');
+                const origHtml = btn ? btn.innerHTML : '';
                 const name = this.querySelector('input[name="name"]')?.value;
                 const phone = this.querySelector('input[name="phone"]')?.value;
                 const address = this.querySelector('textarea[name="address"]')?.value;
 
                 if (!name || !phone || !address) return;
 
-                setTimeout(() => {
+                if (isVerify) {
+                    e.preventDefault();
+
                     if (btn) {
                         btn.disabled = true;
                         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
                     }
-                }, 50);
+
+                    const formData = new FormData(this);
+
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                        },
+                        body: formData
+                    })
+                    .then(async res => {
+                        let data = {};
+                        try { data = await res.json(); } catch(err) { data = {}; }
+
+                        if (res.ok && data.success) {
+                            if (data.requires_otp) {
+                                closeQuickOrderModal();
+                                openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
+                                    window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + data.order_id);
+                                });
+                            } else if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            }
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
+                            } else {
+                                alert(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে।');
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Quick Order OTP Error:', err);
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('সার্ভারে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।');
+                        }
+                    })
+                    .finally(() => {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    });
+                } else {
+                    setTimeout(() => {
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                        }
+                    }, 50);
+                }
             });
         }
     });
@@ -728,6 +799,33 @@
         if (e.key === 'Escape') {
             closeQuickOrderModal();
         }
+    });
+
+    // Enforce browser autocomplete / address autofill disable on Quick Order Modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('quick-order-form');
+        if (!form) return;
+
+        form.setAttribute('autocomplete', 'off');
+        const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="submit"]), textarea');
+        inputs.forEach(el => {
+            el.setAttribute('autocomplete', 'off');
+            el.setAttribute('autocorrect', 'off');
+            el.setAttribute('autocapitalize', 'off');
+            el.setAttribute('spellcheck', 'false');
+            el.setAttribute('data-lpignore', 'true');
+            el.setAttribute('data-form-type', 'other');
+
+            const unlock = () => { el.removeAttribute('readonly'); };
+            el.addEventListener('focus', unlock);
+            el.addEventListener('pointerdown', unlock);
+            el.addEventListener('mousedown', unlock);
+            el.addEventListener('touchstart', unlock);
+        });
+
+        form.addEventListener('submit', function() {
+            inputs.forEach(el => el.removeAttribute('readonly'));
+        });
     });
 </script>
 

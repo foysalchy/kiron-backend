@@ -227,6 +227,9 @@ class SiteSettingService
             }
 
             $setting->update($data);
+            if (!empty($setting->company_id)) {
+                \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
+            }
 
             if ($setting->company_id) {
                 $company = Company::find($setting->company_id);

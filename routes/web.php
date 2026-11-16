@@ -147,6 +147,8 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index');
     Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('order.store');
     Route::post('/order/partial-save', [OrderController::class, 'partialSave'])->name('order.partial');
+    Route::post('/order/verify-otp', [OrderController::class, 'verifyOtp'])->name('order.verify.otp');
+    Route::post('/order/resend-otp', [OrderController::class, 'resendOtp'])->name('order.resend.otp');
 
     Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
     Route::get('/thank-you/{id}', [OrderController::class, 'thankyou'])->name('order.thankyou');

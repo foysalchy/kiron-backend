@@ -18,11 +18,21 @@
 @endpush
 
 @section('content')
+@php
+    $isVerify = (bool) ($setup->checkout_sms_verify ?? false);
+@endphp
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
-        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             @csrf
+            {{-- Decoy fields to trap browser address autofill --}}
+            <div style="opacity: 0; position: absolute; top: 0; left: -9999px; height: 0; width: 0; z-index: -1; overflow: hidden;" aria-hidden="true">
+                <input type="text" name="fake_autofill_name" tabindex="-1" autocomplete="name" />
+                <input type="text" name="fake_autofill_address" tabindex="-1" autocomplete="street-address" />
+                <input type="tel" name="fake_autofill_phone" tabindex="-1" autocomplete="tel" />
+                <input type="email" name="fake_autofill_email" tabindex="-1" autocomplete="email" />
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
@@ -104,11 +114,15 @@
                                 <div class="space-y-2">
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
@@ -123,6 +137,8 @@
                                         <div class="space-y-2">
                                             <input type="email" name="email" placeholder="ইমেইল (ঐচ্ছিক)"
                                                 value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                                readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
@@ -131,6 +147,8 @@
                                         <div class="space-y-2">
                                             <input type="text" name="district" placeholder="আপনার শহর / জেলা *" required
                                                 value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                                readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                         </div>
                                     @endif
@@ -138,6 +156,8 @@
                             @endif
                             <div class="space-y-2">
                                 <textarea name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" rows="2" required
+                                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                                    readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                                     class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -364,6 +384,7 @@
         </form> --}}
     </section>
     <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
+    <x-frontend.checkout-otp-modal />
 @endsection
 
 
@@ -736,19 +757,115 @@
                 hidden.appendChild(newInp);
             }
         }
-        document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit',
-            function(e) {
-                const btn = this.querySelector('button[type="submit"]');
+        const isVerify = @json($isVerify);
+        const checkoutForm = document.querySelector('form[action*="order/store"], form[action*="order/confirm"]');
 
-                const name = this.querySelector('input[name="name"]').value;
-                const phone = this.querySelector('input[name="phone"]').value;
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function (e) {
+                const btn = this.querySelector('button[type="submit"]');
+                const origHtml = btn ? btn.innerHTML : '';
+
+                const name = this.querySelector('input[name="name"]')?.value;
+                const phone = this.querySelector('input[name="phone"]')?.value;
+                const address = this.querySelector('textarea[name="address"]')?.value;
+
                 if (!name || !phone) return;
 
-                setTimeout(() => {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-                }, 50);
+                if (isVerify) {
+                    e.preventDefault();
+
+                    if (!address) {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.warning('অনুগ্রহ করে সম্পূর্ণ ঠিকানা লিখুন।');
+                        }
+                        return;
+                    }
+
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                    }
+
+                    const formData = new FormData(this);
+
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                        },
+                        body: formData
+                    })
+                    .then(async res => {
+                        let data = {};
+                        try { data = await res.json(); } catch(err) { data = {}; }
+
+                        if (res.ok && data.success) {
+                            if (data.requires_otp) {
+                                openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
+                                    window.location.href = otpSuccessData.redirect_url || ('/thank-you/' + data.order_id);
+                                });
+                            } else if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            }
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                            } else {
+                                alert(data.message || 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Checkout OTP Error:', err);
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('সার্ভারে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                        }
+                    })
+                    .finally(() => {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    });
+                } else {
+                    setTimeout(() => {
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                        }
+                    }, 50);
+                }
             });
+        }
+
+        // Enforce browser autocomplete / address autofill disable
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action*="order/store"], form[action*="order/confirm"]');
+            if (!form) return;
+
+            form.setAttribute('autocomplete', 'off');
+            const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="submit"]), textarea');
+            inputs.forEach(el => {
+                el.setAttribute('autocomplete', 'off');
+                el.setAttribute('autocorrect', 'off');
+                el.setAttribute('autocapitalize', 'off');
+                el.setAttribute('spellcheck', 'false');
+                el.setAttribute('data-lpignore', 'true');
+                el.setAttribute('data-form-type', 'other');
+
+                const unlock = () => { el.removeAttribute('readonly'); };
+                el.addEventListener('focus', unlock);
+                el.addEventListener('pointerdown', unlock);
+                el.addEventListener('mousedown', unlock);
+                el.addEventListener('touchstart', unlock);
+            });
+
+            form.addEventListener('submit', function() {
+                inputs.forEach(el => el.removeAttribute('readonly'));
+            });
+        });
     </script>
 @endpush
 @push('scripts')

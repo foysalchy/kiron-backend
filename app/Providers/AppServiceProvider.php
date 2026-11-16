@@ -217,6 +217,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AssetDisposalService::class);
         $this->app->bind(SmsTemplateService::class);
         $this->app->bind(SmsSendService::class);
+        $this->app->bind(\App\Services\CheckoutOtpService::class);
         $this->app->bind(EmailTemplateService::class);
         $this->app->bind(EmailSendService::class);
         $this->app->bind(PricingService::class);

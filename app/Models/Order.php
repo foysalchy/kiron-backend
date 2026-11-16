@@ -53,6 +53,9 @@ class Order extends Model
         'courier_info',
         'assigned_to',
         'status',
+        'is_otp_verified',
+        'otp_code',
+        'otp_expires_at',
         'note',
         'hold_ref',
         'return_info',
@@ -79,6 +82,8 @@ class Order extends Model
         'assigned_to' => 'array',
         'source_info' => 'array',
         'pixel_source_info' => 'array',
+        'is_otp_verified' => 'boolean',
+        'otp_expires_at' => 'datetime',
         
 
 
