@@ -513,16 +513,26 @@ class LandingController extends FrontendController
                 }
             }
 
-            $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+            $marketingSource = session('marketing_source') ?? (session('fbclid') ? 'Facebook Ads' : null);
             $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'landing';
 
+            $ua = request()->userAgent();
+            $ip = request()->ip();
+            $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
+            $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
+
             $sourceInfo = [
-                'ip' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-                'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
-                'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
-                'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? request()->fullUrl(),
-                'source' => $marketingSource ?? 'Direct/Organic',
+                'ip'         => $ip,
+                'device'     => $deviceInfo['device'],
+                'platform'   => $deviceInfo['platform'],
+                'browser'    => $deviceInfo['browser'],
+                'network'    => $networkInfo['network'],
+                'isp'        => $networkInfo['isp'],
+                'user_agent' => $ua,
+                'fbp'        => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                'fbc'        => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                'url'        => session('marketing_landing_url') ?? request()->headers->get('referer') ?? request()->fullUrl(),
+                'source'     => $marketingSource ?? 'Direct/Organic',
                 'utm_source' => session('utm_source'),
                 'utm_medium' => session('utm_medium'),
                 'utm_campaign' => session('utm_campaign'),
@@ -683,6 +693,19 @@ class LandingController extends FrontendController
             }
 
             DB::commit();
+
+            session()->forget([
+                'current_landing_draft_order_id',
+                'marketing_source',
+                'utm_source',
+                'utm_medium',
+                'utm_campaign',
+                'utm_content',
+                'fbclid',
+                '_fbc',
+                '_ttp',
+                'marketing_landing_url'
+            ]);
 
             $market = Market::where('company_id', $order->company_id)->first();
             $instantPurchase = !isset($market->instant_purchase_event) || (bool)$market->instant_purchase_event;
