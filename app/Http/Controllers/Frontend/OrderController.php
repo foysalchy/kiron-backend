@@ -369,7 +369,7 @@ class OrderController extends FrontendController
                     $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
 
                     $ua = request()->userAgent();
-                    $ip = request()->ip();
+                    $ip = \App\Helpers\NetworkHelper::getClientIp();
                     $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
                     $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
 
@@ -497,7 +497,7 @@ class OrderController extends FrontendController
                 $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
 
                 $ua = request()->userAgent();
-                $ip = request()->ip();
+                $ip = \App\Helpers\NetworkHelper::getClientIp();
                 $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
                 $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
 

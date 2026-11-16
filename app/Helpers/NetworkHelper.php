@@ -9,6 +9,35 @@ class NetworkHelper
     private static ?Reader $reader = null;
 
     /**
+     * Get real client IP address even when behind Cloudflare, Nginx, or Reverse Proxy.
+     */
+    public static function getClientIp(): string
+    {
+        $candidates = [
+            request()->header('cf-connecting-ip'),
+            request()->server('HTTP_CF_CONNECTING_IP'),
+            request()->header('x-forwarded-for'),
+            request()->server('HTTP_X_FORWARDED_FOR'),
+            request()->header('x-real-ip'),
+            request()->server('HTTP_X_REAL_IP'),
+            request()->ip(),
+        ];
+
+        foreach ($candidates as $ip) {
+            if (!empty($ip) && is_string($ip)) {
+                if (str_contains($ip, ',')) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+
+        return request()->ip() ?? '127.0.0.1';
+    }
+
+    /**
      * Detect Network Type (WiFi vs Mobile Data) and ISP from IP address.
      *
      * @param string|null $ip

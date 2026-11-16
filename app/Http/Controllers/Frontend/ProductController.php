@@ -493,7 +493,7 @@ class ProductController extends FrontendController
                 'company_id'  => getCurrentCompany()->company_id,
                 'product_id'  => $product->id,
                 'customer_id' => auth('customer')->id(),
-                'ip_address'  => request()->ip(),
+                'ip_address'  => \App\Helpers\NetworkHelper::getClientIp(),
                 'user_agent'  => request()->userAgent(),
             ]);
 
