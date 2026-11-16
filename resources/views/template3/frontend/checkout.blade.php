@@ -150,13 +150,13 @@
                                   
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        autocomplete="off"
+                                        autocomplete="new-password"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     
                                     <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর *" required
-                                    autocomplete="off"
+                                    autocomplete="new-password"
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
@@ -188,7 +188,7 @@
                             <div class="space-y-2">
                                
                                 <textarea name="address" placeholder="আপনার পূর্ণাঙ্গ ঠিকানা *" rows="2" required
-                                autocomplete="off"
+                                autocomplete="new-password"
                                     class="w-full px-3 py-2 rounded-lg border border-gray-400 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
