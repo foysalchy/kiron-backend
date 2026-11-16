@@ -717,9 +717,9 @@ class FrontendOrderService
             'assigned_to' => $order->assigned_to, // Raw assigned_to array (user IDs)
             'source_info' => $order->source_info,
             'ip_address' => $order->type !== 'pos' ? ($order->source_info['ip'] ?? $order->pixel_source_info['ip'] ?? null) : null,
-            'device' => is_array($order->source_info) ? ($order->source_info['device'] ?? null) : null,
-            'platform' => is_array($order->source_info) ? ($order->source_info['platform'] ?? null) : null,
-            'browser' => is_array($order->source_info) ? ($order->source_info['browser'] ?? null) : null,
+            'device' => is_array($order->source_info) ? ($order->source_info['device'] ?? (isset($order->source_info['user_agent']) ? \App\Helpers\DeviceHelper::detect($order->source_info['user_agent'])['device'] : null)) : null,
+            'platform' => is_array($order->source_info) ? ($order->source_info['platform'] ?? (isset($order->source_info['user_agent']) ? \App\Helpers\DeviceHelper::detect($order->source_info['user_agent'])['platform'] : null)) : null,
+            'browser' => is_array($order->source_info) ? ($order->source_info['browser'] ?? (isset($order->source_info['user_agent']) ? \App\Helpers\DeviceHelper::detect($order->source_info['user_agent'])['browser'] : null)) : null,
             'network' => is_array($order->source_info) ? ($order->source_info['network'] ?? (isset($order->source_info['ip']) ? \App\Helpers\NetworkHelper::detect($order->source_info['ip'])['network'] : null)) : null,
             'isp' => is_array($order->source_info) ? ($order->source_info['isp'] ?? (isset($order->source_info['ip']) ? \App\Helpers\NetworkHelper::detect($order->source_info['ip'])['isp'] : null)) : null,
 
