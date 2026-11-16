@@ -123,6 +123,59 @@ class SmsWalletService
         }
     }
 
+    // Super admin reverse approved recharge
+    public function reverseRecharge(int $rechargeId, string $reason, int $adminId): SmsRecharge
+    {
+        DB::beginTransaction();
+        try {
+            $recharge = SmsRecharge::withoutGlobalScopes()->findOrFail($rechargeId);
+
+            if ($recharge->status != Status::Approved->value) {
+                throw ApiException::badRequest('Only approved recharge requests can be reversed');
+            }
+
+            $wallet = $this->getOrCreate($recharge->company_id);
+            if ($wallet->sms_count < $recharge->sms_count) {
+                throw ApiException::badRequest("Cannot reverse: Company has already consumed the SMS. Current balance: {$wallet->sms_count}, Recharge was: {$recharge->sms_count}.");
+            }
+
+            $balanceBefore = $wallet->sms_count;
+            $balanceAfter  = $balanceBefore - $recharge->sms_count;
+
+            $wallet->update(['sms_count' => $balanceAfter]);
+
+            $recharge->update([
+                'status'        => Status::Rejected->value,
+                'reject_reason' => $reason,
+                'approved_by'   => $adminId,
+                'approved_at'   => now(),
+            ]);
+
+            SmsWalletTransaction::create([
+                'company_id'     => $recharge->company_id,
+                'sms_wallet_id'  => $wallet->id,
+                'type'           => 'deduct',
+                'sms_count'      => $recharge->sms_count,
+                'rate_per_sms'   => $recharge->rate_per_sms,
+                'reference_type' => SmsRecharge::class,
+                'reference_id'   => $recharge->id,
+                'balance_before' => $balanceBefore,
+                'balance_after'  => $balanceAfter,
+                'note'           => 'Recharge approval reversed: ' . $reason,
+            ]);
+
+            DB::commit();
+            return $recharge;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Recharge reverse failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to reverse recharge');
+        }
+    }
+
     // SMS send এ balance deduct
     public function deductBalance(int $smsCount, int $smsSendId, float $ratePerSms): void
     {

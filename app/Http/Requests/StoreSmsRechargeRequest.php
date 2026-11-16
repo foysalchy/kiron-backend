@@ -17,7 +17,7 @@ class StoreSmsRechargeRequest extends FormRequest
     {
         return [
             'sms_package_id'   => ['required', 'exists:sms_packages,id'],
-            'payment_method'   => ['required', 'in:cash,bank,bkash,nagad'],
+            'payment_method'   => ['required', 'string', 'max:255'],
             'transaction_id'   => ['nullable', 'string', 'max:255'],
             'account_number'   => ['nullable', 'string', 'max:255'],
             'note'             => ['nullable', 'string'],
