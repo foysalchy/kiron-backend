@@ -365,16 +365,26 @@ class OrderController extends FrontendController
                         throw new \Exception('Order not found.');
                     }
 
-                    $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+                    $marketingSource = session('marketing_source') ?? (session('fbclid') ? 'Facebook Ads' : null);
                     $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
 
+                    $ua = request()->userAgent();
+                    $ip = \App\Helpers\NetworkHelper::getClientIp();
+                    $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
+                    $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
+
                     $sourceInfo = [
-                        'ip' => request()->ip(),
-                        'user_agent' => request()->userAgent(),
-                        'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
-                        'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
-                        'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
-                        'source' => $marketingSource ?? 'Direct/Organic',
+                        'ip'         => $ip,
+                        'device'     => $deviceInfo['device'],
+                        'platform'   => $deviceInfo['platform'],
+                        'browser'    => $deviceInfo['browser'],
+                        'network'    => $networkInfo['network'],
+                        'isp'        => $networkInfo['isp'],
+                        'user_agent' => $ua,
+                        'fbp'        => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                        'fbc'        => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                        'url'        => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
+                        'source'     => $marketingSource ?? 'Direct/Organic',
                         'utm_source' => session('utm_source'),
                         'utm_medium' => session('utm_medium'),
                         'utm_campaign' => session('utm_campaign'),
@@ -483,16 +493,26 @@ class OrderController extends FrontendController
                     $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
                     return redirect()->route('order.thankyou', $p);
                 }
-                $marketingSource = session('marketing_source') ?? (($_COOKIE['_fbc'] ?? session('_fbc')) ? 'Facebook Ads' : null);
+                $marketingSource = session('marketing_source') ?? (session('fbclid') ? 'Facebook Ads' : null);
                 $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'website';
 
+                $ua = request()->userAgent();
+                $ip = \App\Helpers\NetworkHelper::getClientIp();
+                $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
+                $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
+
                 $sourceInfo = [
-                    'ip' => request()->ip(),
-                    'user_agent' => request()->userAgent(),
-                    'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
-                    'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
-                    'url' => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
-                    'source' => $marketingSource ?? 'Direct/Organic',
+                    'ip'         => $ip,
+                    'device'     => $deviceInfo['device'],
+                    'platform'   => $deviceInfo['platform'],
+                    'browser'    => $deviceInfo['browser'],
+                    'network'    => $networkInfo['network'],
+                    'isp'        => $networkInfo['isp'],
+                    'user_agent' => $ua,
+                    'fbp'        => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                    'fbc'        => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc'),
+                    'url'        => session('marketing_landing_url') ?? request()->headers->get('referer') ?? config('app.url'),
+                    'source'     => $marketingSource ?? 'Direct/Organic',
                     'utm_source' => session('utm_source'),
                     'utm_medium' => session('utm_medium'),
                     'utm_campaign' => session('utm_campaign'),
@@ -605,7 +625,19 @@ class OrderController extends FrontendController
                 DB::commit();
 
                 Cart::destroy();
-                Session::forget(['coupon', 'current_draft_order_id']);
+                Session::forget([
+                    'coupon',
+                    'current_draft_order_id',
+                    'marketing_source',
+                    'utm_source',
+                    'utm_medium',
+                    'utm_campaign',
+                    'utm_content',
+                    'fbclid',
+                    '_fbc',
+                    '_ttp',
+                    'marketing_landing_url'
+                ]);
 
                 Log::info('Order confirmed', ['order_id' => $order->id, 'status' => $order->status]);
 
@@ -711,7 +743,19 @@ class OrderController extends FrontendController
             }
 
             \Cart::destroy();
-            Session::forget(['coupon', 'current_draft_order_id']);
+            Session::forget([
+                'coupon',
+                'current_draft_order_id',
+                'marketing_source',
+                'utm_source',
+                'utm_medium',
+                'utm_campaign',
+                'utm_content',
+                'fbclid',
+                '_fbc',
+                '_ttp',
+                'marketing_landing_url'
+            ]);
         }
 
         $previewTheme = request('preview_theme');

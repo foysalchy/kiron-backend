@@ -120,25 +120,25 @@ class CheckoutOtpService
         $otp = (string) random_int(1000, 9999);
         $expiresAt = now()->addMinutes(5);
 
-        // 3. Mark as unverified and set note: 'Checkout done but not verify'
+        // 3. Mark as unverified and set note: 'Unverified'
         $order->update([
             'is_otp_verified' => false,
             'otp_code'        => $otp,
             'otp_expires_at'  => $expiresAt,
-            'note'            => 'Checkout done but not verify',
+            'note'            => 'Unverified',
         ]);
 
         // Add or update system OrderNote
         $existingNote = OrderNote::withoutGlobalScopes()
             ->where('order_id', $order->id)
-            ->where('note', 'Checkout done but not verify')
+            ->whereIn('note', ['Checkout done but not verify', 'Unverified'])
             ->first();
 
         if (!$existingNote) {
             OrderNote::create([
                 'company_id' => $companyId,
                 'order_id'   => $order->id,
-                'note'       => 'Checkout done but not verify',
+                'note'       => 'Unverified',
                 'type'       => 'system',
                 'status'     => 1,
             ]);
@@ -215,13 +215,20 @@ class CheckoutOtpService
                 'is_otp_verified' => true,
                 'otp_code'        => null,
                 'otp_expires_at'  => null,
+                'note'            => 'Verified',
                 'status'          => Status::Pending->value,
             ]);
+
+            // Remove or resolve any previous unverified notes for this order
+            OrderNote::withoutGlobalScopes()
+                ->where('order_id', $order->id)
+                ->whereIn('note', ['Checkout done but not verify', 'Unverified'])
+                ->delete();
 
             OrderNote::create([
                 'company_id' => $order->company_id,
                 'order_id'   => $order->id,
-                'note'       => 'OTP verified successfully (' . $otp . ')',
+                'note'       => 'OTP Verified (' . $otp . ')',
                 'type'       => 'system',
                 'status'     => 1,
             ]);

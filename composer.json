@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "geoip2/geoip2": "^3.4",
         "hardevine/shoppingcart": "^3.4",
         "intervention/image": "^4.3",
         "laravel/framework": "^12.0",

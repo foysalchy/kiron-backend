@@ -210,16 +210,19 @@
             verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ভেরিফাই হচ্ছে...';
         }
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+
         fetch('{{ route("order.verify.otp") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({
                 order_id: orderId,
-                otp: otpCode
+                otp: otpCode,
+                _token: csrfToken
             })
         })
         .then(async (res) => {
@@ -273,14 +276,19 @@
             resendBtn.innerText = 'কোড পাঠানো হচ্ছে...';
         }
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+
         fetch('{{ route("order.resend.otp") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ order_id: orderId })
+            body: JSON.stringify({
+                order_id: orderId,
+                _token: csrfToken
+            })
         })
         .then(async (res) => {
             let data = {};
