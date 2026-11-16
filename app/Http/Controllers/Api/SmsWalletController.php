@@ -49,10 +49,36 @@ class SmsWalletController extends Controller
     }
 
     // Transaction history
-    public function transactions(): JsonResponse
+    public function transactions(Request $request): JsonResponse
     {
-        $transactions = SmsWalletTransaction::latest()
-            ->get();
-        return ResponseHelper::success($transactions);
+        $perPage = (int) $request->query('per_page', 15);
+        $paginated = SmsWalletTransaction::with('reference')
+            ->latest()
+            ->paginate($perPage);
+
+        $paginated->getCollection()->transform(function ($t) {
+            $recipient = null;
+            $recipientName = null;
+
+            if ($t->reference instanceof \App\Models\Order) {
+                $order = $t->reference;
+                $recipient = $order->shipping_address['phone'] ?? $order->customer?->phone ?? null;
+                $recipientName = $order->shipping_address['name'] ?? $order->customer?->name ?? null;
+            } elseif ($t->reference instanceof \App\Models\SmsSend) {
+                $smsSend = $t->reference;
+                $customNumbers = $smsSend->custom_numbers ?? [];
+                if (!empty($customNumbers)) {
+                    $count = count($customNumbers);
+                    $recipient = implode(', ', array_slice($customNumbers, 0, 2)) . ($count > 2 ? " (+{$count} more)" : "");
+                }
+            }
+
+            $t->recipient = $recipient;
+            $t->recipient_name = $recipientName;
+
+            return $t;
+        });
+
+        return ResponseHelper::success($paginated);
     }
 }

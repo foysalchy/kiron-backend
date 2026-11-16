@@ -2029,6 +2029,7 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('/sms-packages', SmsPackageController::class);
             Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);
             Route::post('/sms-recharges/{id}/process', [SmsRechargeController::class, 'process']);
+            Route::post('/sms-recharges/{id}/reverse', [SmsRechargeController::class, 'reverse']);
 
             Route::middleware(['super_admin'])->group(function () {
                 Route::prefix('super-admin')->group(function () {
