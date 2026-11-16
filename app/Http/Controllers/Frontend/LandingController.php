@@ -517,7 +517,7 @@ class LandingController extends FrontendController
             $finalSource = $marketingSource ? (str_contains(strtolower($marketingSource), 'facebook') ? 'facebook' : strtolower($marketingSource)) : 'landing';
 
             $ua = request()->userAgent();
-            $ip = request()->ip();
+            $ip = \App\Helpers\NetworkHelper::getClientIp();
             $deviceInfo = \App\Helpers\DeviceHelper::detect($ua);
             $networkInfo = \App\Helpers\NetworkHelper::detect($ip);
 
