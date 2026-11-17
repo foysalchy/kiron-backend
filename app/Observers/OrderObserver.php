@@ -47,21 +47,28 @@ class OrderObserver
             $firstName = $nameParts[0] ?? '';
             $lastName = count($nameParts) > 1 ? end($nameParts) : $firstName;
 
-            // Format phone to international (assumes BD numbers mostly, add 88 if missing)
-            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+            // Format phone to international E.164 (BD standard 8801XXXXXXXXX)
+            $cleanPhone = preg_replace('/[^0-9]/', '', (string)$phone);
             if (strlen($cleanPhone) == 11 && str_starts_with($cleanPhone, '01')) {
                 $cleanPhone = '88' . $cleanPhone;
+            } elseif (strlen($cleanPhone) == 10 && str_starts_with($cleanPhone, '1')) {
+                $cleanPhone = '880' . $cleanPhone;
             }
 
-            // Hash user data
-            $hashedEmail = $email ? hash('sha256', strtolower(trim($email))) : null;
-            $hashedPhone = $cleanPhone ? hash('sha256', $cleanPhone) : null;
-            $hashedFn = $firstName ? hash('sha256', $cleanStr($firstName)) : null;
-            $hashedLn = $lastName ? hash('sha256', $cleanStr($lastName)) : null;
-            $hashedCt = $city ? hash('sha256', $cleanStr($city)) : null;
-            $hashedSt = $state ? hash('sha256', $cleanStr($state)) : null;
-            $hashedZip = $zip ? hash('sha256', $cleanStr($zip)) : null;
-            $hashedCountry = hash('sha256', $country);
+            // Hash user data per Meta Conversions API specifications
+            $hashedEmail = (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) ? hash('sha256', strtolower(trim($email))) : null;
+            $hashedPhone = (!empty($cleanPhone) && strlen($cleanPhone) >= 10) ? hash('sha256', $cleanPhone) : null;
+            $cleanFn = $cleanStr($firstName);
+            $cleanLn = $cleanStr($lastName);
+            $hashedFn = !empty($cleanFn) ? hash('sha256', $cleanFn) : null;
+            $hashedLn = !empty($cleanLn) ? hash('sha256', $cleanLn) : null;
+            $cleanCt = $cleanStr($city);
+            $cleanSt = $cleanStr($state);
+            $cleanZp = $cleanStr($zip);
+            $hashedCt = !empty($cleanCt) ? hash('sha256', $cleanCt) : null;
+            $hashedSt = !empty($cleanSt) ? hash('sha256', $cleanSt) : null;
+            $hashedZip = !empty($cleanZp) ? hash('sha256', $cleanZp) : null;
+            $hashedCountry = hash('sha256', $country ?: 'bd');
 
             // Laravel EncryptCookies middleware strips _fbp and _fbc, so read them natively
             $fbp = $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? session('_fbp') ?? null;

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dorja.io | Bangladesh's Best Commerce Operating System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Hind Siliguri"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            teal: '#13565e',
+                            tealLight: '#078e9a',
+                            mint: '#eaf8f5',
+                            mintBorder: '#bfe7df',
+                        },
+                        fiesta: {
+                            bg: '#fcfdfd',
+                            subtle: '#f4f7f6',
+                            card: '#ffffff',
+                            border: '#e6ecea',
+                            heading: '#0f172a',
+                            text: '#475569',
+                            muted: '#64748b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fcfdfd;
+            color: #475569;
+            overflow-x: hidden;
+        }
+
+        /* 1. AI FIESTA AURA GRADIENT CONTAINER (Green/Teal to Mint Glow) */
+        .fiesta-aura-box {
+            background: linear-gradient(135deg, #a7f3d0 0%, #99f6e4 30%, #a5f3fc 70%, #c7d2fe 100%);
+            border-radius: 28px;
+            padding: 14px;
+            box-shadow: 0 20px 45px -10px rgba(16, 185, 129, 0.18);
+        }
+
+        /* 2. PILL BADGES */
+        .fiesta-tag {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 3. SECTION WRAPPER WITH SUBTLE PADDING & BORDERS */
+        .fiesta-section {
+            padding-top: 5rem;
+            padding-bottom: 5rem;
+            border-bottom: 1px solid #edf2f0;
+        }
+
+        /* 4. CLEAN ROUNDED CARD */
+        .fiesta-box {
+            background: #ffffff;
+            border: 1px solid #e6ecea;
+            border-radius: 20px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fiesta-box:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* 5. BLACK PILL BUTTON */
+        .btn-black-pill {
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-black-pill:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.3);
+        }
+
+        /* Giant Watermark Text in Footer */
+        .giant-watermark {
+            font-size: clamp(4rem, 15vw, 11rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: #e2e8f0;
+            line-height: 0.85;
+            user-select: none;
+            background: linear-gradient(180deg, #cbd5e1 0%, #f1f5f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-fiesta-text">
+
+    <!-- FLOATING TOP NAVBAR -->
+    <header class="fixed top-0 inset-x-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+            <nav class="bg-white/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center justify-between border border-slate-200/90 shadow-sm">
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-2.5">
+                    <img src="/images/saas/dorja-logo.webp" alt="Dorja Logo" class="h-7 w-auto object-contain" onerror="this.onerror=null; this.src='/images/logo.png'">
+                    <span class="text-lg font-extrabold tracking-tight text-slate-900">
+                        Dorja<span class="text-brand-tealLight">.io</span>
+                    </span>
+                </a>
+
+                <!-- Nav Links -->
+                <div class="hidden md:flex items-center gap-7 text-xs font-semibold text-slate-600">
+                    <a href="#work-smarter" class="hover:text-slate-900 transition-colors">Work Smarter</a>
+                    <a href="#features" class="hover:text-slate-900 transition-colors">Features</a>
+                    <a href="#compare" class="hover:text-slate-900 transition-colors">Compare Cost</a>
+                    <a href="#pricing" class="hover:text-slate-900 transition-colors">Pricing</a>
+                    <a href="#faq" class="hover:text-slate-900 transition-colors">FAQ</a>
+                </div>
+
+                <!-- CTA -->
+                <div class="flex items-center gap-3">
+                    <a href="https://app.dorja.io" target="_blank" class="text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-1.5">
+                        Sign In
+                    </a>
+                    <a href="#pricing" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-full inline-flex items-center gap-1.5 transition-all">
+                        <span>Get Started</span>
+                        <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 1. HERO SECTION (EXACT AI FIESTA HERO MATCH) -->
+    <section class="pt-32 pb-16 md:pt-40 md:pb-20 text-center">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            
+            <!-- Top Tag Pill -->
+            <div class="inline-flex items-center gap-2 fiesta-tag mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Bangladesh's Best Commerce Operating System</span>
+            </div>
+
+            <!-- Giant Bold Headline (AI Fiesta font weight & hierarchy) -->
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.12] mb-5">
+                Every Business Tool & Automation. <br class="hidden sm:inline">
+                One Single Subscription.
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
+                Run your complete E-Commerce, Landing Pages, POS, Automated Courier Dispatch, Multi-Warehouse Stocks, and Accounting on Dorja.
+            </p>
+
+            <!-- Black Pill CTA & Avatars Social Proof -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                <a href="#pricing" class="btn-black-pill shadow-lg">
+                    <span>Start 15-Day Free Trial</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+                <!-- Mini Social Proof Avatar Pill -->
+                <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-sm">
+                    <div class="flex -space-x-2">
+                        <img class="w-6 h-6 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&q=80" alt="Merchant">
+                        <img class="w-6 h-6 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&q=80" alt="Merchant">
+                        <img class="w-6 h-6 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&q=80" alt="Merchant">
+                    </div>
+                    <span>Trusted by <strong>1,200+</strong> scaling merchants</span>
+                </div>
+            </div>
+
+            <!-- HERO FIESTA AURA CONTAINER (Gradinet Border Frame with Inner UI) -->
+            <div class="fiesta-aura-box max-w-4xl mx-auto text-left">
+                <!-- Floating Model / Module Pill Selector Top -->
+                <div class="flex items-center justify-center gap-2 mb-3.5 flex-wrap">
+                    <div class="px-3 py-1 rounded-full bg-white/95 text-[11px] font-bold text-slate-800 shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-store text-emerald-600"></i> Landing & Ecom
+                    </div>
+                    <div class="px-3 py-1 rounded-full bg-white/70 text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-cash-register text-teal-600"></i> POS
+                    </div>
+                    <div class="px-3 py-1 rounded-full bg-white/70 text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-truck-fast text-indigo-600"></i> Courier Auto
+                    </div>
+                    <div class="px-3 py-1 rounded-full bg-white/70 text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-rose-500"></i> Fraud AI
+                    </div>
+                    <div class="px-3 py-1 rounded-full bg-white/70 text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-calculator text-cyan-600"></i> P&L Ledger
+                    </div>
+                </div>
+
+                <!-- Inner Clean White Board Card -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        
+                        <!-- Left Explanation Prompt -->
+                        <div class="md:col-span-5 space-y-4">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md">
+                                Multi-Channel Command
+                            </span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
+                                Turn Clicks into Completed Orders
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                                Single product landing page connected directly to Steadfast, Pathao, and stock ledger. Zero manual entries.
+                            </p>
+                            <a href="#pricing" class="inline-flex items-center gap-2 text-xs font-bold text-slate-900 hover:text-emerald-700 transition-colors">
+                                <span>Try Interactive Sandbox</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </a>
+                        </div>
+
+                        <!-- Right Clean Fake UI Window Mockup (Like AI Fiesta Prompts) -->
+                        <div class="md:col-span-7 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-200 text-xs">
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Checkout Queue
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-500">Auto Dispatched</span>
+                            </div>
+                            
+                            <!-- Prompt-like Card 1 -->
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-slate-800">
+                                    <span>#ORD-9842 · Wireless Earbuds Pro</span>
+                                    <span class="text-emerald-600 font-bold">৳ ১,৮৫০</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-truck-fast text-indigo-500"></i> Steadfast Consignment Generated: #ST-99120
+                                </div>
+                            </div>
+
+                            <!-- Prompt-like Card 2 -->
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-slate-800">
+                                    <span>#REC-312 · Incomplete Checkout</span>
+                                    <span class="text-amber-600 font-bold">SMS Sent</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-clock-rotate-left text-amber-500"></i> Auto 10% voucher recovered customer in 2 mins
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 2. PARTNERS LOGO CLOUD (AI FIESTA STYLE) -->
+    <section class="py-10 border-b border-slate-100 bg-white">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">
+                Integrated with the country's leading ecosystem
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all duration-300">
+                <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-solid fa-wallet text-rose-500"></i> bKash Merchant</span>
+                <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-solid fa-credit-card text-amber-500"></i> Nagad Pay</span>
+                <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-solid fa-truck text-indigo-500"></i> Steadfast Courier</span>
+                <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-solid fa-motorcycle text-red-500"></i> Pathao Parcel</span>
+                <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-brands fa-wordpress text-blue-500"></i> WooCommerce Sync</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. "100+ Leading AI Models" EQUIVALENT: "30+ Native Features. All Right Here." (TAGS GRID) -->
+    <section class="fiesta-section text-center bg-white" id="features">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-3">
+                30+ Native Business Modules. All Right Here.
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mb-10 max-w-xl mx-auto">
+                No third-party plugins or costly extensions required. Everything works seamlessly out of the box.
+            </p>
+
+            <!-- Tag Cloud Pills Grid (Exact AI Fiesta Model Grid Replica) -->
+            <div class="flex flex-wrap items-center justify-center gap-2.5 max-w-4xl mx-auto">
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-cart-shopping text-emerald-600"></i> Landing Page Builder</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-cash-register text-teal-600"></i> Retail POS Billing</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-shield-halved text-rose-500"></i> Fraud Customer Detection</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-rotate-left text-amber-500"></i> Incomplete Order Recovery</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-boxes-stacked text-indigo-500"></i> Multi-Warehouse Stocks</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-truck-fast text-blue-500"></i> Automated Courier Dispatch</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-chart-line text-emerald-600"></i> Real-time Profit & Loss</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-barcode text-slate-700"></i> Barcode & Thermal Print</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-tags text-purple-500"></i> Coupons & Discounts</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-users text-cyan-600"></i> Customer CRM & VIP Tier</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-globe text-teal-600"></i> Custom Domain with SSL</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Return Order Tracker</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-envelope text-indigo-500"></i> SMS & Email Marketing</span>
+                <span class="fiesta-tag hover:border-slate-400 transition-colors"><i class="fa-solid fa-user-tie text-slate-700"></i> Staff Roles & Permissions</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. "10x the output. Without 10 different tools." (AI FIESTA TABBED FEATURE CARD) -->
+    <section class="fiesta-section bg-fiesta-subtle">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-3">
+                    10x Your Sales. Without 10 Different Tools.
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
+                    Centralize operations, slash human error, and automate shipping fulfillment in clicks.
+                </p>
+            </div>
+
+            <!-- Card with left list and right interactive card (Exact AI Fiesta layout) -->
+            <div class="fiesta-box p-6 sm:p-8 bg-white max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Left Selectable List -->
+                    <div class="md:col-span-5 space-y-4">
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
+                            <h4 class="font-bold text-slate-900 text-sm mb-1 flex items-center justify-between">
+                                <span>1-Click Order Fulfillment</span>
+                                <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
+                            </h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Instantly verify order, check fraud risk score, and push consignment to courier with automatic tracking SMS.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 cursor-pointer text-xs font-semibold text-slate-700 flex items-center justify-between">
+                            <span>Auto Lost Cart Recovery</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                        </div>
+                        <div class="p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 cursor-pointer text-xs font-semibold text-slate-700 flex items-center justify-between">
+                            <span>Real-Time Profit Calculator</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Fake Interactive Panel (Minimalist White Frame with pill) -->
+                    <div class="md:col-span-7 bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-4">
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm space-y-3">
+                            <div class="text-xs font-bold text-slate-800">Dispatch Order #ORD-8419</div>
+                            <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-100 text-xs">
+                                <span class="text-slate-600">Customer Risk:</span>
+                                <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[11px]">Safe (98% Delivery History)</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-100 text-xs">
+                                <span class="text-slate-600">Assigned Partner:</span>
+                                <span class="font-bold text-indigo-700">Steadfast (Auto-Selected Best Rate)</span>
+                            </div>
+                            <button class="w-full bg-slate-900 text-white font-bold py-2 rounded-lg text-xs hover:bg-slate-800 transition-colors">
+                                Confirm & Print Airway Bill
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. "EVERYTHING YOU NEED TO WORK SMARTER" (EXACT AI FIESTA SECTION IN SCREENSHOT) -->
+    <section class="fiesta-section bg-white" id="work-smarter">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            
+            <div class="text-center mb-14">
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2">
+                    Everything you need to work smarter
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500">
+                    Features built to save you time and improve your business output by 10x
+                </p>
+            </div>
+
+            <!-- Exact Grid Layout from User's Screenshot: 2 Top Wide Cards, 3 Bottom Cards -->
+            <div class="space-y-6 max-w-4xl mx-auto">
+                
+                <!-- TOP ROW: 2 CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Card 1: Auto Mode -->
+                    <div class="fiesta-box p-6 flex flex-col justify-between">
+                        <!-- Top Fake UI Pill / Toggle (Matching screenshot) -->
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-5">
+                            <div class="flex items-center justify-between text-xs mb-2">
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bolt text-amber-500"></i> Auto Dispatch Mode
+                                </span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Active</span>
+                            </div>
+                            <div class="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200 flex justify-between">
+                                <span>Steadfast & Pathao Router</span>
+                                <span class="text-emerald-600 font-semibold">Fastest Delivery</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-1.5">Auto Mode</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Automatically routes each customer order to the courier partner best suited to deliver it safely, removing the guesswork.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Consensus (Fraud Guard) -->
+                    <div class="fiesta-box p-6 flex flex-col justify-between">
+                        <!-- Top Fake UI Score Matrix (Matching screenshot) -->
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-5">
+                            <div class="flex items-center justify-between text-xs mb-2">
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-shield-halved text-emerald-600"></i> Risk Assessment
+                                </span>
+                                <span class="text-[11px] font-bold text-slate-700">Consensus: Safe</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                                <div class="bg-white p-1.5 rounded border border-slate-200"><span class="text-emerald-600 font-bold">96%</span> Delivery</div>
+                                <div class="bg-white p-1.5 rounded border border-slate-200"><span class="text-slate-700 font-bold">0</span> Fake RTO</div>
+                                <div class="bg-white p-1.5 rounded border border-slate-200"><span class="text-emerald-600 font-bold">Verified</span> Phone</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-1.5">Consensus</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Generates a unified trust score based on courier databases and cancellation records to eliminate courier return losses.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BOTTOM ROW: 3 CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Card 3: Prompt Enhancer (Recovery Boost) -->
+                    <div class="fiesta-box p-5 flex flex-col justify-between">
+                        <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 mb-4 text-[11px] flex items-center justify-between">
+                            <span class="text-slate-600">Abandoned Cart Follow-up</span>
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">Boost Active</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Prompt Enhancer (Boost)</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Turns dropped checkouts into confirmed buyers by firing automated discount triggers with a single click.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Library -->
+                    <div class="fiesta-box p-5 flex flex-col justify-between">
+                        <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 mb-4 text-[11px] flex items-center justify-between">
+                            <span class="text-slate-600"><i class="fa-solid fa-folder text-indigo-500 mr-1"></i> Multi-Warehouse Hub</span>
+                            <span class="text-slate-500 font-mono">1,480 SKUs</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Library</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Automatically saves and organizes every barcode, SKU, invoice, and supplier ledger in a single searchable space.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Experts (P&L Ledger) -->
+                    <div class="fiesta-box p-5 flex flex-col justify-between">
+                        <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 mb-4 text-[11px] flex items-center justify-between">
+                            <span class="text-slate-600"><i class="fa-solid fa-user-tie text-teal-600 mr-1"></i> Real-time Net Profit</span>
+                            <span class="text-emerald-600 font-bold">32.8% Margin</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Experts</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Specialist automated analytics that track ad spend, product cost, and shipping fees to keep profit margins healthy.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 6. COST COMPARISON (SAVE 80%) -->
+    <section class="fiesta-section bg-fiesta-subtle" id="compare">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2">
+                    Save Over 80% on Software Costs
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500">
+                    Why pay multiple monthly bills when Dorja gives you everything under one roof?
+                </p>
+            </div>
+
+            <!-- Comparison Table Container -->
+            <div class="fiesta-box overflow-hidden bg-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    
+                    <!-- Left: Separate Apps -->
+                    <div class="p-6 sm:p-8 bg-rose-50/20 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-rose-100">
+                            <span class="font-bold text-rose-950 text-sm">Buying Separate SaaS</span>
+                            <span class="text-[11px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">High Monthly Burn</span>
+                        </div>
+                        <div class="space-y-3 text-xs text-slate-600">
+                            <div class="flex justify-between"><span>Shopify / Funnel Builder:</span> <span class="font-bold text-slate-800">৳ ৩,০০০/mo</span></div>
+                            <div class="flex justify-between"><span>POS & Inventory:</span> <span class="font-bold text-slate-800">৳ ২,৫০০/mo</span></div>
+                            <div class="flex justify-between"><span>Courier Automation:</span> <span class="font-bold text-slate-800">৳ ১,৫০০/mo</span></div>
+                            <div class="flex justify-between"><span>Accounting Ledger:</span> <span class="font-bold text-slate-800">৳ ২,৫০০/mo</span></div>
+                            <div class="flex justify-between"><span>HRM & Payroll:</span> <span class="font-bold text-slate-800">৳ ২,৫০০/mo</span></div>
+                        </div>
+                        <div class="pt-3 border-t border-rose-100 flex justify-between items-center text-xs font-bold text-rose-800">
+                            <span>TOTAL MONTHLY EXPENSE:</span>
+                            <span class="text-lg line-through text-rose-600">৳ ১২,০০০+</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Dorja -->
+                    <div class="p-6 sm:p-8 bg-emerald-50/20 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-emerald-100">
+                            <span class="font-bold text-teal-950 text-sm">Dorja.io Unified OS</span>
+                            <span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">All Included</span>
+                        </div>
+                        <div class="space-y-2.5 text-xs text-slate-700 font-medium">
+                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> All 30+ native modules in one login</div>
+                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Real-time inventory sync without API errors</div>
+                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 1-click automated courier shipping</div>
+                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 0% sales commission fees</div>
+                        </div>
+                        <div class="pt-3 border-t border-emerald-200 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] text-slate-500 uppercase font-bold block">Starts at only:</span>
+                                <span class="text-xl font-black text-brand-teal">৳ ৪৯৯</span> <span class="text-xs text-slate-500">/ mo</span>
+                            </div>
+                            <a href="#pricing" class="btn-black-pill text-xs !py-2 !px-4">
+                                Choose Plan &rarr;
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. PRICING SECTION -->
+    <section class="fiesta-section bg-white" id="pricing">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-14">
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2">
+                    Simple, Transparent Pricing
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500">
+                    Every tier includes full 15-day free access. No credit card required.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 items-stretch">
+                <!-- Starter -->
+                <div class="fiesta-box p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm mb-1">Starter</div>
+                        <div class="text-2xl font-extrabold text-slate-900 mb-4">৳ ৪৯৯ <span class="text-xs font-normal text-slate-400">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 300 Orders / mo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 50 Products</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 10 Staff Users</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> POS & Landing Page</li>
+                        </ul>
+                    </div>
+                    <a href="https://app.dorja.io/register" class="w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs text-center transition-colors">
+                        Start Trial
+                    </a>
+                </div>
+
+                <!-- Growth (POPULAR) -->
+                <div class="fiesta-box p-5 flex flex-col justify-between border-2 border-brand-teal relative shadow-md">
+                    <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-brand-teal text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">Popular</span>
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm mb-1">Growth</div>
+                        <div class="text-2xl font-extrabold text-brand-teal mb-4">৳ ৯৯৯ <span class="text-xs font-normal text-slate-400">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-700 font-medium mb-6">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 700 Orders / mo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 100 Products</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 15 Staff Users</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Custom Domain with SSL</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Courier Integration</li>
+                        </ul>
+                    </div>
+                    <a href="https://app.dorja.io/register" class="btn-black-pill w-full !py-2 text-xs !justify-center">
+                        Start Trial
+                    </a>
+                </div>
+
+                <!-- Business -->
+                <div class="fiesta-box p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm mb-1">Business</div>
+                        <div class="text-2xl font-extrabold text-slate-900 mb-4">৳ ১,৯৯৯ <span class="text-xs font-normal text-slate-400">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 1,600 Orders / mo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 160 Products</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 20 Staff Users</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Multi-Warehouse</li>
+                        </ul>
+                    </div>
+                    <a href="https://app.dorja.io/register" class="w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs text-center transition-colors">
+                        Start Trial
+                    </a>
+                </div>
+
+                <!-- Enterprise -->
+                <div class="fiesta-box p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm mb-1">Enterprise</div>
+                        <div class="text-2xl font-extrabold text-slate-900 mb-4">৳ ২,৯৯৯ <span class="text-xs font-normal text-slate-400">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-600 mb-6">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 2,500+ Orders</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 2,000 Products</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 30 Staff Users</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Dedicated Manager</li>
+                        </ul>
+                    </div>
+                    <a href="https://app.dorja.io/register" class="w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs text-center transition-colors">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. FAQ SECTION (EXACT 2-COLUMN AI FIESTA FAQ IN SCREENSHOT) -->
+    <section class="fiesta-section bg-fiesta-subtle" id="faq">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
+                <!-- Left Title Column (Matching screenshot) -->
+                <div class="md:col-span-4 space-y-4">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+                        Got questions <br>about Dorja?
+                    </h2>
+                    <p class="text-xs text-slate-500">
+                        Everything you need to know about setup, couriers, and pricing.
+                    </p>
+                    <div class="pt-4 border-t border-slate-200 text-xs text-slate-600 space-y-1">
+                        <p class="font-bold text-slate-800">Need direct human help?</p>
+                        <p>Call Hotline: <strong>01864411645</strong></p>
+                        <p>Email: <strong>info@dorja.io</strong></p>
+                    </div>
+                </div>
+
+                <!-- Right Accordion Column -->
+                <div class="md:col-span-8 space-y-3">
+                    
+                    <div class="fiesta-box p-4 bg-white">
+                        <button class="w-full flex justify-between items-center text-left text-xs font-bold text-slate-900" onclick="toggleFaqClean(1)">
+                            <span>Can I accept multiple payment methods for a single order?</span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]" id="fc-icon-1"></i>
+                        </button>
+                        <div class="mt-2 text-xs text-slate-500 leading-relaxed" id="fc-ans-1">
+                            Yes. Dorja supports COD, bKash, Nagad, Card, and Bank Transfer. You can even split a single checkout transaction across multiple channels.
+                        </div>
+                    </div>
+
+                    <div class="fiesta-box p-4 bg-white">
+                        <button class="w-full flex justify-between items-center text-left text-xs font-bold text-slate-900" onclick="toggleFaqClean(2)">
+                            <span>How does the Fraud Customer Detection work?</span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]" id="fc-icon-2"></i>
+                        </button>
+                        <div class="mt-2 text-xs text-slate-500 leading-relaxed" id="fc-ans-2">
+                            When an order is placed, Dorja automatically scans the customer's historical delivery success rates, cancellations, and return ratios to calculate an instant risk indicator.
+                        </div>
+                    </div>
+
+                    <div class="fiesta-box p-4 bg-white">
+                        <button class="w-full flex justify-between items-center text-left text-xs font-bold text-slate-900" onclick="toggleFaqClean(3)">
+                            <span>Can I link my custom domain with free SSL?</span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]" id="fc-icon-3"></i>
+                        </button>
+                        <div class="mt-2 text-xs text-slate-500 leading-relaxed" id="fc-ans-3">
+                            Yes! Starting with the Growth plan, you can connect your existing domain (e.g. yourshop.com) with automatic free SSL security certificates.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. DARK BANNER CTA (EXACT MATCH WITH BOTTOM BANNER IN SCREENSHOT) -->
+    <section class="py-16 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="rounded-2xl p-8 sm:p-10 bg-slate-900 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2 max-w-md">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                        Enterprise Grade
+                    </span>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold leading-snug">
+                        Bring every business tool to your team.
+                    </h3>
+                    <p class="text-xs text-slate-400">
+                        Setup takes less than 3 minutes. No credit card required.
+                    </p>
+                </div>
+                <div>
+                    <a href="https://app.dorja.io/register" class="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs px-6 py-3 rounded-full inline-flex items-center gap-2 shadow-lg transition-colors">
+                        <span>Get Started Free</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. GIANT WATERMARK BRANDING & MINIMAL FOOTER (EXACT MATCH WITH SCREENSHOT FOOTER) -->
+    <footer class="pt-10 pb-14 bg-white border-t border-slate-100 text-center relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4">
+            
+            <!-- Switcher Pill in Footer (Matching screenshot) -->
+            <div class="inline-flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 mb-10">
+                <span class="px-3 py-1 rounded-full bg-white text-slate-900 shadow-xs">Dorja Core</span>
+                <span class="px-3 py-1 rounded-full text-slate-500 hover:text-slate-900 cursor-pointer">Partner Portal</span>
+            </div>
+
+            <!-- GIANT "Dorja.io" WATERMARK LOGO (Exact AI Fiesta typography style) -->
+            <div class="giant-watermark mb-10">
+                Dorja.io
+            </div>
+
+            <!-- Sub Links & Copyright -->
+            <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-medium mb-4">
+                <a href="#work-smarter" class="hover:text-slate-700">Features</a>
+                <a href="#compare" class="hover:text-slate-700">Cost Compare</a>
+                <a href="#pricing" class="hover:text-slate-700">Pricing</a>
+                <a href="/blog" class="hover:text-slate-700">Blog</a>
+                <a href="/contact" class="hover:text-slate-700">Contact</a>
+                <a href="#" class="hover:text-slate-700">Privacy Policy</a>
+                <a href="#" class="hover:text-slate-700">Terms of Service</a>
+            </div>
+            <p class="text-[11px] text-slate-400">&copy; 2026 Dorja.io. Business Made Simple.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE ACCORDION SCRIPT -->
+    <script>
+        function toggleFaqClean(id) {
+            const ans = document.getElementById('fc-ans-' + id);
+            const icon = document.getElementById('fc-icon-' + id);
+            if (ans.style.display === 'none') {
+                ans.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                ans.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html>
