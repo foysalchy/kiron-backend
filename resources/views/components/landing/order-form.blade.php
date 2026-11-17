@@ -505,17 +505,7 @@
                         </div>
                     </div>
 
-                    <button type="{{ $isPreviewMode ? 'button' : 'submit' }}"
-                        id="submit-order-btn"
-                        {{ $isEntirelyOutOfStock ? 'disabled' : '' }}
-                        @if($isPreviewMode) onclick="showPreviewAlert()" @endif
-                        class="w-full {{ $isEntirelyOutOfStock ? 'bg-gray-400 cursor-not-allowed opacity-75' : 'bg-[#1f8a54] hover:bg-[#176840] cursor-pointer' }} text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2">
-                        @if($isEntirelyOutOfStock)
-                            <span>{{ $trans['out_of_stock_btn'] }}</span>
-                        @else
-                            <span id="btn-text">{{ $trans['place_order'] }}</span> <span id="btn-total"></span>{{ $setup->currency }}
-                        @endif
-                    </button>
+                   
                 </div>
             </div>
             {{-- LEFT: Billing Info --}}
@@ -543,6 +533,19 @@
                         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
                         readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+                <div>
+                     <button type="{{ $isPreviewMode ? 'button' : 'submit' }}"
+                        id="submit-order-btn"
+                        {{ $isEntirelyOutOfStock ? 'disabled' : '' }}
+                        @if($isPreviewMode) onclick="showPreviewAlert()" @endif
+                        class="w-full {{ $isEntirelyOutOfStock ? 'bg-gray-400 cursor-not-allowed opacity-75' : 'bg-[#1f8a54] hover:bg-[#176840] cursor-pointer' }} text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                        @if($isEntirelyOutOfStock)
+                            <span>{{ $trans['out_of_stock_btn'] }}</span>
+                        @else
+                            <span id="btn-text">{{ $trans['place_order'] }}</span> <span id="btn-total"></span>{{ $setup->currency }}
+                        @endif
+                    </button>
                 </div>
             </div>
 
