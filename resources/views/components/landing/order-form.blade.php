@@ -426,7 +426,7 @@
                     </div>
 
                     {{-- Product Info Rows Container (Dynamic) --}}
-                    <div id="summary-items-list" class="space-y-3 pb-5 mb-5 border-b border-dashed border-gray-200">
+                    <div id="summary-items-list" class="space-y-3 pb-5 mb-3 border-b border-dashed border-gray-200">
                         <div class="flex justify-between items-start gap-4">
                             <div class="flex items-start gap-3">
                                 <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
@@ -450,7 +450,7 @@
                     </div>
 
                     {{-- Qty Selector & Shipping Area (Inside Summary) --}}
-                    <div class="px-2 space-y-4 mb-6">
+                    <div class="px-2 space-y-4 mb-2">
                         <div id="global-qty-wrapper" class="flex items-center justify-between">
                             <span class="text-sm font-bold text-gray-700">{{ $trans['quantity'] }}</span>
                             <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
@@ -486,7 +486,7 @@
                     </div>
 
                     {{-- Calculations --}}
-                    <div class="px-2 space-y-2 border-t border-dashed border-gray-100 pt-4 mb-6">
+                    <div class="px-2 space-y-1 border-t border-dashed border-gray-100 pt-2 mb-2">
                         <div class="flex justify-between text-sm md:text-base text-gray-800">
                             <span>{{ $trans['subtotal'] }}</span>
                             <span class="font-bold text-gray-800"><span
