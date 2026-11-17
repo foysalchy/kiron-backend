@@ -1310,22 +1310,56 @@
             draftDebounceTimer = setTimeout(window.saveLandingDraft, 500);
         }
 
+        let fbPixelUserUpdated = false;
+        function updateMetaPixelUserData() {
+            if (fbPixelUserUpdated || typeof fbq !== 'function') return;
+            const pVal = phoneInput ? phoneInput.value.replace(/[^0-9]/g, '') : '';
+            if (pVal.length >= 11) {
+                fbPixelUserUpdated = true;
+                const normPhone = (pVal.length === 11 && pVal.startsWith('01')) ? ('88' + pVal) : pVal;
+                const nVal = nameInput ? nameInput.value.trim() : '';
+                const uData = { ph: normPhone };
+                if (nVal) {
+                    const nParts = nVal.split(' ');
+                    uData.fn = nParts[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (nParts.length > 1) {
+                        uData.ln = nParts[nParts.length - 1].toLowerCase().replace(/[^a-z0-9]/g, '');
+                    }
+                }
+                try {
+                    fbq('set', 'user_data', uData);
+                    fbq('track', 'InitiateCheckout', {
+                        content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
+                        content_ids: ['{{ $mainProduct->id ?? "" }}'],
+                        content_type: 'product',
+                        currency: 'BDT'
+                    });
+                } catch(e) {}
+            }
+        }
+
         if (phoneInput) {
             phoneInput.addEventListener('blur', function () {
+                updateMetaPixelUserData();
                 if (!isSubmittingOrder) window.saveLandingDraft();
             });
             phoneInput.addEventListener('change', function () {
+                updateMetaPixelUserData();
                 if (!isSubmittingOrder) window.saveLandingDraft();
             });
             phoneInput.addEventListener('input', function () {
                 if (this.value.trim().length >= 11) {
+                    updateMetaPixelUserData();
                     scheduleDraftSave();
                 }
             });
         }
 
         if (nameInput) {
-            nameInput.addEventListener('blur', scheduleDraftSave);
+            nameInput.addEventListener('blur', function() {
+                updateMetaPixelUserData();
+                scheduleDraftSave();
+            });
         }
         if (addressInput) {
             addressInput.addEventListener('blur', scheduleDraftSave);
@@ -1399,6 +1433,21 @@
                             const finalOrderId = otpSuccessData.order_id || data.order_id || '';
 
                             if (typeof fbq === 'function') {
+                                const pVal = phoneInput ? phoneInput.value.replace(/[^0-9]/g, '') : '';
+                                const normPhone = (pVal.length === 11 && pVal.startsWith('01')) ? ('88' + pVal) : pVal;
+                                const nVal = nameInput ? nameInput.value.trim() : '';
+                                const uData = {};
+                                if (normPhone) uData.ph = normPhone;
+                                if (nVal) {
+                                    const nParts = nVal.split(' ');
+                                    uData.fn = nParts[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+                                    if (nParts.length > 1) {
+                                        uData.ln = nParts[nParts.length - 1].toLowerCase().replace(/[^a-z0-9]/g, '');
+                                    }
+                                }
+                                if (Object.keys(uData).length > 0) {
+                                    try { fbq('set', 'user_data', uData); } catch(e){}
+                                }
                                 fbq('track', 'Purchase', {
                                     content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
                                     content_ids: ['{{ $mainProduct->id ?? "" }}'],
@@ -1436,6 +1485,21 @@
 
                     if (data.instant_purchase !== false) {
                         if (typeof fbq === 'function') {
+                            const pVal = phoneInput ? phoneInput.value.replace(/[^0-9]/g, '') : '';
+                            const normPhone = (pVal.length === 11 && pVal.startsWith('01')) ? ('88' + pVal) : pVal;
+                            const nVal = nameInput ? nameInput.value.trim() : '';
+                            const uData = {};
+                            if (normPhone) uData.ph = normPhone;
+                            if (nVal) {
+                                const nParts = nVal.split(' ');
+                                uData.fn = nParts[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+                                if (nParts.length > 1) {
+                                    uData.ln = nParts[nParts.length - 1].toLowerCase().replace(/[^a-z0-9]/g, '');
+                                }
+                            }
+                            if (Object.keys(uData).length > 0) {
+                                try { fbq('set', 'user_data', uData); } catch(e){}
+                            }
                             fbq('track', 'Purchase', {
                                 content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
                                 content_ids: ['{{ $mainProduct->id ?? "" }}'],
