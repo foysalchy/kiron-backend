@@ -395,36 +395,7 @@
 
         {{-- Main Grid --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-
-            {{-- LEFT: Billing Info --}}
-            <div class="lg:col-span-7 space-y-6">
-                <div>
-                    <label for="name" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['your_name'] }} <span
-                            class="text-red-500">*</span></label>
-                    <input id="name" type="text" name="name" required
-                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
-                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
-                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
-                </div>
-                <div>
-                    <label for="phone" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['phone_number'] }} <span
-                            class="text-red-500">*</span></label>
-                    <input type="tel" id="phone" name="phone" required
-                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
-                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
-                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
-                </div>
-                <div>
-                    <label for="address" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['full_address'] }} <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" id="address" name="address" required
-                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
-                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
-                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
-                </div>
-            </div>
-
-            {{-- RIGHT: Order Summary with Shipping Area --}}
+ {{-- RIGHT: Order Summary with Shipping Area --}}
             <div class="lg:col-span-5">
                 <div class="bg-white p-2 sticky top-8 ">
 
@@ -547,6 +518,35 @@
                     </button>
                 </div>
             </div>
+            {{-- LEFT: Billing Info --}}
+            <div class="lg:col-span-7 space-y-6">
+                <div>
+                    <label for="name" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['your_name'] }} <span
+                            class="text-red-500">*</span></label>
+                    <input id="name" type="text" name="name" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
+                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+                <div>
+                    <label for="phone" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['phone_number'] }} <span
+                            class="text-red-500">*</span></label>
+                    <input type="tel" id="phone" name="phone" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
+                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+                <div>
+                    <label for="address" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['full_address'] }} <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="address" name="address" required
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                        readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
+                        class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+            </div>
+
+           
         </div>
     </form>
 </div>
