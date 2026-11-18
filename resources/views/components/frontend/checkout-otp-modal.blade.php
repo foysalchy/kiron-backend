@@ -343,18 +343,12 @@
                 digits = digits.substring(2);
             }
             if (!digits) {
-                return { valid: false, message: 'মোবাইল নম্বর আবশ্যক।' };
-            }
-            if (digits.length < 3) {
-                return { valid: false, message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)' };
+                return { valid: false, message: 'Invalid phone number' };
             }
             const prefix = digits.substring(0, 3);
             const validPrefixes = ['013', '014', '015', '016', '017', '018', '019'];
-            if (!validPrefixes.includes(prefix)) {
-                return { valid: false, message: 'অবৈধ অপারেটর নম্বর! 013, 014, 015, 016, 017, 018, 019 দিয়ে শুরু হতে হবে।' };
-            }
-            if (digits.length !== 11) {
-                return { valid: false, message: 'মোবাইল নম্বর ঠিক ১১ ডিজিট হতে হবে (বর্তমানে ' + digits.length + ' ডিজিট)।' };
+            if (digits.length !== 11 || !validPrefixes.includes(prefix)) {
+                return { valid: false, message: 'Invalid phone number' };
             }
             return { valid: true, cleanPhone: digits };
         }
