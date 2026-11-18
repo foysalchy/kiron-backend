@@ -527,7 +527,7 @@
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                     <p id="landing-phone-error" class="hidden text-xs font-semibold text-red-600 mt-1.5 flex items-center gap-1">
                         <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span id="landing-phone-error-text">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)</span>
+                        <span id="landing-phone-error-text">Invalid phone number</span>
                     </p>
                 </div>
                 <div>
@@ -1258,18 +1258,12 @@
                 digits = digits.substring(2);
             }
             if (!digits) {
-                return { valid: false, message: 'মোবাইল নম্বর আবশ্যক।' };
-            }
-            if (digits.length < 3) {
-                return { valid: false, message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)' };
+                return { valid: false, message: 'Invalid phone number' };
             }
             const prefix = digits.substring(0, 3);
             const validPrefixes = ['013', '014', '015', '016', '017', '018', '019'];
-            if (!validPrefixes.includes(prefix)) {
-                return { valid: false, message: 'অবৈধ অপারেটর নম্বর! 013, 014, 015, 016, 017, 018, 019 দিয়ে শুরু হতে হবে।' };
-            }
-            if (digits.length !== 11) {
-                return { valid: false, message: 'মোবাইল নম্বর ঠিক ১১ ডিজিট হতে হবে (বর্তমানে ' + digits.length + ' ডিজিট)।' };
+            if (digits.length !== 11 || !validPrefixes.includes(prefix)) {
+                return { valid: false, message: 'Invalid phone number' };
             }
             return { valid: true, cleanPhone: digits };
         }
@@ -1456,7 +1450,7 @@
                     const errEl = document.getElementById('landing-phone-error');
                     const errTxt = document.getElementById('landing-phone-error-text');
                     if (errEl && errTxt) {
-                        errTxt.innerText = 'সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (013, 014, 015, 016, 017, 018, 019)';
+                        errTxt.innerText = 'Invalid phone number';
                         errEl.classList.remove('hidden');
                     }
                     phoneField.focus();
