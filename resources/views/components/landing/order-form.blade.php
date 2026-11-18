@@ -525,6 +525,10 @@
                         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"
                         readonly onfocus="this.removeAttribute('readonly');" onpointerdown="this.removeAttribute('readonly');" onmousedown="this.removeAttribute('readonly');" ontouchstart="this.removeAttribute('readonly');"
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                    <p id="landing-phone-error" class="hidden text-xs font-semibold text-red-600 mt-1.5 flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span id="landing-phone-error-text">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)</span>
+                    </p>
                 </div>
                 <div>
                     <label for="address" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['full_address'] }} <span
@@ -1247,10 +1251,73 @@
 
         let draftDebounceTimer = null;
 
+        // Bangladesh Phone Number Real-Time Validation
+        function validateBdPhone(raw) {
+            let digits = (raw || '').replace(/[^0-9]/g, '');
+            if (digits.startsWith('8801')) {
+                digits = digits.substring(2);
+            }
+            if (!digits) {
+                return { valid: false, message: 'মোবাইল নম্বর আবশ্যক।' };
+            }
+            if (digits.length < 3) {
+                return { valid: false, message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)' };
+            }
+            const prefix = digits.substring(0, 3);
+            const validPrefixes = ['013', '014', '015', '016', '017', '018', '019'];
+            if (!validPrefixes.includes(prefix)) {
+                return { valid: false, message: 'অবৈধ অপারেটর নম্বর! 013, 014, 015, 016, 017, 018, 019 দিয়ে শুরু হতে হবে।' };
+            }
+            if (digits.length !== 11) {
+                return { valid: false, message: 'মোবাইল নম্বর ঠিক ১১ ডিজিট হতে হবে (বর্তমানে ' + digits.length + ' ডিজিট)।' };
+            }
+            return { valid: true, cleanPhone: digits };
+        }
+
+        function checkLandingPhoneValidity() {
+            if (!phoneInput) return true;
+            const res = validateBdPhone(phoneInput.value);
+            const errEl = document.getElementById('landing-phone-error');
+            const errTxt = document.getElementById('landing-phone-error-text');
+            const submitBtn = document.getElementById('submit-order-btn') || (form && form.querySelector('button[type="submit"]'));
+
+            if (!phoneInput.value.trim()) {
+                if (errEl) errEl.classList.add('hidden');
+                phoneInput.classList.remove('!border-red-500');
+                if (submitBtn && submitBtn.dataset.stockDisabled !== 'true') {
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                return false;
+            }
+
+            if (!res.valid) {
+                if (errEl && errTxt) {
+                    errTxt.innerText = res.message;
+                    errEl.classList.remove('hidden');
+                }
+                phoneInput.classList.add('!border-red-500');
+                if (submitBtn && submitBtn.dataset.stockDisabled !== 'true') {
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                return false;
+            } else {
+                if (errEl) errEl.classList.add('hidden');
+                phoneInput.classList.remove('!border-red-500');
+                if (submitBtn && submitBtn.dataset.stockDisabled !== 'true') {
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                return true;
+            }
+        }
+
+        // Initialize state on load
+        checkLandingPhoneValidity();
+
         window.saveLandingDraft = function () {
             if (!phoneInput || isPreview || currentVariationOutOfStock || isSubmittingOrder) return;
-            const phone = phoneInput.value.trim();
-            if (phone.length < 11) return;
+            const valCheck = validateBdPhone(phoneInput.value);
+            if (!valCheck.valid) return;
+            const phone = valCheck.cleanPhone;
 
             const tokenInput = form ? form.querySelector('input[name="_token"]') : null;
             const token = tokenInput ? tokenInput.value : '';
@@ -1343,15 +1410,22 @@
 
         if (phoneInput) {
             phoneInput.addEventListener('blur', function () {
-                updateMetaPixelUserData();
-                if (!isSubmittingOrder) window.saveLandingDraft();
+                checkLandingPhoneValidity();
+                if (validateBdPhone(this.value).valid) {
+                    updateMetaPixelUserData();
+                    if (!isSubmittingOrder) window.saveLandingDraft();
+                }
             });
             phoneInput.addEventListener('change', function () {
-                updateMetaPixelUserData();
-                if (!isSubmittingOrder) window.saveLandingDraft();
+                checkLandingPhoneValidity();
+                if (validateBdPhone(this.value).valid) {
+                    updateMetaPixelUserData();
+                    if (!isSubmittingOrder) window.saveLandingDraft();
+                }
             });
             phoneInput.addEventListener('input', function () {
-                if (this.value.trim().length >= 11) {
+                checkLandingPhoneValidity();
+                if (validateBdPhone(this.value).valid) {
                     updateMetaPixelUserData();
                     scheduleDraftSave();
                 }
@@ -1372,6 +1446,24 @@
     const landingForm = document.getElementById('landing-order-form');
     if (landingForm) {
         landingForm.onsubmit = function (e) {
+            const phoneField = document.getElementById('phone');
+            if (phoneField) {
+                const digits = phoneField.value.replace(/[^0-9]/g, '');
+                const cleanPhone = digits.startsWith('8801') ? digits.substring(2) : digits;
+                const validPrefixes = ['013', '014', '015', '016', '017', '018', '019'];
+                if (cleanPhone.length !== 11 || !validPrefixes.includes(cleanPhone.substring(0, 3))) {
+                    e.preventDefault();
+                    const errEl = document.getElementById('landing-phone-error');
+                    const errTxt = document.getElementById('landing-phone-error-text');
+                    if (errEl && errTxt) {
+                        errTxt.innerText = 'সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (013, 014, 015, 016, 017, 018, 019)';
+                        errEl.classList.remove('hidden');
+                    }
+                    phoneField.focus();
+                    phoneField.classList.add('!border-red-500');
+                    return false;
+                }
+            }
             if (isPreview) {
                 e.preventDefault();
                 showPreviewAlert();

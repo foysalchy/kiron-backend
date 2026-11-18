@@ -334,4 +334,110 @@
         }
     });
     @endif
+
+    // Real-Time BD Phone Number Validation & Confirm Button Control for all Checkouts
+    (function initGlobalBdPhoneValidation() {
+        function validateBdPhoneDigits(raw) {
+            let digits = (raw || '').replace(/[^0-9]/g, '');
+            if (digits.startsWith('8801')) {
+                digits = digits.substring(2);
+            }
+            if (!digits) {
+                return { valid: false, message: 'মোবাইল নম্বর আবশ্যক।' };
+            }
+            if (digits.length < 3) {
+                return { valid: false, message: 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)' };
+            }
+            const prefix = digits.substring(0, 3);
+            const validPrefixes = ['013', '014', '015', '016', '017', '018', '019'];
+            if (!validPrefixes.includes(prefix)) {
+                return { valid: false, message: 'অবৈধ অপারেটর নম্বর! 013, 014, 015, 016, 017, 018, 019 দিয়ে শুরু হতে হবে।' };
+            }
+            if (digits.length !== 11) {
+                return { valid: false, message: 'মোবাইল নম্বর ঠিক ১১ ডিজিট হতে হবে (বর্তমানে ' + digits.length + ' ডিজিট)।' };
+            }
+            return { valid: true, cleanPhone: digits };
+        }
+
+        function setupValidation() {
+            // Find all phone inputs in checkout pages (except landing order-form which has its own)
+            const phoneInputs = document.querySelectorAll('input[name="phone"]:not(#phone), #customer-phone');
+            phoneInputs.forEach(input => {
+                if (input.dataset.bdValInit) return;
+                input.dataset.bdValInit = 'true';
+
+                // Locate or create error container
+                let errEl = input.parentNode.querySelector('.bd-phone-val-error');
+                if (!errEl) {
+                    errEl = document.createElement('p');
+                    errEl.className = 'bd-phone-val-error hidden text-xs font-semibold text-red-600 mt-1 flex items-center gap-1';
+                    errEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span class="bd-phone-val-text"></span>';
+                    input.parentNode.appendChild(errEl);
+                }
+                const errText = errEl.querySelector('.bd-phone-val-text');
+
+                const form = input.closest('form');
+                const confirmBtn = (form ? form.querySelector('button[type="submit"]') : null) || document.getElementById('confirm-order-btn');
+
+                function updateState() {
+                    const res = validateBdPhoneDigits(input.value);
+                    if (!input.value.trim()) {
+                        errEl.classList.add('hidden');
+                        input.classList.remove('!border-red-500', 'border-red-500');
+                        if (confirmBtn) {
+                            confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            confirmBtn.style.pointerEvents = 'none';
+                        }
+                        return false;
+                    }
+                    if (!res.valid) {
+                        if (errText) errText.innerText = res.message;
+                        errEl.classList.remove('hidden');
+                        input.classList.add('!border-red-500', 'border-red-500');
+                        if (confirmBtn) {
+                            confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            confirmBtn.style.pointerEvents = 'none';
+                        }
+                        return false;
+                    } else {
+                        errEl.classList.add('hidden');
+                        input.classList.remove('!border-red-500', 'border-red-500');
+                        if (confirmBtn) {
+                            confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            confirmBtn.style.pointerEvents = '';
+                        }
+                        return true;
+                    }
+                }
+
+                input.addEventListener('input', updateState);
+                input.addEventListener('blur', updateState);
+                input.addEventListener('change', updateState);
+
+                // Initial check
+                updateState();
+
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        const check = validateBdPhoneDigits(input.value);
+                        if (!check.valid) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            updateState();
+                            input.focus();
+                            return false;
+                        }
+                    }, true);
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupValidation);
+        } else {
+            setupValidation();
+        }
+        // Also observe for dynamic modals like quick-order-modal
+        setTimeout(setupValidation, 1000);
+    })();
 </script>

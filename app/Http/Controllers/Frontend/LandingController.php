@@ -750,9 +750,14 @@ class LandingController extends FrontendController
 
     public function partialSave(Request $request)
     {
-        if (!$request->phone || strlen(trim($request->phone)) < 11) {
-            return response()->json(['success' => false, 'message' => 'Invalid phone number']);
+        $rawPhone = preg_replace('/[^0-9]/', '', (string)$request->phone);
+        if (str_starts_with($rawPhone, '8801')) {
+            $rawPhone = substr($rawPhone, 2);
         }
+        if (!preg_match('/^01[3-9][0-9]{8}$/', $rawPhone)) {
+            return response()->json(['success' => false, 'message' => 'Invalid Bangladeshi phone number']);
+        }
+        $request->merge(['phone' => $rawPhone]);
 
         if (!$request->product_id) {
             return response()->json(['success' => false, 'message' => 'Product is required']);
