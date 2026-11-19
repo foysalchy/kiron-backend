@@ -643,10 +643,10 @@ class ProductService
         $data['warehouse_info'] = null; // Don't use JSON for variations
 
         // Calculate total stock (will be updated after creating variations)
+        $manageStock =  $data['manage_stock'] == 1 ? true : false;
         $data['stock_quantity'] = 0;
         $data['available_stock'] = 0;
-        $data['stock_status'] = 'out_of_stock';
-        $manageStock =  $data['manage_stock'] == 1 ? true : false;
+        $data['stock_status'] = $manageStock ? 'out_of_stock' : 'in_stock';
 
         // Create the product
         $product = Product::create($data);
@@ -752,7 +752,9 @@ class ProductService
         $product->update([
             'stock_quantity' => $totalStock,
             'available_stock' => $totalStock,
-            'stock_status' => $totalStock > 0 ? 'in_stock' : 'out_of_stock',
+            'stock_status' => $manageStock
+                ? ($totalStock > 0 ? 'in_stock' : 'out_of_stock')
+                : 'in_stock',
         ]);
 
         return $product;
@@ -2041,7 +2043,9 @@ class ProductService
         $product->update([
             'stock_quantity' => $totalStock,
             'available_stock' => $totalStock,
-            'stock_status' => $totalStock > 0 ? 'in_stock' : 'out_of_stock'
+            'stock_status' => $product->manage_stock
+                ? ($totalStock > 0 ? 'in_stock' : 'out_of_stock')
+                : 'in_stock',
         ]);
     }
 
@@ -2510,7 +2514,9 @@ class ProductService
 
         $product->available_stock = $totalStock;
         $product->stock_quantity = $totalStock;
-        $product->stock_status = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
+        $product->stock_status = $product->manage_stock
+            ? ($totalStock > 0 ? 'in_stock' : 'out_of_stock')
+            : 'in_stock';
         $product->save();
     }
 
