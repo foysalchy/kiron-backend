@@ -587,7 +587,9 @@ class ProductController extends FrontendController
             );
         }
 
-        $trustBadges = \Illuminate\Support\Facades\Cache::remember('trust_badges_product', now()->addHours(24), function () {
+        $companyId = $this->company_id ?? 'global';
+
+        $trustBadges = \Illuminate\Support\Facades\Cache::remember("trust_badges_product_{$companyId}", now()->addHours(6), function () {
             return ContentSetting::where('status', Status::Active->value)
                 ->whereIn('page_type', [
                     ContentSetting::PAGE_PRODUCT,
