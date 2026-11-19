@@ -73,6 +73,11 @@ class CachedOptionsObserver
         if ($model instanceof SystemPage) {
             SystemPage::clearPageTypeCache($model->page_type, $model->company_id);
         }
+
+        if ($model instanceof \App\Models\ContentSetting) {
+            $companyId = $model->company_id ?: 'global';
+            \Illuminate\Support\Facades\Cache::forget("trust_badges_product_{$companyId}");
+        }
     }
     public function updating($model)
     {
