@@ -3,12 +3,16 @@
 namespace App\Services;
 
 use App\Enums\Status;
+use App\Helpers\NetworkHelper;
+use App\Models\IpDirectory;
+use App\Models\IpSetting;
 use App\Models\Order;
 use App\Models\OrderNote;
 use App\Models\SiteSetting;
 use App\Models\SmsWallet;
 use App\Models\SmsWalletTransaction;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -102,6 +106,23 @@ class CheckoutOtpService
     public function sendOtp(Order $order, string $phone): array
     {
         $companyId = $order->company_id;
+        $clientIp = NetworkHelper::getClientIp();
+
+        // 0. Fraud Protection: Blocked IP check
+        $isIpBlocked = IpDirectory::withoutGlobalScopes()
+            ->where('company_id', $companyId)
+            ->where('ip_address', $clientIp)
+            ->where('status', 0) // 0 = Blocked
+            ->exists();
+
+        if ($isIpBlocked) {
+            Log::warning("Checkout OTP rejected: IP {$clientIp} is blocked in directory for company {$companyId}");
+            return [
+                'success' => false,
+                'error'   => 'ip_blocked',
+                'message' => 'দুঃখিত, আপনার নেটওয়ার্ক থেকে এই মুহূর্তে ওটিপি পাঠানো স্থগিত রয়েছে। হেল্পলাইনে যোগাযোগ করুন।',
+            ];
+        }
 
         // 1. Balance verification
         if (!$this->hasSufficientBalance($companyId)) {
@@ -113,6 +134,42 @@ class CheckoutOtpService
                 'success' => false,
                 'error'   => 'insufficient_balance',
                 'message' => 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।',
+            ];
+        }
+
+        // 1.1 Fraud Rules: SMS Rate Limiting per Phone and IP
+        IpSetting::ensureColumnsExist();
+        $ipSetting = IpSetting::withoutGlobalScopes()->where('company_id', $companyId)->first();
+        $smsLimitMinutes = (int) ($ipSetting?->sms_limit_minutes ?: 5);
+        $smsLimitCount   = (int) ($ipSetting?->sms_limit_count ?: 3);
+
+        $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($cleanPhone, '880') && strlen($cleanPhone) === 13) {
+            $cleanPhone = '0' . substr($cleanPhone, 3);
+        }
+
+        $phoneCacheKey = "otp_limit_phone_{$companyId}_{$cleanPhone}";
+        $ipCacheKey    = "otp_limit_ip_{$companyId}_{$clientIp}";
+
+        $phoneAttempts = (int) Cache::get($phoneCacheKey, 0);
+        $ipAttempts    = (int) Cache::get($ipCacheKey, 0);
+
+        if ($phoneAttempts >= $smsLimitCount) {
+            Log::warning("Checkout OTP rate-limited for phone {$cleanPhone}: exceeded {$smsLimitCount} SMS in {$smsLimitMinutes} mins.");
+            return [
+                'success' => false,
+                'error'   => 'sms_limit_exceeded',
+                'message' => "আপনি ইতিমধ্যে অতিরিক্ত বার ওটিপি চেষ্টা করেছেন। অনুগ্রহ করে {$smsLimitMinutes} মিনিট পর আবার চেষ্টা করুন।",
+            ];
+        }
+
+        $maxIpAttempts = max(5, $smsLimitCount * 2);
+        if ($ipAttempts >= $maxIpAttempts) {
+            Log::warning("Checkout OTP rate-limited for IP {$clientIp}: exceeded {$maxIpAttempts} SMS in {$smsLimitMinutes} mins.");
+            return [
+                'success' => false,
+                'error'   => 'ip_sms_limit_exceeded',
+                'message' => "আপনার নেটওয়ার্ক থেকে অতিরিক্ত ওটিপি রিকোয়েস্ট করা হয়েছে। অনুগ্রহ করে {$smsLimitMinutes} মিনিট পর চেষ্টা করুন।",
             ];
         }
 
@@ -156,6 +213,9 @@ class CheckoutOtpService
 
         try {
             $this->smsSendService->sendToGateway([$phone], $message);
+            // Record rate limit attempts on send
+            Cache::put($phoneCacheKey, $phoneAttempts + 1, now()->addMinutes($smsLimitMinutes));
+            Cache::put($ipCacheKey, $ipAttempts + 1, now()->addMinutes($smsLimitMinutes));
         } catch (\Exception $e) {
             Log::error("Failed to send checkout OTP SMS for Order #{$order->id}: " . $e->getMessage());
         }

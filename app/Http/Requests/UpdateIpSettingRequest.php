@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use App\Models\IpSetting;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateIpSettingRequest extends UpdateBaseCompanyRequest
@@ -24,12 +25,20 @@ class UpdateIpSettingRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
+        IpSetting::ensureColumnsExist();
+
         return array_merge(
             $this->companyRules(),
             [
-                'frequency_minute' => ['sometimes', 'required', 'integer', 'min:1'],
-                'order_limit'      => ['sometimes', 'required', 'integer', 'min:1'],
-                'status'           => ['sometimes', 'integer'],
+                'frequency_minute'        => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'order_limit'             => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'sms_limit_minutes'       => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'sms_limit_count'         => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'order_limit_minutes'     => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'order_limit_count'       => ['sometimes', 'nullable', 'integer', 'min:1'],
+                'honeypot_filter_enabled' => ['sometimes', 'nullable', 'boolean'],
+                'block_checkout_only'     => ['sometimes', 'nullable', 'boolean'],
+                'status'                  => ['sometimes', 'integer'],
             ]
         );
     }

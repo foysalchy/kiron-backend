@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Enums\Status;
+use App\Helpers\NetworkHelper;
 use App\Http\Controllers\Controller;
+use App\Models\IpDirectory;
 use App\Models\LandingPage;
 use App\Models\Market;
 use App\Models\Order;
@@ -11,6 +13,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\ProductVariationStock;
+use App\Services\FraudProtectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Cache, DB, Log};
 use Illuminate\Support\Facades\Hash;
@@ -212,6 +215,19 @@ class LandingController extends FrontendController
 
     public function storeLandingOrder(Request $request)
     {
+        $fraudService = app(FraudProtectionService::class);
+        $fraudCheck = $fraudService->validateOrderSubmission($request, $this->company_id);
+        if (!$fraudCheck['allowed']) {
+            $msg = $fraudCheck['message'] ?? 'Order cannot be placed at this time.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg);
+        }
+        if (!empty($fraudCheck['clean_phone'])) {
+            $request->merge(['phone' => $fraudCheck['clean_phone']]);
+        }
+
         $request->validate([
             'name'            => 'required|string|max:255',
             'phone'           => 'required|string|max:20',
@@ -675,6 +691,8 @@ class LandingController extends FrontendController
                 $otpResult = $otpService->sendOtp($order, $request->phone);
                 DB::commit();
 
+                $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
                         'success'          => true,
@@ -696,6 +714,8 @@ class LandingController extends FrontendController
             }
 
             DB::commit();
+
+            $fraudService->recordOrderPlaced($this->company_id, $request->phone);
 
             session()->forget([
                 'current_landing_draft_order_id',
@@ -750,6 +770,16 @@ class LandingController extends FrontendController
 
     public function partialSave(Request $request)
     {
+        $clientIp = NetworkHelper::getClientIp();
+        $isBlocked = IpDirectory::withoutGlobalScopes()
+            ->where('company_id', $this->company_id)
+            ->where('ip_address', $clientIp)
+            ->where('status', 0)
+            ->exists();
+        if ($isBlocked) {
+            return response()->json(['success' => false, 'message' => 'Blocked IP']);
+        }
+
         $rawPhone = preg_replace('/[^0-9]/', '', (string)$request->phone);
         if (str_starts_with($rawPhone, '8801')) {
             $rawPhone = substr($rawPhone, 2);

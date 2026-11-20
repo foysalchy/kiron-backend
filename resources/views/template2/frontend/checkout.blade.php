@@ -27,6 +27,10 @@
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             @csrf
+            {{-- Anti-Spam Honeypot Field --}}
+            <div style="display:none !important;" aria-hidden="true">
+                <input type="text" name="_hp_security_check" value="" tabindex="-1" autocomplete="off" />
+            </div>
             {{-- Decoy fields to trap browser address autofill --}}
             <div style="opacity: 0; position: absolute; top: 0; left: -9999px; height: 0; width: 0; z-index: -1; overflow: hidden;" aria-hidden="true">
                 <input type="text" name="fake_autofill_name" tabindex="-1" autocomplete="name" />

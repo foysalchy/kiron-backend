@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\NetworkHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{Cart as CartTrack, ContentSetting, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, SiteSetting, Warehouse};
+use App\Models\{Cart as CartTrack, ContentSetting, CustomerPaymentMethod, IpDirectory, IpSetting, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, SiteSetting, Warehouse};
+use App\Services\FraudProtectionService;
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -21,9 +23,22 @@ class OrderController extends FrontendController
 
     public function index()
     {
+        // 0. Fraud Protection: Blocked IP Check (Checkout page blocked, browsing allowed)
+        $clientIp = NetworkHelper::getClientIp();
+        $isBlocked = IpDirectory::withoutGlobalScopes()
+            ->where('company_id', $this->company_id)
+            ->where('ip_address', $clientIp)
+            ->where('status', 0) // 0 = Blocked
+            ->exists();
+
+        if ($isBlocked) {
+            $msg = 'দুঃখিত, আপনার নেটওয়ার্ক থেকে চেকআউট সাময়িকভাবে স্থগিত রয়েছে। অনুগ্রহ করে আমাদের হেল্পলাইনে যোগাযোগ করুন।';
+            return redirect()->route('cart.index')->with('error', $msg);
+        }
+
         $setup = SiteSetting::where('company_id', $this->company_id)->first();
         if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
-            $previewTheme = request('preview_theme');
+                    $previewTheme = request('preview_theme');
             $intendedUrl = $previewTheme
                 ? route('checkout.index', ['preview_theme' => $previewTheme])
                 : route('checkout.index');
@@ -38,7 +53,7 @@ class OrderController extends FrontendController
         }
 
         if (Cart::count() == 0) {
-            $previewTheme = request('preview_theme');
+                    $previewTheme = request('preview_theme');
             $params = $previewTheme ? ['preview_theme' => $previewTheme] : [];
             return redirect()->route('cart.index', $params)->with('error', 'Your cart is empty!');
         }
@@ -136,6 +151,16 @@ class OrderController extends FrontendController
 
     public function partialSave(Request $request)
     {
+        $clientIp = NetworkHelper::getClientIp();
+        $isBlocked = IpDirectory::withoutGlobalScopes()
+            ->where('company_id', $this->company_id)
+            ->where('ip_address', $clientIp)
+            ->where('status', 0)
+            ->exists();
+        if ($isBlocked) {
+            return response()->json(['success' => false, 'message' => 'Blocked IP']);
+        }
+
         $rawPhone = preg_replace('/[^0-9]/', '', (string)$request->phone);
         if (str_starts_with($rawPhone, '8801')) {
             $rawPhone = substr($rawPhone, 2);
@@ -305,7 +330,7 @@ class OrderController extends FrontendController
 
         $setup = SiteSetting::where('company_id', $this->company_id)->first();
         if (($setup->login_required_for_checkout ?? 0) == 1 && !auth('customer')->check()) {
-            $previewTheme = request('preview_theme');
+                    $previewTheme = request('preview_theme');
             $intendedUrl = $previewTheme
                 ? route('checkout.index', ['preview_theme' => $previewTheme])
                 : route('checkout.index');
@@ -321,6 +346,20 @@ class OrderController extends FrontendController
 
         $pm = strtolower($request->payment_method ?? '');
         $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
+
+        // Fraud, Honeypot & Rate Limit Protection
+        $fraudService = app(FraudProtectionService::class);
+        $fraudCheck = $fraudService->validateOrderSubmission($request, $this->company_id);
+        if (!$fraudCheck['allowed']) {
+            $msg = $fraudCheck['message'] ?? 'Order cannot be placed at this time.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg);
+        }
+        if (!empty($fraudCheck['clean_phone'])) {
+            $request->merge(['phone' => $fraudCheck['clean_phone']]);
+        }
 
         $request->validate([
             'name'           => 'required',
@@ -444,6 +483,8 @@ class OrderController extends FrontendController
                         throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
                     }
 
+                    $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+
                     if ($request->ajax() || $request->wantsJson()) {
                         return response()->json([
                             'success'          => true,
@@ -478,7 +519,7 @@ class OrderController extends FrontendController
         if ($currentStatus !== Status::Draft->value) {
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
-            $previewTheme = request('preview_theme');
+                    $previewTheme = request('preview_theme');
             $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
             return redirect()->route('order.thankyou', $p)->with('success', 'Order already placed.');
         }
@@ -495,7 +536,7 @@ class OrderController extends FrontendController
                 }
                 $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
                 if ($currentStatus !== Status::Draft->value) {
-                    $previewTheme = request('preview_theme');
+                            $previewTheme = request('preview_theme');
                     $p = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
                     return redirect()->route('order.thankyou', $p);
                 }
@@ -630,6 +671,8 @@ class OrderController extends FrontendController
 
                 DB::commit();
 
+                $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+
                 Cart::destroy();
                 Session::forget([
                     'coupon',
@@ -650,7 +693,7 @@ class OrderController extends FrontendController
 
 
 
-                $previewTheme = request('preview_theme');
+                        $previewTheme = request('preview_theme');
                 $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
                 $thankYouUrl = route('order.thankyou', $thankYouParams);
 
@@ -763,6 +806,8 @@ class OrderController extends FrontendController
                 'marketing_landing_url'
             ]);
         }
+
+        app(FraudProtectionService::class)->recordOrderPlaced($order->company_id, $order->customer?->phone ?? ($order->shipping_address['phone'] ?? ''));
 
         $previewTheme = request('preview_theme');
         $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);

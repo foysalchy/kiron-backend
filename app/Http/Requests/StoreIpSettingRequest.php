@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
+use App\Models\IpSetting;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreIpSettingRequest extends BaseCompanyRequest
@@ -24,12 +25,20 @@ class StoreIpSettingRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
+        IpSetting::ensureColumnsExist();
+
         return array_merge(
             $this->companyRules(),
             [
-                'frequency_minute' => ['required', 'integer', 'min:1'],
-                'order_limit'      => ['required', 'integer', 'min:1'],
-                'status'           => ['nullable', 'integer'],
+                'frequency_minute'        => ['nullable', 'integer', 'min:1'],
+                'order_limit'             => ['nullable', 'integer', 'min:1'],
+                'sms_limit_minutes'       => ['nullable', 'integer', 'min:1'],
+                'sms_limit_count'         => ['nullable', 'integer', 'min:1'],
+                'order_limit_minutes'     => ['nullable', 'integer', 'min:1'],
+                'order_limit_count'       => ['nullable', 'integer', 'min:1'],
+                'honeypot_filter_enabled' => ['nullable', 'boolean'],
+                'block_checkout_only'     => ['nullable', 'boolean'],
+                'status'                  => ['nullable', 'integer'],
             ]
         );
     }

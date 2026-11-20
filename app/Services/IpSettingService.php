@@ -17,6 +17,7 @@ class IpSettingService
     public function getAllIpSettings(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
+            IpSetting::ensureColumnsExist();
             $query = IpSetting::query();
 
             if (isset($filters['status'])) {
