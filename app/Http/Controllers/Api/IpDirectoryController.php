@@ -56,7 +56,7 @@ class IpDirectoryController extends Controller
     {
         $this->ipDirectoryService->deleteIp($id);
 
-        return ResponseHelper::success(null, 'IP deleted successfully');
+        return ResponseHelper::success(null, 'IP permanently deleted successfully');
     }
 
     public function restore(int $id): JsonResponse

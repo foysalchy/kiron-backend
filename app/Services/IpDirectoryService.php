@@ -108,19 +108,22 @@ class IpDirectoryService
     }
 
     /**
-     * Delete IP (Soft Delete)
+     * Delete IP permanently (Direct Force Delete - No Trash)
      */
     public function deleteIp(int $id): bool
     {
         DB::beginTransaction();
         try {
-            $ip = $this->getIpById($id);
-            $ip->delete();
+            $ip = IpDirectory::withTrashed()->find($id);
+            if (!$ip) {
+                throw ApiException::notFound('IP Address');
+            }
+            $ip->forceDelete();
 
-            LogHelper::deleted('ip_directory', $ip->id, $ip->company_id);
+            LogHelper::forceDeleted('ip_directory', $id, $ip->company_id);
 
             DB::commit();
-            Log::info('IP soft deleted successfully', ['ip_id' => $id]);
+            Log::info('IP permanently deleted successfully', ['ip_id' => $id]);
 
             return true;
         } catch (ApiException $e) {
@@ -128,8 +131,8 @@ class IpDirectoryService
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('IP deletion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to delete IP');
+            Log::error('IP permanent deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete IP');
         }
     }
 

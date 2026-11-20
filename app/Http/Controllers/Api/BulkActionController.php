@@ -74,6 +74,7 @@ class BulkActionController extends Controller
         'account-incomes'        => \App\Models\TransactionIncome::class,
         'product-groups'        => \App\Models\ProductGroup::class,
         'notices'        => \App\Models\Notice::class,
+        'ip-directories' => \App\Models\IpDirectory::class,
     ];
 
     /**
