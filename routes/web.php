@@ -150,6 +150,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::post('/order/verify-otp', [OrderController::class, 'verifyOtp'])->name('order.verify.otp');
     Route::post('/order/resend-otp', [OrderController::class, 'resendOtp'])->name('order.resend.otp');
 
+    Route::get('/order/already-placed/{id?}', [OrderController::class, 'alreadyPlacedNotice'])->name('order.already_placed');
     Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
     Route::get('/thank-you/{id}', [OrderController::class, 'thankyou'])->name('order.thankyou');
     Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');

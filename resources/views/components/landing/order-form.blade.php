@@ -1518,6 +1518,10 @@
                 }
 
                 if (res.ok && data.success) {
+                    if (data.redirect_url && data.already_placed) {
+                        window.location.href = data.redirect_url;
+                        return;
+                    }
                     if (data.requires_otp) {
                         openCheckoutOtpModal(data.order_id, data.phone, function(otpSuccessData) {
                             closeCheckoutOtpModal();

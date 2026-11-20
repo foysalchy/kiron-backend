@@ -351,6 +351,24 @@ class OrderController extends FrontendController
         $fraudService = app(FraudProtectionService::class);
         $fraudCheck = $fraudService->validateOrderSubmission($request, $this->company_id);
         if (!$fraudCheck['allowed']) {
+            if (!empty($fraudCheck['already_placed'])) {
+                $recentId = $fraudCheck['recent_order_id'] ?? null;
+                $previewTheme = request('preview_theme');
+                $noticeParams = array_filter(['id' => $recentId, 'preview_theme' => $previewTheme]);
+                $noticeUrl = route('order.already_placed', $noticeParams);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success'        => true,
+                        'already_placed' => true,
+                        'order_id'       => $recentId,
+                        'redirect_url'   => $noticeUrl,
+                        'message'        => 'আপনি ইতিমধ্যে সম্প্রতি একটি অর্ডার সম্পন্ন করেছেন।',
+                    ]);
+                }
+                return redirect()->to($noticeUrl);
+            }
+
             $msg = $fraudCheck['message'] ?? 'Order cannot be placed at this time.';
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $msg], 422);
@@ -389,16 +407,16 @@ class OrderController extends FrontendController
 
         $otpService = app(\App\Services\CheckoutOtpService::class);
         $isOtpEnabled = $otpService->isOtpEnabled($this->company_id);
+        $hasSmsBalance = $isOtpEnabled ? $otpService->hasSufficientBalance($this->company_id) : false;
+
+        $isOtpFallbackNoBalance = false;
+        if ($isOtpEnabled && !$hasSmsBalance) {
+            Log::info("Order #{$orderId}: SMS wallet balance is 0 for company {$this->company_id}. Bypassing OTP checkout, proceeding directly with 'Not Verified' note.");
+            $isOtpEnabled = false;
+            $isOtpFallbackNoBalance = true;
+        }
 
         if ($isOtpEnabled) {
-            if (!$otpService->hasSufficientBalance($this->company_id)) {
-                $msg = 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।';
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json(['success' => false, 'message' => $msg], 422);
-                }
-                return back()->with('error', $msg);
-            }
-
             try {
                 return DB::transaction(function () use ($request, $orderId, $isCOD, $otpService, $fraudService) {
                     $order = Order::where('company_id', $this->company_id)
@@ -480,10 +498,136 @@ class OrderController extends FrontendController
                     $otpResult = $otpService->sendOtp($order, $request->phone);
 
                     if (!$otpResult['success']) {
-                        throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
+                        if ($otpResult['error'] === 'sms_limit_exceeded' || $otpResult['error'] === 'ip_blocked' || $otpResult['error'] === 'ip_sms_limit_exceeded') {
+                            throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
+                        }
+
+                        // Gateway error or insufficient gateway balance -> Fallback to direct order!
+                        Log::warning("Order #{$order->id}: OTP SMS failed ({$otpResult['error']}). Falling back to direct order with 'Not Verified' note.");
+
+                        $order->update([
+                            'status'          => Status::Pending->value,
+                            'is_otp_verified' => false,
+                            'note'            => 'Not Verified',
+                        ]);
+
+                        OrderNote::create([
+                            'company_id' => $this->company_id,
+                            'order_id'   => $order->id,
+                            'note'       => 'Not Verified',
+                            'type'       => 'system',
+                            'status'     => 1,
+                        ]);
+
+                        $stockResult = $this->finalizeOrderAndDeductStock($order);
+                        if (!$stockResult['success']) {
+                            Log::warning('Stock deduction warning on fallback direct order: ' . ($stockResult['error'] ?? ''));
+                        }
+
+                        $transactionId = $request->transaction_id;
+                        if ($isCOD) {
+                            $transactionId = 'COD-' . ($order->order_no ?? $order->id) . '-' . time();
+                        }
+
+                        $screenshotPaths = [];
+                        if ($request->hasFile('screenshots')) {
+                            foreach ($request->file('screenshots') as $index => $image) {
+                                $customFileName = 'order-screenshot-' . ($order->order_no ?? 'order') . '-' . ($index + 1) . '-' . time();
+                                $screenshotPaths[] = FileUploadHelper::uploadImage(
+                                    $image,
+                                    'payments/screenshots',
+                                    'r2',
+                                    2048,
+                                    $customFileName
+                                );
+                            }
+                        }
+
+                        $senderInfo = array_filter([
+                            'sender_number' => $request->sender_number,
+                            'screenshot'    => $screenshotPaths,
+                            'bank_name'     => $request->bank_name,
+                            'branch_name'   => $request->branch_name,
+                            'card_type'     => $request->card_type,
+                        ]);
+
+                        if (!$isCOD) {
+                            OrderPayment::create([
+                                'order_id'       => $order->id,
+                                'payment_method' => $request->payment_method,
+                                'transaction_id' => $transactionId,
+                                'reference_no'   => $request->reference_no,
+                                'sender_number'  => $request->sender_number,
+                                'amount'         => $request->amount ?? $order->grand_total ?? 0,
+                                'change_amount'  => 0,
+                                'sender_info'    => $senderInfo,
+                                'note'           => $request->note,
+                            ]);
+                        }
+
+                        if (Session::has('coupon')) {
+                            $couponData = Session::get('coupon');
+                            $couponId = $couponData['coupon_id'] ?? null;
+                            $couponDiscount = $couponData['discount_amount'] ?? 0;
+
+                            if ($couponId) {
+                                app(\App\Services\CouponService::class)->applyCoupon(
+                                    $couponId,
+                                    $order->id,
+                                    $order->subtotal ?? $order->grand_total,
+                                    $couponDiscount,
+                                    $order->customer_id
+                                );
+                            }
+                        }
+
+                        foreach (Cart::content() as $item) {
+                            $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
+                            CartTrack::where('session_id', session()->getId())
+                                ->where('product_id', $cleanProductId)
+                                ->where('variation_id', $item->options->variation_id ?? null)
+                                ->update(['status' => CartTrack::PURCHASED]);
+                        }
+
+                        Cart::destroy();
+                        Session::forget([
+                            'coupon',
+                            'current_draft_order_id',
+                            'marketing_source',
+                            'utm_source',
+                            'utm_medium',
+                            'utm_campaign',
+                            'utm_content',
+                            'fbclid',
+                            '_fbc',
+                            '_ttp',
+                            'marketing_landing_url'
+                        ]);
+
+                        app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
+
+                        $previewTheme = request('preview_theme');
+                        $thankYouParams = array_filter(['id' => $order->id, 'preview_theme' => $previewTheme]);
+                        $thankYouUrl = route('order.thankyou', $thankYouParams);
+
+                        if ($request->ajax() || $request->wantsJson()) {
+                            return response()->json([
+                                'success'          => true,
+                                'requires_otp'     => false,
+                                'redirect_url'     => $thankYouUrl,
+                                'thankyou_url'     => $thankYouUrl,
+                                'invoice_url'      => route('order.invoice', $order->id),
+                                'order_id'         => $order->id,
+                                'order_code'       => $order->order_no ?? ('#' . $order->id),
+                                'message'          => 'Your order has been successfully placed.',
+                                'instant_purchase' => true,
+                            ]);
+                        }
+
+                        return redirect()->to($thankYouUrl)->with('success', 'Your order has been successfully placed.');
                     }
 
-                    app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
+                    app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
 
                     if ($request->ajax() || $request->wantsJson()) {
                         return response()->json([
@@ -525,7 +669,7 @@ class OrderController extends FrontendController
         }
 
         try {
-            return DB::transaction(function () use ($request, $orderId, $isCOD, $fraudService) {
+            return DB::transaction(function () use ($request, $orderId, $isCOD, $fraudService, $isOtpFallbackNoBalance) {
                 $order = Order::where('company_id', $this->company_id)
                     ->where('id', $orderId)
                     ->lockForUpdate()
@@ -579,7 +723,19 @@ class OrderController extends FrontendController
                     'source_info' => $sourceInfo,
                     'pixel_source_info' => $sourceInfo,
                     'status' => Status::Pending->value,
+                    'is_otp_verified' => $isOtpFallbackNoBalance ? false : null,
+                    'note' => $isOtpFallbackNoBalance ? 'Not Verified' : ($request->note ?? null),
                 ]);
+
+                if ($isOtpFallbackNoBalance) {
+                    OrderNote::create([
+                        'company_id' => $this->company_id,
+                        'order_id'   => $order->id,
+                        'note'       => 'Not Verified',
+                        'type'       => 'system',
+                        'status'     => 1,
+                    ]);
+                }
                 if ($order->customer) {
                     $order->customer->update([
                         'name' => $request->name,
@@ -603,7 +759,7 @@ class OrderController extends FrontendController
                 $screenshotPaths = [];
                 if ($request->hasFile('screenshots')) {
                     foreach ($request->file('screenshots') as $index => $image) {
-                        $customFileName = 'order-screenshot-' . ($orderData['order_no'] ?? 'order') . '-' . ($index + 1) . '-' . time();
+                        $customFileName = 'order-screenshot-' . ($order->order_no ?? 'order') . '-' . ($index + 1) . '-' . time();
                         $screenshotPaths[] = FileUploadHelper::uploadImage(
                             $image,
                             'payments/screenshots',
@@ -671,7 +827,7 @@ class OrderController extends FrontendController
 
                 DB::commit();
 
-                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
+                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
 
                 Cart::destroy();
                 Session::forget([
@@ -1047,6 +1203,61 @@ class OrderController extends FrontendController
 
         return $this->view('frontend.thankyou', compact('order', 'relatedProducts', 'pixelPurchaseFired'));
     }
+
+    public function alreadyPlacedNotice(Request $request, $id = null)
+    {
+        $companyId = $this->company_id;
+        $order = null;
+
+        if ($id && is_numeric($id)) {
+            $order = Order::where('company_id', $companyId)
+                ->with(['customer', 'orderDetails.product'])
+                ->find($id);
+        }
+
+        if (!$order) {
+            $lastOrderId = session('last_placed_order_id');
+            if ($lastOrderId) {
+                $order = Order::where('company_id', $companyId)
+                    ->with(['customer', 'orderDetails.product'])
+                    ->find($lastOrderId);
+            }
+        }
+
+        if (!$order) {
+            $clientIp = NetworkHelper::getClientIp();
+            $order = Order::where('company_id', $companyId)
+                ->with(['customer', 'orderDetails.product'])
+                ->where(function ($q) use ($clientIp) {
+                    $q->whereJsonContains('source_info->ip', $clientIp)
+                      ->orWhereJsonContains('pixel_source_info->ip', $clientIp);
+                })
+                ->latest('id')
+                ->first();
+        }
+
+        $relatedProducts = collect();
+        if ($order) {
+            $productIds = $order->orderDetails->pluck('product_id')->toArray();
+            $relatedProducts = \App\Models\Product::where('company_id', $companyId)
+                ->whereNotIn('id', $productIds)
+                ->where('status', \App\Enums\Status::Active->value)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+        } else {
+            $relatedProducts = \App\Models\Product::where('company_id', $companyId)
+                ->where('status', \App\Enums\Status::Active->value)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+        }
+
+        $setup = SiteSetting::where('company_id', $companyId)->first();
+
+        return $this->view('frontend.already-placed', compact('order', 'relatedProducts', 'setup'));
+    }
+
     public function trackOrder(Request $request)
     {
         $order = null;

@@ -218,6 +218,22 @@ class LandingController extends FrontendController
         $fraudService = app(FraudProtectionService::class);
         $fraudCheck = $fraudService->validateOrderSubmission($request, $this->company_id);
         if (!$fraudCheck['allowed']) {
+            if (!empty($fraudCheck['already_placed'])) {
+                $recentId = $fraudCheck['recent_order_id'] ?? null;
+                $noticeUrl = route('order.already_placed', array_filter(['id' => $recentId]));
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success'        => true,
+                        'already_placed' => true,
+                        'order_id'       => $recentId,
+                        'redirect_url'   => $noticeUrl,
+                        'message'        => 'আপনি ইতিমধ্যে সম্প্রতি একটি অর্ডার সম্পন্ন করেছেন।',
+                    ]);
+                }
+                return redirect()->to($noticeUrl);
+            }
+
             $msg = $fraudCheck['message'] ?? 'Order cannot be placed at this time.';
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $msg], 422);
@@ -557,15 +573,13 @@ class LandingController extends FrontendController
 
             $otpService = app(\App\Services\CheckoutOtpService::class);
             $isOtpEnabled = $otpService->isOtpEnabled($this->company_id);
+            $hasSmsBalance = $isOtpEnabled ? $otpService->hasSufficientBalance($this->company_id) : false;
 
-            if ($isOtpEnabled) {
-                if (!$otpService->hasSufficientBalance($this->company_id)) {
-                    $msg = 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।';
-                    if ($request->ajax() || $request->wantsJson()) {
-                        return response()->json(['success' => false, 'message' => $msg], 422);
-                    }
-                    return back()->with('error', $msg);
-                }
+            $isOtpFallbackNoBalance = false;
+            if ($isOtpEnabled && !$hasSmsBalance) {
+                Log::info("Landing Order: SMS wallet balance is 0 for company {$this->company_id}. Bypassing OTP, placing direct order with 'Not Verified' note.");
+                $isOtpEnabled = false;
+                $isOtpFallbackNoBalance = true;
             }
 
             $orderData = [
@@ -587,7 +601,8 @@ class LandingController extends FrontendController
                 'source_info'      => $sourceInfo,
                 'pixel_source_info'=> $sourceInfo,
                 'status'           => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
-                'is_otp_verified'  => $isOtpEnabled ? false : null,
+                'is_otp_verified'  => $isOtpFallbackNoBalance ? false : ($isOtpEnabled ? false : null),
+                'note'             => $isOtpFallbackNoBalance ? 'Not Verified' : null,
             ];
 
             // Strict customer match: only update draft belonging to this specific customer
@@ -649,7 +664,8 @@ class LandingController extends FrontendController
                     'source_info'       => $sourceInfo,
                     'pixel_source_info' => $sourceInfo,
                     'status'            => $isOtpEnabled ? Status::Draft->value : Status::Pending->value,
-                    'is_otp_verified'   => $isOtpEnabled ? false : null,
+                    'is_otp_verified'   => $isOtpFallbackNoBalance ? false : ($isOtpEnabled ? false : null),
+                    'note'              => $isOtpFallbackNoBalance ? 'Not Verified' : ($draftOrder->note ?? null),
                 ]);
 
                 if (!$isOtpEnabled) {
@@ -687,11 +703,111 @@ class LandingController extends FrontendController
                 $order = $this->orderService->createLandingOrder($orderData);
             }
 
+            if ($isOtpFallbackNoBalance) {
+                OrderNote::create([
+                    'company_id' => $this->company_id,
+                    'order_id'   => $order->id,
+                    'note'       => 'Not Verified',
+                    'type'       => 'system',
+                    'status'     => 1,
+                ]);
+            }
+
             if ($isOtpEnabled) {
                 $otpResult = $otpService->sendOtp($order, $request->phone);
+
+                if (!$otpResult['success']) {
+                    if ($otpResult['error'] === 'sms_limit_exceeded' || $otpResult['error'] === 'ip_blocked' || $otpResult['error'] === 'ip_sms_limit_exceeded') {
+                        throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
+                    }
+
+                    // SMS gateway balance or sending error -> Fallback to direct order!
+                    Log::warning("Landing Order #{$order->id}: OTP SMS failed ({$otpResult['error']}). Falling back to direct order with 'Not Verified' note.");
+
+                    $order->update([
+                        'status'          => Status::Pending->value,
+                        'is_otp_verified' => false,
+                        'note'            => 'Not Verified',
+                    ]);
+
+                    OrderNote::create([
+                        'company_id' => $this->company_id,
+                        'order_id'   => $order->id,
+                        'note'       => 'Not Verified',
+                        'type'       => 'system',
+                        'status'     => 1,
+                    ]);
+
+                    // Deduct stock for the confirmed order
+                    $productService = app(\App\Services\ProductService::class);
+                    foreach ($warehouseInfoList as $wInfo) {
+                        $itemProdId = $wInfo['product_id'] ?? $productId;
+                        $itemProdObj = Product::find($itemProdId);
+                        if ($itemProdObj && $itemProdObj->manage_stock) {
+                            $stockData = [
+                                'warehouse_id'     => $wInfo['warehouse_id'],
+                                'bin_id'           => null,
+                                'quantity'         => (int) $wInfo['quantity'],
+                                'batch_number'     => null,
+                                'serial_numbers'   => null,
+                                'transaction_type' => 'sale',
+                                'reference_type'   => 'LandingOrder',
+                                'reference_id'     => $order->id,
+                                'notes'            => "Stock deducted for order: {$order->order_no}"
+                            ];
+                            if (!empty($wInfo['variation_id'])) {
+                                $stockData['variation_id'] = $wInfo['variation_id'];
+                            }
+                            $productService->removeStockFromWarehouse($itemProdId, $stockData);
+                        }
+                    }
+
+                    DB::commit();
+
+                    app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
+
+                    session()->forget([
+                        'current_landing_draft_order_id',
+                        'marketing_source',
+                        'utm_source',
+                        'utm_medium',
+                        'utm_campaign',
+                        'utm_content',
+                        'fbclid',
+                        '_fbc',
+                        '_ttp',
+                        'marketing_landing_url'
+                    ]);
+
+                    $market = Market::where('company_id', $order->company_id)->first();
+                    $instantPurchase = !isset($market->instant_purchase_event) || (bool)$market->instant_purchase_event;
+
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success'          => true,
+                            'requires_otp'     => false,
+                            'message'          => 'আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!',
+                            'order_id'         => $order->id,
+                            'order_code'       => $order->order_no ?? ('#' . $order->id),
+                            'thankyou_url'     => route('order.thankyou', $order->id),
+                            'invoice_url'      => route('order.invoice', $order->id),
+                            'instant_purchase' => $instantPurchase,
+                        ]);
+                    }
+
+                    return redirect()->back()->with([
+                        'success'               => 'আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!',
+                        'landing_order_success' => true,
+                        'order_id'              => $order->id,
+                        'order_code'            => $order->order_no ?? ('#' . $order->id),
+                        'invoice_url'           => route('order.invoice', $order->id),
+                        'instant_purchase'      => $instantPurchase,
+                    ]);
+                }
+
                 DB::commit();
 
-                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
+                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
 
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
@@ -715,7 +831,7 @@ class LandingController extends FrontendController
 
             DB::commit();
 
-            app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
+            app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone, null, $order->id);
 
             session()->forget([
                 'current_landing_draft_order_id',

@@ -131,9 +131,10 @@ class CheckoutOtpService
             ]);
 
             return [
-                'success' => false,
-                'error'   => 'insufficient_balance',
-                'message' => 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।',
+                'success'          => false,
+                'error'            => 'insufficient_balance',
+                'is_balance_error' => true,
+                'message'          => 'দুঃখিত, এই মুহূর্তে ভেরিফিকেশন সার্ভিস অনুপলব্ধ (Insufficient SMS Balance)।',
             ];
         }
 
@@ -177,25 +178,25 @@ class CheckoutOtpService
         $otp = (string) random_int(1000, 9999);
         $expiresAt = now()->addMinutes(5);
 
-        // 3. Mark as unverified and set note: 'Unverified'
+        // 3. Mark as unverified and set note: 'Not Verified'
         $order->update([
             'is_otp_verified' => false,
             'otp_code'        => $otp,
             'otp_expires_at'  => $expiresAt,
-            'note'            => 'Unverified',
+            'note'            => 'Not Verified',
         ]);
 
         // Add or update system OrderNote
         $existingNote = OrderNote::withoutGlobalScopes()
             ->where('order_id', $order->id)
-            ->whereIn('note', ['Checkout done but not verify', 'Unverified'])
+            ->whereIn('note', ['Checkout done but not verify', 'Unverified', 'Not Verified'])
             ->first();
 
         if (!$existingNote) {
             OrderNote::create([
                 'company_id' => $companyId,
                 'order_id'   => $order->id,
-                'note'       => 'Unverified',
+                'note'       => 'Not Verified',
                 'type'       => 'system',
                 'status'     => 1,
             ]);
@@ -221,10 +222,15 @@ class CheckoutOtpService
             Log::error("Failed to send checkout OTP SMS for Order #{$order->id}: " . $errMsg);
             $this->refundSmsBalance($companyId, $order);
 
+            $isBalanceError = str_contains(strtolower($errMsg), 'balance') 
+                || str_contains(strtolower($errMsg), 'not enough')
+                || str_contains(strtolower($errMsg), '1007');
+
             return [
-                'success' => false,
-                'error'   => 'gateway_error',
-                'message' => 'এসএমএস গেটওয়ে ব্যালেন্স শেষ হওয়ায় ওটিপি পাঠানো সম্ভব হয়নি (' . $errMsg . ')।',
+                'success'          => false,
+                'error'            => $isBalanceError ? 'gateway_insufficient_balance' : 'gateway_error',
+                'is_balance_error' => true,
+                'message'          => 'এসএমএস গেটওয়ে ব্যালেন্স শেষ হওয়ায় ওটিপি পাঠানো সম্ভব হয়নি (' . $errMsg . ')।',
             ];
         }
 
@@ -290,7 +296,7 @@ class CheckoutOtpService
             // Remove or resolve any previous unverified notes for this order
             OrderNote::withoutGlobalScopes()
                 ->where('order_id', $order->id)
-                ->whereIn('note', ['Checkout done but not verify', 'Unverified'])
+                ->whereIn('note', ['Checkout done but not verify', 'Unverified', 'Not Verified'])
                 ->delete();
 
             OrderNote::create([

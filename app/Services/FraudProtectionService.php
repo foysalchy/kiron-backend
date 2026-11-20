@@ -125,23 +125,48 @@ class FraudProtectionService
             $phoneOrderCount = (int) Cache::get($phoneKey, 0);
             $ipOrderCount    = (int) Cache::get($ipKey, 0);
 
-            if ($phoneOrderCount >= $orderLimitCount) {
-                Log::warning("Fraud protection: Phone {$cleanPhone} exceeded order limit ({$phoneOrderCount}/{$orderLimitCount} in {$orderLimitMinutes} mins)");
-                return [
-                    'allowed' => false,
-                    'message' => "আপনি ইতিমধ্যে সম্প্রতি একটি অর্ডার সম্পন্ন করেছেন। অনুগ্রহ করে {$orderLimitMinutes} মিনিট পর আবার চেষ্টা করুন।",
-                    'clean_phone' => $cleanPhone,
-                ];
-            }
+            if ($phoneOrderCount >= $orderLimitCount || $ipOrderCount >= max(3, $orderLimitCount * 3)) {
+                $recentOrderId = Cache::get("fraud_last_order_id_phone_{$companyId}_{$cleanPhone}")
+                    ?: Cache::get("fraud_last_order_id_ip_{$companyId}_{$clientIp}")
+                    ?: session('last_placed_order_id');
 
-            $maxIpLimit = max(3, $orderLimitCount * 3);
-            if ($ipOrderCount >= $maxIpLimit) {
-                Log::warning("Fraud protection: IP {$clientIp} exceeded order limit ({$ipOrderCount}/{$maxIpLimit} in {$orderLimitMinutes} mins)");
-                return [
-                    'allowed' => false,
-                    'message' => "আপনার নেটওয়ার্ক থেকে অতিরিক্ত অর্ডার সম্পন্ন হয়েছে। অনুগ্রহ করে {$orderLimitMinutes} মিনিট পর চেষ্টা করুন।",
-                    'clean_phone' => $cleanPhone,
-                ];
+                if (!$recentOrderId) {
+                    $recentOrder = Order::withoutGlobalScopes()
+                        ->where('company_id', $companyId)
+                        ->where(function ($q) use ($cleanPhone, $clientIp) {
+                            $q->where('shipping_address->phone', 'like', "%{$cleanPhone}%")
+                              ->orWhereJsonContains('source_info->ip', $clientIp)
+                              ->orWhereJsonContains('pixel_source_info->ip', $clientIp);
+                        })
+                        ->latest('id')
+                        ->first();
+                    $recentOrderId = $recentOrder?->id;
+                }
+
+                if ($phoneOrderCount >= $orderLimitCount) {
+                    Log::warning("Fraud protection: Phone {$cleanPhone} exceeded order limit ({$phoneOrderCount}/{$orderLimitCount} in {$orderLimitMinutes} mins)");
+                    return [
+                        'allowed'          => false,
+                        'already_placed'   => true,
+                        'recent_order_id'  => $recentOrderId,
+                        'order_limit_mins' => $orderLimitMinutes,
+                        'message'          => "আপনি ইতিমধ্যে সম্প্রতি একটি অর্ডার সম্পন্ন করেছেন।",
+                        'clean_phone'      => $cleanPhone,
+                    ];
+                }
+
+                $maxIpLimit = max(3, $orderLimitCount * 3);
+                if ($ipOrderCount >= $maxIpLimit) {
+                    Log::warning("Fraud protection: IP {$clientIp} exceeded order limit ({$ipOrderCount}/{$maxIpLimit} in {$orderLimitMinutes} mins)");
+                    return [
+                        'allowed'          => false,
+                        'already_placed'   => true,
+                        'recent_order_id'  => $recentOrderId,
+                        'order_limit_mins' => $orderLimitMinutes,
+                        'message'          => "আপনার নেটওয়ার্ক থেকে ইতিমধ্যে সম্প্রতি অর্ডার সম্পন্ন হয়েছে।",
+                        'clean_phone'      => $cleanPhone,
+                    ];
+                }
             }
         }
 
@@ -158,9 +183,10 @@ class FraudProtectionService
      * @param int|null $companyId
      * @param string $phone
      * @param string|null $clientIp
+     * @param int|null $orderId
      * @return void
      */
-    public function recordOrderPlaced(?int $companyId = null, string $phone = '', ?string $clientIp = null): void
+    public function recordOrderPlaced(?int $companyId = null, string $phone = '', ?string $clientIp = null, ?int $orderId = null): void
     {
         if (!$companyId) {
             return;
@@ -181,12 +207,24 @@ class FraudProtectionService
             $phoneKey = "fraud_order_limit_phone_{$companyId}_{$cleanPhone}";
             $count = (int) Cache::get($phoneKey, 0);
             Cache::put($phoneKey, $count + 1, $ttl);
+
+            if ($orderId) {
+                Cache::put("fraud_last_order_id_phone_{$companyId}_{$cleanPhone}", $orderId, $ttl);
+            }
         }
 
         if ($clientIp) {
             $ipKey = "fraud_order_limit_ip_{$companyId}_{$clientIp}";
             $count = (int) Cache::get($ipKey, 0);
             Cache::put($ipKey, $count + 1, $ttl);
+
+            if ($orderId) {
+                Cache::put("fraud_last_order_id_ip_{$companyId}_{$clientIp}", $orderId, $ttl);
+            }
+        }
+
+        if ($orderId) {
+            session()->put('last_placed_order_id', $orderId);
         }
     }
 }
