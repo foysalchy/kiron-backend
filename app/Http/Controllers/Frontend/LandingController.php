@@ -9,6 +9,7 @@ use App\Models\IpDirectory;
 use App\Models\LandingPage;
 use App\Models\Market;
 use App\Models\Order;
+use App\Models\OrderNote;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\ProductVariation;
