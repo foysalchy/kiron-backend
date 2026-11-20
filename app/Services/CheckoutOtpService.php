@@ -217,7 +217,15 @@ class CheckoutOtpService
             Cache::put($phoneCacheKey, $phoneAttempts + 1, now()->addMinutes($smsLimitMinutes));
             Cache::put($ipCacheKey, $ipAttempts + 1, now()->addMinutes($smsLimitMinutes));
         } catch (\Exception $e) {
-            Log::error("Failed to send checkout OTP SMS for Order #{$order->id}: " . $e->getMessage());
+            $errMsg = $e->getMessage();
+            Log::error("Failed to send checkout OTP SMS for Order #{$order->id}: " . $errMsg);
+            $this->refundSmsBalance($companyId, $order);
+
+            return [
+                'success' => false,
+                'error'   => 'gateway_error',
+                'message' => 'এসএমএস গেটওয়ে ব্যালেন্স শেষ হওয়ায় ওটিপি পাঠানো সম্ভব হয়নি (' . $errMsg . ')।',
+            ];
         }
 
         $maskedPhone = substr($phone, 0, 3) . '****' . substr($phone, -4);
@@ -369,6 +377,43 @@ class CheckoutOtpService
             });
         } catch (\Exception $e) {
             Log::error("Failed to deduct SMS balance for Order #{$order->id}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Refund 1 SMS balance if gateway sending fails.
+     */
+    protected function refundSmsBalance(int $companyId, Order $order): void
+    {
+        try {
+            DB::transaction(function () use ($companyId, $order) {
+                $wallet = SmsWallet::withoutGlobalScopes()
+                    ->where('company_id', $companyId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($wallet) {
+                    $balanceBefore = $wallet->sms_count;
+                    $balanceAfter  = $balanceBefore + 1;
+
+                    $wallet->update(['sms_count' => $balanceAfter]);
+
+                    SmsWalletTransaction::create([
+                        'company_id'     => $companyId,
+                        'sms_wallet_id'  => $wallet->id,
+                        'type'           => 'refund',
+                        'sms_count'      => 1,
+                        'rate_per_sms'   => $wallet->currentRate(),
+                        'reference_type' => Order::class,
+                        'reference_id'   => $order->id,
+                        'balance_before' => $balanceBefore,
+                        'balance_after'  => $balanceAfter,
+                        'note'           => 'Refund: OTP SMS send failed for Order #' . ($order->order_no ?? $order->id),
+                    ]);
+                }
+            });
+        } catch (\Exception $e) {
+            Log::error("Failed to refund SMS balance for Order #{$order->id}: " . $e->getMessage());
         }
     }
 }

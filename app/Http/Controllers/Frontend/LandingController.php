@@ -691,7 +691,7 @@ class LandingController extends FrontendController
                 $otpResult = $otpService->sendOtp($order, $request->phone);
                 DB::commit();
 
-                $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
 
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
@@ -715,7 +715,7 @@ class LandingController extends FrontendController
 
             DB::commit();
 
-            $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+            app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
 
             session()->forget([
                 'current_landing_draft_order_id',

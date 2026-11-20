@@ -400,7 +400,7 @@ class OrderController extends FrontendController
             }
 
             try {
-                return DB::transaction(function () use ($request, $orderId, $isCOD, $otpService) {
+                return DB::transaction(function () use ($request, $orderId, $isCOD, $otpService, $fraudService) {
                     $order = Order::where('company_id', $this->company_id)
                         ->where('id', $orderId)
                         ->lockForUpdate()
@@ -483,7 +483,7 @@ class OrderController extends FrontendController
                         throw new \Exception($otpResult['message'] ?? 'Failed to send OTP.');
                     }
 
-                    $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+                    app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
 
                     if ($request->ajax() || $request->wantsJson()) {
                         return response()->json([
@@ -525,7 +525,7 @@ class OrderController extends FrontendController
         }
 
         try {
-            return DB::transaction(function () use ($request, $orderId, $isCOD) {
+            return DB::transaction(function () use ($request, $orderId, $isCOD, $fraudService) {
                 $order = Order::where('company_id', $this->company_id)
                     ->where('id', $orderId)
                     ->lockForUpdate()
@@ -671,7 +671,7 @@ class OrderController extends FrontendController
 
                 DB::commit();
 
-                $fraudService->recordOrderPlaced($this->company_id, $request->phone);
+                app(FraudProtectionService::class)->recordOrderPlaced($this->company_id, $request->phone);
 
                 Cart::destroy();
                 Session::forget([
