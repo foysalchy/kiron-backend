@@ -6,8 +6,8 @@
 ])
 
 @php
-    $setup = $setup ?? \App\Models\SiteSetting::where('company_id', getCurrentCompany()?->company_id)->first();
-    $helplinePhone = $setup->phone_number ?? $setup->corporate_phone ?? '01700000000';
+   
+    $helplinePhone = $setup->phone ?? '01700000000';
     $shopName = $setup->shop_name ?? config('app.name');
 @endphp
 
@@ -103,11 +103,7 @@
                 </a>
             @endif
 
-            <a href="{{ route('shop.index') }}"
-                class="w-full sm:w-auto px-6 py-3 bg-[var(--primary-color,#13565e)] hover:bg-opacity-90 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm md:text-base">
-                <i class="fas fa-shopping-bag"></i>
-                <span>আরও কেনাকাটা করুন</span>
-            </a>
+           
 
             @if($order)
                 <a href="{{ route('order.invoice', $order->id) }}" target="_blank"
