@@ -1517,6 +1517,7 @@ Route::prefix('v1')->group(function () {
 
                 //account-journals routes
                 Route::prefix('account-journals')->group(function () {
+                    Route::delete('/flush', [TransactionJournalController::class, 'flush']);
                     Route::get('/', [TransactionJournalController::class, 'index']);
                     Route::post('/', [TransactionJournalController::class, 'store']);
                     Route::get('/{id}', [TransactionJournalController::class, 'show']);

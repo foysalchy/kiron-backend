@@ -356,4 +356,69 @@ class TransactionJournalService
             throw $e;
         }
     }
+
+    /**
+     * Flush / Delete all accounts related transactions (Journals, Accounts, Incomes) for company
+     */
+    public function flushAllTransactions(int $companyId): array
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Transaction Journals & Associated Accounts
+            $journals = TransactionJournal::withoutGlobalScopes()
+                ->withTrashed()
+                ->where('company_id', $companyId)
+                ->get();
+
+            $deletedJournalsCount = $journals->count();
+            $deletedAccountsCount = 0;
+
+            foreach ($journals as $journal) {
+                if ($journal->file) {
+                    FileUploadHelper::delete($journal->file);
+                }
+                $deletedAccountsCount += $journal->accounts()->delete();
+                $journal->forceDelete();
+            }
+
+            // Also clean up any orphan journal accounts for safety
+            \App\Models\TransactionJournalAccount::whereDoesntHave('transactionJournal')->delete();
+
+            // 2. Transaction Incomes & Associated Categories
+            $incomes = \App\Models\TransactionIncome::withoutGlobalScopes()
+                ->withTrashed()
+                ->where('company_id', $companyId)
+                ->get();
+
+            $deletedIncomesCount = $incomes->count();
+
+            foreach ($incomes as $income) {
+                if ($income->file) {
+                    FileUploadHelper::delete($income->file);
+                }
+                $income->categories()->delete();
+                $income->forceDelete();
+            }
+
+            // Also clean up any orphan income categories
+            \App\Models\TransactionIncomeCategory::whereDoesntHave('income')->delete();
+
+            DB::commit();
+            Log::info("All account transactions flushed successfully for company ID: {$companyId}", [
+                'journals_count' => $deletedJournalsCount,
+                'accounts_count' => $deletedAccountsCount,
+                'incomes_count' => $deletedIncomesCount,
+            ]);
+
+            return [
+                'journals_count' => $deletedJournalsCount,
+                'accounts_count' => $deletedAccountsCount,
+                'incomes_count' => $deletedIncomesCount,
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to flush all transactions for company ID {$companyId}: " . $e->getMessage());
+            throw ApiException::serverError('Failed to flush transactions: ' . $e->getMessage());
+        }
+    }
 }
