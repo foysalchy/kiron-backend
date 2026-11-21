@@ -107,4 +107,15 @@ class TransactionJournalController extends Controller
 
         return ResponseHelper::success($data, 'Status updated to ' . $request->status . ' successfully');
     }
+
+    /**
+     * Flush / Delete all accounts related transactions (Journals, Accounts, Incomes)
+     */
+    public function flush(Request $request): JsonResponse
+    {
+        $companyId = auth()->user()->company_id ?? 1;
+        $result = $this->journalService->flushAllTransactions($companyId);
+
+        return ResponseHelper::success($result, 'All previous account transactions have been cleared successfully');
+    }
 }
