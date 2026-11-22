@@ -44,7 +44,7 @@
     $isVerify = (bool) ($setup->checkout_sms_verify ?? false);
 @endphp
 <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-6">
-    <h1 class="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Checkout</h1>
+    <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>
 
     <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         @csrf
@@ -73,7 +73,7 @@
                         </div>
                         <div class="space-y-0">
                             @foreach ($cartContent as $item)
-                                <div class="bg-white border-b border-gray-100 last:border-0 p-3 flex items-start gap-3">
+                                <div class="bg-white border-b border-gray-100 last:border-0 p-4 py-2 flex items-start gap-3">
                                     <div class="w-12 h-12 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0 mt-0.5">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
@@ -127,15 +127,12 @@
 
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl shadow-xs overflow-hidden border border-gray-200">
-                        <div class="p-4 md:p-6 border-b border-gray-100">
+                        <div class="p-4">
                             <h2 class="text-[16px] font-bold text-gray-800 leading-tight border-l-4 border-[var(--primary-color)] pl-2">
                                 Delivery Address
                             </h2>
-                            <p class="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
-                                To confirm your order, enter your name, address, phone number and click confirm order
-                            </p>
                         </div>
-                        <div class="p-4 md:p-6 space-y-3">
+                        <div class="p-4 space-y-3 pt-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="space-y-2">
                                     <input type="text" name="name" placeholder="আপনার নাম *" required
@@ -259,8 +256,8 @@
 
                     <!-- 1. Delivery Selection (Synced with Logic) -->
                     @if(!isset($is_free_delivery) || !$is_free_delivery)
-                    <div class="mb-8">
-                        <h2 class="text-base md:text-xl font-semibold leading-none tracking-tight mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Delivery
+                    <div class="mb-3">
+                        <h2 class="text-[14px] md:text-xl font-semibold leading-none tracking-tight mb-4 border-l-4 border-[var(--primary-color)] pl-2">Select Delivery
                             Method</h2>
                         <div class="space-y-2">
                             <label class="flex items-center gap-3 cursor-pointer group">
@@ -284,12 +281,12 @@
                     @endif
 
                     <!-- Product Row in Summary -->
-                    <div class="space-y-3 mb-8 hidden lg:block">
+                    <div class="space-y-3 mb-6 hidden lg:block">
                         @foreach ($cartContent as $item)
                         <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4 border border-gray-100">
                             <!-- Actual Product Image -->
                             <div
-                                class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                class="w-14 h-14 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                 <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                     alt="{{ $item->name }}"
                                     class="w-full h-full object-cover">
@@ -360,7 +357,7 @@
                     </div>
 
                     <!-- 3. Cost Breakdown -->
-                    <div class="space-y-4 border-t border-gray-100 pt-6">
+                    <div class="space-y-1 border-t border-gray-100 pt-1">
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-md font-medium">Subtotal:</span>
                             <span class="text-md font-bold text-gray-900">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} <span id="subtotal-display">{{ number_format($subtotal) }}</span>@else<span id="subtotal-display">{{ number_format($subtotal) }}</span> {{ $setup->currency }}@endif</span>
@@ -387,7 +384,7 @@
                                 @endif
                             </span>
                         </div>
-                        <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                        <div class="flex justify-between items-center border-t border-gray-100 pt-0">
                             <span class="text-lg font-black text-gray-900">Total to Pay:</span>
                             <span class="text-xl font-bold text-gray-900">
                                 @if(($setup->currency_position ?? 'left') == 'left')
