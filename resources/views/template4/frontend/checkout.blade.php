@@ -103,7 +103,7 @@
                     </div>
 
                     <!-- Card 1: Shipping Address -->
-                    <section class="bg-white p-4 md:p-6 border border-gray-200 rounded-lg shadow-sm">
+                    <section class="bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
                         <h2 class="text-[16px] font-bold text-gray-800 mb-3">Shipping Address</h2>
                         <div class="space-y-3">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -252,11 +252,11 @@
                     @endif
 
                     <!-- Product Row in Summary (Desktop) -->
-                    <div class="space-y-4 mb-8 hidden lg:block">
+                    <div class="space-y-3 mb-6 hidden lg:block">
                         @foreach ($cartContent as $item)
                             <div class="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200">
                                 <!-- Actual Product Image -->
-                                <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                <div class="w-14 h-14 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                     <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                                         alt="{{ $item->name }}" class="w-full h-full object-cover">
                                 </div>
@@ -354,7 +354,7 @@
                         </div>
                     @endif
 
-                    <div class="space-y-3 border-t border-gray-100 pt-4">
+                    <div class="space-y-1.5 border-t border-gray-100 pt-2">
 
                         <!-- ১. সাবটোটাল (প্রোডাক্টের মোট দাম) -->
                         <div class="flex justify-between items-center text-gray-700">

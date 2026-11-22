@@ -57,39 +57,48 @@ if (!function_exists('getCurrentCompany')) {
         }
 
 
+        // 1. FIRST: Check Custom Domain directly (runs without needing any subdomain)
+        $store = Cache::remember(
+            "store_custom_{$host}",
+            now()->addHours(6),
+            function () use ($host) {
+                return DomainSetup::withoutGlobalScopes()
+                    ->where(function ($q) use ($host) {
+                        $q->where('custom_domain', $host)
+                          ->orWhere('custom_domain', 'www.' . $host);
+                    })
+                    ->first();
+            }
+        );
+
+        if ($store) {
+            app()->instance('store', $store);
+            return $store;
+        }
+
+        // 2. SECOND: If not a custom domain, check Subdomain
         $parts = explode('.', $host);
 
         $subdomain = $parts[0] === 'www'
             ? null
             : $parts[0];
 
+        if ($subdomain && !in_array($host, ['dorja.io', 'www.dorja.io'])) {
+            $store = Cache::remember(
+                "store_{$subdomain}",
+                now()->addHours(6),
+                function () use ($subdomain) {
+                    return DomainSetup::withoutGlobalScopes()
+                        ->where('sub_domain', $subdomain)
+                        ->first();
+                }
+            );
 
-        if (!$subdomain) {
-            return null;
-        }
-
-
-        $store = Cache::remember(
-            "store_{$subdomain}",
-            now()->addHours(6),
-            function () use ($subdomain) {
-
-                return DomainSetup::withoutGlobalScopes()
-                    ->where('sub_domain', $subdomain)
-                    ->first();
-
+            if ($store) {
+                app()->instance('store', $store);
+                return $store;
             }
-        );
-
-
-        if ($store) {
-
-            // Store for current request
-            app()->instance('store', $store);
-
-            return $store;
         }
-
 
         abort(404, 'Store Not Found');
     }

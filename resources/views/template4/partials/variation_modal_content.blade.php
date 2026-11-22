@@ -38,7 +38,7 @@
                         onclick="handleModalSelection(this, {{ $variation->id }}, {{ $variation->final_price }}, '{{ $type }}')"
                         data-price="{{ $variation->final_price }}" data-var-id="{{ $variation->id }}" {{-- এই লাইনটি যোগ
                         করুন --}}
-                        class="modal-var-btn flex justify-between items-center border p-3 rounded-xl transition-all w-full mb-2 outline-none {{ $loop->first ? 'border-[var(--primary-color)] bg-[var(--primary-color)/10] ring-1 ring-[var(--primary-color)]' : 'border-gray-100 bg-white' }}">
+                        class="modal-var-btn flex justify-between items-center border-2 p-3 rounded-xl transition-all w-full mb-2 outline-none border-gray-200 bg-white">
 
                         <span class="text-sm font-bold text-gray-700">{{ $variation->display_name }}</span>
                         <span class="text-[var(--primary-color)] font-extrabold">

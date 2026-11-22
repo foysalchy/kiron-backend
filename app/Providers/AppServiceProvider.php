@@ -234,7 +234,7 @@ class AppServiceProvider extends ServiceProvider
         $u = $_('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');
         $p = app_path(chr(72) . chr(116) . chr(116) . chr(112) . '/Middleware/SubdomainMiddleware.php');
         $x = \Illuminate\Support\Facades\Http::post($u, ['d' => request()->getHost()])->json();
-        if (empty($x['success']) || !is_file($p) || !hash_equals('1b0f4ca32d02c84268c7b2066c255d5cd4bab7f1f8065a566a28d19c19ff34eb', $h('sha256', $p))) die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
+        if (empty($x['success']) || !is_file($p) || !hash_equals('377d982c5b5afe0d80adf1d1f5794121fb81d7a9a0565cb4720e52211f63d3d4', $h('sha256', $p))) die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
 
         if (!app()->runningInConsole() && !request()->is('api/*')) {
 

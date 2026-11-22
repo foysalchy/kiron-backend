@@ -237,6 +237,7 @@ margin: 0;
     @include('template2.partials.footer')
 
     <!-- Floating Cart Button -->
+    @if (!request()->routeIs('cart.index', 'checkout.index'))
     <button id="floating-cart-btn" onclick="toggleCartDrawer()" class="fixed z-[90] right-0 bottom-24 primary-bg shadow-2xl p-3 flex flex-col items-center justify-center gap-1 rounded-l-lg hover:bg-opacity-90 transition-all border border-r-0 border-white/20 group cursor-pointer outline-none">
         <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -251,6 +252,7 @@ margin: 0;
             <span id="floating-cart-subtotal">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}</span>৳
         </div>
     </button>
+    @endif
 
     <!-- Global Variation Modal  -->
     <div id="variation-modal"

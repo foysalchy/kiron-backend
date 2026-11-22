@@ -41,11 +41,11 @@
                                             <!-- Product Name Link -->
                                             <a href="{{ url($item->options->slug ?? $item->id) }}" class="cursor-pointer group">
                                                 <h3
-                                                    class="text-base md:text-lg lg:text-xl font-bold text-gray-900 truncate  transition-colors">
+                                                    class="text-sm md:text-lg font-bold text-gray-900 truncate  transition-colors">
                                                     {{ $item->name }}
                                                 </h3>
                                             </a>
-                                            <p class="text-xs md:text-sm text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}
+                                            <p class="text-[10px] md:text-xs text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}
                                             </p>
 
                                             <button type="button" onclick="removeCartItem('{{ $item->rowId }}')"
@@ -178,8 +178,8 @@
                             </div>
                         </div>
                         <div class="flex justify-between items-center py-4 md:py-5">
-                            <span class="text-base md:text-lg font-medium text-gray-500">Total</span>
-                            <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">
+                            <span class="text-xl md:text-2xl font-bold text-gray-800">Total</span>
+                            <span class="text-2xl font-bold text-[#1147aa]">
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($total) : number_format($total) . ' ' . $setup->currency }}
                             </span>
                         </div>

@@ -28,7 +28,7 @@
           <img src="{{ $item->options->thumbnail }}"
                onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
                alt="{{ $item->name }}"
-               class="w-24 h-24 rounded-xl object-cover">
+               class="w-16 h-16 md:w-24 md:h-24 rounded-xl object-cover">
 
             <div class="flex-1 w-full">
                 <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">

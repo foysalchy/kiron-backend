@@ -31,6 +31,19 @@
             transform: rotate(90deg);
             display: inline-block;
         }
+
+        .t2-product-thumb-swiper {
+            width: 100%;
+            overflow: hidden;
+        }
+        .t2-product-thumb-swiper .swiper-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .t2-product-thumb-swiper .swiper-slide {
+            flex-shrink: 0;
+            height: auto;
+        }
     </style>
 @endpush
 @section('meta')
@@ -76,18 +89,33 @@
 
         <!-- 2. Product Top Info Card -->
         <div class="overflow-hidden mb-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-lg shadow-xs ">
+            @php
+                $isGalleryDown = !empty($setup) && $setup->isGalleryPositionDown();
+                $videoData = $product->video_data;
+                $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
+            @endphp
+            <div class="grid grid-cols-1 {{ $isGalleryDown ? 'lg:grid-cols-12' : 'lg:grid-cols-2' }} gap-0 bg-white rounded-lg shadow-xs ">
 
                 <!-- Left: Image Gallery -->
-                <div class="p-2 sm:p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
-                    <div class="flex flex-row gap-2.5 sm:gap-4 items-start">
-                        <!-- Thumbnails Container (Vertical on both mobile and desktop) -->
-                        @php
-                            $videoData = $product->video_data;
-                            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
-                        @endphp
-                        <div id="t1-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-14 sm:w-16 md:w-20 shrink-0 relative py-7 px-0 flex flex-col">
-                            <div class="swiper t1-product-thumb-swiper w-full">
+                <div class="{{ $isGalleryDown ? 'lg:col-span-5' : '' }} p-2 sm:p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
+
+                    @if ($isGalleryDown)
+                        {{-- ==================== LAYOUT: DOWN (Exactly like Template 2) ==================== --}}
+                        <div class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group flex items-center justify-center">
+                            <img id="mainImage"
+                                src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                alt="{{ $product->title ?? 'Product Image' }}"
+                                class="w-full h-full object-contain transition-transform duration-500">
+
+                            <!-- Mobile Floating Wishlist Button -->
+                            <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="Add to wishlist"
+                                class="md:hidden absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/90 shadow-sm border border-gray-100 flex items-center justify-center active:scale-90 transition-transform">
+                                <i id="wish-icon-mobile"
+                                    class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500' }} text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} relative mt-3 px-8">
+                            <div class="swiper t2-product-thumb-swiper w-full">
                                 <div id="thumbnail-container" class="swiper-wrapper">
                                     @foreach ($allProductImages as $imgUrl)
                                         <div class="swiper-slide">
@@ -114,8 +142,8 @@
                                                 <div
                                                     class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
                                                     <span
-                                                        class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                                        <i class="fas fa-play text-xs ml-0.5"></i>
+                                                        class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                                        <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
                                                     </span>
                                                 </div>
                                             </button>
@@ -124,37 +152,90 @@
                                 </div>
                             </div>
 
-                            <!-- Navigation Arrows (Outside slider: top/bottom) -->
+                            <!-- Navigation Arrows (Always visible outside slider) -->
                             <button type="button" aria-label="Previous image"
-                                class="t1-thumb-prev absolute left-1/2 -translate-x-1/2 top-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                class="t2-thumb-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
                                 <i class="fas fa-chevron-left text-xs"></i>
                             </button>
                             <button type="button" aria-label="Next image"
-                                class="t1-thumb-next absolute left-1/2 -translate-x-1/2 bottom-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                class="t2-thumb-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
                                 <i class="fas fa-chevron-right text-xs"></i>
                             </button>
                         </div>
+                    @else
+                        {{-- ==================== LAYOUT: LEFT (Original Template 1) ==================== --}}
+                        <div class="flex flex-row gap-2 sm:gap-3 md:gap-4 items-start">
+                            <!-- Thumbnails Container (Vertical on both mobile and desktop) -->
+                            <div id="t1-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-12 sm:w-16 md:w-20 shrink-0 relative py-6 sm:py-7 px-0 flex flex-col">
+                                <div class="swiper t1-product-thumb-swiper w-full">
+                                    <div id="thumbnail-container" class="swiper-wrapper">
+                                        @foreach ($allProductImages as $imgUrl)
+                                            <div class="swiper-slide">
+                                                <button onclick="changeImage('{{ $imgUrl }}', this)"
+                                                    class="thumb-btn w-full aspect-square rounded-lg border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden cursor-pointer block">
+                                                    <img src="{{ $imgUrl }}"
+                                                        onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                                        class="w-full h-full object-contain pointer-events-none" alt="Product Image"
+                                                        loading="lazy" width="800" height="800">
+                                                </button>
+                                            </div>
+                                        @endforeach
 
-                        <!-- Main Image Container -->
-                        <div id="t1-main-image-wrap"
-                            class="flex-1 min-w-0 aspect-square overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                            <img id="mainImage"
-                                src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
-                                alt="{{ $product->title ?? 'Product Image' }}"
-                                class="w-full h-full object-contain transition-transform duration-500">
+                                        @if ($videoData)
+                                            <div class="swiper-slide">
+                                                <button type="button"
+                                                    onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                                    aria-label="Play Product Video"
+                                                    class="thumb-btn w-full aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden relative group/vbtn cursor-pointer block">
+                                                    <img src="{{ $videoData['thumbnail_url'] ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                                        onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
+                                                        class="w-full h-full object-contain pointer-events-none"
+                                                        alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
+                                                    <div
+                                                        class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                                        <span
+                                                            class="w-6 h-6 sm:w-8 sm:h-8 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                                            <i class="fas fa-play text-xs ml-0.5"></i>
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
 
-                            <!-- Mobile Floating Wishlist Button -->
-                            <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="Add to wishlist"
-                                class="md:hidden absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/90 shadow-sm border border-gray-100 flex items-center justify-center active:scale-90 transition-transform">
-                                <i id="wish-icon-mobile"
-                                    class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500' }} text-sm"></i>
-                            </button>
+                                <!-- Navigation Arrows (Outside slider: top/bottom) -->
+                                <button type="button" aria-label="Previous image"
+                                    class="t1-thumb-prev absolute left-1/2 -translate-x-1/2 top-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button type="button" aria-label="Next image"
+                                    class="t1-thumb-next absolute left-1/2 -translate-x-1/2 bottom-0 z-10 w-6 h-6 md:w-7 md:h-7 bg-gray-100 hover:bg-[var(--primary-color)] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-xs border border-gray-200 cursor-pointer transition disabled:opacity-30 disabled:pointer-events-none">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Main Image Container -->
+                            <div id="t1-main-image-wrap"
+                                class="flex-1 min-w-0 aspect-square overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
+                                <img id="mainImage"
+                                    src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                    alt="{{ $product->title ?? 'Product Image' }}"
+                                    class="w-full h-full object-contain transition-transform duration-500">
+
+                                <!-- Mobile Floating Wishlist Button -->
+                                <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="Add to wishlist"
+                                    class="md:hidden absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/90 shadow-sm border border-gray-100 flex items-center justify-center active:scale-90 transition-transform">
+                                    <i id="wish-icon-mobile"
+                                        class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500' }} text-sm"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
 
                 <!-- Right: Product Purchase Details -->
-                <div class="p-4 md:p-8">
+                <div class="{{ $isGalleryDown ? 'lg:col-span-7' : '' }} p-4 md:p-8">
                     @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
 
                     @if ($isUpcoming)
@@ -293,7 +374,7 @@
                             {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}
                         </button>
 
-                        <span
+                        <span id="product-stock-display"
                             class="hidden md:inline text-sm {{ !$isProductOutOfStock ? 'text-green-600' : 'text-red-500' }}">
                             {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
                         </span>
@@ -567,7 +648,7 @@
 
                                     <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                         <span class="font-medium text-gray-500">Availability:</span>
-                                        <span
+                                        <span id="tab-stock"
                                             class="font-bold {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
                                             {{ $isProductOutOfStock ? 'Out of Stock' : 'In Stock' }}
                                         </span>
@@ -1107,6 +1188,8 @@
         function updateSkuDisplay() {
             const skuEl = document.getElementById('product-sku');
             const tabSkuEl = document.getElementById('tab-sku');
+            const stockEl = document.getElementById('product-stock-display');
+            const tabStockEl = document.getElementById('tab-stock');
 
             if (finalSelectedVariationIds.length === 0) {
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
@@ -1115,14 +1198,66 @@
                     if (skuEl) skuEl.innerText = text;
                     if (tabSkuEl) tabSkuEl.innerText = text;
                 }
+                const defaultOutOfStock = @json($isProductOutOfStock);
+                const manageStock = @json((bool)$product->manage_stock);
+                const defaultStock = @json((int)$product->available_stock);
+
+                let defaultStockText = 'In Stock';
+                let defaultStockClass = 'hidden md:inline text-sm text-green-600';
+                let defaultTabStockClass = 'font-bold text-green-700';
+
+                if (defaultOutOfStock) {
+                    defaultStockText = 'Out of stock';
+                    defaultStockClass = 'hidden md:inline text-sm text-red-500';
+                    defaultTabStockClass = 'font-bold text-red-500';
+                } else if (!manageStock) {
+                    defaultStockText = 'In Stock';
+                    defaultStockClass = 'hidden md:inline text-sm text-green-600';
+                    defaultTabStockClass = 'font-bold text-green-700';
+                } else {
+                    defaultStockText = defaultStock + ' in stock';
+                    defaultStockClass = 'hidden md:inline text-sm text-green-600';
+                    defaultTabStockClass = 'font-bold text-green-700';
+                }
+
+                if (stockEl) {
+                    stockEl.innerText = defaultStockText;
+                    stockEl.className = defaultStockClass;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = defaultStockText;
+                    tabStockEl.className = defaultTabStockClass;
+                }
                 return;
             }
 
             let selectedSkus = [];
+            let totalSelectedStock = 0;
+            let hasValidStock = false;
+
             finalSelectedVariationIds.forEach(id => {
                 const v = allVariations.find(v => v.id === id);
                 if (v && v.sku) selectedSkus.push(v.sku);
+                if (v && v.stock !== undefined && v.stock !== null) {
+                    totalSelectedStock += parseInt(v.stock, 10);
+                    hasValidStock = true;
+                }
             });
+
+            if (hasValidStock) {
+                let stockText = (totalSelectedStock > 0) ? (totalSelectedStock + ' in stock') : 'Out of stock';
+                let stockClass = (totalSelectedStock > 0) ? 'hidden md:inline text-sm text-green-600' : 'hidden md:inline text-sm text-red-500';
+                let tabStockClass = (totalSelectedStock > 0) ? 'font-bold text-green-700' : 'font-bold text-red-500';
+
+                if (stockEl) {
+                    stockEl.innerText = stockText;
+                    stockEl.className = stockClass;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = stockText;
+                    tabStockEl.className = tabStockClass;
+                }
+            }
 
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");
@@ -1359,7 +1494,10 @@
         }
     </script>
     <script>
+        const isGalleryDown = {{ (!empty($setup) && $setup->isGalleryPositionDown()) ? 'true' : 'false' }};
+
         function syncT1ThumbHeight() {
+            if (isGalleryDown) return;
             const mainWrap = document.getElementById('t1-main-image-wrap');
             const thumbWrap = document.getElementById('t1-thumb-wrapper');
             const swiperEl = document.querySelector('.t1-product-thumb-swiper');
@@ -1373,26 +1511,58 @@
         }
 
         function initT1ThumbSwiper(SwiperClass) {
-            const thumbWrap = document.getElementById('t1-thumb-wrapper');
-            if (thumbWrap && (thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden'))) return;
-            const el = document.querySelector('.t1-product-thumb-swiper');
-            if (SwiperClass && el) {
-                if (window.t1ThumbSwiper && typeof window.t1ThumbSwiper.destroy === 'function') {
-                    window.t1ThumbSwiper.destroy(true, true);
-                }
-                syncT1ThumbHeight();
-                window.t1ThumbSwiper = new SwiperClass(el, {
-                    direction: 'vertical',
-                    slidesPerView: 'auto',
-                    spaceBetween: 8,
-                    watchSlidesProgress: true,
-                    observer: true,
-                    observeParents: true,
-                    navigation: {
-                        nextEl: '.t1-thumb-next',
-                        prevEl: '.t1-thumb-prev',
+            if (!SwiperClass) return;
+
+            if (isGalleryDown) {
+                const el = document.querySelector('.t2-product-thumb-swiper');
+                if (el) {
+                    if (window.t1ThumbSwiper && typeof window.t1ThumbSwiper.destroy === 'function') {
+                        window.t1ThumbSwiper.destroy(true, true);
                     }
-                });
+                    window.t1ThumbSwiper = new SwiperClass(el, {
+                        slidesPerView: 4,
+                        spaceBetween: 8,
+                        watchSlidesProgress: true,
+                        observer: true,
+                        observeParents: true,
+                        navigation: {
+                            nextEl: '.t2-thumb-next',
+                            prevEl: '.t2-thumb-prev',
+                        },
+                        breakpoints: {
+                            640: {
+                                slidesPerView: 5,
+                                spaceBetween: 10,
+                            },
+                            1024: {
+                                slidesPerView: 6,
+                                spaceBetween: 10,
+                            }
+                        }
+                    });
+                }
+            } else {
+                const thumbWrap = document.getElementById('t1-thumb-wrapper');
+                if (thumbWrap && (thumbWrap.classList.contains('hidden') || thumbWrap.classList.contains('!hidden'))) return;
+                const el = document.querySelector('.t1-product-thumb-swiper');
+                if (el) {
+                    if (window.t1ThumbSwiper && typeof window.t1ThumbSwiper.destroy === 'function') {
+                        window.t1ThumbSwiper.destroy(true, true);
+                    }
+                    syncT1ThumbHeight();
+                    window.t1ThumbSwiper = new SwiperClass(el, {
+                        direction: 'vertical',
+                        slidesPerView: 'auto',
+                        spaceBetween: 8,
+                        watchSlidesProgress: true,
+                        observer: true,
+                        observeParents: true,
+                        navigation: {
+                            nextEl: '.t1-thumb-next',
+                            prevEl: '.t1-thumb-prev',
+                        }
+                    });
+                }
             }
         }
 
