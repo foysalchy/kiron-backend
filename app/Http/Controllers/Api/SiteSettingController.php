@@ -213,7 +213,7 @@ class SiteSettingController extends Controller
     }
     public function basicData()
     {
-        $setting = SiteSetting::select('id', 'company_id', 'logo', 'favicon', 'currency', 'currency_position', 'order_details_cta')->first();
+        $setting = SiteSetting::select('id', 'company_id', 'logo', 'favicon', 'currency', 'currency_position', 'order_details_cta', 'product_gallery_position')->first();
         if ($setting) {
             $companyId = auth('sanctum')->user()?->company_id ?? $setting->company_id ?? 1;
             $accSetting = \App\Services\AutoAccountingService::getSetting($companyId);

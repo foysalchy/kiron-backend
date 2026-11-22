@@ -80,92 +80,177 @@
 
         @php $isUpcoming = ($product->status == \App\Enums\Status::Upcoming->value); @endphp
 
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20">
-            <div class="space-y-4 min-w-0">
-                <div
-                    class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
-                    <img id="mainImage"
-                        src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
-                        alt="{{ $product->title }}" class="w-full h-full object-cover">
+        @php
+            $isGalleryDown = !empty($setup) && $setup->isGalleryPositionDown();
+            $videoData = $product->video_data;
+            $totalGalleryCount = count($allProductImages ?? []) + (!empty($videoData) ? 1 : 0);
+        @endphp
 
-                    @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                        <span
-                            class="absolute top-5 left-5 bg-[var(--primary-color)] text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
-                            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
-                            Off
-                        </span>
-                    @endif
+        <div class="grid grid-cols-1 {{ $isGalleryDown ? 'lg:grid-cols-12' : 'lg:grid-cols-2' }} gap-12 lg:gap-20">
 
-                    @if ($isUpcoming)
-                        <span
-                            class="absolute top-5 right-5 bg-blue-600 text-white text-xs md:text-base font-semibold px-2 py-0.5 rounded-full shadow-sm z-10">
-                            {{ \App\Enums\Status::Upcoming->label() }}
-                        </span>
-                    @endif
-                </div>
+            @if ($isGalleryDown)
+                {{-- ==================== LAYOUT: DOWN (Original Template 5) ==================== --}}
+                <div class="{{ $isGalleryDown ? 'lg:col-span-5' : '' }} space-y-4 min-w-0">
+                    <div
+                        class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
+                        <img id="mainImage"
+                            src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                            alt="{{ $product->title }}" class="w-full h-full object-cover">
 
-                <!-- Thumbnail Gallery with Arrows -->
-                <div class="relative group/gallery">
-                    <!-- Left Arrow -->
-                    <button type="button" id="thumb-arrow-left" aria-label="Scroll product images left"
-                        onclick="scrollThumbnails(-1)"
-                        class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
-                        <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.4">
-                            <path d="M15 18l-6-6 6-6" />
-                        </svg>
-                    </button>
+                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
+                            <span
+                                class="absolute top-5 left-5 bg-[var(--primary-color)] text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
+                                {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
+                                Off
+                            </span>
+                        @endif
 
-                    <div id="thumbnail-container"
-                        class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ (count($allProductImages) + (!empty($product->video_data) ? 1 : 0)) > 3 ? 'px-8 md:px-10' : '' }}">
-                        @php
-                            $videoData = $product->video_data;
-                        @endphp
-
-                        @foreach ($allProductImages as $index => $imgUrl)
-                            <button type="button" aria-label="View product image {{ $index + 1 }}"
-                                onclick="changeImage('{{ $imgUrl }}')"
-                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
-                                <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
-                                    onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
-                                    class="w-full h-full object-cover pointer-events-none">
-                            </button>
-                        @endforeach
-
-                        @if ($videoData)
-                            <button type="button"
-                                onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
-                                aria-label="Play Product Video"
-                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
-                                <img src="{{ $videoData['thumbnail_url'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
-                                    onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
-                                    class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail"
-                                    loading="lazy" width="800" height="800">
-                                <div
-                                    class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                                    <span
-                                        class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                        <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
-                                    </span>
-                                </div>
-                            </button>
+                        @if ($isUpcoming)
+                            <span
+                                class="absolute top-5 right-5 bg-blue-600 text-white text-xs md:text-base font-semibold px-2 py-0.5 rounded-full shadow-sm z-10">
+                                {{ \App\Enums\Status::Upcoming->label() }}
+                            </span>
                         @endif
                     </div>
 
-                    <!-- Right Arrow -->
-                    <button type="button" id="thumb-arrow-right" aria-label="Scroll product images right"
-                        onclick="scrollThumbnails(1)"
-                        class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
-                        <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.4">
-                            <path d="M9 18l6-6-6-6" />
-                        </svg>
-                    </button>
+                    <!-- Thumbnail Gallery with Arrows -->
+                    <div id="t5-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} relative group/gallery">
+                        <!-- Left Arrow -->
+                        <button type="button" id="thumb-arrow-left" aria-label="Scroll product images left"
+                            onclick="scrollThumbnails(-1)"
+                            class="{{ $totalGalleryCount > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
+                            <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.4">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div id="thumbnail-container"
+                            class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ $totalGalleryCount > 3 ? 'px-8 md:px-10' : '' }}">
+                            @foreach ($allProductImages as $index => $imgUrl)
+                                <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                    onclick="changeImage('{{ $imgUrl }}')"
+                                    class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
+                                    <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
+                                        onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                        class="w-full h-full object-cover pointer-events-none">
+                                </button>
+                            @endforeach
+
+                            @if ($videoData)
+                                <button type="button"
+                                    onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                    aria-label="Play Product Video"
+                                    class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                                    <img src="{{ $videoData['thumbnail_url'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                                        onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                        class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail"
+                                        loading="lazy" width="800" height="800">
+                                    <div
+                                        class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                        <span
+                                            class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                            <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                                        </span>
+                                    </div>
+                                </button>
+                            @endif
+                        </div>
+
+                        <!-- Right Arrow -->
+                        <button type="button" id="thumb-arrow-right" aria-label="Scroll product images right"
+                            onclick="scrollThumbnails(1)"
+                            class="{{ $totalGalleryCount > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
+                            <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.4">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            @else
+                {{-- ==================== LAYOUT: LEFT ==================== --}}
+                <div class="flex flex-row gap-2 sm:gap-3 md:gap-4 items-start min-w-0">
+                    <div id="t5-thumb-wrapper" class="{{ $totalGalleryCount <= 1 ? '!hidden' : '' }} w-14 sm:w-16 md:w-24 shrink-0 relative py-7 md:py-8 px-0 flex flex-col h-[320px] sm:h-[400px] lg:h-[500px]">
+                        <!-- Up Arrow -->
+                        <button type="button" id="thumb-arrow-left" aria-label="Scroll product images up"
+                            onclick="scrollThumbnails(-1)"
+                            class="{{ $totalGalleryCount > 3 ? 'flex' : 'hidden' }} absolute top-0 left-1/2 -translate-x-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
+                            <svg width="12" height="12" class="md:w-[14px] md:h-[14px] rotate-90" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.4">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div id="thumbnail-container"
+                            class="flex flex-col gap-2 sm:gap-3 md:gap-4 overflow-y-auto no-scrollbar py-1 w-full h-full scroll-smooth cursor-grab active:cursor-grabbing">
+                            @foreach ($allProductImages as $index => $imgUrl)
+                                <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                    onclick="changeImage('{{ $imgUrl }}')"
+                                    class="thumb-btn h-14 w-14 sm:h-16 sm:w-16 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
+                                    <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
+                                        onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                        class="w-full h-full object-cover pointer-events-none">
+                                </button>
+                            @endforeach
+
+                            @if ($videoData)
+                                <button type="button"
+                                    onclick="openVideoModal('{{ $videoData['embed_url'] }}', '{{ $videoData['type'] }}')"
+                                    aria-label="Play Product Video"
+                                    class="thumb-btn h-14 w-14 sm:h-16 sm:w-16 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                                    <img src="{{ $videoData['thumbnail_url'] ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                                        onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
+                                        class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail"
+                                        loading="lazy" width="800" height="800">
+                                    <div
+                                        class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
+                                        <span
+                                            class="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                            <i class="fas fa-play text-[10px] sm:text-xs md:text-sm ml-0.5"></i>
+                                        </span>
+                                    </div>
+                                </button>
+                            @endif
+                        </div>
+
+                        <!-- Down Arrow -->
+                        <button type="button" id="thumb-arrow-right" aria-label="Scroll product images down"
+                            onclick="scrollThumbnails(1)"
+                            class="{{ $totalGalleryCount > 3 ? 'flex' : 'hidden' }} absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
+                            <svg width="12" height="12" class="md:w-[14px] md:h-[14px] rotate-90" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.4">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div
+                        class="relative flex-1 h-[320px] sm:h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
+                        <img id="mainImage"
+                            src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+                            alt="{{ $product->title }}" class="w-full h-full object-cover">
+
+                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
+                            <span
+                                class="absolute top-5 left-5 bg-[var(--primary-color)] text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
+                                {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
+                                Off
+                            </span>
+                        @endif
+
+                        @if ($isUpcoming)
+                            <span
+                                class="absolute top-5 right-5 bg-blue-600 text-white text-xs md:text-base font-semibold px-2 py-0.5 rounded-full shadow-sm z-10">
+                                {{ \App\Enums\Status::Upcoming->label() }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
             <!-- Product Info -->
-            <div class="flex flex-col">
+            <div class="{{ $isGalleryDown ? 'lg:col-span-7' : '' }} flex flex-col">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="flex items-center">
                         @for ($i = 1; $i <= 5; $i++)
@@ -368,6 +453,7 @@
 
 @push('scripts')
     <script>
+        const isGalleryDown = {{ (!empty($setup) && $setup->isGalleryPositionDown()) ? 'true' : 'false' }};
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
         const valueImages = @json($valueImages ?? []);
@@ -482,28 +568,35 @@
             const container = document.getElementById('thumbnail-container');
             const leftArrow = document.getElementById('thumb-arrow-left');
             const rightArrow = document.getElementById('thumb-arrow-right');
+            const thumbWrapper = document.getElementById('t5-thumb-wrapper');
             if (!container) return;
 
             container.innerHTML = '';
             images.forEach((img, i) => {
+                const btnSizeClass = isGalleryDown
+                    ? 'h-20 w-20 md:h-24 md:w-24'
+                    : 'h-14 w-14 sm:h-16 sm:w-16 md:h-24 md:w-24';
                 container.innerHTML += `
                               <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
-                                class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
+                                class="thumb-btn ${btnSizeClass} shrink-0 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
                                 <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
                               </button>`;
             });
 
             if (productVideoData && productVideoData.embed_url) {
+                const vBtnSizeClass = isGalleryDown
+                    ? 'h-20 w-20 md:h-24 md:w-24'
+                    : 'h-14 w-14 sm:h-16 sm:w-16 md:h-24 md:w-24';
                 container.innerHTML += `
                         <button type="button" onclick="openVideoModal('${productVideoData.embed_url}', '${productVideoData.type}')"
                             aria-label="Play Product Video"
-                            class="thumb-btn h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
+                            class="thumb-btn ${vBtnSizeClass} shrink-0 rounded-xl overflow-hidden border-2 border-coal/10 hover:border-[var(--primary-color)]/50 transition-colors relative group/vbtn cursor-pointer">
                             <img src="${productVideoData.thumbnail_url || '{{ asset('images/template1/frontend/product-thumbnail.webp') }}'}"
                                 onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
                                 class="w-full h-full object-cover pointer-events-none" alt="Product Video Thumbnail" loading="lazy" width="800" height="800">
                             <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover/vbtn:bg-black/50 transition-colors">
-                                <span class="w-7 h-7 sm:w-9 sm:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
-                                    <i class="fas fa-play text-xs sm:text-sm ml-0.5"></i>
+                                <span class="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-black/60 rounded-full flex items-center justify-center text-white shadow-md border border-white/70">
+                                    <i class="fas fa-play text-[10px] sm:text-xs md:text-sm ml-0.5"></i>
                                 </span>
                             </div>
                         </button>`;
@@ -511,15 +604,24 @@
 
             // ============ Arrow visibility + container padding dynamically আপডেট ============
             const totalCount = images.length + (productVideoData && productVideoData.embed_url ? 1 : 0);
-            const showArrows = totalCount > 3;
+            if (thumbWrapper) {
+                if (totalCount <= 1) {
+                    thumbWrapper.classList.add('!hidden');
+                } else {
+                    thumbWrapper.classList.remove('!hidden');
+                }
+            }
 
+            const showArrows = totalCount > 3;
             if (leftArrow) leftArrow.classList.toggle('hidden', !showArrows);
             if (leftArrow) leftArrow.classList.toggle('flex', showArrows);
             if (rightArrow) rightArrow.classList.toggle('hidden', !showArrows);
             if (rightArrow) rightArrow.classList.toggle('flex', showArrows);
 
-            container.classList.toggle('px-8', showArrows);
-            container.classList.toggle('md:px-10', showArrows);
+            if (isGalleryDown) {
+                container.classList.toggle('px-8', showArrows);
+                container.classList.toggle('md:px-10', showArrows);
+            }
         }
 
         function updatePriceDisplay(salePrice, regularPrice) {
@@ -720,10 +822,17 @@
             if (!container) return;
 
             const scrollAmount = 110;
-            container.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
+            if (isGalleryDown) {
+                container.scrollBy({
+                    left: direction * scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                container.scrollBy({
+                    top: direction * scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
         function initThumbnailDragScroll() {
             const container = document.getElementById('thumbnail-container');
