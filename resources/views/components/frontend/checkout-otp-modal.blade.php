@@ -379,8 +379,8 @@
                         errEl.classList.add('hidden');
                         input.classList.remove('!border-red-500', 'border-red-500');
                         if (confirmBtn) {
-                            confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                            confirmBtn.style.pointerEvents = 'none';
+                            confirmBtn.disabled = true;
+                            confirmBtn.setAttribute('disabled', 'disabled');
                         }
                         return false;
                     }
@@ -389,16 +389,16 @@
                         errEl.classList.remove('hidden');
                         input.classList.add('!border-red-500', 'border-red-500');
                         if (confirmBtn) {
-                            confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                            confirmBtn.style.pointerEvents = 'none';
+                            confirmBtn.disabled = true;
+                            confirmBtn.setAttribute('disabled', 'disabled');
                         }
                         return false;
                     } else {
                         errEl.classList.add('hidden');
                         input.classList.remove('!border-red-500', 'border-red-500');
                         if (confirmBtn) {
-                            confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                            confirmBtn.style.pointerEvents = '';
+                            confirmBtn.disabled = false;
+                            confirmBtn.removeAttribute('disabled');
                         }
                         return true;
                     }

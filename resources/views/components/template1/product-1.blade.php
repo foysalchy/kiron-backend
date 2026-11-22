@@ -151,7 +151,8 @@
 
             // ১. ভ্যারিয়েশন সিলেকশন লজিক (সংশোধিত)
             function handleModalSelection(btn, varId, price, type) {
-                const activeClasses = ['border-[var(--primary-color)]', 'bg-orange-50', 'ring-1', 'ring-[var(--primary-color)]'];
+                const activeClasses = ['border-[var(--primary-color)]', 'bg-[var(--primary-color)]/10', 'ring-2', 'ring-[var(--primary-color)]'];
+                const inactiveClasses = ['border-gray-200', 'bg-white'];
 
                 // টাইপটি ছোট হাতের অক্ষরে চেক করা হচ্ছে যাতে ভুল না হয়
                 const isMultiple = (type.toLowerCase() === 'multiple');
@@ -161,14 +162,20 @@
                     if (modalSelectedIds.includes(varId)) {
                         modalSelectedIds = modalSelectedIds.filter(id => id !== varId);
                         btn.classList.remove(...activeClasses);
+                        btn.classList.add(...inactiveClasses);
                     } else {
                         modalSelectedIds.push(varId);
+                        btn.classList.remove(...inactiveClasses);
                         btn.classList.add(...activeClasses);
                     }
                 } else {
                     // সিঙ্গেল টাইপ: রেডিও লজিক
                     modalSelectedIds = [varId];
-                    document.querySelectorAll('.modal-var-btn').forEach(el => el.classList.remove(...activeClasses));
+                    document.querySelectorAll('.modal-var-btn').forEach(el => {
+                        el.classList.remove(...activeClasses);
+                        el.classList.add(...inactiveClasses);
+                    });
+                    btn.classList.remove(...inactiveClasses);
                     btn.classList.add(...activeClasses);
                 }
 
@@ -184,8 +191,11 @@
                 const pos = "{{ $setup->currency_position ?? 'left' }}";
 
                 let totalSum = 0;
-                document.querySelectorAll('.modal-var-btn.bg-orange-50').forEach(el => {
-                    totalSum += parseFloat(el.getAttribute('data-price') || 0);
+                modalSelectedIds.forEach(id => {
+                    const el = document.querySelector(`.modal-var-btn[data-var-id="${id}"]`);
+                    if (el) {
+                        totalSum += parseFloat(el.getAttribute('data-price') || 0);
+                    }
                 });
 
                 const finalTotal = totalSum * qty;
@@ -226,15 +236,6 @@
                     .then(res => res.text())
                     .then(html => {
                         contentArea.innerHTML = html;
-
-                        const firstBtn = contentArea.querySelector('.modal-var-btn');
-                        if (firstBtn) {
-                            const firstId = parseInt(firstBtn.getAttribute('data-var-id'));
-                            if (!modalSelectedIds.includes(firstId)) {
-                                modalSelectedIds.push(firstId);
-                            }
-                            document.getElementById('modal-selected-ids').value = modalSelectedIds.join(',');
-                        }
                         updateModalTotal();
                     });
             }

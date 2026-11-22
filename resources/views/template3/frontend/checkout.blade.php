@@ -61,6 +61,21 @@
     transform:scale3d(1.03,1.03,1.03)rotate(-1deg)
   }
 }
+button[type="submit"]:disabled,
+button[type="submit"][disabled],
+#confirm-order-btn:disabled,
+#confirm-order-btn[disabled] {
+    background-color: #9ca3af !important;
+    background-image: none !important;
+    border-color: #9ca3af !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    animation: none !important;
+}
 </style>
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pb-24 lg:pb-6">
         <h1 class="px-6 text-2xl font-bold text-gray-900 mb-2 tracking-tight">Checkout</h1>

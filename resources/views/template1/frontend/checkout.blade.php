@@ -60,6 +60,21 @@
                 transform: scale3d(1.03, 1.03, 1.03)rotate(-1deg)
             }
         }
+        button[type="submit"]:disabled,
+        button[type="submit"][disabled],
+        #confirm-order-btn:disabled,
+        #confirm-order-btn[disabled] {
+            background-color: #9ca3af !important;
+            background-image: none !important;
+            border-color: #9ca3af !important;
+            color: #ffffff !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            box-shadow: none !important;
+            transform: none !important;
+            animation: none !important;
+        }
     </style>
 @endpush
 
