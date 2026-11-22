@@ -56,6 +56,7 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'product_details_quick_order' => ['nullable', 'boolean'],
                 'products_page_cta' => ['nullable', 'string', 'in:both,wp,call'],
                 'order_details_cta' => ['nullable', 'string', 'in:simple,advanced'],
+                'product_gallery_position' => ['nullable', 'string', 'in:left,down'],
                 'allow_search_engine_index' => ['nullable', 'boolean'],
                 'watermark_status' => ['nullable', 'boolean'],
                 'watermark_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

@@ -49,6 +49,7 @@ class SiteSetting extends Model
         'product_details_quick_order',
         'products_page_cta',
         'order_details_cta',
+        'product_gallery_position',
         'allow_search_engine_index',
         'status',
         'meta_image',
@@ -281,5 +282,15 @@ class SiteSetting extends Model
     public function isAdvancedOrderDetailsCta(): bool
     {
         return ($this->order_details_cta ?? 'advanced') === 'advanced';
+    }
+
+    public function isGalleryPositionDown(): bool
+    {
+        return ($this->product_gallery_position ?? 'left') === 'down';
+    }
+
+    public function isGalleryPositionLeft(): bool
+    {
+        return ($this->product_gallery_position ?? 'left') === 'left';
     }
 }
