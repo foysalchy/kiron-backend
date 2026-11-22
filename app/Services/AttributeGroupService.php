@@ -133,17 +133,41 @@ class AttributeGroupService
                 if ($values !== null && is_array($values)) {
                     $cleanedValues = array_values(array_filter(array_map('trim', $values), fn($v) => $v !== ''));
                     
-                    // Delete existing values for this group
-                    $group->values()->forceDelete();
+                    $existingValues = $group->values()->withTrashed()->get();
+                    $existingByName = $existingValues->keyBy(fn($v) => mb_strtolower(trim($v->name)));
+                    $incomingNamesLower = array_map(fn($v) => mb_strtolower(trim($v)), $cleanedValues);
 
-                    // Re-create new values
+                    // 1. Remove only values that are no longer in the updated list
+                    foreach ($existingValues as $existingVal) {
+                        if (!$existingVal->trashed() && !in_array(mb_strtolower(trim($existingVal->name)), $incomingNamesLower)) {
+                            $isUsed = \App\Models\ProductVariationAttribute::where('attribute_value_id', $existingVal->id)->exists();
+                            if ($isUsed) {
+                                $existingVal->delete();
+                            } else {
+                                $existingVal->forceDelete();
+                            }
+                        }
+                    }
+
+                    // 2. Add new values or restore/update existing ones
                     foreach ($cleanedValues as $valName) {
-                        AttributeValue::create([
-                            'company_id' => $group->company_id,
-                            'attribute_group_id' => $group->id,
-                            'name' => $valName,
-                            'status' => Status::Active->value,
-                        ]);
+                        $nameLower = mb_strtolower(trim($valName));
+                        if ($existingByName->has($nameLower)) {
+                            $existing = $existingByName->get($nameLower);
+                            if ($existing->trashed()) {
+                                $existing->restore();
+                            }
+                            if ($existing->name !== $valName) {
+                                $existing->update(['name' => $valName]);
+                            }
+                        } else {
+                            AttributeValue::create([
+                                'company_id' => $group->company_id,
+                                'attribute_group_id' => $group->id,
+                                'name' => $valName,
+                                'status' => Status::Active->value,
+                            ]);
+                        }
                     }
                 }
 
