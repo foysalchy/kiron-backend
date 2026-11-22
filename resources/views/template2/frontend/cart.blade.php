@@ -6,7 +6,7 @@
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0" id="cart-container">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
             <!-- Top Header -->
-            <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                 <h1 class="text-lg md:text-2xl font-bold text-gray-800">
                     Shopping Cart ({{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} Items)
                 </h1>
@@ -28,9 +28,9 @@
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
                                 <div class="flex flex-col sm:flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
-                                    <div class="flex flex-row items-start gap-3 w-full sm:flex-1">
+                                    <div class="flex flex-row items-start gap-3 md:gap-6 w-full sm:flex-1">
                                         <!-- Image -->
-                                        <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
+                                        <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
                                             <img src="{{ $item->options->thumbnail }}" alt="{{ $item->name ?? 'Product Image' }}"
                                                 onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                                 class="w-full h-full object-cover">
@@ -44,19 +44,19 @@
                                                 </h3>
                                             </a>
                                             <div class="flex items-center gap-2 mb-2">
-                                                <span class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                                <span class=" text-[var(--primary-color)] text-[10px] md:text-xs font-bold px-2 py-0.5 rounded uppercase">
                                                     {{ $item->options->variant ?? 'Product' }}
                                                 </span>
                                             </div>
                                             <div class="flex flex-wrap items-baseline gap-1 sm:gap-2">
-                                                <p class="font-bold text-gray-700 text-base sm:text-lg">
+                                                <p class="font-bold text-gray-700 text-base md:text-lg">
                                                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                     {{ number_format($item->price, 0) }}
                                                     {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                                 </p>
 
                                                 @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                                                    <span class="text-xs sm:text-sm text-gray-500 line-through font-normal pl-1">
+                                                    <span class="text-xs md:text-sm text-gray-500 line-through font-normal pl-1">
                                                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                         {{ number_format($item->options['regular_price'], 0) }}
                                                         {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
@@ -68,12 +68,12 @@
 
                                     <div class="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 mt-2 sm:mt-0">
                                         <!-- Qty Controls -->
-                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" aria-label="Decrease quantity"
-                                                class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-                                            <span class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
-                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" aria-label="Increase quantity"
-                                                class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
+                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
+                                            <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" aria-label="Decrease quantity"
+                                                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
+                                            <span class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
+                                            <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" aria-label="Increase quantity"
+                                                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
 
                                         <!-- Price & Delete -->
@@ -208,8 +208,8 @@
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg md:text-2xl font-bold text-gray-800">Total:</span>
-                            <span class="text-lg md:text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                            <span class="text-2xl font-bold text-gray-800">Total:</span>
+                            <span class="text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                 {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 

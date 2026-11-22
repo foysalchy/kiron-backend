@@ -47,7 +47,7 @@
                                             </a>
                                             <div class="flex items-center gap-2 mb-2">
                                                 <span
-                                                    class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                                    class=" text-[var(--primary-color)] text-[10px] md:text-xs font-bold px-2 py-0.5 rounded uppercase">
                                                     {{ $item->options->variant ?? 'Product' }}
                                                 </span>
                                             </div>
@@ -68,15 +68,15 @@
                                     <div class="flex items-center justify-between sm:justify-end gap-3 md:gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 shrink-0">
                                         <!-- Qty Controls -->
                                         <div
-                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                            class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
                                             <button type="button"
                                                 onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }}, {{ $item->price }})"
-                                                class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
+                                                class="px-2.5 sm:px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                             <span id="qty-{{ $item->rowId }}"
-                                                class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
+                                                class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
                                             <button type="button"
                                                 onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }}, {{ $item->price }})"
-                                                class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
+                                                class="px-2.5 sm:px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
 
                                         <!-- Price & Delete -->
@@ -210,8 +210,8 @@
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg md:text-2xl font-semibold md:font-black text-gray-800">Total:</span>
-                            <span class="text-lg md:text-2xl font-semibold md:font-black text-[var(--primary-color)]">
+                            <span class="text-2xl font-semibold md:font-black text-gray-800">Total:</span>
+                            <span class="text-2xl font-semibold md:font-black text-[var(--primary-color)]">
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($total, 0) : number_format($total, 0) . ' ' . $setup->currency }}
                             </span>
                         </div>

@@ -36,7 +36,26 @@ class SubdomainMiddleware
         if ($host === $mainDomain) {
             return redirect()->route('saas.index');
         }
-        // Subdomain (*.dorja.io)
+        // 1. Custom Domain Check: runs directly with custom domain without needing any subdomain
+        $store = \App\Models\DomainSetup::withoutGlobalScopes()
+            ->where(function ($q) use ($host) {
+                $q->where('custom_domain', $host)
+                  ->orWhere('custom_domain', 'www.' . $host);
+            })
+            ->first();
+
+        if ($store) {
+            $storeIdentifier = $store->custom_domain ?: $store->sub_domain;
+            app()->instance('currentStore', $storeIdentifier);
+            app()->instance('store', $store);
+            URL::defaults([
+                'store' => $storeIdentifier
+            ]);
+
+            return $next($request);
+        }
+
+        // 2. Subdomain (*.dorja.io)
         if (str_ends_with($host, '.' . $mainDomain)) {
 
             $subdomain = explode('.', $host)[0];
@@ -45,18 +64,6 @@ class SubdomainMiddleware
                 'store' => $subdomain
             ]);
             app()->instance('currentStore', $subdomain);
-
-            return $next($request);
-        }
-
-        // Custom Domain
-        $store = \App\Models\DomainSetup::where('custom_domain', $host)->first();
-
-        if ($store) {
-            app()->instance('currentStore', $store->subdomain);
-            URL::defaults([
-                'store' => $store->subdomain
-            ]);
 
             return $next($request);
         }
