@@ -313,7 +313,7 @@
                         @php
                             $isProductOutOfStock = ($product->stock_status === 'out_of_stock') || ($product->manage_stock && $product->available_stock <= 0);
                         @endphp
-                        <span
+                        <span id="product-stock-display"
                             class="text-sm {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
                             {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
                         </span>
@@ -565,7 +565,7 @@
 
                                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                             <span class="font-medium text-gray-500">Availability:</span>
-                                            <span
+                                            <span id="tab-stock"
                                                 class="font-bold {{ $isProductOutOfStock ? 'text-red-500' : 'text-green-700' }}">
                                                 {{ $isProductOutOfStock ? 'Out of Stock' : 'In Stock' }}
                                             </span>
@@ -1062,6 +1062,8 @@
         function updateSkuDisplay() {
             const skuEl = document.getElementById('product-sku');
             const tabSkuEl = document.getElementById('tab-sku');
+            const stockEl = document.getElementById('product-stock-display');
+            const tabStockEl = document.getElementById('tab-stock');
 
             if (finalSelectedVariationIds.length === 0) {
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
@@ -1070,14 +1072,66 @@
                     if (skuEl) skuEl.innerText = text;
                     if (tabSkuEl) tabSkuEl.innerText = text;
                 }
+                const defaultOutOfStock = @json($isProductOutOfStock);
+                const manageStock = @json((bool)$product->manage_stock);
+                const defaultStock = @json((int)$product->available_stock);
+
+                let defaultStockText = 'In Stock';
+                let defaultStockClass = 'text-sm text-green-700';
+                let defaultTabStockClass = 'font-bold text-green-700';
+
+                if (defaultOutOfStock) {
+                    defaultStockText = 'Out of stock';
+                    defaultStockClass = 'text-sm text-red-500';
+                    defaultTabStockClass = 'font-bold text-red-500';
+                } else if (!manageStock) {
+                    defaultStockText = 'In Stock';
+                    defaultStockClass = 'text-sm text-green-700';
+                    defaultTabStockClass = 'font-bold text-green-700';
+                } else {
+                    defaultStockText = defaultStock + ' in stock';
+                    defaultStockClass = 'text-sm text-green-700';
+                    defaultTabStockClass = 'font-bold text-green-700';
+                }
+
+                if (stockEl) {
+                    stockEl.innerText = defaultStockText;
+                    stockEl.className = defaultStockClass;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = defaultStockText;
+                    tabStockEl.className = defaultTabStockClass;
+                }
                 return;
             }
 
             let selectedSkus = [];
+            let totalSelectedStock = 0;
+            let hasValidStock = false;
+
             finalSelectedVariationIds.forEach(id => {
                 const v = allVariations.find(v => v.id === id);
                 if (v && v.sku) selectedSkus.push(v.sku);
+                if (v && v.stock !== undefined && v.stock !== null) {
+                    totalSelectedStock += parseInt(v.stock, 10);
+                    hasValidStock = true;
+                }
             });
+
+            if (hasValidStock) {
+                let stockText = (totalSelectedStock > 0) ? (totalSelectedStock + ' in stock') : 'Out of stock';
+                let stockClass = (totalSelectedStock > 0) ? 'text-sm text-green-700' : 'text-sm text-red-500';
+                let tabStockClass = (totalSelectedStock > 0) ? 'font-bold text-green-700' : 'font-bold text-red-500';
+
+                if (stockEl) {
+                    stockEl.innerText = stockText;
+                    stockEl.className = stockClass;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = stockText;
+                    tabStockEl.className = tabStockClass;
+                }
+            }
 
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");

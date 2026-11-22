@@ -377,9 +377,9 @@
                         @endif
                         <p
                             class="text-sm mt-4 {{ !$isProductOutOfStock ? 'text-green-700' : 'text-red-500' }}">
-                            <i
+                            <i id="product-stock-icon"
                                 class="fas {{ !$isProductOutOfStock ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
-                            {{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}
+                            <span id="product-stock-display">{{ $isProductOutOfStock ? 'Out of stock' : (!$product->manage_stock ? 'In Stock' : $product->available_stock . ' in stock') }}</span>
                         </p>
 
                         <p class="text-sm md:text-base text-gray-600 mt-5 md:mt-6 leading-relaxed">
@@ -595,7 +595,7 @@
 
                                     <div class="flex justify-between py-2 border-b border-gray-100">
                                         <span class="text-gray-600 font-medium">Availability:</span>
-                                        <span
+                                        <span id="tab-stock"
                                             class="font-bold {{ !$isProductOutOfStock ? 'text-green-600' : 'text-red-500' }}">
                                             {{ !$isProductOutOfStock ? 'In Stock' : 'Out of Stock' }}
                                         </span>
@@ -917,6 +917,9 @@
         function updateSkuDisplay() {
             const skuEl = document.getElementById('product-sku');
             const tabSkuEl = document.getElementById('tab-sku');
+            const stockEl = document.getElementById('product-stock-display');
+            const stockIcon = document.getElementById('product-stock-icon');
+            const tabStockEl = document.getElementById('tab-stock');
 
             if (finalSelectedVariationIds.length === 0) {
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
@@ -925,14 +928,69 @@
                     if (skuEl) skuEl.innerText = text;
                     if (tabSkuEl) tabSkuEl.innerText = text;
                 }
+                const defaultOutOfStock = @json($isProductOutOfStock);
+                const manageStock = @json((bool)$product->manage_stock);
+                const defaultStock = @json((int)$product->available_stock);
+
+                let defaultStockText = 'In Stock';
+                let defaultTabStockClass = 'font-bold text-green-600';
+
+                if (defaultOutOfStock) {
+                    defaultStockText = 'Out of stock';
+                    defaultTabStockClass = 'font-bold text-red-500';
+                    if (stockIcon) stockIcon.className = 'fas fa-times-circle mr-1 text-red-500';
+                    if (stockEl && stockEl.parentElement) stockEl.parentElement.className = 'text-sm mt-4 text-red-500';
+                } else if (!manageStock) {
+                    defaultStockText = 'In Stock';
+                    defaultTabStockClass = 'font-bold text-green-600';
+                    if (stockIcon) stockIcon.className = 'fas fa-check-circle mr-1 text-green-700';
+                    if (stockEl && stockEl.parentElement) stockEl.parentElement.className = 'text-sm mt-4 text-green-700';
+                } else {
+                    defaultStockText = defaultStock + ' in stock';
+                    defaultTabStockClass = 'font-bold text-green-600';
+                    if (stockIcon) stockIcon.className = 'fas fa-check-circle mr-1 text-green-700';
+                    if (stockEl && stockEl.parentElement) stockEl.parentElement.className = 'text-sm mt-4 text-green-700';
+                }
+
+                if (stockEl) {
+                    stockEl.innerText = defaultStockText;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = defaultStockText;
+                    tabStockEl.className = defaultTabStockClass;
+                }
                 return;
             }
 
             let selectedSkus = [];
+            let totalSelectedStock = 0;
+            let hasValidStock = false;
+
             finalSelectedVariationIds.forEach(id => {
                 const v = allVariations.find(v => v.id === id);
                 if (v && v.sku) selectedSkus.push(v.sku);
+                if (v && v.stock !== undefined && v.stock !== null) {
+                    totalSelectedStock += parseInt(v.stock, 10);
+                    hasValidStock = true;
+                }
             });
+
+            if (hasValidStock) {
+                let isOut = (totalSelectedStock <= 0);
+                let stockText = isOut ? 'Out of stock' : (totalSelectedStock + ' in stock');
+                let tabStockClass = isOut ? 'font-bold text-red-500' : 'font-bold text-green-600';
+
+                if (stockIcon) stockIcon.className = isOut ? 'fas fa-times-circle mr-1 text-red-500' : 'fas fa-check-circle mr-1 text-green-700';
+                if (stockEl && stockEl.parentElement) stockEl.parentElement.className = isOut ? 'text-sm mt-4 text-red-500' : 'text-sm mt-4 text-green-700';
+
+                if (stockEl) {
+                    stockEl.innerText = stockText;
+                }
+                if (tabStockEl) {
+                    tabStockEl.innerText = stockText;
+                    tabStockEl.className = tabStockClass;
+                }
+            }
 
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");
