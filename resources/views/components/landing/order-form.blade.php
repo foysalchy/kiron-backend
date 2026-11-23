@@ -173,15 +173,9 @@
                             $pHasSingleVar = ($p->type === 'variation') && ($varsCount === 1);
                             $singleVar = $pHasSingleVar ? $p->variations->first() : null;
 
+                            $firstVar = ($p->type === 'variation' && $p->variations) ? $p->variations->first() : null;
+                            $pPrice = $firstVar ? ($firstVar->regular_price - ($firstVar->discount ?? 0)) : ($p->sale_price ?? ($p->regular_price - ($p->discount ?? 0)));
                             $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
-                            $pPrice = $p->sale_price ?? ($p->regular_price - ($p->discount ?? 0));
-
-                            if ($pHasSingleVar && $singleVar) {
-                                $pPrice = $singleVar->regular_price - ($singleVar->discount ?? 0);
-                                if (!empty($singleVar->image)) {
-                                    $pImg = \Illuminate\Support\Facades\Storage::disk('r2')->url($singleVar->image);
-                                }
-                            }
 
                             $pIsSingleOutOfStock = ($p->type === 'single') && (
                                 $p->stock_status === 'out_of_stock' ||
@@ -197,67 +191,87 @@
                                 );
                                 $singleVarMaxStock = $p->manage_stock ? ($singleVar->available_stock ?? 0) : 999999;
                             }
+
+                            $pIsMultipleAttribute = false;
+                            if ($p->type === 'variation' && $p->variations) {
+                                $pVarIds = $p->variations->pluck('id')->filter()->toArray();
+                                if (!empty($pVarIds)) {
+                                    $pIsMultipleAttribute = \App\Models\AttributeGroup::withoutGlobalScopes()
+                                        ->whereIn('id', function($q) use ($pVarIds) {
+                                            $q->select('attribute_group_id')
+                                              ->from('product_variation_attributes')
+                                              ->whereIn('product_variation_id', $pVarIds);
+                                        })
+                                        ->whereRaw('LOWER(category) = ?', ['multiple'])
+                                        ->exists();
+                                }
+                            }
                         @endphp
 
-                        <div class="order-product-item-wrapper border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm space-y-3 hidden" data-order-product-id="{{ $p->id }}">
-                            <div class="flex items-center justify-between {{ $pHasMultipleVars ? 'border-b border-gray-100 pb-3' : '' }}">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
-                                        <img src="{{ $pImg }}" class="w-full h-full object-contain" alt="{{ $p->title }}">
+                        <div class="order-product-item-wrapper l1-single-variant-container border-2 border-gray-200 rounded-2xl p-4 sm:p-5 bg-white transition-all duration-200 hover:border-gray-300 hidden" data-order-product-id="{{ $p->id }}" data-product-id="{{ $p->id }}" data-is-multiple="{{ $pIsMultipleAttribute ? '1' : '0' }}">
+                            {{-- Top Row: Checkbox + Thumbnail + Product Title + Price + Side Remove --}}
+                            <div class="flex items-start justify-between gap-3 cursor-pointer select-none" onclick="toggleMultiProductCard('{{ $p->id }}')">
+                                <div class="flex items-center gap-3.5 sm:gap-4 flex-grow min-w-0">
+                                    <input type="checkbox" id="multi-card-cb-{{ $p->id }}" class="w-5 h-5 rounded border-2 border-gray-300 text-[#35B11E] focus:ring-0 focus:ring-offset-0 pointer-events-none cursor-pointer">
+
+                                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 flex items-center justify-center p-1">
+                                        <img id="multi-card-img-{{ $p->id }}" src="{{ $pImg }}" width="80" height="80" class="w-full h-full object-contain pointer-events-none" alt="{{ $p->title }}">
                                     </div>
-                                    <div>
-                                        <h4 class="font-bold text-gray-800 text-sm md:text-base leading-snug">{{ $p->title }}</h4>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="text-xs text-gray-500 font-semibold">{{ $trans['price_label'] }} {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
-                                            @if ($pHasSingleVar && $singleVar)
-                                                <span class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">({{ $singleVar->display_name }})</span>
-                                                @if ($singleVarOutOfStock)
-                                                    <span class="text-[10px] text-red-600 font-bold">({{ $trans['out_of_stock'] }})</span>
-                                                @endif
-                                            @endif
+
+                                    <div class="flex-grow min-w-0 text-left">
+                                        <h4 class="font-bold text-gray-900 text-sm sm:text-base leading-snug truncate">
+                                            {{ $p->title }}
+                                        </h4>
+                                        <div class="mt-1 flex items-baseline gap-2 flex-wrap">
+                                            <span id="multi-card-price-{{ $p->id }}" class="text-base sm:text-lg font-black text-[#0D2601]">
+                                                {{ number_format($pPrice, 2) }}{{ $setup->currency }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-                                @if (!$pHasMultipleVars)
-                                    @if ($pHasSingleVar && $singleVar)
-                                        <button type="button"
-                                            onclick="removeVariationItem('{{ $singleVar->id }}', false)"
-                                            class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-                                            title="{{ $trans['remove'] }}">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    @else
-                                        <button type="button"
-                                            onclick="removeVariationItem('{{ $p->id }}', true)"
-                                            class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-                                            title="{{ $trans['remove'] }}">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    @endif
-                                @endif
+
+                                <button type="button"
+                                    onclick="event.stopPropagation(); removeEntireMultiProduct('{{ $p->id }}')"
+                                    class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer flex-shrink-0 mt-0.5"
+                                    title="{{ $trans['remove'] }}">
+                                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
 
                             @if ($pHasMultipleVars)
-                                {{-- Variations of this product (multiple variations) --}}
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                                    @foreach ($p->variations as $variation)
-                                        @php
-                                            $vSalePrice = $variation->regular_price - ($variation->discount ?? 0);
-                                            $vImage = $variation->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($variation->image)) : $pImg;
-                                            $vOutOfStock = (
-                                                $variation->stock_status === 'out_of_stock' ||
-                                                ($p->manage_stock && ($variation->available_stock <= 0))
-                                            );
-                                            $maxStock = $p->manage_stock ? ($variation->available_stock ?? 0) : 999999;
-                                        @endphp
-                                        <label class="relative {{ $vOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
-                                            <input type="checkbox" name="variation_ids[]" value="{{ $variation->id }}"
+                                {{-- Variations of this product (Identical collapsible drawer matching single variation design) --}}
+                                <div id="multi-drawer-{{ $p->id }}" class="mt-4 pt-4 border-t border-gray-100 hidden transition-all">
+                                    <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap pt-1">
+                                        @foreach ($p->variations as $variation)
+                                            @php
+                                                $vSalePrice = $variation->regular_price - ($variation->discount ?? 0);
+                                                $vImage = $variation->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($variation->image)) : $pImg;
+                                                $vOutOfStock = (
+                                                    $variation->stock_status === 'out_of_stock' ||
+                                                    ($p->manage_stock && ($variation->available_stock <= 0))
+                                                );
+                                                $maxStock = $p->manage_stock ? ($variation->available_stock ?? 0) : 999999;
+                                                $dispName = $variation->display_name ?: ($variation->sku ?: 'Option');
+                                            @endphp
+
+                                            <button type="button"
+                                                onclick="selectMultiProductVariationButton('{{ $p->id }}', '{{ $variation->id }}', this)"
+                                                data-prod-id="{{ $p->id }}"
+                                                data-var-id="{{ $variation->id }}"
                                                 data-price="{{ $vSalePrice }}"
-                                                data-name="{{ $variation->display_name }}"
+                                                data-img="{{ $vImage }}"
+                                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                                class="l1-size-btn multi-size-btn-{{ $p->id }} px-4 py-2 rounded-xl border-2 text-xs sm:text-sm font-bold transition-all cursor-pointer bg-white text-gray-800 border-gray-300 hover:border-[#35B11E] {{ $vOutOfStock ? 'opacity-50 cursor-not-allowed line-through' : '' }}"
+                                                {{ $vOutOfStock ? 'disabled' : '' }}>
+                                                {{ $dispName }}
+                                            </button>
+
+                                            {{-- Hidden input for form binding --}}
+                                            <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $variation->id }}" value="{{ $variation->id }}"
+                                                data-price="{{ $vSalePrice }}"
+                                                data-name="{{ $dispName }}"
                                                 data-title="{{ $p->title }}"
                                                 data-img="{{ $vImage }}"
                                                 data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
@@ -265,33 +279,12 @@
                                                 data-max-stock="{{ $maxStock }}"
                                                 {{ $vOutOfStock ? 'disabled' : '' }}
                                                 onchange="onVariationCheckboxChange()"
-                                                class="hidden peer variant-checkbox">
-
-                                            <div class="variant-card-box flex items-center justify-between gap-3 p-3 border-2 border-gray-200 rounded-xl transition-all hover:border-gray-300 bg-white">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
-                                                        <svg class="w-3.5 h-3.5 text-white hidden checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class="w-10 h-10 rounded border border-gray-100 overflow-hidden flex-shrink-0 bg-white">
-                                                        <img src="{{ $vImage }}" class="w-full h-full object-contain" alt="VAR">
-                                                    </div>
-                                                    <div class="text-left">
-                                                        <p class="text-xs font-bold text-gray-800">{{ $variation->display_name }}</p>
-                                                        @if($vOutOfStock)
-                                                            <span class="text-[10px] text-red-600 font-bold">{{ $trans['out_of_stock'] }}</span>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                <span class="text-xs font-bold text-gray-900">{{ number_format($vSalePrice, 2) }}{{ $setup->currency }}</span>
-                                            </div>
-                                        </label>
-                                    @endforeach
+                                                class="hidden variant-checkbox">
+                                        @endforeach
+                                    </div>
                                 </div>
                             @elseif ($pHasSingleVar && $singleVar)
-                                {{-- Single variation product (hidden input, acts as single item visually) --}}
-                                <input type="checkbox" name="variation_ids[]" value="{{ $singleVar->id }}"
+                                <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $singleVar->id }}" value="{{ $singleVar->id }}"
                                     data-price="{{ $pPrice }}"
                                     data-name="{{ $singleVar->display_name }}"
                                     data-title="{{ $p->title }}"
@@ -303,8 +296,7 @@
                                     onchange="onVariationCheckboxChange()"
                                     class="hidden variant-checkbox">
                             @else
-                                {{-- Single product item (hidden input, card removed via side remove icon) --}}
-                                <input type="checkbox" name="product_ids[]" value="{{ $p->id }}"
+                                <input type="checkbox" name="product_ids[]" id="multi_prod_input_{{ $p->id }}" value="{{ $p->id }}"
                                     data-price="{{ $pPrice }}"
                                     data-name="Regular"
                                     data-title="{{ $p->title }}"
@@ -321,78 +313,110 @@
                     @endforeach
                 </div>
             @elseif ($mainProduct->type === 'variation')
-                @foreach ($mainProduct->variations as $index => $variation)
-                    @php
-                        $vSalePrice = $variation->regular_price - $variation->discount;
-                        $vImage = $variation->image_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
-                        $vOutOfStock = (
-                            $variation->stock_status === 'out_of_stock' ||
-                            ($mainProduct->manage_stock && ($variation->available_stock <= 0))
-                        );
-                        $isChecked = ($firstAvailableVariationIndex !== null)
-                            ? ($index === $firstAvailableVariationIndex)
-                            : ($index === 0);
-                        $maxStock = $mainProduct->manage_stock
-                            ? ($variation->available_stock ?? 0)
-                            : 999999;
-                    @endphp
-                    <label class="relative {{ $vOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
-                        @if ($isMultipleAttribute)
-                            <input type="checkbox" name="variation_ids[]" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
-                                data-price="{{ $vSalePrice }}"
-                                data-name="{{ $variation->display_name }}"
-                                data-img="{{ $vImage }}"
-                                data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
-                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
-                                data-max-stock="{{ $maxStock }}"
-                                {{ $vOutOfStock ? 'disabled' : '' }}
-                                onchange="onVariationCheckboxChange()"
-                                class="hidden peer variant-checkbox">
-                        @else
-                            <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
-                                data-price="{{ $vSalePrice }}"
-                                data-name="{{ $variation->display_name }}"
-                                data-img="{{ $vImage }}"
-                                data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
-                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
-                                data-max-stock="{{ $maxStock }}"
-                                {{ $vOutOfStock ? 'disabled' : '' }}
-                                onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}', {{ $vOutOfStock ? 'true' : 'false' }}, {{ $maxStock }})"
-                                class="hidden peer">
-                        @endif
+                @php
+                    $pImg = $landing->thumbnail_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
+                    $firstVar = $mainProduct->variations->first();
+                    $pPrice = $firstVar ? ($firstVar->regular_price - $firstVar->discount) : ($mainProduct->sale_price ?? $mainProduct->regular_price);
+                @endphp
 
-                        <div
-                            class="variant-card-box flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all {{ !$vOutOfStock ? 'hover:border-gray-300' : 'bg-gray-50 border-gray-200' }} bg-white">
-                            <div class="flex items-center gap-4 w-full">
-                                @if ($isMultipleAttribute)
-                                    <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
-                                        <svg class="w-3.5 h-3.5 text-white {{ $isChecked ? '' : 'hidden' }} checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                        </svg>
-                                    </div>
-                                @endif
-                                <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                                    <img src="{{ $vImage }}" width="64" height="64" class="w-full h-full object-contain"
-                                        alt="PRODUCT">
-                                </div>
-                                <div class="flex-grow text-left">
-                                    <p class="text-sm md:text-md font-bold text-gray-800">{{ $mainProduct->title }}</p>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <p class="text-xs text-[#145a32] font-bold uppercase">Option:
-                                            {{ $variation->display_name }}</p>
-                                        @if($vOutOfStock)
-                                            <span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">{{ $trans['out_of_stock'] }}</span>
-                                        @endif
-                                    </div>
-                                </div>
+                <div class="l1-single-variant-container border-2 border-gray-200 rounded-2xl p-4 sm:p-5 bg-white transition-all duration-200 hover:border-gray-300">
+                    {{-- Top Header Row: Checkbox + Thumbnail + Product Title / Code + Price --}}
+                    <div class="flex items-start justify-between gap-3 cursor-pointer select-none" onclick="toggleL1MainCard()">
+                        <div class="flex items-center gap-3.5 sm:gap-4 flex-grow min-w-0">
+                            <input type="checkbox" id="l1-main-checkbox-input" class="w-5 h-5 rounded border-2 border-gray-300 text-[#35B11E] focus:ring-0 focus:ring-offset-0 pointer-events-none cursor-pointer">
+
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 flex items-center justify-center p-1">
+                                <img id="l1-main-thumb" src="{{ $pImg }}" width="80" height="80" class="w-full h-full object-contain pointer-events-none" alt="{{ $mainProduct->title }}">
                             </div>
-                            <div class="flex items-center gap-4 flex-shrink-0">
-                                <span
-                                    class="text-lg font-bold text-gray-900">{{ number_format($vSalePrice, 2) }}{{ $setup->currency }}</span>
+
+                            <div class="flex-grow min-w-0 text-left">
+                                <h4 class="font-bold text-gray-900 text-sm sm:text-base leading-snug truncate">
+                                    {{ $landing->title ?? $mainProduct->title }}
+                                </h4>
+                                <div class="mt-1 flex items-baseline gap-2 flex-wrap">
+                                    <span id="l1-main-price" class="text-base sm:text-lg font-black text-[#0D2601]">
+                                        {{ number_format($pPrice, 2) }}{{ $setup->currency }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </label>
-                @endforeach
+
+                        <button type="button"
+                            onclick="event.stopPropagation(); removeSingleVariationCard();"
+                            class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer flex-shrink-0 mt-0.5"
+                            title="{{ $trans['remove'] }}">
+                            <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Hidden inputs to maintain form binding --}}
+                    <div class="hidden">
+                        @foreach ($mainProduct->variations as $index => $variation)
+                            @php
+                                $vSalePrice = $variation->regular_price - $variation->discount;
+                                $vImage = $variation->image_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
+                                $vOutOfStock = (
+                                    $variation->stock_status === 'out_of_stock' ||
+                                    ($mainProduct->manage_stock && ($variation->available_stock <= 0))
+                                );
+                                $maxStock = $mainProduct->manage_stock ? ($variation->available_stock ?? 0) : 999999;
+                                $dispName = $variation->display_name ?: ($variation->sku ?: 'Option ' . ($index + 1));
+                            @endphp
+                            @if ($isMultipleAttribute)
+                                <input type="checkbox" name="variation_ids[]" id="l1_input_{{ $variation->id }}" value="{{ $variation->id }}"
+                                    data-price="{{ $vSalePrice }}"
+                                    data-name="{{ $dispName }}"
+                                    data-img="{{ $vImage }}"
+                                    data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
+                                    data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                    data-max-stock="{{ $maxStock }}"
+                                    {{ $vOutOfStock ? 'disabled' : '' }}
+                                    onchange="onVariationCheckboxChange()"
+                                    class="l1-internal-input variant-checkbox">
+                            @else
+                                <input type="radio" name="variant_radio" id="l1_radio_{{ $variation->id }}" value="{{ $variation->id }}"
+                                    data-price="{{ $vSalePrice }}"
+                                    data-name="{{ $dispName }}"
+                                    data-img="{{ $vImage }}"
+                                    data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
+                                    data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                    data-max-stock="{{ $maxStock }}"
+                                    {{ $vOutOfStock ? 'disabled' : '' }}
+                                    onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ addslashes($dispName) }}', '{{ $vImage }}', {{ $vOutOfStock ? 'true' : 'false' }}, {{ $maxStock }})"
+                                    class="l1-internal-input">
+                            @endif
+                        @endforeach
+                    </div>
+
+                    {{-- Collapsible Variation Selector (Hidden initially until card/checkbox is clicked) --}}
+                    <div id="l1-size-drawer" class="mt-4 pt-4 border-t border-gray-100 hidden transition-all">
+                        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap pt-1">
+                            @foreach ($mainProduct->variations as $index => $variation)
+                                @php
+                                    $vSalePrice = $variation->regular_price - $variation->discount;
+                                    $vImage = $variation->image_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
+                                    $vOutOfStock = (
+                                        $variation->stock_status === 'out_of_stock' ||
+                                        ($mainProduct->manage_stock && ($variation->available_stock <= 0))
+                                    );
+                                    $dispName = $variation->display_name ?: ($variation->sku ?: 'Option ' . ($index + 1));
+                                @endphp
+                                <button type="button"
+                                    onclick="selectL1VariationButton('{{ $variation->id }}', this)"
+                                    data-var-id="{{ $variation->id }}"
+                                    data-price="{{ $vSalePrice }}"
+                                    data-img="{{ $vImage }}"
+                                    data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                    class="l1-size-btn px-4 py-2 rounded-xl border-2 text-xs sm:text-sm font-bold transition-all cursor-pointer bg-white text-gray-800 border-gray-300 hover:border-[#35B11E] {{ $vOutOfStock ? 'opacity-50 cursor-not-allowed line-through' : '' }}"
+                                    {{ $vOutOfStock ? 'disabled' : '' }}>
+                                    {{ $dispName }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
         @endif
@@ -705,10 +729,17 @@
             onVariationCheckboxChange();
         } else if (isVarProduct) {
             if (isMultipleAttribute) {
+                // If multiple attribute, initially unselected or toggle based on checked
                 onVariationCheckboxChange();
             } else {
-                const firstRadio = document.querySelector('input[name="variant_radio"]:checked') || document.querySelector('input[name="variant_radio"]');
-                if (firstRadio) firstRadio.dispatchEvent(new Event('change'));
+                // Single variation attribute: default select the first available variation
+                const firstAvailableBtn = document.querySelector('.l1-size-btn:not([disabled])');
+                if (firstAvailableBtn) {
+                    firstAvailableBtn.click();
+                } else {
+                    const firstBtn = document.querySelector('.l1-size-btn');
+                    if (firstBtn) firstBtn.click();
+                }
             }
         } else {
             updateUI();
@@ -751,47 +782,59 @@
             const lineTotalFormatted = (price * itemQty).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             html += `
-                <div class="flex justify-between items-center gap-3 py-2.5 border-b border-gray-100 last:border-0" data-item-id="${item.id}">
-                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                <div class="py-3 border-b border-gray-100 last:border-0" data-item-id="${item.id}">
+                    {{-- Row 1: Image + Full Title & Option + Top-Right Cross Remove Button --}}
+                    <div class="flex items-start gap-3">
                         <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-white p-0.5">
                             <img src="${item.img || PRODUCT_THUMB}" width="48" height="48"
                                 alt="${item.title || PRODUCT_TITLE}"
                                 class="w-full h-full object-contain">
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-bold text-gray-800 truncate">${item.title || PRODUCT_TITLE}</p>
-                            ${item.option ? `<p class="text-[11px] text-[#145a32] font-semibold mt-0.5 uppercase">${item.option}</p>` : ''}
-                            <p class="text-[11px] text-gray-500 font-medium">${price.toFixed(2)}${CURRENCY}</p>
+                        <div class="flex-1 min-w-0 pr-1">
+                            <p class="text-xs font-bold text-gray-800 leading-snug truncate">${item.title || PRODUCT_TITLE}</p>
+                            @if ($mainProduct->type === 'variation' || $isMultiProductMode)
+                                ${item.option ? `<p class="text-[11px] text-[#145a32] font-bold mt-0.5 uppercase">${item.option}</p>` : ''}
+                            @endif
                         </div>
-                    </div>
-
-                    <div class="flex items-center gap-3 flex-shrink-0">
                         ${isMulti ? `
-                            <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden shadow-sm">
-                                <button type="button" onclick="changeItemQty('${itemKey}', -1, ${item.maxStock})"
-                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-r border-gray-300 cursor-pointer text-gray-600">−</button>
-                                <span class="w-7 text-center font-bold text-xs text-gray-800">${itemQty}</span>
-                                <button type="button" onclick="changeItemQty('${itemKey}', 1, ${item.maxStock})"
-                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-l border-gray-300 cursor-pointer text-gray-600">+</button>
-                            </div>
                             <button type="button" onclick="removeVariationItem('${item.id}', ${item.isProduct ? 'true' : 'false'})"
-                                class="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                                class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer flex-shrink-0 mt-0.5"
                                 title="${FORM_TRANS.remove || 'রিমুভ করুন'}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
-                            ${item.isProduct
-                                ? `<input type="hidden" name="product_quantities[${item.id}]" value="${itemQty}">`
-                                : `<input type="hidden" name="variation_quantities[${item.id}]" value="${itemQty}">`
-                            }
-                        ` : `
-                            <span class="text-xs font-bold text-gray-700">
-                                <span class="text-gray-400">×</span> <span class="item-summary-qty">${qty}</span>
-                            </span>
-                        `}
-                        <div class="text-right w-16">
-                            <span class="text-xs font-bold text-gray-900">${lineTotalFormatted}${CURRENCY}</span>
+                        ` : ''}
+                    </div>
+
+                    {{-- Row 2: Unit Price + Quantity Selector + Line Total --}}
+                    <div class="flex items-center justify-between gap-2 mt-2 pl-[60px]">
+                        <div class="text-[11px] text-gray-500 font-semibold">
+                            ${price.toFixed(2)}${CURRENCY}
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            ${isMulti ? `
+                                <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden shadow-xs">
+                                    <button type="button" onclick="changeItemQty('${itemKey}', -1, ${item.maxStock})"
+                                        class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-r border-gray-300 cursor-pointer text-gray-600">−</button>
+                                    <span class="w-7 text-center font-bold text-xs text-gray-800">${itemQty}</span>
+                                    <button type="button" onclick="changeItemQty('${itemKey}', 1, ${item.maxStock})"
+                                        class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-l border-gray-300 cursor-pointer text-gray-600">+</button>
+                                </div>
+                                ${item.isProduct
+                                    ? `<input type="hidden" name="product_quantities[${item.id}]" value="${itemQty}">`
+                                    : `<input type="hidden" name="variation_quantities[${item.id}]" value="${itemQty}">`
+                                }
+                            ` : `
+                                <span class="text-xs font-bold text-gray-700">
+                                    <span class="text-gray-400">×</span> <span class="item-summary-qty">${qty}</span>
+                                </span>
+                            `}
+
+                            <div class="text-right min-w-[70px]">
+                                <span class="text-xs sm:text-sm font-black text-gray-900">${lineTotalFormatted}${CURRENCY}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -815,6 +858,31 @@
         onVariationCheckboxChange();
     }
 
+    function removeEntireMultiProduct(productId) {
+        const wrapper = document.querySelector(`.order-product-item-wrapper[data-order-product-id="${productId}"]`);
+        const checkbox = document.getElementById(`multi-card-cb-${productId}`);
+        const drawer = document.getElementById(`multi-drawer-${productId}`);
+
+        if (wrapper) {
+            wrapper.querySelectorAll('input.variant-checkbox').forEach(input => {
+                input.checked = false;
+                delete variationQuantities[input.value];
+                delete variationQuantities['prod_' + input.value];
+            });
+            wrapper.querySelectorAll('.l1-size-btn').forEach(b => {
+                b.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                b.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            });
+            wrapper.classList.add('hidden');
+            wrapper.classList.remove('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+            wrapper.classList.add('border-gray-200', 'bg-white');
+        }
+        if (checkbox) checkbox.checked = false;
+        if (drawer) drawer.classList.add('hidden');
+
+        onVariationCheckboxChange();
+    }
+
     function removeVariationItem(id, isProduct = false) {
         const selector = isProduct
             ? `input[name="product_ids[]"][value="${id}"]`
@@ -824,6 +892,14 @@
             cb.checked = false;
             const storageKey = isProduct ? ('prod_' + id) : id;
             delete variationQuantities[storageKey];
+
+            // If this variation belongs to a button, deactivate its styling
+            const btn = document.querySelector(`.l1-size-btn[data-var-id="${id}"]`);
+            if (btn) {
+                btn.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            }
+
             onVariationCheckboxChange();
         }
     }
@@ -832,13 +908,14 @@
         const checkboxes = Array.from(document.querySelectorAll('.variant-checkbox'));
         const checkedList = checkboxes.filter(cb => cb.checked);
 
-        // Update visual checkmark icons and box highlights
+        // Update visual checkmark icons, box highlights, and button highlights
         checkboxes.forEach(cb => {
             const label = cb.closest('label');
             if (label) {
                 const box = label.querySelector('.checkmark-box');
                 const card = label.querySelector('.variant-card-box');
                 const icon = label.querySelector('.checkmark-icon');
+                const btn = label.querySelector('.l1-multi-opt-btn');
 
                 if (cb.checked) {
                     if (box) {
@@ -852,6 +929,10 @@
                     if (icon) {
                         icon.classList.remove('hidden');
                     }
+                    if (btn) {
+                        btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+                        btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                    }
                 } else {
                     if (box) {
                         box.classList.remove('bg-[#1f8a54]', 'border-[#1f8a54]');
@@ -864,6 +945,10 @@
                     if (icon) {
                         icon.classList.add('hidden');
                     }
+                    if (btn) {
+                        btn.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                        btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+                    }
                 }
             }
         });
@@ -872,11 +957,39 @@
         let anyProductVisible = false;
         document.querySelectorAll('.order-product-item-wrapper').forEach(wrapper => {
             const hasChecked = wrapper.querySelector('.variant-checkbox:checked');
+            const productId = wrapper.dataset.orderProductId;
+            const cardCheckbox = document.getElementById(`multi-card-cb-${productId}`);
+            const drawer = document.getElementById(`multi-drawer-${productId}`);
+
             if (hasChecked) {
                 wrapper.classList.remove('hidden');
+                wrapper.classList.remove('border-gray-200', 'bg-white');
+                wrapper.classList.add('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+                if (cardCheckbox) cardCheckbox.checked = true;
+                if (drawer) drawer.classList.remove('hidden');
+
+                // Highlight active variation button and update card info
+                const activeBtn = wrapper.querySelector(`.l1-size-btn[data-var-id="${hasChecked.value}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                    activeBtn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+                    const priceEl = document.getElementById(`multi-card-price-${productId}`);
+                    if (priceEl && activeBtn.dataset.price) {
+                        priceEl.innerText = parseFloat(activeBtn.dataset.price).toFixed(2) + CURRENCY;
+                    }
+                    const thumbEl = document.getElementById(`multi-card-img-${productId}`);
+                    if (thumbEl && activeBtn.dataset.img) {
+                        thumbEl.src = activeBtn.dataset.img;
+                    }
+                }
+
                 anyProductVisible = true;
             } else {
                 wrapper.classList.add('hidden');
+                wrapper.classList.remove('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+                wrapper.classList.add('border-gray-200', 'bg-white');
+                if (cardCheckbox) cardCheckbox.checked = false;
+                if (drawer) drawer.classList.add('hidden');
             }
         });
 
@@ -1041,6 +1154,224 @@
             btn.className = "w-full bg-[#1f8a54] hover:bg-[#176840] cursor-pointer text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2";
             btn.innerHTML = `<span id="btn-text">${FORM_TRANS.place_order || 'অর্ডার করুন'}</span> <span id="btn-total"></span>` + CURRENCY;
         }
+    }
+
+    let l1CardSelected = false;
+
+    function toggleL1MainCard() {
+        const container = document.querySelector('.l1-single-variant-container');
+        const drawer = document.getElementById('l1-size-drawer');
+        const checkboxInput = document.getElementById('l1-main-checkbox-input');
+        if (!container || !drawer) return;
+
+        // Clicking the card ensures it is selected and opens the drawer
+        l1CardSelected = true;
+        if (checkboxInput) checkboxInput.checked = true;
+
+        container.classList.remove('border-gray-200', 'bg-white');
+        container.classList.add('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+        drawer.classList.remove('hidden');
+
+        if (isMultipleAttribute) {
+            const firstCb = document.querySelector('input.l1-internal-input.variant-checkbox');
+            if (firstCb && !document.querySelector('input.l1-internal-input.variant-checkbox:checked')) {
+                firstCb.checked = true;
+                const btn = document.querySelector(`.l1-size-btn[data-var-id="${firstCb.value}"]`);
+                if (btn) {
+                    btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                    btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+                }
+            }
+            onVariationCheckboxChange();
+        } else {
+            const checkedRadio = document.querySelector('input.l1-internal-input:checked') || document.querySelector('input.l1-internal-input');
+            if (checkedRadio) {
+                checkedRadio.checked = true;
+                const btn = document.querySelector(`.l1-size-btn[data-var-id="${checkedRadio.value}"]`);
+                if (btn) {
+                    btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                    btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+                }
+                checkedRadio.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+
+    function removeSingleVariationCard() {
+        const container = document.querySelector('.l1-single-variant-container');
+        const drawer = document.getElementById('l1-size-drawer');
+        const checkboxInput = document.getElementById('l1-main-checkbox-input');
+        if (!container || !drawer) return;
+
+        l1CardSelected = false;
+        if (checkboxInput) checkboxInput.checked = false;
+
+        container.classList.remove('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+        container.classList.add('border-gray-200', 'bg-white');
+        drawer.classList.add('hidden');
+
+        // Uncheck all variations
+        document.querySelectorAll('input.l1-internal-input').forEach(r => r.checked = false);
+        document.querySelectorAll('.l1-size-btn').forEach(b => {
+            b.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+            b.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+        });
+        const selectedIdInput = document.getElementById('selected-variation-id');
+        if (selectedIdInput) selectedIdInput.value = '';
+        UNIT_PRICE = 0;
+        renderSummaryItems([], isMultipleAttribute);
+        updateBtnState(false, true);
+        updateUI(0);
+    }
+
+    function selectL1VariationButton(varId, btn) {
+        if (!l1CardSelected) {
+            toggleL1MainCard();
+        }
+
+        const input = document.getElementById('l1_input_' + varId);
+        if (!input) return;
+
+        if (isMultipleAttribute) {
+            // Toggle selection for multiple type
+            input.checked = !input.checked;
+            if (input.checked) {
+                btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+            } else {
+                btn.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            }
+
+            // Update card thumb and price if selected
+            if (input.checked) {
+                const price = btn.dataset.price;
+                const img = btn.dataset.img;
+                if (price) {
+                    const priceEl = document.getElementById('l1-main-price');
+                    if (priceEl) priceEl.innerText = parseFloat(price).toFixed(2) + CURRENCY;
+                }
+                if (img) {
+                    const thumbEl = document.getElementById('l1-main-thumb');
+                    if (thumbEl) thumbEl.src = img;
+                }
+            }
+
+            onVariationCheckboxChange();
+        } else {
+            // Single selection (Radio)
+            document.querySelectorAll('.l1-size-btn').forEach(b => {
+                b.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                b.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            });
+            btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+            btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+
+            const price = btn.dataset.price;
+            const img = btn.dataset.img;
+            if (price) {
+                const priceEl = document.getElementById('l1-main-price');
+                if (priceEl) priceEl.innerText = parseFloat(price).toFixed(2) + CURRENCY;
+            }
+            if (img) {
+                const thumbEl = document.getElementById('l1-main-thumb');
+                if (thumbEl) thumbEl.src = img;
+            }
+
+            input.checked = true;
+            input.dispatchEvent(new Event('change'));
+        }
+    }
+
+    function toggleMultiProductCard(productId) {
+        const wrapper = document.querySelector(`.order-product-item-wrapper[data-order-product-id="${productId}"]`);
+        const drawer = document.getElementById(`multi-drawer-${productId}`);
+        const checkbox = document.getElementById(`multi-card-cb-${productId}`);
+        if (!wrapper) return;
+
+        // Clicking the card ensures it is active and keeps options open
+        if (checkbox) checkbox.checked = true;
+
+        wrapper.classList.remove('border-gray-200', 'bg-white');
+        wrapper.classList.add('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+        if (drawer) drawer.classList.remove('hidden');
+
+        // If it has a single product/variation input (no multiple variations drawer), check it directly
+        const singleInput = wrapper.querySelector('#multi_prod_input_' + productId) || wrapper.querySelector('input.variant-checkbox:not(.l1-size-btn input)');
+        if (singleInput && !drawer) {
+            singleInput.checked = true;
+        } else if (drawer) {
+            // If it has variations, select the first available variation if none selected yet
+            const firstVarInput = wrapper.querySelector('input.variant-checkbox');
+            if (firstVarInput && !wrapper.querySelector('input.variant-checkbox:checked')) {
+                firstVarInput.checked = true;
+                const btn = wrapper.querySelector(`.l1-size-btn[data-var-id="${firstVarInput.value}"]`);
+                if (btn) {
+                    btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                    btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+                }
+            }
+        }
+
+        onVariationCheckboxChange();
+    }
+
+    function selectMultiProductVariationButton(productId, varId, btn) {
+        const wrapper = document.querySelector(`.order-product-item-wrapper[data-order-product-id="${productId}"]`);
+        const checkbox = document.getElementById(`multi-card-cb-${productId}`);
+        const input = document.getElementById(`multi_var_input_${varId}`);
+        if (!wrapper || !input) return;
+
+        // Ensure parent card is active
+        if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+            wrapper.classList.remove('border-gray-200', 'bg-white');
+            wrapper.classList.add('border-[#35B11E]', 'bg-[#fdf8f4]', 'shadow-sm');
+            const drawer = document.getElementById(`multi-drawer-${productId}`);
+            if (drawer) drawer.classList.remove('hidden');
+        }
+
+        // Toggle or single select based on product attribute category
+        const isProdMultiple = wrapper.dataset.isMultiple === '1';
+        if (isProdMultiple) {
+            input.checked = !input.checked;
+            if (input.checked) {
+                btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+            } else {
+                btn.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+                delete variationQuantities[varId];
+            }
+        } else {
+            // Radio behavior for variations of this specific product
+            wrapper.querySelectorAll(`.multi-size-btn-${productId}`).forEach(b => {
+                b.classList.remove('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+                b.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            });
+            wrapper.querySelectorAll('input.variant-checkbox').forEach(i => {
+                i.checked = false;
+                delete variationQuantities[i.value];
+            });
+
+            input.checked = true;
+            btn.classList.add('bg-[#35B11E]', 'text-white', 'border-[#35B11E]', 'shadow-xs');
+            btn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+        }
+
+        // Update card image and price
+        const price = btn.dataset.price;
+        const img = btn.dataset.img;
+        if (price) {
+            const priceEl = document.getElementById(`multi-card-price-${productId}`);
+            if (priceEl) priceEl.innerText = parseFloat(price).toFixed(2) + CURRENCY;
+        }
+        if (img) {
+            const thumbEl = document.getElementById(`multi-card-img-${productId}`);
+            if (thumbEl) thumbEl.src = img;
+        }
+
+        onVariationCheckboxChange();
     }
 
     function updateVariation(id, price, name, img, isOutOfStock = false, maxStock = 999999) {
