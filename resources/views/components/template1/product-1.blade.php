@@ -151,7 +151,7 @@
 
             // ১. ভ্যারিয়েশন সিলেকশন লজিক (সংশোধিত)
             function handleModalSelection(btn, varId, price, type) {
-                const activeClasses = ['border-[var(--primary-color)]', 'bg-[var(--primary-color)]/10', 'ring-2', 'ring-[var(--primary-color)]'];
+                const activeClasses = ['border-[var(--primary-color)]', 'bg-[var(--primary-color)]/10'];
                 const inactiveClasses = ['border-gray-200', 'bg-white'];
 
                 // টাইপটি ছোট হাতের অক্ষরে চেক করা হচ্ছে যাতে ভুল না হয়
