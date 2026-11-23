@@ -133,186 +133,118 @@
         </div>
 
         {{-- Product Selection Area (Only shown for multi-product mode or when product has variations) --}}
-        @if ($isMultiProductMode || $mainProduct->type === 'variation')
+        @if ($isMultiProductMode)
+            {{-- MULTI-PRODUCT MODE: Hidden container for form binding without visual cards above form --}}
+            <div id="multi-product-list-wrapper" class="hidden">
+                @foreach ($allProducts as $p)
+                    @php
+                        $varsCount = ($p->variations) ? $p->variations->count() : 0;
+                        $pHasMultipleVars = ($p->type === 'variation') && ($varsCount > 1);
+                        $pHasSingleVar = ($p->type === 'variation') && ($varsCount === 1);
+                        $singleVar = $pHasSingleVar ? $p->variations->first() : null;
+
+                        $firstVar = ($p->type === 'variation' && $p->variations) ? $p->variations->first() : null;
+                        $pPrice = $firstVar ? ($firstVar->regular_price - ($firstVar->discount ?? 0)) : ($p->sale_price ?? ($p->regular_price - ($p->discount ?? 0)));
+                        $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
+
+                        $pIsSingleOutOfStock = ($p->type === 'single') && (
+                            $p->stock_status === 'out_of_stock' ||
+                            ($p->manage_stock && ($p->available_stock <= 0))
+                        );
+
+                        $singleVarOutOfStock = false;
+                        $singleVarMaxStock = 999999;
+                        if ($pHasSingleVar && $singleVar) {
+                            $singleVarOutOfStock = (
+                                $singleVar->stock_status === 'out_of_stock' ||
+                                ($p->manage_stock && ($singleVar->available_stock <= 0))
+                            );
+                            $singleVarMaxStock = $p->manage_stock ? ($singleVar->available_stock ?? 0) : 999999;
+                        }
+
+                        $pIsMultipleAttribute = false;
+                        if ($p->type === 'variation' && $p->variations) {
+                            $pVarIds = $p->variations->pluck('id')->filter()->toArray();
+                            if (!empty($pVarIds)) {
+                                $pIsMultipleAttribute = \App\Models\AttributeGroup::withoutGlobalScopes()
+                                    ->whereIn('id', function($q) use ($pVarIds) {
+                                        $q->select('attribute_group_id')
+                                          ->from('product_variation_attributes')
+                                          ->whereIn('product_variation_id', $pVarIds);
+                                    })
+                                    ->whereRaw('LOWER(category) = ?', ['multiple'])
+                                    ->exists();
+                            }
+                        }
+                    @endphp
+
+                    <div class="order-product-item-wrapper hidden" data-order-product-id="{{ $p->id }}" data-product-id="{{ $p->id }}" data-is-multiple="{{ $pIsMultipleAttribute ? '1' : '0' }}">
+                        @if ($pHasMultipleVars)
+                            @foreach ($p->variations as $variation)
+                                @php
+                                    $vSalePrice = $variation->regular_price - ($variation->discount ?? 0);
+                                    $vImage = $variation->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($variation->image)) : $pImg;
+                                    $vOutOfStock = (
+                                        $variation->stock_status === 'out_of_stock' ||
+                                        ($p->manage_stock && ($variation->available_stock <= 0))
+                                    );
+                                    $maxStock = $p->manage_stock ? ($variation->available_stock ?? 0) : 999999;
+                                    $dispName = $variation->display_name ?: ($variation->sku ?: 'Option');
+                                @endphp
+
+                                <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $variation->id }}" value="{{ $variation->id }}"
+                                    data-price="{{ $vSalePrice }}"
+                                    data-name="{{ $dispName }}"
+                                    data-title="{{ $p->title }}"
+                                    data-img="{{ $vImage }}"
+                                    data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                    data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                    data-max-stock="{{ $maxStock }}"
+                                    {{ $vOutOfStock ? 'disabled' : '' }}
+                                    onchange="onVariationCheckboxChange()"
+                                    class="hidden variant-checkbox">
+                            @endforeach
+                        @elseif ($pHasSingleVar && $singleVar)
+                            <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $singleVar->id }}" value="{{ $singleVar->id }}"
+                                data-price="{{ $pPrice }}"
+                                data-name="{{ $singleVar->display_name }}"
+                                data-title="{{ $p->title }}"
+                                data-img="{{ $pImg }}"
+                                data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                data-out-of-stock="{{ $singleVarOutOfStock ? '1' : '0' }}"
+                                data-max-stock="{{ $singleVarMaxStock }}"
+                                {{ $singleVarOutOfStock ? 'disabled' : '' }}
+                                onchange="onVariationCheckboxChange()"
+                                class="hidden variant-checkbox">
+                        @else
+                            <input type="checkbox" name="product_ids[]" id="multi_prod_input_{{ $p->id }}" value="{{ $p->id }}"
+                                data-price="{{ $pPrice }}"
+                                data-name="Regular"
+                                data-title="{{ $p->title }}"
+                                data-img="{{ $pImg }}"
+                                data-is-product="1"
+                                data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                data-out-of-stock="{{ $pIsSingleOutOfStock ? '1' : '0' }}"
+                                data-max-stock="{{ $p->manage_stock ? ($p->available_stock ?? 0) : 999999 }}"
+                                {{ $pIsSingleOutOfStock ? 'disabled' : '' }}
+                                onchange="onVariationCheckboxChange()"
+                                class="hidden variant-checkbox">
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @elseif ($mainProduct->type === 'variation')
         <div class="space-y-4 mb-10">
             <div class="flex items-center justify-between">
                 <label class="block text-lg font-bold text-gray-800">
                     {{ $trans['select_product'] }} <span class="text-red-500">*</span>
                 </label>
-                @if ($mainProduct->type === 'variation' && $isMultipleAttribute)
+                @if ($isMultipleAttribute)
                     <span class="text-xs font-bold text-[#14532d] bg-[#dcfce7] px-3 py-1 rounded-full border border-[#86efac]">
                         {{ $trans['multiple_products_hint'] }}
                     </span>
                 @endif
             </div>
-
-            @if ($isMultiProductMode)
-                {{-- Empty state prompt if nothing is added yet --}}
-                <div id="multi-product-empty-notice" class="p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
-                    <div class="text-center mb-4">
-                        <p class="text-base font-bold text-gray-800 mb-1">{{ $trans['no_product_empty_title'] }}</p>
-                        <p class="text-sm text-gray-500 font-medium">{{ $trans['no_product_empty_subtitle'] }}</p>
-                    </div>
-                    <div class="flex justify-center">
-                        <a href="#landing-products-section"
-                            onclick="const el = document.getElementById('landing-products-section') || document.querySelector('.product-card'); if (el) { el.scrollIntoView({ behavior: 'smooth' }); return false; }"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#15803d] hover:bg-[#166534] text-white text-sm font-bold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer">
-                            <i class="fa-solid fa-cart-plus text-sm"></i>
-                            <span>{{ $trans['choose_product_btn'] }}</span>
-                            <i class="fa-solid fa-arrow-up text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- MULTI-PRODUCT SELECTION LIST --}}
-                <div class="space-y-6" id="multi-product-list-wrapper">
-                    @foreach ($allProducts as $p)
-                        @php
-                            $varsCount = ($p->variations) ? $p->variations->count() : 0;
-                            $pHasMultipleVars = ($p->type === 'variation') && ($varsCount > 1);
-                            $pHasSingleVar = ($p->type === 'variation') && ($varsCount === 1);
-                            $singleVar = $pHasSingleVar ? $p->variations->first() : null;
-
-                            $firstVar = ($p->type === 'variation' && $p->variations) ? $p->variations->first() : null;
-                            $pPrice = $firstVar ? ($firstVar->regular_price - ($firstVar->discount ?? 0)) : ($p->sale_price ?? ($p->regular_price - ($p->discount ?? 0)));
-                            $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
-
-                            $pIsSingleOutOfStock = ($p->type === 'single') && (
-                                $p->stock_status === 'out_of_stock' ||
-                                ($p->manage_stock && ($p->available_stock <= 0))
-                            );
-
-                            $singleVarOutOfStock = false;
-                            $singleVarMaxStock = 999999;
-                            if ($pHasSingleVar && $singleVar) {
-                                $singleVarOutOfStock = (
-                                    $singleVar->stock_status === 'out_of_stock' ||
-                                    ($p->manage_stock && ($singleVar->available_stock <= 0))
-                                );
-                                $singleVarMaxStock = $p->manage_stock ? ($singleVar->available_stock ?? 0) : 999999;
-                            }
-
-                            $pIsMultipleAttribute = false;
-                            if ($p->type === 'variation' && $p->variations) {
-                                $pVarIds = $p->variations->pluck('id')->filter()->toArray();
-                                if (!empty($pVarIds)) {
-                                    $pIsMultipleAttribute = \App\Models\AttributeGroup::withoutGlobalScopes()
-                                        ->whereIn('id', function($q) use ($pVarIds) {
-                                            $q->select('attribute_group_id')
-                                              ->from('product_variation_attributes')
-                                              ->whereIn('product_variation_id', $pVarIds);
-                                        })
-                                        ->whereRaw('LOWER(category) = ?', ['multiple'])
-                                        ->exists();
-                                }
-                            }
-                        @endphp
-
-                        <div class="order-product-item-wrapper l1-single-variant-container border-2 border-gray-200 rounded-2xl p-4 sm:p-5 bg-white transition-all duration-200 hover:border-gray-300 hidden" data-order-product-id="{{ $p->id }}" data-product-id="{{ $p->id }}" data-is-multiple="{{ $pIsMultipleAttribute ? '1' : '0' }}">
-                            {{-- Top Row: Checkbox + Thumbnail + Product Title + Price + Side Remove --}}
-                            <div class="flex items-start justify-between gap-3 cursor-pointer select-none" onclick="toggleMultiProductCard('{{ $p->id }}')">
-                                <div class="flex items-center gap-3.5 sm:gap-4 flex-grow min-w-0">
-                                    <input type="checkbox" id="multi-card-cb-{{ $p->id }}" class="w-5 h-5 rounded border-2 border-gray-300 text-[#35B11E] focus:ring-0 focus:ring-offset-0 pointer-events-none cursor-pointer">
-
-                                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 flex items-center justify-center p-1">
-                                        <img id="multi-card-img-{{ $p->id }}" src="{{ $pImg }}" width="80" height="80" class="w-full h-full object-contain pointer-events-none" alt="{{ $p->title }}">
-                                    </div>
-
-                                    <div class="flex-grow min-w-0 text-left">
-                                        <h4 class="font-bold text-gray-900 text-sm sm:text-base leading-snug truncate">
-                                            {{ $p->title }}
-                                        </h4>
-                                        <div class="mt-1 flex items-baseline gap-2 flex-wrap">
-                                            <span id="multi-card-price-{{ $p->id }}" class="text-base sm:text-lg font-black text-[#0D2601]">
-                                                {{ number_format($pPrice, 2) }}{{ $setup->currency }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button type="button"
-                                    onclick="event.stopPropagation(); removeEntireMultiProduct('{{ $p->id }}')"
-                                    class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                                    title="{{ $trans['remove'] }}">
-                                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            @if ($pHasMultipleVars)
-                                {{-- Variations of this product (Identical collapsible drawer matching single variation design) --}}
-                                <div id="multi-drawer-{{ $p->id }}" class="mt-4 pt-4 border-t border-gray-100 hidden transition-all">
-                                    <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap pt-1">
-                                        @foreach ($p->variations as $variation)
-                                            @php
-                                                $vSalePrice = $variation->regular_price - ($variation->discount ?? 0);
-                                                $vImage = $variation->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($variation->image)) : $pImg;
-                                                $vOutOfStock = (
-                                                    $variation->stock_status === 'out_of_stock' ||
-                                                    ($p->manage_stock && ($variation->available_stock <= 0))
-                                                );
-                                                $maxStock = $p->manage_stock ? ($variation->available_stock ?? 0) : 999999;
-                                                $dispName = $variation->display_name ?: ($variation->sku ?: 'Option');
-                                            @endphp
-
-                                            <button type="button"
-                                                onclick="selectMultiProductVariationButton('{{ $p->id }}', '{{ $variation->id }}', this)"
-                                                data-prod-id="{{ $p->id }}"
-                                                data-var-id="{{ $variation->id }}"
-                                                data-price="{{ $vSalePrice }}"
-                                                data-img="{{ $vImage }}"
-                                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
-                                                class="l1-size-btn multi-size-btn-{{ $p->id }} px-4 py-2 rounded-xl border-2 text-xs sm:text-sm font-bold transition-all cursor-pointer bg-white text-gray-800 border-gray-300 hover:border-[#35B11E] {{ $vOutOfStock ? 'opacity-50 cursor-not-allowed line-through' : '' }}"
-                                                {{ $vOutOfStock ? 'disabled' : '' }}>
-                                                {{ $dispName }}
-                                            </button>
-
-                                            {{-- Hidden input for form binding --}}
-                                            <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $variation->id }}" value="{{ $variation->id }}"
-                                                data-price="{{ $vSalePrice }}"
-                                                data-name="{{ $dispName }}"
-                                                data-title="{{ $p->title }}"
-                                                data-img="{{ $vImage }}"
-                                                data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
-                                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
-                                                data-max-stock="{{ $maxStock }}"
-                                                {{ $vOutOfStock ? 'disabled' : '' }}
-                                                onchange="onVariationCheckboxChange()"
-                                                class="hidden variant-checkbox">
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @elseif ($pHasSingleVar && $singleVar)
-                                <input type="checkbox" name="variation_ids[]" id="multi_var_input_{{ $singleVar->id }}" value="{{ $singleVar->id }}"
-                                    data-price="{{ $pPrice }}"
-                                    data-name="{{ $singleVar->display_name }}"
-                                    data-title="{{ $p->title }}"
-                                    data-img="{{ $pImg }}"
-                                    data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
-                                    data-out-of-stock="{{ $singleVarOutOfStock ? '1' : '0' }}"
-                                    data-max-stock="{{ $singleVarMaxStock }}"
-                                    {{ $singleVarOutOfStock ? 'disabled' : '' }}
-                                    onchange="onVariationCheckboxChange()"
-                                    class="hidden variant-checkbox">
-                            @else
-                                <input type="checkbox" name="product_ids[]" id="multi_prod_input_{{ $p->id }}" value="{{ $p->id }}"
-                                    data-price="{{ $pPrice }}"
-                                    data-name="Regular"
-                                    data-title="{{ $p->title }}"
-                                    data-img="{{ $pImg }}"
-                                    data-is-product="1"
-                                    data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
-                                    data-out-of-stock="{{ $pIsSingleOutOfStock ? '1' : '0' }}"
-                                    data-max-stock="{{ $p->manage_stock ? ($p->available_stock ?? 0) : 999999 }}"
-                                    {{ $pIsSingleOutOfStock ? 'disabled' : '' }}
-                                    onchange="onVariationCheckboxChange()"
-                                    class="hidden variant-checkbox">
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @elseif ($mainProduct->type === 'variation')
                 @php
                     $pImg = $landing->thumbnail_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
                     $firstVar = $mainProduct->variations->first();
@@ -417,8 +349,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
-        </div>
+            </div>
         @endif
 
         {{-- Main Grid --}}
@@ -533,7 +464,7 @@
                         </div>
                     </div>
 
-                   
+
                 </div>
             </div>
             {{-- LEFT: Billing Info --}}
@@ -581,7 +512,7 @@
                 </div>
             </div>
 
-           
+
         </div>
     </form>
 </div>
@@ -782,59 +713,56 @@
             const lineTotalFormatted = (price * itemQty).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             html += `
-                <div class="py-3 border-b border-gray-100 last:border-0" data-item-id="${item.id}">
-                    {{-- Row 1: Image + Full Title & Option + Top-Right Cross Remove Button --}}
-                    <div class="flex items-start gap-3">
-                        <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-white p-0.5">
-                            <img src="${item.img || PRODUCT_THUMB}" width="48" height="48"
-                                alt="${item.title || PRODUCT_TITLE}"
-                                class="w-full h-full object-contain">
-                        </div>
-                        <div class="flex-1 min-w-0 pr-1">
-                            <p class="text-xs font-bold text-gray-800 leading-snug truncate">${item.title || PRODUCT_TITLE}</p>
-                            @if ($mainProduct->type === 'variation' || $isMultiProductMode)
-                                ${item.option ? `<p class="text-[11px] text-[#145a32] font-bold mt-0.5 uppercase">${item.option}</p>` : ''}
-                            @endif
-                        </div>
-                        ${isMulti ? `
-                            <button type="button" onclick="removeVariationItem('${item.id}', ${item.isProduct ? 'true' : 'false'})"
-                                class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                                title="${FORM_TRANS.remove || 'রিমুভ করুন'}">
-                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        ` : ''}
+                <div class="flex gap-2.5 sm:gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0" data-item-id="${item.id}">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 flex items-center justify-center p-0.5">
+                        <img src="${item.img || PRODUCT_THUMB}" width="56" height="56"
+                            alt="${item.title || PRODUCT_TITLE}"
+                            class="w-full h-full object-contain">
                     </div>
-
-                    {{-- Row 2: Unit Price + Quantity Selector + Line Total --}}
-                    <div class="flex items-center justify-between gap-2 mt-2 pl-[60px]">
-                        <div class="text-[11px] text-gray-500 font-semibold">
-                            ${price.toFixed(2)}${CURRENCY}
+                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                        {{-- Row 1: Title (left) & Variant (right) --}}
+                        <div class="flex items-center justify-between gap-1.5 min-w-0">
+                            <h3 class="text-xs sm:text-[13px] font-bold text-gray-800 leading-tight truncate" style="max-width: 145px;">${item.title || PRODUCT_TITLE}</h3>
+                            ${item.option ? `<span class="text-[11px] sm:text-xs text-gray-500 font-semibold flex-shrink-0 whitespace-nowrap text-right">(${item.option})</span>` : ''}
                         </div>
 
-                        <div class="flex items-center gap-3">
+                        {{-- Row 2: Unit Price, Quantity, Subtotal, Cross Remove (Never wrap on small screens) --}}
+                        <div class="flex items-center justify-between gap-1 sm:gap-2 mt-1.5 min-w-0">
+                            <span class="text-xs sm:text-[13px] font-bold text-gray-900 whitespace-nowrap flex-shrink-0">
+                                ${price.toFixed(0)}${CURRENCY}
+                            </span>
+
                             ${isMulti ? `
-                                <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden shadow-xs">
+                                <div class="flex items-center border border-gray-200 rounded-full h-6 sm:h-7 w-[72px] sm:w-20 bg-white flex-shrink-0">
                                     <button type="button" onclick="changeItemQty('${itemKey}', -1, ${item.maxStock})"
-                                        class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-r border-gray-300 cursor-pointer text-gray-600">−</button>
-                                    <span class="w-7 text-center font-bold text-xs text-gray-800">${itemQty}</span>
+                                        class="w-5 sm:w-6 flex items-center justify-center text-gray-500 hover:text-black text-[11px] sm:text-xs cursor-pointer font-bold select-none">−</button>
+                                    <span class="flex-1 text-center text-[10px] sm:text-[11px] font-bold text-gray-800 select-none">${itemQty}</span>
                                     <button type="button" onclick="changeItemQty('${itemKey}', 1, ${item.maxStock})"
-                                        class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-l border-gray-300 cursor-pointer text-gray-600">+</button>
+                                        class="w-5 sm:w-6 flex items-center justify-center text-gray-500 hover:text-black text-[11px] sm:text-xs cursor-pointer font-bold select-none">+</button>
                                 </div>
                                 ${item.isProduct
                                     ? `<input type="hidden" name="product_quantities[${item.id}]" value="${itemQty}">`
                                     : `<input type="hidden" name="variation_quantities[${item.id}]" value="${itemQty}">`
                                 }
                             ` : `
-                                <span class="text-xs font-bold text-gray-700">
+                                <span class="text-xs font-bold text-gray-700 whitespace-nowrap flex-shrink-0">
                                     <span class="text-gray-400">×</span> <span class="item-summary-qty">${qty}</span>
                                 </span>
                             `}
 
-                            <div class="text-right min-w-[70px]">
-                                <span class="text-xs sm:text-sm font-black text-gray-900">${lineTotalFormatted}${CURRENCY}</span>
-                            </div>
+                            <span class="text-xs sm:text-[13px] font-bold text-gray-700 whitespace-nowrap flex-shrink-0 text-right">
+                                ${lineTotalFormatted}${CURRENCY}
+                            </span>
+
+                            ${isMulti ? `
+                                <button type="button" onclick="removeVariationItem('${item.id}', ${item.isProduct ? 'true' : 'false'})"
+                                    aria-label="Remove item"
+                                    class="text-gray-400 hover:text-red-500 transition-colors cursor-pointer flex-shrink-0 p-0.5">
+                                    <svg class="w-4 h-4 pointer-events-none" viewBox="0 0 512 512" fill="currentColor">
+                                        <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
+                                    </svg>
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
