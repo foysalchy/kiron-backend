@@ -56,15 +56,61 @@
             overflow: hidden;
             width: 100%;
         }
+        .theme-global-bg {
+            background: #EEF5F3;
+            color: #0A1F22;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: .55;
+            animation: drift 20s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                transform: translate(60px, -40px) scale(1.12);
+            }
+            100% {
+                transform: translate(-50px, 50px) scale(.92);
+            }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.55);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            backdrop-filter: blur(18px) saturate(170%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 18px 40px -24px rgba(0, 58, 63, 0.35);
+        }
     </style>
 </head>
 
-<body>
+<body class="theme-global-bg">
+    <!-- Global Scroll Progress Indicator (Exact EduManager Style) -->
+    <div id="globalScrollProgress" class="fixed top-0 inset-x-0 h-[3.5px] origin-left z-[9999] bg-gradient-to-r from-[#00555C] via-[#00A08A] to-[#7CE0C3] pointer-events-none transition-transform duration-75" aria-hidden="true" style="transform: scaleX(0);"></div>
+
+    <!-- Ambient Blurry Color Orbs from Original Design -->
+    <div aria-hidden="true" style="position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none">
+        <span class="orb" style="width: 600px; height: 600px; left: -160px; top: 10%; background: #B8F0DE; animation-duration: 24s"></span>
+        <span class="orb" style="width: 520px; height: 520px; right: -140px; top: 40%; background: #A8DCF5; animation-duration: 28s; animation-delay: -8s"></span>
+        <span class="orb" style="width: 440px; height: 440px; left: 35%; bottom: -160px; background: #7CE0C3; opacity: .35; animation-duration: 32s; animation-delay: -16s"></span>
+    </div>
+
     <!-- HEADER -->
     @include('saas.partials.header')
 
     <!-- Page Content Area -->
-    <main class="bg-[#f2f4f8]  ">
+    <main class="relative z-10">
         @yield('content')
     </main>
 
@@ -87,6 +133,16 @@
         menuToggle.addEventListener("click", toggleMenu);
         menuClose.addEventListener("click", toggleMenu);
         menuOverlay.addEventListener("click", toggleMenu);
+
+        // Top Scroll Progress Bar (EduManager Signature Feature)
+        window.addEventListener('scroll', function () {
+            const scrollBar = document.getElementById('globalScrollProgress');
+            if (!scrollBar) return;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = docHeight > 0 ? (scrollTop / docHeight) : 0;
+            scrollBar.style.transform = `scaleX(${scrolled})`;
+        }, { passive: true });
 
         document.addEventListener('DOMContentLoaded', () => {
             window.lenisReady.then((lenis) => {

@@ -1,5 +1,5 @@
-<header class="sticky top-0 z-50 w-full bg-white border-b border-gray-100">
-    <div class="container mx-auto px-4 md:px-10 h-20 flex items-center justify-between">
+<header class="sticky top-0 z-50 w-full pt-3 px-4 md:px-6 pointer-events-none">
+    <div class="glass container mx-auto max-w-[1240px] rounded-full px-5 md:px-8 py-2 md:py-2.5 flex items-center justify-between pointer-events-auto">
         <!-- Logo Section -->
         <div class="flex-shrink-0">
             <a href="{{ route('saas.index') }}" class="flex items-center gap-2"
@@ -9,40 +9,63 @@
                         fetchpriority="high" loading="eager" width="180" height="45" onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
                 @else
                     @if (file_exists(public_path('images/saas/dorja-logo.webp')))
-                        <img src="{{ asset('images/saas/dorja-logo.webp') }}" alt="Default Logo" fetchpriority="high" loading="eager" alt="Logo" width="180" height="45"
-                            class="h-8 md:h-9 w-auto" fetchpriority="high">
+                        <img src="{{ asset('images/saas/dorja-logo.webp') }}" alt="Default Logo" fetchpriority="high" loading="eager" width="180" height="45"
+                            class="h-8 md:h-9 w-auto">
                     @else
-                        <span class="text-xl font-bold text-gray-900">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
+                        <span class="text-xl font-bold text-[#0A1F22]">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
                     @endif
                 @endif
             </a>
         </div>
 
-        <!-- Navigation Links (Desktop) -->
-        <nav class="hidden lg:flex items-center space-x-8">
-            <a href="{{ route('saas.index') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Home</a>
-            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Features</a>
+        <!-- Navigation Links (Desktop) with Smooth Sliding Glider -->
+        <nav id="desktop-nav" class="relative hidden lg:flex items-center space-x-1 p-1">
+            <!-- Sliding Pill Glider -->
+            <div id="nav-glider" class="absolute bg-[#E6EFED] rounded-full transition-all duration-300 ease-out pointer-events-none opacity-0 z-0"></div>
+
+            <a href="{{ route('saas.index') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.index') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                Home
+            </a>
+            <a href="{{ route('saas.feature.list') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.feature.*') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                Features
+            </a>
             <a href="{{ route('saas.index') }}#intergation"
-                class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Integration</a>
-            <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Pricing</a>
-            <a href="{{ route('saas.partner') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Partner</a>
-            <a href="{{ route('saas.faq.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">FAQ</a>
-            <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Contact</a>
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] font-semibold">
+                Integration
+            </a>
+            <a href="{{ route('saas.package.list') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.package.*') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                Pricing
+            </a>
+            <a href="{{ route('saas.partner') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.partner') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                Partner
+            </a>
+            <a href="{{ route('saas.faq.list') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.faq.*') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                FAQ
+            </a>
+            <a href="{{ route('saas.contact') }}"
+                class="nav-item relative z-10 text-lg px-4 py-1.5 rounded-full transition-colors duration-200 {{ request()->routeIs('saas.contact') ? 'is-active text-[#00555C] font-bold' : 'text-[#2C4346] hover:text-[#00555C] font-semibold' }}">
+                Contact
+            </a>
         </nav>
 
         <!-- Right Side Buttons -->
         <div class="flex items-center space-x-3 md:space-x-6">
-            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#00555c]">
+            <a href="https://app.dorja.io" class="hidden md:block text-[#2C4346] font-bold text-lg hover:text-[#00555C]">
                 Login
             </a>
-            <!-- CTA Button (Responsive Padding & Font) -->
+            <!-- CTA Button -->
             <a href="https://app.dorja.io/register"
-                class="bg-[#00555c] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#078e9a] transition shadow-sm whitespace-nowrap">
+                class="bg-[#00555C] hover:bg-[#003A3F] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-full font-bold text-xs md:text-lg transition shadow-lg shadow-teal-900/20 whitespace-nowrap">
                 Start Free Trial
             </a>
 
             <!-- Mobile Menu Toggle Button -->
-            <button id="menu-toggle" class="lg:hidden text-gray-700 text-2xl p-1" aria-label="mobile menu">
+            <button id="menu-toggle" class="lg:hidden text-gray-700 text-xl p-1" aria-label="mobile menu">
                 <i class="fa-solid fa-bars-staggered"></i>
             </button>
         </div>
@@ -77,4 +100,76 @@
             </nav>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const nav = document.getElementById("desktop-nav");
+            const glider = document.getElementById("nav-glider");
+            if (!nav || !glider) return;
+
+            const items = nav.querySelectorAll(".nav-item");
+            let activeItem = nav.querySelector(".nav-item.is-active");
+
+            function moveGlider(target, immediate = false) {
+                if (!target) {
+                    glider.style.opacity = "0";
+                    return;
+                }
+                const navRect = nav.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+
+                if (immediate) {
+                    glider.style.transition = "none";
+                } else {
+                    glider.style.transition = "all 0.65s cubic-bezier(0.25, 1, 0.5, 1)";
+                }
+
+                glider.style.left = (targetRect.left - navRect.left) + "px";
+                glider.style.top = (targetRect.top - navRect.top) + "px";
+                glider.style.width = targetRect.width + "px";
+                glider.style.height = targetRect.height + "px";
+                glider.style.opacity = "1";
+            }
+
+            // Set glider on initial load without jump
+            if (activeItem) {
+                moveGlider(activeItem, true);
+                requestAnimationFrame(() => {
+                    glider.style.transition = "all 0.65s cubic-bezier(0.25, 1, 0.5, 1)";
+                });
+            }
+
+            // Smooth sliding when selecting/clicking a menu item
+            items.forEach(item => {
+                item.addEventListener("click", function (e) {
+                    items.forEach(i => {
+                        i.classList.remove("is-active", "font-bold", "text-[#0c4a45]");
+                        i.classList.add("text-gray-700", "font-semibold");
+                    });
+
+                    this.classList.remove("text-gray-700");
+                    this.classList.add("is-active", "font-bold", "text-[#0c4a45]");
+                    activeItem = this;
+
+                    moveGlider(this);
+
+                    // If it's an on-page anchor link (e.g., #intergation), smoothly scroll to section
+                    const href = this.getAttribute("href");
+                    if (href && href.includes("#")) {
+                        const hash = href.substring(href.indexOf("#"));
+                        const targetEl = document.querySelector(hash);
+                        if (targetEl) {
+                            e.preventDefault();
+                            targetEl.scrollIntoView({ behavior: "smooth" });
+                            history.pushState(null, null, hash);
+                        }
+                    }
+                });
+            });
+
+            window.addEventListener("resize", function () {
+                if (activeItem) moveGlider(activeItem, true);
+            });
+        });
+    </script>
 </header>

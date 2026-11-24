@@ -32,9 +32,192 @@
     ])
 @endsection
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('dorja-modules.css') }}">
     <style>
         .hero-bg {
-            background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);
+            background-image: linear-gradient(rgba(0, 85, 92, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 85, 92, 0.05) 1px, transparent 1px);
+            background-size: 56px 56px;
+        }
+
+        /* 2x3 Hero Card Grid Styles */
+        .hero-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .hero-widget-card {
+            border-radius: 20px;
+            padding: 16px 18px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hero-widget-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px -22px rgba(0, 58, 63, 0.45);
+        }
+
+        .hero-widget-card.card-primary {
+            background-color: #00555C;
+            color: #ffffff;
+            box-shadow: 0 18px 40px -20px rgba(0, 85, 92, 0.6);
+        }
+
+        .hero-widget-card.card-light {
+            background: rgba(255, 255, 255, 0.55);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            backdrop-filter: blur(18px) saturate(170%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 18px 40px -24px rgba(0, 58, 63, 0.35);
+        }
+
+        .hero-widget-card .mini-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 28px;
+            margin-top: 8px;
+        }
+
+        .hero-widget-card .mini-bars i {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .card-primary .mini-bars i {
+            background: #7CE0C3;
+        }
+
+        .card-light .mini-bars i {
+            background: #00555C;
+        }
+
+        .hero-btn-nav {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px -14px rgba(0, 58, 63, 0.4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #0A1F22;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .hero-btn-nav:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: #00555C;
+        }
+
+        /* 3D Perspective & EduManager Mockup Styles */
+        .perspective-container {
+            perspective: 1600px;
+        }
+
+        .tilted-device-card {
+            transform-origin: center top;
+            transform: scale(0.96) rotateX(10deg);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tilted-device-card:hover {
+            transform: scale(0.99) rotateX(2deg);
+        }
+
+        @keyframes float-slow {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-9px);
+            }
+        }
+
+        .float-slow {
+            animation: float-slow 4s ease-in-out infinite;
+        }
+
+        /* EduManager Exact Heading Scale */
+        .hero-display-heading {
+            font-size: clamp(1.85rem, 3.6vw, 3.25rem) !important;
+            font-weight: 700 !important;
+            line-height: 1.18 !important;
+            letter-spacing: -0.025em !important;
+            color: #0A1F22 !important;
+        }
+
+        .hero-gradient-text {
+            background: linear-gradient(90deg, #00555C 0%, #008272 50%, #00A08A 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            display: inline-block !important;
+        }
+
+        /* Solution Tabs Styling (Matching dorja.io — Modern Homepage Redesign-2nd.html) */
+        .sol-tab-btn {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            padding: 11px 20px !important;
+            border-radius: 999px !important;
+            cursor: pointer !important;
+            min-height: 44px !important;
+            border: 1px solid #D7E2DF !important;
+            background: rgba(255, 255, 255, 0.6) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            backdrop-filter: blur(12px) !important;
+            color: #2C4346 !important;
+            outline: none !important;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+
+        .sol-tab-btn.active {
+            background: #00555C !important;
+            border-color: #00555C !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 8px 22px -6px rgba(0, 85, 92, 0.45) !important;
+        }
+
+        .sol-tab-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border-color: #D7E2DF !important;
+            color: #2C4346 !important;
+        }
+
+        .sol-tab-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: #00555C !important;
+            color: #00555C !important;
+        }
+
+        @media (max-width: 768px) {
+            .tilted-device-card {
+                transform: none !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-card-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                max-width: 100%;
+            }
+
+            .hero-widget-card {
+                padding: 12px 14px;
+                min-height: 120px;
+            }
         }
 
         /* Hero Dynamic Stage & Satellite Orbit Styles */
@@ -369,17 +552,17 @@
         }
 
         /* .animated-text {
-                                        background: linear-gradient(90deg,
-                                                #00555c,
-                                                #4fd1c5,
-                                                #7c3aed,
-                                                #00555c);
-                                        background-size: 300% 100%;
-                                        -webkit-background-clip: text;
-                                        background-clip: text;
-                                        color: transparent;
-                                        animation: textGradient 4s linear infinite;
-                                    } */
+                                                                        background: linear-gradient(90deg,
+                                                                                #00555c,
+                                                                                #4fd1c5,
+                                                                                #7c3aed,
+                                                                                #00555c);
+                                                                        background-size: 300% 100%;
+                                                                        -webkit-background-clip: text;
+                                                                        background-clip: text;
+                                                                        color: transparent;
+                                                                        animation: textGradient 4s linear infinite;
+                                                                    } */
 
         @keyframes textGradient {
             0% {
@@ -396,32 +579,26 @@
         }
 
         .hero-bg::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
+            display: none !important;
         }
 
         .hero-pagination .swiper-pagination-bullet {
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.3) !important;
-            opacity: 1 !important;
+            width: 8px;
+            height: 8px;
+            background: #94a3b8 !important;
+            opacity: 0.6 !important;
             border-radius: 50%;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
-            margin: 0 8px !important;
+            margin: 0 4px !important;
             position: relative;
         }
 
         .hero-pagination .swiper-pagination-bullet-active {
-            width: 45px !important;
-            background: #ffffff !important;
-            border-radius: 20px;
+            width: 26px !important;
+            background: #0c4a45 !important;
+            opacity: 1 !important;
+            border-radius: 12px;
         }
 
         .hero-pagination .swiper-pagination-bullet::before {
@@ -453,27 +630,8 @@
 
         @media (max-width: 640px) {
             .heroSwiper {
-                height: 100vh !important;
-                min-height: 870px !important;
-            }
-
-            .hero-action-buttons {
-                position: absolute !important;
-                bottom: 30px !important;
-                left: 24px !important;
-                right: 24px !important;
-                margin: 0 auto !important;
-                z-index: 20 !important;
-            }
-
-            .hero-pagination {
-                position: absolute !important;
-                bottom: 175px !important;
-                left: 0 !important;
-                right: 0 !important;
-                margin: 0 auto !important;
-                justify-content: center !important;
-                z-index: 50 !important;
+                height: auto !important;
+                min-height: auto !important;
             }
         }
 
@@ -533,15 +691,15 @@
         }
 
         .flow-line {
-            stroke: #e2e8f0;
+            stroke: #9CC9C2;
             stroke-width: 1.8;
             fill: none;
-            opacity: 0.4;
+            opacity: 0.55;
         }
 
         .flow-pulse {
-            stroke: white;
-            stroke-width: 2.2;
+            stroke: #00555C;
+            stroke-width: 2.4;
             fill: none;
             stroke-dasharray: 8 200;
             stroke-dashoffset: 0;
@@ -574,20 +732,20 @@
         .node-circle {
             position: absolute;
             transform: translate(-50%, -50%);
-            border-radius: 5px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #ffffff;
-            border: 1.4px solid #2A303B;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0, 85, 92, 0.15);
+            box-shadow: 0 4px 14px rgba(0, 58, 63, 0.08);
+            transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .node-circle:hover {
-            border-color: #00555c;
-            box-shadow: 0 0 0 6px rgba(52, 164, 135, 0.1);
-            transform: translate(-50%, -50%) scale(1.15);
+            border-color: #00555C;
+            box-shadow: 0 0 0 6px rgba(0, 85, 92, 0.12);
+            transform: translate(-50%, -50%) scale(1.12);
         }
 
         .node-circle.small {
@@ -608,10 +766,10 @@
             transform: translate(-50%, -50%);
             width: 120px;
             height: 60px;
-            border-radius: 5px;
-            background: linear-gradient(145deg, #00555c, #2c8a71);
+            border-radius: 12px;
+            background: #00555C;
             border: 2px solid #ffffff;
-            box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
+            box-shadow: 0 10px 25px rgba(0, 85, 92, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -811,369 +969,240 @@
         ];
     @endphp
 
-    <!-- HERO SECTION -->
-    @if ($sliders->isNotEmpty())
-        <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
-            <div class="swiper-wrapper">
-                @foreach ($sliders as $key => $slider)
-                    @php
-                        // Intelligent theme picker based on slider title/desc keywords or cyclic index
-                        $titleAndDesc = strtolower(($slider->title ?? '') . ' ' . ($slider->description ?? ''));
-                        if (str_contains($titleAndDesc, 'pos') || str_contains($titleAndDesc, 'retail') || str_contains($titleAndDesc, 'point of sale')) {
-                            $theme = $heroSatelliteThemes[1];
-                        } elseif (str_contains($titleAndDesc, 'account') || str_contains($titleAndDesc, 'finance') || str_contains($titleAndDesc, 'tax') || str_contains($titleAndDesc, 'invoice')) {
-                            $theme = $heroSatelliteThemes[2];
-                        } elseif (str_contains($titleAndDesc, 'hrm') || str_contains($titleAndDesc, 'payroll') || str_contains($titleAndDesc, 'attendance') || str_contains($titleAndDesc, 'employee')) {
-                            $theme = $heroSatelliteThemes[3];
-                        } elseif (str_contains($titleAndDesc, 'inventory') || str_contains($titleAndDesc, 'stock') || str_contains($titleAndDesc, 'warehouse') || str_contains($titleAndDesc, 'courier')) {
-                            $theme = $heroSatelliteThemes[4];
-                        } elseif (str_contains($titleAndDesc, 'ecommerce') || str_contains($titleAndDesc, 'store') || str_contains($titleAndDesc, 'shop')) {
-                            $theme = $heroSatelliteThemes[0];
-                        } else {
-                            $theme = $heroSatelliteThemes[$key % count($heroSatelliteThemes)];
-                        }
-                    @endphp
-                    <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
-                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
-
-                            <div class="scroll-wrapper text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
-                                @if ($key == 0)
-                                    <h1
-                                        class="move-up text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
-                                        {{ $slider->title }}
-                                    </h1>
-                                @else
-                                    <h2
-                                        class="move-up text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
-                                        {{ $slider->title }}
-                                    </h2>
-                                @endif
-
-                                <p
-                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
-                                    {{ $slider->description }}
-                                </p>
-
-                                <!-- Action Buttons -->
-                                <div
-                                    class="hero-action-buttons relative flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
-                                    <a href="https://app.dorja.io/register"
-                                        class="w-full sm:w-auto bg-[#00555c] hover:bg-[#078e9a] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                                        Start Free Trial
-                                    </a>
-                                    <a href="#"
-                                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
-                                        Watch Demo <i class="fa-solid fa-play text-xs"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Right Side: Animated Connecting System Stage & Satellite Cards -->
-                            <div class="relative flex justify-center items-center order-1 lg:order-2 w-full">
-                                <div class="hero-stage">
-                                    <!-- Animated Connecting SVG Data Lines -->
-                                    <svg viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true"
-                                        class="hero-svg-lines">
-                                        <defs>
-                                            <linearGradient id="heroGradientLine" x1="0" x2="1">
-                                                <stop offset="0" stop-color="#10B981" />
-                                                <stop offset="1" stop-color="#00D2C4" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path id="p1" class="ln" d="M265,78 C400,78 400,280 500,280" />
-                                        <path id="p2" class="ln" d="M265,280 L500,280" />
-                                        <path id="p3" class="ln" d="M265,482 C400,482 400,280 500,280" />
-                                        <path id="p4" class="ln" d="M735,78 C600,78 600,280 500,280" />
-                                        <path id="p5" class="ln" d="M735,280 L500,280" />
-                                        <path id="p6" class="ln" d="M735,482 C600,482 600,280 500,280" />
-                                        <circle r="4" fill="#00D2C4">
-                                            <animateMotion dur="3s" repeatCount="indefinite">
-                                                <mpath href="#p1" />
-                                            </animateMotion>
-                                        </circle>
-                                        <circle r="4" fill="#fff">
-                                            <animateMotion dur="2.4s" repeatCount="indefinite">
-                                                <mpath href="#p2" />
-                                            </animateMotion>
-                                        </circle>
-                                        <circle r="4" fill="#00D2C4">
-                                            <animateMotion dur="3.4s" repeatCount="indefinite">
-                                                <mpath href="#p3" />
-                                            </animateMotion>
-                                        </circle>
-                                        <circle r="4" fill="#fff">
-                                            <animateMotion dur="2.8s" repeatCount="indefinite">
-                                                <mpath href="#p4" />
-                                            </animateMotion>
-                                        </circle>
-                                        <circle r="4" fill="#00D2C4">
-                                            <animateMotion dur="2.2s" repeatCount="indefinite">
-                                                <mpath href="#p5" />
-                                            </animateMotion>
-                                        </circle>
-                                        <circle r="4" fill="#fff">
-                                            <animateMotion dur="3.2s" repeatCount="indefinite">
-                                                <mpath href="#p6" />
-                                            </animateMotion>
-                                        </circle>
-                                    </svg>
-
-                                    <!-- Rotating Dashed Orbit Rings -->
-                                    <div class="hero-orb o2"></div>
-                                    <div class="hero-orb o1"></div>
-
-                                    <!-- Central Core Hub / Live Sync -->
-                                    <div class="hero-hub overflow-hidden p-2">
-                                        @if (!empty($slider->image_url))
-                                            <img src="{{ $slider->image_url }}" alt="Core Hub"
-                                                class="w-full h-full object-contain filter drop-shadow" />
-                                        @else
-                                            <span class="font-bold text-white text-xs tracking-tight">Dorja Hub</span>
-                                            <small class="text-[9px] text-[#8FE9E1] font-normal">Live Sync</small>
-                                        @endif
-                                    </div>
-
-                                    <!-- 6 Satellite Connected Cards -->
-                                    <div class="hero-card c1">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <circle cx="9" cy="20" r="1.5" />
-                                                <circle cx="18" cy="20" r="1.5" />
-                                                <path d="M2 3h3l2.5 12h11L21 7H6" />
-                                            </svg>
-                                            {{ $theme['c1']['title'] }}
-                                        </h3>
-                                        <div class="big">{{ $theme['c1']['big'] }}
-                                            @if(!empty($theme['c1']['em']))<em>{{ $theme['c1']['em'] }}</em>@endif
-                                        </div>
-                                        <div class="bars">
-                                            @foreach($theme['c1']['bars'] as $h)
-                                                <i style="height:{{ $h }}%"></i>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <div class="hero-card c2">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M4 3h16v18l-3-2-3 2-2-2-2 2-3-2-3 2z" />
-                                                <path d="M8 8h8M8 12h8" />
-                                            </svg>
-                                            {{ $theme['c2']['title'] }}
-                                        </h3>
-                                        <p>{{ $theme['c2']['line1'] }}</p>
-                                        <p class="{{ $theme['c2']['line2_color'] ?? 'text-teal-300' }}">{{ $theme['c2']['line2'] }}
-                                        </p>
-                                        <div class="bars">
-                                            @foreach($theme['c2']['bars'] as $h)
-                                                <i style="height:{{ $h }}%"></i>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <div class="hero-card c3">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <circle cx="9" cy="8" r="3.5" />
-                                                <path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6" />
-                                                <path d="M17 11l2 2 3-4" />
-                                            </svg>
-                                            {{ $theme['c3']['title'] }}
-                                        </h3>
-                                        <p>{{ $theme['c3']['line1'] }}</p>
-                                        @foreach($theme['c3']['tags'] as $tag)
-                                            <span class="tag">{{ $tag }}</span>
-                                        @endforeach
-                                    </div>
-
-                                    <div class="hero-card c4">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <rect x="3" y="4" width="18" height="12" rx="2" />
-                                                <path d="M8 20h8M12 16v4" />
-                                            </svg>
-                                            {{ $theme['c4']['title'] }}
-                                        </h3>
-                                        <div class="big">{{ $theme['c4']['big'] }}
-                                            @if(!empty($theme['c4']['em']))<em>{{ $theme['c4']['em'] }}</em>@endif
-                                        </div>
-                                        @if(!empty($theme['c4']['sub']))
-                                            <p class="mt-1">{{ $theme['c4']['sub'] }}</p>
-                                        @endif
-                                    </div>
-
-                                    <div class="hero-card c5">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M21 8l-9-5-9 5v8l9 5 9-5z" />
-                                                <path d="M3 8l9 5 9-5M12 13v8" />
-                                            </svg>
-                                            {{ $theme['c5']['title'] }}
-                                        </h3>
-                                        <p>{{ $theme['c5']['line1'] }}</p>
-                                        @if(!empty($theme['c5']['line2']))
-                                            <p class="{{ $theme['c5']['line2_color'] ?? 'text-amber-300' }}">{{ $theme['c5']['line2'] }}
-                                            </p>
-                                        @endif
-                                        @foreach($theme['c5']['tags'] as $tag)
-                                            <span class="tag">{{ $tag }}</span>
-                                        @endforeach
-                                    </div>
-
-                                    <div class="hero-card c6">
-                                        <h3>
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M3 20V4M3 20h18" />
-                                                <path d="M7 15l4-4 3 3 6-7" />
-                                            </svg>
-                                            {{ $theme['c6']['title'] }}
-                                        </h3>
-                                        <div class="big">{{ $theme['c6']['big'] }}
-                                            @if(!empty($theme['c6']['em']))<em>{{ $theme['c6']['em'] }}</em>@endif
-                                        </div>
-                                        <div class="bars">
-                                            @foreach($theme['c6']['bars'] as $h)
-                                                <i style="height:{{ $h }}%"></i>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+    <!-- HERO SECTION (EduManager Inspired Single Static Showcase) -->
+    <section id="top" class="hero-bg relative pt-24 md:pt-36 pb-20 overflow-hidden">
+        <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
+            <!-- Top Pill Badge -->
+            <div class="inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                <i class="w-2.5 h-2.5 rounded-full bg-[#00A08A] pulse"></i>
+                <span>All-in-One Business Management & ERP</span>
             </div>
-            <div class="absolute inset-0 pointer-events-none z-50">
-                <div class="container mx-auto px-6 h-full flex flex-col justify-center">
-                    <div class="hero-pagination-holder lg:w-1/2 flex justify-center lg:justify-start pt-[580px] md:pt-[420px]">
-                        <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
+
+            <!-- Display H1 (EduManager Scale & Dual Brand Colors - Clean 2-Line Layout) -->
+            <h1 class="hero-display-heading max-w-5xl mx-auto">
+                <span class="block lg:whitespace-nowrap">Launch Your Complete eCommerce</span>
+                <span class="hero-gradient-text block">Business in Minutes.</span>
+            </h1>
+
+            <!-- Subtitle Description -->
+            <p class="text-base sm:text-lg lg:text-xl text-[#4B6366] max-w-3xl mx-auto mt-6 leading-relaxed">
+                Dorja is the complete cloud ERP & POS platform for retail, wholesale, eCommerce and multi-branch businesses. Manage sales, inventory, accounting and delivery seamlessly.
+            </p>
+
+            <!-- Dual Action CTAs -->
+            <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+                <a href="https://app.dorja.io/register"
+                    class="inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-all duration-200 active:scale-[0.98] bg-[#00555C] text-white hover:bg-[#003A3F] h-[52px] px-8 text-[17px] shadow-[0_12px_30px_-6px_rgba(0,85,92,0.45)]">
+                    <span>Start Free Trial</span>
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                </a>
+                <a href="#features"
+                    class="inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-all duration-200 active:scale-[0.98] h-[52px] px-8 text-[17px] bg-white/70 text-[#00555C] hover:bg-white border border-white/90 shadow-sm">
+                    <span>Explore Features</span>
+                </a>
+            </div>
+
+            <!-- 3-point Checklist Row -->
+            <ul class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[15px] sm:text-[16px] text-[#2C4346] font-medium">
+                <li class="inline-flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#00555C] text-white grid place-items-center text-[12px] font-bold">✓</span>
+                    <span>Setup in minutes, start free</span>
+                </li>
+                <li class="inline-flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#00555C] text-white grid place-items-center text-[12px] font-bold">✓</span>
+                    <span>Dedicated support & cloud backup</span>
+                </li>
+                <li class="inline-flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#00555C] text-white grid place-items-center text-[12px] font-bold">✓</span>
+                    <span>Unified POS, ERP, CRM & eCommerce</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- HERO PREVIEW SHOWCASE SECTION (Separate clean section without grid background) -->
+    <section class="relative pb-20 overflow-hidden">
+        <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
+            <!-- 3D Perspective Showcase (Exact EduManager Reference) -->
+            <div class="relative mt-4 md:mt-8 mx-auto max-w-[1080px] perspective-container">
+                <!-- Glowing blur blob beneath -->
+                <div class="absolute -inset-x-10 -bottom-10 top-1/3 bg-gradient-to-r from-[#00555C]/20 via-[#7CE0C3]/15 to-[#00A08A]/20 blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
+
+                <!-- Product Demo Showcase Card with EduManager 3D Tilt -->
+                <div class="relative">
+                    <div id="heroDeviceMockup" class="tilted-device-card relative group" style="transform-origin: center top; will-change: transform;">
+
+                        <!-- Interactive Animated Product Demo Frame (Exact Dorja Demo Experience) -->
+                        <div id="dorjaDemoContainer" class="w-full relative overflow-visible bg-transparent">
+                            <iframe id="dorjaDemoIframe" src="{{ asset('dorja-demo.html') }}" class="w-full border-0 block bg-transparent" style="height: 680px;" title="Dorja Interactive Walkthrough" loading="lazy"></iframe>
+                        </div>
+
+                    </div>
+
+                    <!-- 4 Floating Badges exactly like EduManager -->
+                    <div style="animation-delay: 0s;" class="hidden lg:flex absolute float-slow items-center gap-2.5 h-12 pl-2.5 pr-5 rounded-2xl bg-white/90 backdrop-blur-xl ring-1 ring-black/[0.06] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] left-[-2%] top-[10%] z-20">
+                        <span class="w-8 h-8 rounded-xl grid place-items-center text-white" style="background:#00555C">
+                            <i class="fa-solid fa-cash-register text-xs"></i>
+                        </span>
+                        <span class="text-[15px] font-semibold text-[#0A1F22]">POS & Billing</span>
+                    </div>
+
+                    <div style="animation-delay: -1.5s;" class="hidden lg:flex absolute float-slow items-center gap-2.5 h-12 pl-2.5 pr-5 rounded-2xl bg-white/90 backdrop-blur-xl ring-1 ring-black/[0.06] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] right-[-3%] top-[6%] z-20">
+                        <span class="w-8 h-8 rounded-xl grid place-items-center text-white" style="background:#00A08A">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </span>
+                        <span class="text-[15px] font-semibold text-[#0A1F22]">Accounting & Profit</span>
+                    </div>
+
+                    <div style="animation-delay: -3s;" class="hidden lg:flex absolute float-slow items-center gap-2.5 h-12 pl-2.5 pr-5 rounded-2xl bg-white/90 backdrop-blur-xl ring-1 ring-black/[0.06] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] left-[-5%] top-[52%] z-20">
+                        <span class="w-8 h-8 rounded-xl grid place-items-center text-white" style="background:#B8893B">
+                            <i class="fa-solid fa-boxes-stacked text-xs"></i>
+                        </span>
+                        <span class="text-[15px] font-semibold text-[#0A1F22]">Inventory & Stock</span>
+                    </div>
+
+                    <div style="animation-delay: -4.5s;" class="hidden lg:flex absolute float-slow items-center gap-2.5 h-12 pl-2.5 pr-5 rounded-2xl bg-white/90 backdrop-blur-xl ring-1 ring-black/[0.06] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] right-[-5%] top-[48%] z-20">
+                        <span class="w-8 h-8 rounded-xl grid place-items-center text-white" style="background:#5B52C8">
+                            <i class="fa-solid fa-truck-fast text-xs"></i>
+                        </span>
+                        <span class="text-[15px] font-semibold text-[#0A1F22]">Courier & Delivery</span>
                     </div>
                 </div>
             </div>
-
-        </section>
-    @endif
+        </div>
+    </section>
     <!-- LOGO SHOWCASE SECTION -->
     @if ($brands->isNotEmpty())
-        <section class="bg-black py-16 border-t border-white/5">
-            <div class="container mx-auto">
+        <section class="py-12 relative border-y border-white/40 px-4 md:px-10">
+            <div class="container mx-auto max-w-[1240px]">
                 <div
-                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center justify-items-center gap-y-12 gap-x-8 grayscale hover:opacity-100 transition-all duration-500">
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center justify-items-center gap-y-10 gap-x-8 opacity-80 hover:opacity-100 transition-all duration-500">
                     @forelse($brands as $brand)
-                        <div class="w-full flex justify-center text-white">
-                            <a href="{{ $brand->link }}" target="_blank" class="block">
+                        <div class="w-full flex justify-center">
+                            <a href="{{ $brand->link }}" target="_blank" class="block grayscale hover:grayscale-0 transition-all duration-300">
                                 <img src="{{ $brand->logo_url ?? '' }}" alt="{{ $brand->name }}"
-                                    class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
+                                    class="h-8 md:h-10 lg:h-12 object-contain cursor-pointer" />
                             </a>
                         </div>
                     @empty
-                        <div class="col-span-full text-gray-500 text-sm italic">No active brands available</div>
+                        <div class="col-span-full text-[#6F8789] text-sm italic">No active brands available</div>
                     @endforelse
                 </div>
             </div>
         </section>
     @endif
-    <section class="bg-white py-10 px-4 md:px-10">
-        <div class="container mx-auto">
+    <section id="features" class="py-16 px-4 md:px-10">
+        <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                    <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     All-in-One Solution
                 </span>
 
-                <h2 class="move-up text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-4" data-speed="0.05">
+                <h2 class="move-up text-2xl md:text-4xl font-extrabold text-[#0A1F22] mb-4" data-speed="0.05">
                     From Start to Growth — Everything in One System
                 </h2>
 
                 <!-- Tabs -->
-                <div class=" p-1.5  gap-2 rounded-2xl w-full  " id="solution-tabs">
-
-                    @foreach ($solutions as $key => $sol)
-                        <button onclick="switchSolution('{{ $key }}', this)"
-                            class="sol-tab-btn whitespace-nowrap flex-1  mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                                                                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c] hover:text-white' }}">
-                            {{ $sol['title'] }}
-                        </button>
-                    @endforeach
-
+                <div class="flex justify-center mb-7">
+                    <div class="flex flex-wrap items-center justify-center gap-2" id="solution-tabs" role="tablist" aria-label="Modules">
+                        @foreach ($solutions as $key => $sol)
+                            <button type="button" role="tab" onclick="switchSolution('{{ $key }}', this)"
+                                class="sol-tab-btn whitespace-nowrap {{ $loop->first ? 'active' : '' }}">
+                                {{ $sol['title'] }}
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
-            <!-- Content Card -->
-            <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Content Card (Glass Card) -->
+            <div class="glass border border-white/85 rounded-[28px] p-6 md:p-12 pb-16 md:pb-24 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)] relative overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center relative z-10">
 
                     <!-- Left Content -->
-                    <div>
-                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
+                    <div class="lg:col-span-5 relative flex flex-col justify-between min-h-[480px]">
+                        <div>
+                            <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-[#0A1F22] mb-5 relative z-10"></h3>
 
-                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
+                            <p id="sol-desc" class="text-[#4B6366] text-base md:text-lg leading-relaxed mb-8 max-w-md relative z-10"></p>
 
-                        <!-- Features -->
-                        <div id="sol-features" class="space-y-5 mb-12"></div>
+                            <!-- Features -->
+                            <div id="sol-features" class="space-y-4 mb-8 relative z-10"></div>
 
-                        <a href="#"
-                            class="inline-flex items-center gap-3 bg-[#00555c] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
-                            Explore More
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
+                            <a href="https://app.dorja.io/register"
+                                class="btnp inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-7 py-3.5 rounded-full font-semibold text-base transition-all shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)] relative z-10">
+                                <span>Explore More</span>
+                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                            </a>
+                        </div>
+
+                        <!-- Watermark moved to card bottom -->
                     </div>
 
-                    <!-- Right Image -->
-                    <div>
-                        <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                            <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 text-xs text-gray-600 font-mono flex items-center justify-between">
-                                <div class="bg-white border border-gray-200 rounded-md px-3 py-1 shadow-2xs">
-                                    <span id="sol-mockup" class="text-gray-700 font-medium">Ecommerce</span>
+                    <!-- Right Interactive Coding Mockup (Instead of Static Image) -->
+                    <div class="lg:col-span-7">
+                        <div class="bw relative rounded-2xl overflow-hidden bg-white border border-[#e4e9ea] shadow-[0_30px_70px_-25px_rgba(0,58,63,0.3)]" id="solBw">
+                            <div class="bw-bar h-[42px] bg-[#f1f4f5] border-b border-[#e4e9ea] flex items-center gap-3 px-3.5">
+                                <div class="bw-dots flex gap-1.5">
+                                    <i class="w-2.5 h-2.5 rounded-full bg-[#ff5f57] block"></i>
+                                    <i class="w-2.5 h-2.5 rounded-full bg-[#febc2e] block"></i>
+                                    <i class="w-2.5 h-2.5 rounded-full bg-[#28c840] block"></i>
                                 </div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                <div class="bw-url flex-1 max-w-[420px] mx-auto h-[26px] rounded-md bg-white border border-[#e4e9ea] flex items-center gap-2 px-2.5 text-xs text-[#475569] overflow-hidden whitespace-nowrap">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    <span id="solBwUrl" class="font-mono text-[11.5px]">app.dorja.io/dashboard</span>
                                 </div>
                             </div>
-
-                            <div class="w-full bg-gray-50 flex items-center justify-center p-2">
-                                <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
-                                    class="w-full h-auto object-contain rounded-lg shadow-sm" alt="Dashboard Preview" />
+                            <div class="bw-body relative w-full aspect-[16/10.5] min-h-[380px] md:min-h-[480px] bg-[#f6f6f6] overflow-hidden" id="solBwBody">
+                                <div class="ld absolute inset-0 grid place-items-center text-xs text-[#5d6f75]">Loading preview…</div>
                             </div>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 mt-3 text-xs text-[#5d6f75]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"></path></svg>
+                            <span>Live preview of the real dashboard. Hover and scroll inside it.</span>
                         </div>
                     </div>
 
                 </div>
+
+                <!-- Watermark Outline Text — absolute bottom of glass card, clipped by overflow-hidden -->
+                <span id="sol-watermark" aria-hidden="true"
+                    class="absolute left-6 md:left-12 bottom-[28px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
+                    style="font-size: clamp(65px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
+
             </div>
 
         </div>
     </section>
 
     <!-- INTEGRATION SECTION -->
-    <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden " id="intergation">
-        <div class="max-w-[1400px] mx-auto">
+    <section class="py-20 px-4 md:px-10 overflow-hidden relative" id="intergation">
+        <div class="container mx-auto max-w-[1240px]">
 
             <!-- Section Header -->
-            <div class="text-center mb-8">
-                <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-bold text-[14px] mb-6 uppercase tracking-wider">
+            <div class="text-center mb-12">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Smart Integration
                 </span>
-                <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-white mb-10" data-speed="0.05">
+                <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
                     Track and automate your entire business
                 </h2>
-
+                <p class="text-base md:text-lg text-[#4B6366] max-w-2xl mx-auto">
+                    Seamlessly connect your payment gateways, couriers, sales channels, and communication tools into one unified workflow.
+                </p>
             </div>
 
-            <!-- <div class="integration-section pt-10">
-                                            <div class="pin-wrap"> -->
-            <div class="  pt-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+            <div class="pt-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                     <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                    <div class="  border integration-card    shadow-sm relative group">
-
-
-                        <div class="relative border-[#262626] border-[20px]">
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto">
                                 <!-- 4 Input Paths -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -1223,18 +1252,16 @@
                                     class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
                             </div>
                         </div>
-                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
                             Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept
                             secure online payments, automate payment confirmation, and manage every transaction from a
                             single platform.
                         </div>
                     </div>
 
-                    <div class="  border  integration-card   shadow-sm relative group">
-
-
-                        <div class="relative border-[#262626] border-[20px]">
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto">
                                 <!-- ৪টি ইনপুট পাথ -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -1282,17 +1309,15 @@
                                     class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
                             </div>
                         </div>
-                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
                             </h3>
                             Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create
                             shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
                         </div>
                     </div>
-                    <div class="  border  integration-card   shadow-sm relative group">
-
-
-                        <div class="relative border-[#262626] border-[20px]">
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto">
                                 <!-- ৪টি ইনপুট পাথ -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -1342,18 +1367,16 @@
                                     class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
                             </div>
                         </div>
-                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
                                 Channel </h3>
                             Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified
                             inbox. Respond faster, manage conversations efficiently, and deliver a better customer
                             experience.
                         </div>
                     </div>
-                    <div class="  border  integration-card   shadow-sm relative group">
-
-
-                        <div class="relative border-[#262626] border-[20px]">
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto">
                                 <!-- ৪টি ইনপুট পাথ -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -1402,8 +1425,8 @@
                                     class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
                             </div>
                         </div>
-                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
                             </h3>
                             Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other
                             connected sales channels through a single dashboard. Process, fulfill, and track every order
@@ -1421,7 +1444,7 @@
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-base mb-6">
+                    class="inline-block px-6 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-base mb-6">
                     Integration
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight max-w-4xl mx-auto">
@@ -1434,7 +1457,7 @@
             <!-- Integration Cards Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Card 1: Payment Methods -->
-                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                <div class="bg-white border border-white/80 rounded-2xl p-8 md:p-14">
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
@@ -1473,9 +1496,9 @@
                                 class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Nagad" onerror="
-        this.src =
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png'
-        " />
+                                        this.src =
+                                        'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png'
+                                        " />
                             </div>
                             <div
                                 class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
@@ -1492,7 +1515,7 @@
                 </div>
 
                 <!-- Card 2: Courier Management -->
-                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                <div class="bg-white border border-white/80 rounded-2xl p-8 md:p-14">
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
@@ -1537,7 +1560,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                <div class="bg-white border border-white/80 rounded-2xl p-8 md:p-14">
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
@@ -1582,7 +1605,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                <div class="bg-white border border-white/80 rounded-2xl p-8 md:p-14">
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
@@ -1633,15 +1656,15 @@
 
     <!-- FEATURES SECTION -->
     @if ($topFeatures->isNotEmpty())
-        <section class="bg-white py-10">
-            <div class="container mx-auto px-6 md:px-10">
+        <section class="py-16 px-4 md:px-10 relative">
+            <div class="container mx-auto max-w-[1240px]">
                 <!-- Section Header -->
-                <div class="text-center mb-16">
-                    <span
-                        class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                <div class="text-center mb-14">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                        <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Features
                     </span>
-                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 " data-speed="0.05">
+                    <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
                         Everything you need for your business <br class="hidden md:block" />
                         now in one place
                     </h2>
@@ -1650,33 +1673,34 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach ($topFeatures as $feature)
                         <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#00555c] transition-all duration-300">
+                            class="glass flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
 
                             <!-- Left Icon -->
                             <div class="flex-shrink-0">
-                                <div class="w-16 h-16    rounded
-                                                                                           border border-white/20
-                                                                                           flex items-center justify-center">
+                                <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
                                     @if ($feature->image_url)
-                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-16"
-                                            alt=" {{ $feature->title }}" />
+                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
+                                            alt="{{ $feature->title }}" />
                                     @else
-                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
                                     @endif
                                 </div>
                             </div>
 
                             <!-- Right Content -->
                             <div class="flex-1 min-w-0">
-                                <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#00555c]">
-                                    {{ $feature->title }}
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
+                                        {{ $feature->title }}
+                                    </span>
+                                    <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
+                                        {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
                                 </div>
 
-
-
-                                <span class="inline-flex items-center gap-2 font-semibold text-[#00555c]">
-                                    Read More
-                                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
+                                    <span>Read More</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                                 </span>
                             </div>
 
@@ -1684,183 +1708,139 @@
                     @endforeach
                 </div>
 
-                <div class="mt-16 text-center">
+                <div class="mt-12 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#00555c] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
+                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold transition shadow-lg shadow-teal-900/20">
                         Start Free Trial
                     </a>
                 </div>
             </div>
         </section>
     @endif
-    <!-- SUCCESS SECTION (Dark Theme) -->
-    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
-        <div
-            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full pointer-events-none">
-        </div>
-
-        <div class="container mx-auto">
-            <!-- TOP PART: Header and Button -->
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
-                <div class="max-w-2xl">
-                    <!-- Badge Tag -->
-                    <span
-                        class="inline-block px-5 py-2 rounded-full border border-white/40 text-gray-300 text-sm md:text-lg font-medium mb-6">
-                        Your Business Growth Partner
-                    </span>
-                    <!-- Heading -->
-                    <h2 class="move-up text-white text-4xl md:text-5xl font-bold leading-tight mb-6" data-speed="0.05">
-                        Start Your Online Business Now and Grow with dorja.io
-                    </h2>
-                    <!-- Description -->
-                    <p class="text-gray-300 text-lg leading-relaxed max-w-2xl">
-                        Our advanced integrations make your business operations easier, smarter, and significantly more
-                        powerful.
-                    </p>
-                </div>
-
-                <!-- CTA Button -->
-                <div class="flex-shrink-0">
-                    <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#00555c] hover:bg-[#078e9a] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
-                        Start Now
-                    </a>
-                </div>
-            </div>
-
-            <!-- BOTTOM PART: 3 Columns Features -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12 lg:gap-20">
-                <!-- Feature 1 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-table-cells-large text-[#02adbb] text-4xl"></i>
-                    </div>
-                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
-                        Affordable Pricing
-                    </h3>
-                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
-                        Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
-                        to enterprises that grow with you.
-                    </p>
-                    <a href="{{ route('saas.package.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
-                        Explore Our Pricing
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-layer-group text-[#02adbb] text-4xl"></i>
-                    </div>
-                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
-                        Explore Features
-                    </h3>
-                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
-                        Discover a complete suite of business tools designed to automate operations, improve efficiency, and
-                        help you make faster data-driven decisions.
-                    </p>
-                    <a href="{{ route('saas.feature.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
-                        Explore Features
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-bolt text-[#02adbb] text-4xl"></i>
-                    </div>
-                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
-                        Start Your Journey Today
-                    </h3>
-                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
-                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way
-                        you manage and grow your business.
-                    </p>
-                    <a href="https://app.dorja.io/register"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
-                        Get Started
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- SOLUTION SECTION -->
     <!-- DEMO & TEMPLATE SECTION -->
     @php
         $displayDemos = ($demos && $demos->isNotEmpty()) ? $demos : collect([
-            (object)['id' => 1, 'type' => 1, 'title' => 'Landing Template 1 (Classic)', 'link' => url('/landing-preview/1'), 'image_url' => 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80'],
-            (object)['id' => 2, 'type' => 1, 'title' => 'Landing Template 2 (Modern Gadget)', 'link' => url('/landing-preview/2'), 'image_url' => 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80'],
-            (object)['id' => 3, 'type' => 1, 'title' => 'Landing Template 3 (Beauty & Cosmetics)', 'link' => url('/landing-preview/3'), 'image_url' => 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80'],
-            (object)['id' => 4, 'type' => 1, 'title' => 'Landing Template 4 (Multi Product)', 'link' => url('/landing-preview/4'), 'image_url' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80'],
-            (object)['id' => 5, 'type' => 1, 'title' => 'Landing Template 5 (High Conversion)', 'link' => url('/landing-preview/5'), 'image_url' => 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&q=80'],
-            (object)['id' => 6, 'type' => 1, 'title' => 'Landing Template 6 (Mega Storefront)', 'link' => url('/landing-preview/6'), 'image_url' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80'],
-            (object)['id' => 7, 'type' => 2, 'title' => 'Theme 1 (Modern Minimalist)', 'link' => url('/theme-preview/1'), 'image_url' => asset('assets/themes/theme_1.webp')],
-            (object)['id' => 8, 'type' => 2, 'title' => 'Theme 2 (Ocean Lifestyle)', 'link' => url('/theme-preview/2'), 'image_url' => asset('assets/themes/theme_2.webp')],
-            (object)['id' => 9, 'type' => 2, 'title' => 'Theme 3 (Organic Nature)', 'link' => url('/theme-preview/3'), 'image_url' => asset('assets/themes/theme_3.webp')],
-            (object)['id' => 10, 'type' => 2, 'title' => 'Theme 4 (Urban Streetwear)', 'link' => url('/theme-preview/4'), 'image_url' => asset('assets/themes/theme_4.webp')],
-            (object)['id' => 11, 'type' => 2, 'title' => 'Theme 5 (Luxury Boutique)', 'link' => url('/theme-preview/5'), 'image_url' => asset('assets/themes/theme_5.webp')],
+            (object)['id' => 1, 'type' => 1, 'title' => 'Landing Template 1 (Classic)', 'link' => url('/landing-preview/1'), 'image_url' => asset('images/saas/landing1.png')],
+            (object)['id' => 2, 'type' => 1, 'title' => 'Landing Template 2 (Modern Gadget)', 'link' => url('/landing-preview/2'), 'image_url' => asset('images/saas/landing2.png')],
+            (object)['id' => 3, 'type' => 1, 'title' => 'Landing Template 3 (Beauty & Cosmetics)', 'link' => url('/landing-preview/3'), 'image_url' => asset('images/saas/landing3.png')],
+            (object)['id' => 4, 'type' => 1, 'title' => 'Landing Template 4 (Multi Product)', 'link' => url('/landing-preview/4'), 'image_url' => asset('images/saas/landing4.png')],
+            (object)['id' => 5, 'type' => 1, 'title' => 'Landing Template 5 (High Conversion)', 'link' => url('/landing-preview/5'), 'image_url' => asset('images/saas/landingcustom.png')],
+            (object)['id' => 6, 'type' => 1, 'title' => 'Landing Template 6 (Mega Storefront)', 'link' => url('/landing-preview/6'), 'image_url' => asset('images/saas/landing1.png')],
+            (object)['id' => 7, 'type' => 2, 'title' => 'Theme 1 (Modern Minimalist)', 'link' => url('/theme-preview/1'), 'image_url' => asset('images/ecom/ecom1.png')],
+            (object)['id' => 8, 'type' => 2, 'title' => 'Theme 2 (Ocean Lifestyle)', 'link' => url('/theme-preview/2'), 'image_url' => asset('images/ecom/ecom2.png')],
+            (object)['id' => 9, 'type' => 2, 'title' => 'Theme 3 (Organic Nature)', 'link' => url('/theme-preview/3'), 'image_url' => asset('images/ecom/ecom3.png')],
+            (object)['id' => 10, 'type' => 2, 'title' => 'Theme 4 (Urban Streetwear)', 'link' => url('/theme-preview/4'), 'image_url' => asset('images/ecom/ecom4.png')],
+            (object)['id' => 11, 'type' => 2, 'title' => 'Theme 5 (Luxury Boutique)', 'link' => url('/theme-preview/5'), 'image_url' => asset('images/ecom/ecom5.png')],
         ]);
     @endphp
     @if ($displayDemos->isNotEmpty())
-        <section class="bg-white py-10 px-4 md:px-10" id="demo-section">
-            <div class="max-w-[1400px] mx-auto">
-                <!-- Section Header -->
-                <div class="text-center mb-12">
-                    <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
-                        Demo & Template
-                    </span>
-                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10"
-                        data-speed="0.05">
-                        Get a complete system live experience on one platform
-                    </h2>
+        <style>
+            .demo-card {
+                border-radius: 24px;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                background-color: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.9);
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
+            .demo-card:hover {
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+            .demo-image-frame {
+                position: relative;
+                display: block;
+                height: 340px;
+                max-height: 340px;
+                min-height: 340px;
+                overflow: hidden;
+                border-radius: 16px;
+                margin: 10px;
+                background-color: #E9F1EF;
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                cursor: pointer;
+            }
+            .demo-preview-img {
+                display: block;
+                width: 100%;
+                height: auto;
+                min-height: 100%;
+                object-fit: cover;
+                object-position: top;
+                transform: translateY(0);
+                transition: transform 9000ms cubic-bezier(0.25, 1, 0.5, 1);
+                will-change: transform;
+            }
+            .demo-card:hover .demo-preview-img,
+            .demo-image-frame:hover .demo-preview-img {
+                transform: translateY(calc(-100% + 340px));
+            }
+            #demo-tab-container {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                box-shadow: 0 4px 20px -2px rgba(0, 85, 92, 0.08);
+            }
+        </style>
+        <section class="py-20 px-4 md:px-10 relative" id="demo-section" style="background: #0A1F22; color: #fff;">
+            <div class="container mx-auto max-w-[1240px]">
+                <!-- Header with Redesign Alignment (Title on Left, Pill Tabs on Right) -->
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+                    <div class="max-w-2xl">
+                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                            <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
+                            Demo &amp; Template
+                        </span>
+                        <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                            Get a complete system live experience on one platform
+                        </h2>
+                    </div>
 
-                    <!-- Tabs Container (Clickable and Hover Effect Fixed) -->
-                    <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
-                        <button onclick="filterDemos(1, this)"
-                            class="tab-btn bg-[#00555c] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
+                    <!-- Tabs Pill Switcher with Smooth Glider (Matching Header Glider) -->
+                    <div role="tablist" aria-label="Templates" class="relative inline-flex p-1.5 rounded-full mb-1" id="demo-tab-container" style="align-self: flex-end;">
+                        <!-- Sliding Pill Glider -->
+                        <div id="demo-glider" class="absolute bg-[#00555C] rounded-full pointer-events-none z-0 shadow-sm" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
+
+                        <button type="button" role="tab" onclick="filterDemos(1, this)"
+                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-white">
                             Landing Page Template
                         </button>
-                        <button onclick="filterDemos(2, this)"
-                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#00555c] transition-all">
+                        <button type="button" role="tab" onclick="filterDemos(2, this)"
+                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
                             E-Commerce Template
                         </button>
                     </div>
                 </div>
 
                 <!-- Templates Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="demo-grid">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch" id="demo-grid">
                     @forelse($displayDemos as $demo)
-                        <div class="demo-card group border border-indigo-100 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                        <div class="demo-card group overflow-hidden flex flex-col h-full"
                             data-type="{{ $demo->type }}">
-                            <!-- Preview Window with Smooth Vertical Scroll on Hover -->
-                            <div class="relative h-[320px] sm:h-[380px] overflow-hidden bg-gray-100 border-b border-gray-100">
+                            <!-- Image Frame with Padding & Rounded Corners matching redesign -->
+                            <a href="{{ $demo->link ?? '#' }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
                                 <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
                                     alt="{{ $demo->title ?? 'Theme Preview' }}"
-                                    class="w-full h-auto object-cover object-top transition-transform duration-[6000ms] ease-in-out group-hover:-translate-y-[calc(100%-380px)]" />
-                                <!-- Subtle overlay shadow -->
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                </div>
-                            </div>
-                            <div class="py-5 px-6 flex items-center justify-between bg-white mt-auto">
-                                <div>
-                                    <h4
-                                        class="text-base md:text-lg font-bold text-gray-900 group-hover:text-[#00555c] transition-colors">
+                                    loading="lazy"
+                                    class="demo-preview-img" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                            </a>
+                            <div class="p-5 sm:p-6 flex items-center justify-between gap-3 mt-auto">
+                                <div class="min-w-0 pr-2">
+                                    <h3 class="text-base sm:text-lg font-bold text-[#0A1F22] truncate group-hover:text-[#00555C] transition-colors" title="{{ $demo->title ?? 'Template Preview' }}">
                                         {{ $demo->title ?? 'Template Preview' }}
-                                    </h4>
-                                    <span class="text-xs text-gray-500 font-medium">Interactive Demo</span>
+                                    </h3>
+                                    <span class="text-xs text-[#6F8789] font-medium">Interactive Demo</span>
                                 </div>
                                 <a href="{{ $demo->link ?? '#' }}" target="_blank"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00555c] text-white font-semibold text-sm hover:bg-[#078e9a] shadow-sm hover:shadow transition-all">
+                                    class="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-sm transition shadow-sm hover:shadow whitespace-nowrap">
                                     <span>Live Preview</span>
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                    <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 </a>
                             </div>
                         </div>
@@ -1951,7 +1931,7 @@
     @endphp
 
     <!-- INFINITY LOOP SECTION -->
-    <section class="bg-white py-14 overflow-hidden scroll-container">
+    <section class="py-12 overflow-hidden scroll-container" style="background: #0A1F22;">
         <div class="flex flex-col gap-8">
 
             @foreach ($rows as $row)
@@ -1964,7 +1944,7 @@
                             <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                                 @foreach ($row['data'] as $item)
                                     <span
-                                        class="bg-[#00555c] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
+                                        class="px-10 py-4 rounded-full font-bold whitespace-nowrap text-xl shadow-sm border" style="color: #C6DDDA; border-color: #234B4D; background: transparent;">
                                         {{ $item }}
                                     </span>
                                 @endforeach
@@ -1977,67 +1957,56 @@
 
         </div>
     </section>
-    <section class="py-24 hero-bg relative overflow-hidden">
-        <!-- Background Blur -->
-        <div class="absolute -top-24 -left-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+    <!-- ============ READY TO GROW ============ -->
+    <section class="py-16 px-4 md:px-10 relative">
+        <div class="container mx-auto max-w-[1240px]">
+            <div class="glass border border-white/85 rounded-[32px] p-8 md:p-16 flex flex-col items-center text-center gap-6 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)]">
 
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="max-w-4xl mx-auto text-center">
-
-                <span
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#7CE0C3]/35 text-[#00555C] font-semibold text-sm">
                     🚀 Business Made Simple
                 </span>
 
-                <h2 class="move-up mt-6 text-4xl md:text-5xl font-extrabold text-white leading-tight" data-speed="0.05">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-[#0A1F22] tracking-tight max-w-4xl whitespace-nowrap">
                     Ready to Grow Your Business?
                 </h2>
 
-                <p class="mt-6 text-lg text-gray-300 leading-8 max-w-3xl mx-auto">
+                <p class="text-[#2F4A4D] text-base md:text-lg max-w-2xl leading-relaxed">
                     Join thousands of businesses using <strong>Dorja.io</strong> to manage sales,
                     inventory, accounting, CRM, HRM, POS, warehouses, and marketing from one
                     powerful cloud platform.
                 </p>
 
                 <!-- Buttons -->
-                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-
+                <div class="flex flex-wrap gap-3 justify-center mt-2">
                     <a href="https://app.dorja.io/register"
-                        class="px-8 py-4 rounded-xl bg-[#00555c] hover:bg-[#078e9a] text-white font-semibold transition duration-300 shadow-lg">
-                        Start Free Trial
+                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-base px-8 py-3.5 rounded-full transition shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        <span>Start Free Trial</span>
                     </a>
 
                     <a href="{{ route('saas.package.list') }}"
-                        class="px-8 py-4 rounded-xl border border-white/20 hover:border-white text-white font-semibold transition duration-300">
-                        View Pricing
+                        class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#0A1F22] border border-[#BFD6D1] font-semibold text-base px-8 py-3.5 rounded-full transition">
+                        <span>View Pricing</span>
                     </a>
-
                 </div>
 
                 <!-- Trust Badges -->
-                <div class="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-gray-400">
-
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <div class="flex flex-wrap gap-x-6 gap-y-3 justify-center mt-2 text-[15px] font-medium text-[#2F4A4D]">
+                    <span class="inline-flex items-center gap-2">
+                        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00555C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg>
                         Free Trial
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    </span>
+                    <span class="inline-flex items-center gap-2">
+                        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00555C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg>
                         No Credit Card Required
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    </span>
+                    <span class="inline-flex items-center gap-2">
+                        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00555C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg>
                         Setup in Minutes
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    </span>
+                    <span class="inline-flex items-center gap-2">
+                        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00555C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg>
                         Secure Cloud Platform
-                    </div>
-
+                    </span>
                 </div>
 
             </div>
@@ -2045,12 +2014,13 @@
     </section>
 
     @if ($pricingPlans->isNotEmpty())
-        <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
-            <div class="container mx-auto">
+        <section class="py-20 px-4 md:px-10 relative" id="pricing">
+            <div class="container mx-auto max-w-[1240px]">
 
                 <div class="text-center mb-10">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                        <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Choose Best Plan for Your Business
                     </span>
                     <h2 class="move-up text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-6" data-speed="0.05">
@@ -2060,16 +2030,20 @@
 
                 <!-- Billing Cycle Toggle Switch -->
                 <div class="flex items-center justify-center mb-14">
-                    <div class="inline-flex items-center p-1.5 bg-gray-100 rounded-full border border-gray-200/90 shadow-inner">
+                    <div id="pricing-toggle-wrap" class="relative inline-flex items-center p-1.5 rounded-full"
+                        style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 4px 20px -2px rgba(0, 85, 92, 0.08);">
+                        <!-- Sliding Glider (Matching Demo Switcher) -->
+                        <div id="pricing-glider" class="absolute bg-[#00555C] rounded-full shadow-sm pointer-events-none z-0" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
+
                         <button type="button" id="home-monthly-btn" onclick="switchHomePricingCycle('monthly')"
-                            class="home-cycle-btn px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 bg-white text-gray-900 shadow-sm cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-white cursor-pointer">
                             Monthly Billing
                         </button>
                         <button type="button" id="home-yearly-btn" onclick="switchHomePricingCycle('yearly')"
-                            class="home-cycle-btn px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] flex items-center gap-2 cursor-pointer">
                             <span>Yearly Billing</span>
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm animate-pulse">
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-[#7CE0C3] text-[#00555C] shadow-sm">
                                 Save 20%
                             </span>
                         </button>
@@ -2113,18 +2087,18 @@
                         @endphp
 
                         <!-- Card Container -->
-                        <div class="bg-white border border-gray-200 flex flex-col h-full p-7 transition-all duration-300 relative border-t-[6px] shadow-sm hover:shadow-xl rounded-b-lg"
-                            style="border-top-color: {{ $themeColor }};">
+                        <div class="{{ $mode === 'popular' ? 'rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative text-white shadow-2xl border border-white/20' : 'glass rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative shadow-sm hover:shadow-xl' }}"
+                            @if ($mode === 'popular') style="background-color: #1c696f !important;" @endif>
 
                             <!-- Header: Title and Most Popular Badge -->
                             <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
+                                <h2 class="text-xl font-bold {{ $mode === 'popular' ? 'text-white' : 'text-gray-900' }}">{{ $plan->name }}</h2>
 
                                 @if ($mode === 'popular')
                                     <div
-                                        class="relative bg-[#0073ea] text-white text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
+                                        class="relative bg-[#7CE0C3] text-[#052528] text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
                                         <span>Most Popular</span>
-                                        <div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
+                                        <div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#7CE0C3] rotate-45">
                                         </div>
                                     </div>
                                 @endif
@@ -2135,45 +2109,45 @@
                                 <!-- Monthly Display -->
                                 <div class="home-pricing-monthly-block transition-all duration-200">
                                     <div class="flex items-start gap-1">
-                                        <span class="text-3xl font-extrabold"
-                                            style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
+                                        <span class="text-3xl font-extrabold {{ $mode === 'popular' ? '!text-white' : '' }}"
+                                            style="color: {{ $mode === 'popular' ? '#fff' : ($isSpecialMode ? $themeColor : '#111') }};">
                                             {{ $setup->currency ?? '৳' }} {{ number_format($monthlyFinal, 0) }}
                                             @if ($monthlyReg > $monthlyFinal)
-                                                <span class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
+                                                <span class="inline-block {{ $mode === 'popular' ? 'text-white/60' : 'text-gray-400' }} text-lg font-semibold line-through ml-1">
                                                     <del>{{ number_format($monthlyReg, 0) }}</del>
                                                 </span>
                                             @endif
                                         </span>
-                                        <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
+                                        <div class="text-xs {{ $mode === 'popular' ? 'text-white/75' : 'text-gray-500' }} font-bold pt-2 leading-tight">
                                             <span>/month</span>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-400 mt-1 font-medium">Billed monthly</p>
+                                    <p class="text-xs {{ $mode === 'popular' ? 'text-white/70' : 'text-gray-400' }} mt-1 font-medium">Billed monthly</p>
                                 </div>
 
                                 <!-- Yearly Display (hidden by default) -->
                                 <div class="home-pricing-yearly-block transition-all duration-200 hidden">
                                     <div class="flex items-start gap-1">
-                                        <span class="text-3xl font-extrabold"
-                                            style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
+                                        <span class="text-3xl font-extrabold {{ $mode === 'popular' ? '!text-white' : '' }}"
+                                            style="color: {{ $mode === 'popular' ? '#fff' : ($isSpecialMode ? $themeColor : '#111') }};">
                                             {{ $setup->currency ?? '৳' }} {{ number_format($effectiveMonthlyFromYearly, 0) }}
                                             @if ($monthlyFinal > $effectiveMonthlyFromYearly)
-                                                <span class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
+                                                <span class="inline-block {{ $mode === 'popular' ? 'text-white/60' : 'text-gray-400' }} text-lg font-semibold line-through ml-1">
                                                     <del>{{ number_format($monthlyFinal, 0) }}</del>
                                                 </span>
                                             @endif
                                         </span>
-                                        <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
+                                        <div class="text-xs {{ $mode === 'popular' ? 'text-white/75' : 'text-gray-500' }} font-bold pt-2 leading-tight">
                                             <span>/month</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between mt-1 gap-1">
-                                        <span class="text-xs font-semibold text-gray-700">
+                                        <span class="text-xs font-semibold {{ $mode === 'popular' ? 'text-white/90' : 'text-gray-700' }}">
                                             {{ $setup->currency ?? '৳' }}{{ number_format($yearlyFinal, 0) }} / year
                                         </span>
                                         @if ($yearlySaving > 0)
                                             <span
-                                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">
+                                                class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $mode === 'popular' ? 'bg-[#7CE0C3] text-[#052528]' : 'bg-emerald-100 text-emerald-700' }} whitespace-nowrap">
                                                 Save {{ $setup->currency ?? '৳' }}{{ number_format($yearlySaving, 0) }}
                                             </span>
                                         @endif
@@ -2185,15 +2159,15 @@
                             <div class="mb-4">
                                 <a href="https://app.dorja.io/register?plan={{ $plan->id }}&billing=monthly"
                                     data-base-url="https://app.dorja.io/register?plan={{ $plan->id }}"
-                                    class="home-plan-cta-link block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all hover:bg-gray-50 shadow-sm"
-                                    style="border-color: {{ $themeColor }}; color: {{ $themeColor }};">
+                                    class="home-plan-cta-link block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all shadow-sm {{ $mode === 'popular' ? 'bg-[#7CE0C3] hover:bg-[#A5ECD6] text-[#052528] !border-[#7CE0C3]' : 'hover:bg-gray-50' }}"
+                                    style="{{ $mode === 'popular' ? '' : 'border-color: ' . $themeColor . '; color: ' . $themeColor . ';' }}">
                                     Start Free Trial
                                 </a>
                             </div>
 
                             <!-- Description -->
                             <div class="mb-4">
-                                <p class="text-gray-600 text-sm leading-relaxed">
+                                <p class="{{ $mode === 'popular' ? 'text-white/80' : 'text-gray-600' }} text-sm leading-relaxed">
                                     {{ strtolower($plan->name) == 'starter'
                         ? 'Start your business with confidence.'
                         : (strtolower($plan->name) == 'growth'
@@ -2206,25 +2180,25 @@
 
                             <!-- Features/Limits Section (Fixed at bottom) -->
                             <div class="mt-auto">
-                                <hr class="border-gray-200 border-1 mb-4">
+                                <hr class="{{ $mode === 'popular' ? 'border-white/20' : 'border-gray-200' }} border-1 mb-4">
 
                                 <div class="space-y-2">
 
                                     <div class="space-y-2">
 
                                         @foreach ([['User Limit', $plan->user_limit], ['Product Limit', $plan->product_limit], ['Order Limit', $plan->order_limit], ['Extra Order', $plan->extra_order_charge]] as [$label, $value])
-                                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                            <div class="flex items-center justify-between {{ $mode === 'popular' ? 'border-b border-white/15' : 'border-b border-gray-100' }} pb-3">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="w-5 h-5 rounded-full bg-[#7e22ce17] flex items-center justify-center">
-                                                        <i class="fa-solid fa-check text-[10px] text-[#7e22ce]"></i>
+                                                    <div class="w-5 h-5 rounded-full {{ $mode === 'popular' ? 'bg-[#7CE0C3]/20' : 'bg-[#7e22ce17]' }} flex items-center justify-center">
+                                                        <i class="fa-solid fa-check text-[10px] {{ $mode === 'popular' ? 'text-[#7CE0C3]' : 'text-[#7e22ce]' }}"></i>
                                                     </div>
 
-                                                    <span class="text-sm text-[#7e22ce] font-semibold">
+                                                    <span class="text-sm {{ $mode === 'popular' ? 'text-white' : 'text-[#7e22ce]' }} font-semibold">
                                                         {{ $label }}
                                                     </span>
                                                 </div>
 
-                                                <span class="text-sm font-semibold text-[#7e22ce]">
+                                                <span class="text-sm font-semibold {{ $mode === 'popular' ? 'text-white' : 'text-[#7e22ce]' }}">
                                                     {{ $label === 'Extra Order' ? '৳.' : '' }}{{ $value ?: 'Unlimited' }}
                                                     {{ $label === 'Extra Order' ? '/order' : '' }}
                                                 </span>
@@ -2236,13 +2210,13 @@
                                     {{-- Custom multiple input loop --}}
                                     @if (!empty($plan->multiple_input))
                                         @foreach ($plan->multiple_input as $extraDetail)
-                                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                            <div class="flex items-center justify-between {{ $mode === 'popular' ? 'border-b border-white/15' : 'border-b border-gray-100' }} pb-3">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                                                        <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+                                                    <div class="w-5 h-5 rounded-full {{ $mode === 'popular' ? 'bg-[#7CE0C3]/20' : 'bg-emerald-100' }} flex items-center justify-center">
+                                                        <i class="fa-solid fa-check text-[10px] {{ $mode === 'popular' ? 'text-[#7CE0C3]' : 'text-emerald-600' }}"></i>
                                                     </div>
 
-                                                    <span class="text-sm text-gray-600">
+                                                    <span class="text-sm {{ $mode === 'popular' ? 'text-white/90' : 'text-gray-600' }}">
                                                         {{ $extraDetail }}
                                                     </span>
                                                 </div>
@@ -2257,8 +2231,9 @@
                 </div>
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-block bg-[#00555c] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
-                        More Packages <i class="fa-solid fa-arrow-right text-sm"></i>
+                        class="group inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        <span>More Packages</span>
+                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
             </div>
@@ -2266,11 +2241,11 @@
     @endif
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
     @if ($whyChooseUs->isNotEmpty())
-        <section class="bg-[#f9fafb] py-24 px-6 md:px-10 relative overflow-hidden">
-            <div class="container mx-auto">
+        <section class="py-20 px-4 md:px-10 relative">
+            <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-20">
                     <span
-                        class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-1.5 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
                         Why Businesses Choose Dorja.io
                     </span>
 
@@ -2280,31 +2255,50 @@
                     </h2>
                 </div>
 
-                <div class="flex flex-col gap-10">
-                    @foreach ($whyChooseUs as $index => $benefit)
-                        <div
-                            class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
-                            <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="move-up text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2"
-                                    data-speed="0.05">
+                <div class="space-y-6 md:space-y-8">
+                    <!-- Top Row: 2 Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        @foreach ($whyChooseUs->take(2) as $benefit)
+                            <div class="glass rounded-2xl p-6 md:p-8 flex flex-col h-full hover:shadow-xl transition-all duration-300">
+                                <div class="overflow-hidden rounded-xl mb-6">
+                                    <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
+                                        class="w-full h-auto object-cover rounded-xl" alt="{{ $benefit->title }}" />
+                                </div>
+                                <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-3">
                                     {{ $benefit->title }}
                                 </h3>
-                                <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
+                                <div class="text-[#4B6366] text-sm md:text-base leading-relaxed">
                                     {!! $benefit->description !!}
                                 </div>
                             </div>
-                            <div class="w-full lg:w-1/2">
-                                <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
-                                    class="w-full h-auto rounded-3xl  " alt="{{ $benefit->title }}" />
-                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Bottom Row: 3 Cards -->
+                    @if ($whyChooseUs->count() > 2)
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                            @foreach ($whyChooseUs->skip(2)->take(3) as $benefit)
+                                <div class="glass rounded-2xl p-6 md:p-8 flex flex-col h-full hover:shadow-xl transition-all duration-300">
+                                    <div class="overflow-hidden rounded-xl mb-6">
+                                        <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
+                                            class="w-full h-auto object-cover rounded-xl" alt="{{ $benefit->title }}" />
+                                    </div>
+                                    <h3 class="text-[#0A1F22] text-lg md:text-xl font-bold mb-3">
+                                        {{ $benefit->title }}
+                                    </h3>
+                                    <div class="text-[#4B6366] text-sm leading-relaxed">
+                                        {!! $benefit->description !!}
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                    @endforeach
+                    @endif
                 </div>
 
                 <div class="mt-4 text-center">
-                    <a href="#"
-                        class="inline-block bg-[#00555c] hover:bg-[#078e9a] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
-                        Start Free Trial
+                    <a href="https://app.dorja.io/register"
+                        class="btnp inline-flex items-center justify-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        <span>Start Free Trial</span>
                     </a>
                 </div>
             </div>
@@ -2313,20 +2307,21 @@
 
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
-        <section class="bg-white py-10 px-6 md:px-10">
-            <div class="container mx-auto">
+        <section class="py-20 px-4 md:px-10 relative" id="blog-section">
+            <div class="container mx-auto max-w-[1240px]">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
-                        class="bg-[#00555c] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
-                        View All <i class="fa-solid fa-arrow-right text-sm"></i>
+                        class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
+                        <span>View All</span>
+                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach ($blogs as $blog)
                         <a href="{{ route('saas.blog.details', $blog->slug) }}"
-                            class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                            class="glass border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
                             <div class="group block overflow-hidden rounded-xl">
                                 <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
@@ -2339,7 +2334,7 @@
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
                                     <span
-                                        class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-white/80">
                                         {{ 'Admin' }}
                                     </span>
                                     <!-- <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
@@ -2372,11 +2367,11 @@
     @endif
     <!-- Review SECTION -->
     @if ($allReviews->isNotEmpty())
-        <section class="bg-[#f9faff] py-10 px-6 md:px-10" id="reviews-section">
-            <div class="container mx-auto">
+        <section class="py-20 px-4 md:px-10 relative" id="reviews-section">
+            <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
                         Customer Reviews
                     </span>
                     <h2 class="move-up text-3xl md:text-5xl font-black text-gray-900" data-speed="0.05">
@@ -2388,7 +2383,7 @@
                 <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="review-container">
                     @foreach ($allReviews as $index => $review)
                         <div
-                            class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
+                            class="review-card break-inside-avoid bg-white border border-white/80 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
                                 <div>
                                     <h3 class="text-[#00555c] font-bold text-lg">
@@ -2422,13 +2417,13 @@
             </div>
         </section>
     @endif
-    <section class="bg-white py-10 px-6 md:px-10" id="faq-section">
-        <div class="container mx-auto">
+    <section class="py-20 px-4 md:px-10 relative" id="faq-section">
+        <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
             <div class="text-center mb-10">
-                <span
-                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Frequently Asked Questions
                 </span>
 
@@ -2440,7 +2435,7 @@
                 <!-- Search Box -->
                 <div class="mt-8 max-w-xl mx-auto px-5">
                     <input type="text" id="faqSearch" placeholder="Search FAQ..."
-                        class="w-full px-5 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                        class="w-full px-5 py-3 bg-white/90 border border-[#00555C]/30 rounded-xl focus:outline-none focus:border-[#00555C] focus:ring-2 focus:ring-[#00555C]/20 shadow-sm" />
                 </div>
             </div>
 
@@ -2451,14 +2446,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
 
                     @foreach ($faqs as $faq)
-                        <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl">
+                        <div class="faq-item glass border border-white/80 rounded-2xl">
 
                             <!-- Question -->
                             <button
                                 class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
                                 <span class="faq-question">{{ $faq->title }}</span>
 
-                                <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                                <i class="fa-solid fa-plus faq-icon text-[#00555C] text-lg transition-transform duration-200"></i>
                             </button>
 
                             <!-- Answer -->
@@ -2473,14 +2468,14 @@
             </div>
         </div>
     </section>
-    <section class="py-10 bg-white">
-        <div class="container mx-auto px-6">
+    <section class="py-10 px-4 md:px-10">
+        <div class="container mx-auto max-w-[1240px]">
 
 
 
 
 
-            <div class="hero-bg rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl">
+            <div class="rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl" style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
 
                 <h3 class="text-3xl md:text-4xl font-bold">
                     Start Managing Your Business Smarter Today
@@ -2517,10 +2512,22 @@
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const content = btn.nextElementSibling;
-                const icon = btn.querySelector('i');
+                const icon = btn.querySelector('.faq-icon') || btn.querySelector('i');
 
-                content.classList.toggle('hidden');
-                icon.classList.toggle('rotate-180');
+                const isHidden = content.classList.contains('hidden');
+                if (isHidden) {
+                    content.classList.remove('hidden');
+                    if (icon) {
+                        icon.classList.remove('fa-plus');
+                        icon.classList.add('fa-minus');
+                    }
+                } else {
+                    content.classList.add('hidden');
+                    if (icon) {
+                        icon.classList.remove('fa-minus');
+                        icon.classList.add('fa-plus');
+                    }
+                }
             });
         });
 
@@ -2541,154 +2548,395 @@
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            window.SwiperPromise.then((Swiper) => {
-                if (!Swiper) return;
+        // Auto-adjust dorja-demo iframe height based on content
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'dorja-demo-resize' && e.data.height) {
+                const iframe = document.getElementById('dorjaDemoIframe');
+                const container = document.getElementById('dorjaDemoContainer');
+                if (iframe) {
+                    iframe.style.height = (e.data.height + 6) + 'px';
+                }
+                if (container) {
+                    container.style.height = (e.data.height + 6) + 'px';
+                }
+            }
+        });
 
-                const heroSwiper = new Swiper('.heroSwiper', {
-                    loop: true,
-                    effect: 'fade',
-                    fadeEffect: {
-                        crossFade: true
-                    },
-                    autoplay: {
-                        delay: 5000,
-                        disableOnInteraction: false,
-                    },
-                    speed: 1500,
-                    pagination: {
-                        el: '.hero-pagination',
-                        clickable: true,
-                        renderBullet: function (index, className) {
-                            return '<span class="' + className + '"></span>';
-                        }
-                    },
+        // EduManager Scroll-based 3D Tilt Effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.getElementById('heroDeviceMockup');
+            if (!card) return;
+
+            let ticking = false;
+            function updateTilt() {
+                if (window.innerWidth < 768) {
+                    card.style.transform = 'none';
+                    ticking = false;
+                    return;
+                }
+                const rect = card.getBoundingClientRect();
+                const winH = window.innerHeight;
+                // As you scroll down and the card moves into focus, it rotates smoothly from 14deg to 0deg
+                const progress = Math.min(1, Math.max(0, (winH - rect.top) / (winH * 0.95)));
+                const rotateX = Math.max(0, (1 - progress) * 14);
+                const scale = 0.95 + (progress * 0.05);
+                card.style.transform = `scale(${scale}) rotateX(${rotateX.toFixed(2)}deg)`;
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(updateTilt);
+                    ticking = true;
+                }
+            }, { passive: true });
+
+            window.addEventListener('resize', updateTilt, { passive: true });
+            updateTilt();
+        });
+    </script>
+    <script>
+        function formatVideoTime(seconds) {
+            if (isNaN(seconds) || seconds === Infinity) return '00:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function toggleHeroVideo() {
+            const video = document.getElementById('heroVideo');
+            const pauseIcon = document.getElementById('pauseIcon');
+            const playIcon = document.getElementById('playIcon');
+            if (!video) return;
+            if (video.paused) {
+                video.play();
+                if (pauseIcon) pauseIcon.classList.remove('hidden');
+                if (playIcon) playIcon.classList.add('hidden');
+            } else {
+                video.pause();
+                if (pauseIcon) pauseIcon.classList.add('hidden');
+                if (playIcon) playIcon.classList.remove('hidden');
+            }
+        }
+
+        function toggleHeroAudio() {
+            const video = document.getElementById('heroVideo');
+            const muteIcon = document.getElementById('muteIcon');
+            const unmuteIcon = document.getElementById('unmuteIcon');
+            if (!video) return;
+            video.muted = !video.muted;
+            if (video.muted) {
+                if (muteIcon) muteIcon.classList.remove('hidden');
+                if (unmuteIcon) unmuteIcon.classList.add('hidden');
+            } else {
+                if (muteIcon) muteIcon.classList.add('hidden');
+                if (unmuteIcon) unmuteIcon.classList.remove('hidden');
+            }
+        }
+
+        function seekHeroVideo(event) {
+            const video = document.getElementById('heroVideo');
+            const track = document.getElementById('heroVideoProgressTrack');
+            if (!video || !track || !video.duration) return;
+            const rect = track.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+            video.currentTime = percentage * video.duration;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const video = document.getElementById('heroVideo');
+            const progressBar = document.getElementById('heroVideoProgressBar');
+            const pauseIcon = document.getElementById('pauseIcon');
+            const playIcon = document.getElementById('playIcon');
+
+            if (video) {
+                // Ensure video plays smoothly
+                const tryPlay = () => {
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            if (pauseIcon) pauseIcon.classList.remove('hidden');
+                            if (playIcon) playIcon.classList.add('hidden');
+                        }).catch(() => {
+                            // Autoplay was prevented by browser, ensure mute and retry
+                            video.muted = true;
+                            video.play().catch(() => {});
+                        });
+                    }
+                };
+                tryPlay();
+
+                video.addEventListener('timeupdate', function () {
+                    if (!video.duration) return;
+                    const percent = (video.currentTime / video.duration) * 100;
+                    if (progressBar) {
+                        progressBar.style.width = percent + '%';
+                    }
                 });
+
+                video.addEventListener('play', function () {
+                    if (pauseIcon) pauseIcon.classList.remove('hidden');
+                    if (playIcon) playIcon.classList.add('hidden');
+                });
+
+                video.addEventListener('pause', function () {
+                    if (pauseIcon) pauseIcon.classList.add('hidden');
+                    if (playIcon) playIcon.classList.remove('hidden');
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            window.SwiperPromise && window.SwiperPromise.then((Swiper) => {
+                if (!Swiper) return;
+                const heroEl = document.querySelector('.heroSwiper');
+                if (heroEl) {
+                    new Swiper('.heroSwiper', {
+                        loop: true,
+                        speed: 1000,
+                    });
+                }
             });
         });
 
         const solutions = @json($solutions);
 
+        function moveSolGlider(target, immediate = false) {
+            const tabsContainer = document.getElementById("solution-tabs");
+            const glider = document.getElementById("sol-tab-glider");
+            if (!tabsContainer || !glider || !target) return;
+
+            const navRect = tabsContainer.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            if (immediate) {
+                glider.style.transition = "none";
+            } else {
+                glider.style.transition = "all 0.45s cubic-bezier(0.25, 1, 0.5, 1)";
+            }
+
+            glider.style.left = (targetRect.left - navRect.left) + "px";
+            glider.style.top = (targetRect.top - navRect.top) + "px";
+            glider.style.width = targetRect.width + "px";
+            glider.style.height = targetRect.height + "px";
+            glider.style.opacity = "1";
+        }
+
         function switchSolution(key, btn) {
             const data = solutions[key];
+            if (!data) return;
 
-            document.getElementById('sol-title').innerText = data.title;
-            document.getElementById('sol-desc').innerText = data.desc;
-            document.getElementById('sol-img').src = data.img;
-            document.getElementById('sol-mockup').innerText = data.mockup;
+            const solTitle = document.getElementById('sol-title');
+            const solDesc = document.getElementById('sol-desc');
+            const solMockup = document.getElementById('sol-mockup');
+            const solWatermark = document.getElementById('sol-watermark');
+
+            if (solTitle) solTitle.innerText = data.title;
+            if (solDesc) solDesc.innerText = data.desc;
+            if (solMockup) solMockup.innerText = data.mockup;
+            if (solWatermark) solWatermark.innerText = data.title;
+
+            // Trigger live module preview in right coding window
+            if (typeof window.showDorjaModule === 'function') {
+                window.showDorjaModule(key);
+            }
 
             let featureHtml = '';
             data.features.forEach(f => {
                 featureHtml += `
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-8 h-8 bg-[#00555c] rounded-lg flex items-center justify-center text-white">
-                                            <i class="fa-solid ${f.icon} text-sm"></i>
-                                        </div>
-                                        <span class="font-bold text-gray-900 text-lg">${f.text}</span>
-                                    </div>
-                                `;
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 bg-[#00555C] rounded-lg flex items-center justify-center text-white shrink-0">
+                            <i class="fa-solid ${f.icon} text-sm"></i>
+                        </div>
+                        <span class="font-bold text-[#0A1F22] text-base md:text-lg">${f.text}</span>
+                    </div>
+                `;
             });
 
-            document.getElementById('sol-features').innerHTML = featureHtml;
+            const solFeatures = document.getElementById('sol-features');
+            if (solFeatures) solFeatures.innerHTML = featureHtml;
 
             document.querySelectorAll('.sol-tab-btn').forEach(b => {
-                b.classList.remove('bg-[#00555c]', 'text-white');
-                b.classList.add('bg-[#00555c30]', 'text-gray-900');
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
             });
-
-            btn.classList.add('bg-[#00555c]', 'text-white');
-            btn.classList.remove('bg-[#00555c30]', 'text-gray-900');
+            if (btn) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+            }
         }
 
         // default load
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelector(".sol-tab-btn").click();
-        });
-    </script>
-    <script>
-        //review
-        document.addEventListener('DOMContentLoaded', function () {
-            const loadMoreBtn = document.getElementById('load-more-reviews');
-            const itemsToShow = 6;
-
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', function () {
-                    const hiddenCards = document.querySelectorAll('.review-card.hidden');
-
-                    for (let i = 0; i < itemsToShow && i < hiddenCards.length; i++) {
-                        hiddenCards[i].classList.remove('hidden');
-                    }
-
-                    if (document.querySelectorAll('.review-card.hidden').length === 0) {
-                        loadMoreBtn.style.display = 'none';
-                    }
-                });
+            const firstTab = document.querySelector(".sol-tab-btn");
+            if (firstTab) {
+                firstTab.click();
             }
         });
-        //demo
-        function filterDemos(type, btn) {
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(b => {
-                b.classList.remove('bg-[#00555c]', 'text-white');
-                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#00555c]');
-            });
+            </script>
+            <script>
+                //review
+                document.addEventListener('DOMContentLoaded', function () {
+                    const loadMoreBtn = document.getElementById('load-more-reviews');
+                    const itemsToShow = 6;
 
-            btn.classList.add('bg-[#00555c]', 'text-white');
-            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#00555c]');
+                    if (loadMoreBtn) {
+                        loadMoreBtn.addEventListener('click', function () {
+                            const hiddenCards = document.querySelectorAll('.review-card.hidden');
 
-            const cards = document.querySelectorAll('.demo-card');
-            cards.forEach(card => {
-                if (card.getAttribute('data-type') == type) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+                            for (let i = 0; i < itemsToShow && i < hiddenCards.length; i++) {
+                                hiddenCards[i].classList.remove('hidden');
+                            }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const firstTab = document.querySelector('.tab-btn');
-            if (firstTab) filterDemos(1, firstTab);
-        });
-
-        function switchHomePricingCycle(cycle) {
-            const monthlyBtn = document.getElementById('home-monthly-btn');
-            const yearlyBtn = document.getElementById('home-yearly-btn');
-            const monthlyBlocks = document.querySelectorAll('.home-pricing-monthly-block');
-            const yearlyBlocks = document.querySelectorAll('.home-pricing-yearly-block');
-            const ctaLinks = document.querySelectorAll('.home-plan-cta-link');
-
-            if (cycle === 'yearly') {
-                if (monthlyBtn) {
-                    monthlyBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                    monthlyBtn.classList.add('text-gray-600');
-                }
-                if (yearlyBtn) {
-                    yearlyBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                    yearlyBtn.classList.remove('text-gray-600');
-                }
-                monthlyBlocks.forEach(el => el.classList.add('hidden'));
-                yearlyBlocks.forEach(el => el.classList.remove('hidden'));
-                ctaLinks.forEach(link => {
-                    const base = link.getAttribute('data-base-url');
-                    if (base) link.setAttribute('href', base + '&billing=yearly');
+                            if (document.querySelectorAll('.review-card.hidden').length === 0) {
+                                loadMoreBtn.style.display = 'none';
+                            }
+                        });
+                    }
                 });
-            } else {
-                if (yearlyBtn) {
-                    yearlyBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                    yearlyBtn.classList.add('text-gray-600');
+                //demo
+                function moveDemoGlider(target, immediate = false) {
+                    const container = document.getElementById('demo-tab-container');
+                    const glider = document.getElementById('demo-glider');
+                    if (!container || !glider || !target) return;
+
+                    const cRect = container.getBoundingClientRect();
+                    const tRect = target.getBoundingClientRect();
+
+                    if (immediate) {
+                        glider.style.transition = 'none';
+                    } else {
+                        glider.style.transition = 'all 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+                    }
+
+                    glider.style.left = (tRect.left - cRect.left) + 'px';
+                    glider.style.top = (tRect.top - cRect.top) + 'px';
+                    glider.style.width = tRect.width + 'px';
+                    glider.style.height = tRect.height + 'px';
+                    glider.style.opacity = '1';
                 }
-                if (monthlyBtn) {
-                    monthlyBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                    monthlyBtn.classList.remove('text-gray-600');
+
+                function filterDemos(type, btn) {
+                    const buttons = document.querySelectorAll('#demo-tab-container .demo-tab-btn');
+                    buttons.forEach(b => {
+                        b.classList.remove('text-white');
+                        b.classList.add('text-[#2C4346]', 'hover:text-[#00555C]');
+                    });
+
+                    if (btn) {
+                        btn.classList.add('text-white');
+                        btn.classList.remove('text-[#2C4346]', 'hover:text-[#00555C]');
+                        moveDemoGlider(btn);
+                    }
+
+                    const cards = document.querySelectorAll('.demo-card');
+                    cards.forEach(card => {
+                        if (card.getAttribute('data-type') == type) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
                 }
-                yearlyBlocks.forEach(el => el.classList.add('hidden'));
-                monthlyBlocks.forEach(el => el.classList.remove('hidden'));
-                ctaLinks.forEach(link => {
-                    const base = link.getAttribute('data-base-url');
-                    if (base) link.setAttribute('href', base + '&billing=monthly');
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    const firstTab = document.querySelector('#demo-tab-container .demo-tab-btn');
+                    if (firstTab) {
+                        filterDemos(1, firstTab);
+                        moveDemoGlider(firstTab, true);
+                        requestAnimationFrame(() => {
+                            const glider = document.getElementById('demo-glider');
+                            if (glider) glider.style.transition = 'all 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+                        });
+                    }
                 });
-            }
-        }
-    </script>
+
+                window.addEventListener('resize', function () {
+                    const activeBtn = document.querySelector('#demo-tab-container .demo-tab-btn.text-white');
+                    if (activeBtn) moveDemoGlider(activeBtn, true);
+                });
+
+                function movePricingGlider(target, immediate = false) {
+                    const wrap = document.getElementById('pricing-toggle-wrap');
+                    const glider = document.getElementById('pricing-glider');
+                    if (!wrap || !glider || !target) return;
+
+                    const wrapRect = wrap.getBoundingClientRect();
+                    const targetRect = target.getBoundingClientRect();
+
+                    if (immediate) {
+                        glider.style.transition = 'none';
+                    } else {
+                        glider.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                    }
+
+                    glider.style.left = (targetRect.left - wrapRect.left) + 'px';
+                    glider.style.top = (targetRect.top - wrapRect.top) + 'px';
+                    glider.style.width = targetRect.width + 'px';
+                    glider.style.height = targetRect.height + 'px';
+                    glider.style.opacity = '1';
+                }
+
+                // Initialize glider on page load
+                document.addEventListener('DOMContentLoaded', function () {
+                    const monthlyBtn = document.getElementById('home-monthly-btn');
+                    if (monthlyBtn) {
+                        movePricingGlider(monthlyBtn, true);
+                        requestAnimationFrame(() => {
+                            const glider = document.getElementById('pricing-glider');
+                            if (glider) glider.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                        });
+                    }
+                });
+
+                window.addEventListener('resize', function () {
+                    const activeBtn = document.querySelector('.home-cycle-btn.text-white');
+                    if (activeBtn) movePricingGlider(activeBtn, true);
+                });
+
+                function switchHomePricingCycle(cycle) {
+                    const monthlyBtn = document.getElementById('home-monthly-btn');
+                    const yearlyBtn = document.getElementById('home-yearly-btn');
+                    const monthlyBlocks = document.querySelectorAll('.home-pricing-monthly-block');
+                    const yearlyBlocks = document.querySelectorAll('.home-pricing-yearly-block');
+                    const ctaLinks = document.querySelectorAll('.home-plan-cta-link');
+
+                    if (cycle === 'yearly') {
+                        if (monthlyBtn) {
+                            monthlyBtn.classList.remove('text-white');
+                            monthlyBtn.classList.add('text-[#2C4346]', 'hover:text-[#00555C]');
+                        }
+                        if (yearlyBtn) {
+                            yearlyBtn.classList.remove('text-[#2C4346]', 'hover:text-[#00555C]');
+                            yearlyBtn.classList.add('text-white');
+                            movePricingGlider(yearlyBtn);
+                        }
+                        monthlyBlocks.forEach(el => el.classList.add('hidden'));
+                        yearlyBlocks.forEach(el => el.classList.remove('hidden'));
+                        ctaLinks.forEach(link => {
+                            const base = link.getAttribute('data-base-url');
+                            if (base) link.setAttribute('href', base + '&billing=yearly');
+                        });
+                    } else {
+                        if (yearlyBtn) {
+                            yearlyBtn.classList.remove('text-white');
+                            yearlyBtn.classList.add('text-[#2C4346]', 'hover:text-[#00555C]');
+                        }
+                        if (monthlyBtn) {
+                            monthlyBtn.classList.remove('text-[#2C4346]', 'hover:text-[#00555C]');
+                            monthlyBtn.classList.add('text-white');
+                            movePricingGlider(monthlyBtn);
+                        }
+                        yearlyBlocks.forEach(el => el.classList.add('hidden'));
+                        monthlyBlocks.forEach(el => el.classList.remove('hidden'));
+                        ctaLinks.forEach(link => {
+                            const base = link.getAttribute('data-base-url');
+                            if (base) link.setAttribute('href', base + '&billing=monthly');
+                        });
+                    }
+                }
+            </script>
+            <script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+            <script src="{{ asset('js/dorja-modules.js') }}"></script>
 @endpush
