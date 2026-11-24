@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dorja Product Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<style type="text/tailwindcss">
+@theme { --text-2xs: 0.625rem; --font-sans: Geist, sans-serif; }
+</style>
+<style>
+:root{ --page:transparent; --teal:#13565e; --teal2:#078e9a; --soft:#e5f7f4; }
+*, ::before, ::after { border-color: #e5e7eb; }
+html,body{background:transparent;overflow-x:hidden;margin:0;padding:0}
+.stage{position:relative;width:100%;height:auto;min-height:0;padding:0 0 16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;box-sizing:border-box;font-family:Inter,system-ui,sans-serif;color:#111827}
+.glow{position:absolute;width:640px;height:640px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(45,212,191,.22),rgba(45,212,191,0) 65%);transform:translate(-50%,-50%);left:50%;top:30%;transition:left .25s ease-out,top .25s ease-out}
+.grid-bg{position:absolute;inset:0;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%)}
+.hero{position:relative;text-align:center;max-width:760px;margin-bottom:36px}
+.eyebrow{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.04em;color:#5eead4;background:rgba(94,234,212,.1);border:1px solid rgba(94,234,212,.25);padding:6px 12px;border-radius:999px;margin-bottom:16px}
+.hero h1{font-size:clamp(28px,4.6vw,48px);line-height:1.1;font-weight:800;letter-spacing:-.02em;color:#fff}
+.hero p{margin-top:14px;color:#a7c1c4;font-size:clamp(15px,1.8vw,18px);line-height:1.55}
+.wrap{position:relative;width:100%;max-width:1180px;perspective:1800px}
+.tilt{transform-style:preserve-3d;transition:transform .35s ease-out;will-change:transform}
+.browser{width:1440px;height:900px;transform-origin:0 0;border-radius:28px;overflow:hidden;background:#fff;box-shadow:0 30px 80px -20px rgba(0,58,63,0.28),0 0 0 1px rgba(0,0,0,.08);position:absolute;left:0;top:0}
+.chrome{height:48px;background:#eef1f4;border-bottom:1px solid #dde2e7;display:flex;align-items:center;gap:14px;padding:0 16px;color:#4b5563;font-family:Inter,sans-serif}
+.dots{display:flex;gap:8px}.dots i{width:12px;height:12px;border-radius:50%;display:block}
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.navbtns{display:flex;gap:10px;color:#9aa3ad}
+.url{flex:1;max-width:620px;margin:0 auto;height:30px;border-radius:8px;background:#fff;border:1px solid #dde2e7;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:13.5px;color:#374151}
+.url .caret{width:1px;height:16px;background:#374151;animation:blink 1s steps(1) infinite;opacity:0}
+.url.typing .caret{opacity:1}
+@keyframes blink{50%{visibility:hidden}}
+.progress{position:absolute;left:0;top:48px;height:3px;background:linear-gradient(90deg,#2dd4bf,#13565e);width:0;z-index:30;transition:width .5s ease,opacity .3s}
+
+/* app shell */
+.vp{position:relative;height:852px;display:flex;background:#f6f6f6;overflow:hidden;font-family:Geist,sans-serif;color:#111827}
+.vp aside{width:240px;flex:none;height:100%}
+.appmain{flex:1;min-width:0;display:flex;flex-direction:column}
+.pages{position:relative;flex:1;overflow:hidden}
+.page{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .35s ease,transform .35s ease;transform:translateY(8px)}
+.page.show{opacity:1;visibility:visible;transform:none}
+.inner{will-change:transform}
+.sbar{position:absolute;right:3px;top:4px;width:6px;border-radius:3px;background:rgba(0,0,0,.2);opacity:0;transition:opacity .4s}
+.sbar.vis{opacity:1}
+.vp.nohdr #topHdr{display:none}
+
+/* hover / state classes driven by the fake cursor */
+.sb.hov,.sb.on{background:var(--soft)!important;color:var(--teal2)!important}
+.sb.open .chev{transform:rotate(180deg)}
+.sub{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.2,.8,.2,1)}
+.sub.open{max-height:260px}
+.sl.hov{color:var(--teal2)!important;background:#f9fafb}
+.sl.on{color:var(--teal2)!important;background:var(--soft)!important;font-weight:500}
+.sl.on .dot{background:var(--teal)!important}
+.pc{border:1px solid #e5e7eb!important;transition:border-color .2s ease,box-shadow .2s ease}
+.pc.hov{border-color:#13565e!important;box-shadow:0 10px 15px -3px rgba(0,0,0,.08),0 4px 6px -4px rgba(0,0,0,.05)}
+.pc.added{border-color:#13565e!important;outline:2px solid #13565e;outline-offset:-1px}
+.btn-pay.hov,.btn-complete.hov{background:var(--teal2)!important}
+.oid.hov{text-decoration:underline}
+.trow.hov{background:#f9fafb!important}
+.trow.new{background:#ecfdf5!important;box-shadow:inset 3px 0 0 #10b981}
+.fx{box-shadow:0 0 0 1px var(--teal)!important;border-color:var(--teal)!important}
+.ci{animation:slideIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+.fly{position:absolute;z-index:47;width:42px;height:42px;border-radius:8px;background-size:cover;background-position:center;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.modal{position:absolute;inset:0;z-index:40;opacity:0;visibility:hidden;transition:opacity .25s}
+.modal.vis{opacity:1;visibility:visible}
+.modal .box{transform:scale(.96);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.modal.vis .box{transform:none}
+.toast{position:absolute;top:18px;right:18px;z-index:45;opacity:0;transform:translateY(-10px);transition:all .35s}
+.toast.vis{opacity:1;transform:none}
+
+/* dashboard (unchanged look) */
+.dsh{padding:22px 24px 40px;font-family:Geist,sans-serif;font-size:14px;color:#1f2937}
+.dh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.dh h2{font-size:22px;font-weight:700;color:#111827}
+.dh .d{font-size:13px;color:#6b7280;margin-top:3px}
+.dh .warn{font-size:12.5px;color:#d97706;margin-top:3px}
+.rng{display:flex;gap:8px}
+.rng button{height:34px;padding:0 14px;border-radius:9px;border:1px solid #e7eaee;background:#fff;font-size:13px;font-weight:500;color:#374151;transition:all .25s}
+.rng button.on{background:#13525a;border-color:#13525a;color:#fff;font-weight:600}
+.rng button.hov:not(.on){background:#f3f5f7;border-color:#cfd6dd}
+.hero-card{background:#13525a;border-radius:16px;color:#fff;display:grid;grid-template-columns:1fr 1fr 1fr;padding:22px 0;margin-bottom:18px}
+.hc{padding:0 26px;border-right:1px solid rgba(255,255,255,.18)}.hc:last-child{border:0}
+.hc h4{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;margin-bottom:14px}
+.hc h4 i{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.hc h4 svg{width:19px;height:19px}
+.kv{display:flex;justify-content:space-between;font-size:14px;line-height:1.95}
+.kv span:first-child{color:rgba(255,255,255,.82)}.kv b{font-weight:600}
+.card{background:#fff;border:1px solid #e7eaee;border-radius:16px;padding:20px}
+.ct{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;color:#111827}
+.pill{font-size:11px;font-weight:600;color:#13525a;background:#e6f2f3;padding:3px 8px;border-radius:6px}
+.formula{font-size:12.5px;color:#6b7280;margin:8px 0 14px;line-height:1.5}
+.formula b{color:#111827}.formula .g{color:#059669;font-weight:600}
+.chips{display:flex;gap:10px;margin-bottom:16px}
+.chip{border:1px solid #e7eaee;border-radius:10px;padding:8px 12px;min-width:120px}
+.chip small{display:block;font-size:10.5px;color:#6b7280;font-weight:600;letter-spacing:.03em}
+.chip b{font-size:15px;color:#111827}.chip.g b{color:#059669}.chip.gg{background:#ecfdf5;border-color:#a7f3d0}.chip.gg b{color:#059669}
+.prof{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+.chart{border:1px solid #e7eaee;border-radius:12px;padding:14px 16px}
+.chart .h{display:flex;justify-content:space-between;font-size:12.5px;color:#6b7280;margin-bottom:6px}
+.bars{position:relative;height:220px;display:flex;align-items:flex-end;gap:16px;padding:0 6px 26px 44px}
+.bars .ax{position:absolute;left:0;right:0;font-size:10.5px;color:#9ca3af;border-top:1px dashed #edf0f3;padding-left:2px}
+.bar{flex:1;position:relative;height:100%;display:flex;align-items:flex-end}
+.bar i{display:block;width:100%;border-radius:4px 4px 0 0;height:0}
+.bar s{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%) rotate(-8deg);text-decoration:none;font-size:10.5px;color:#6b7280;white-space:nowrap}
+.lines{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;align-items:center;gap:12px;border:1px solid #e7eaee;border-radius:11px;padding:9px 12px}
+.li .dt{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.li .t{flex:1}.li .t b{font-size:13.5px;display:block}.li .t small{font-size:11.5px;color:#6b7280}
+.li .v{font-weight:700;font-size:13.5px}
+.li.net{background:#ecfdf5;border-color:#a7f3d0}.li.net .v{color:#059669}
+.row2{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-top:18px}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.snap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.snap div{border:1px solid #e7eaee;border-radius:12px;padding:14px}
+.snap small{font-size:12px;color:#6b7280}.snap b{display:block;font-size:18px;margin-top:4px}
+.sub2{font-size:12.5px;color:#6b7280;margin-top:2px}
+.lrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f3f5;font-size:13.5px}
+.lrow:last-child{border:0}
+.lrow .n{width:26px;height:26px;border-radius:8px;background:#e6f2f3;color:#13525a;font-weight:700;display:grid;place-items:center;font-size:12.5px;flex:none}
+.lrow .x{flex:1;min-width:0}.lrow .x b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lrow .x small{color:#6b7280;font-size:12px}
+.lrow .amt{font-weight:700}
+
+/* cursor */
+.cursor{position:absolute;left:0;top:0;width:28px;height:28px;z-index:50;pointer-events:none;will-change:transform;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3))}
+.cursor svg{transition:transform .12s}.cursor.down svg{transform:scale(.82)}
+.ripple{position:absolute;z-index:49;pointer-events:none;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:2px solid rgba(19,86,94,.8);background:rgba(45,212,191,.25);animation:rip .6s ease-out forwards}
+@keyframes rip{to{transform:scale(4.2);opacity:0}}
+.tip{position:absolute;z-index:48;pointer-events:none;background:#0b1f24;color:#fff;font:600 13px Inter,sans-serif;padding:7px 11px;border-radius:9px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .25s,transform .25s;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.tip.vis{opacity:1;transform:none}
+.reset{position:absolute;inset:0;background:#fff;z-index:60;opacity:0;pointer-events:none;transition:opacity .5s}.reset.vis{opacity:1}
+
+/* controls */
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:28px;margin-bottom:8px;position:relative;z-index:50}
+.step{font-size:13px;color:#2C4346;background:rgba(255,255,255,0.9);padding:8px 14px;border-radius:999px;border:1px solid #D7E2DF;box-shadow:0 2px 6px rgba(0,0,0,0.04);transition:all .25s ease;cursor:pointer;font-weight:500}
+.step.on{color:#ffffff;background:#00555C;border-color:#00555C;font-weight:600;box-shadow:0 4px 12px rgba(0,85,92,0.25)}
+.step.done{color:#00555C;background:#E8F7F4;border-color:#7CE0C3}
+.cbtn{width:38px;height:38px;border-radius:50%;background:#ffffff;border:1px solid #D7E2DF;box-shadow:0 2px 6px rgba(0,0,0,0.04);display:grid;place-items:center;color:#0A1F22;transition:all .2s;cursor:pointer}
+.cbtn:hover{background:#F3F6F6;border-color:#00555C;color:#00555C}.cbtn svg{width:16px;height:16px}
+@media (max-width:640px){.step{font-size:12px;padding:6px 10px}}
+</style>
+</head>
+<body>
+<section class="stage" id="stage">
+
+  <div class="wrap" id="wrap">
+    <div class="tilt" id="tilt">
+      <div class="browser" id="browser">
+        <div class="chrome">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="navbtns">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          </div>
+          <div class="url" id="url">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <span id="urlText"></span><i class="caret"></i>
+          </div>
+        </div>
+        <div class="progress" id="progress"></div>
+
+        <div class="vp" id="vp">
+          <!-- ============ SIDEBAR (exact markup) ============ -->
+          <aside class="bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-3 py-3 border-b border-gray-200 shrink-0">
+              <img class="w-39 h-[45px] object-contain" src="https://pub-a17d46c849f84ef782ddae78162e6197.r2.dev/bindubazar_43/settings/logos/bindu-bazar_logo_1793095621.webp" alt="Bindu Bazar">
+              <button class="p-1.5 rounded-lg ml-auto"><i data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i></button>
+            </div>
+            <div class="flex-1 overflow-hidden"><div class="flex flex-col h-full overflow-hidden">
+              <div class="px-4 py-2 shrink-0"><div class="relative"><i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i><input class="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-sm focus:outline-none" placeholder="Search menu..." type="text" tabindex="-1"></div></div>
+              <div class="flex-1 px-2 pb-20 space-y-2 overflow-hidden" id="sideNav"></div>
+            </div></div>
+          </aside>
+
+          <div class="appmain">
+            <!-- ============ TOP HEADER (exact markup) ============ -->
+            <header id="topHdr" class="border-b bg-white p-3 pb-[15px] pt-[14px] border-gray-200 flex items-center justify-between gap-2 relative shrink-0">
+              <div class="min-w-0"><nav class="flex"><ol class="inline-flex items-center space-x-3 flex-nowrap">
+                <li class="inline-flex items-center flex-shrink-0"><a class="inline-flex items-center text-sm font-medium text-gray-700"><i data-lucide="house" class="w-4 h-4 mr-2"></i><span>Dashboard</span></a></li>
+                <li class="flex items-center flex-shrink-0"><i data-lucide="chevron-right" class="w-6 h-6 text-gray-400"></i><span id="crumbB" class="ml-2 text-sm font-semibold text-gray-900 capitalize">Dashboard</span></li>
+              </ol></nav></div>
+              <div class="flex items-center gap-4 flex-shrink-0 relative">
+                <a class="flex items-center gap-2 px-3 py-2 text-gray-700 rounded text-sm font-medium"><i data-lucide="external-link" class="w-4 h-4 text-gray-600 flex-shrink-0"></i><span>Visit Store</span></a>
+                <button class="flex items-center gap-2 px-3 py-2 text-gray-700 rounded"><i data-lucide="refresh-cw" class="w-4 h-4 text-gray-600 flex-shrink-0"></i><span class="text-sm font-medium">Clear Cache</span></button>
+                <button class="flex items-center gap-2 px-3 py-2 text-gray-700 rounded"><i data-lucide="calculator" class="w-5 h-5 text-gray-600 flex-shrink-0"></i></button>
+                <button class="relative p-2 rounded"><i data-lucide="bell" class="w-5 h-5 text-gray-700"></i><span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-semibold rounded-full">99+</span></button>
+                <button class="flex items-center gap-2 p-2 rounded"><i data-lucide="user" class="w-5 h-5 text-gray-700"></i><span class="text-gray-700 font-medium">Bindu Bazar</span></button>
+              </div>
+            </header>
+
+            <div class="pages">
+              <!-- ============ DASHBOARD ============ -->
+              <section class="page" id="pDash"><div class="inner"><div class="dsh">
+                <div class="dh">
+                  <div><h2>Business Dashboard</h2><div class="d" id="dRange">2026-11-01 → 2026-11-24</div><div class="warn">Your phone number is not verified. <u>Click here to verify</u></div></div>
+                  <div class="rng"><button id="bToday">Today</button><button id="bMonth" class="on">This Month</button><button>Last Month</button><button>Custom</button></div>
+                </div>
+                <div class="hero-card">
+                  <div class="hc"><h4><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg></i>Products</h4>
+                    <div class="kv"><span>Total:</span><b>86</b></div><div class="kv"><span>Active:</span><b>86</b></div><div class="kv"><span>Inactive:</span><b>0</b></div><div class="kv"><span>Low Stock:</span><b>0</b></div><div class="kv"><span>Out Stock:</span><b>35</b></div></div>
+                  <div class="hc"><h4><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg></i>Orders</h4>
+                    <div class="kv"><span>Pending:</span><b><n data-k="pc">0</n> (৳ <n data-k="pa" data-f="tk">0.00</n>)</b></div>
+                    <div class="kv"><span>Shipped:</span><b><n data-k="sc">4</n> (৳ <n data-k="sa" data-f="tk">6,910.00</n>)</b></div>
+                    <div class="kv"><span>Delivered:</span><b><n data-k="dc">32</n> (৳ <n data-k="da" data-f="tk">58,360.00</n>)</b></div>
+                    <div class="kv"><span>Cancelled:</span><b><n data-k="cc">33</n> (৳ <n data-k="ca" data-f="tk">410,744.00</n>)</b></div>
+                    <div class="kv"><span>Return Req:</span><b>0 (৳ 0.00)</b></div></div>
+                  <div class="hc"><h4><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-5.6"/></svg></i>Employees</h4>
+                    <div class="kv"><span>Total:</span><b>0</b></div><div class="kv"><span>On Leave:</span><b>0</b></div><div class="kv"><span>Late:</span><b>0</b></div><div class="kv"><span>Absent:</span><b>0</b></div><div class="kv"><span>Salary Due:</span><b>0</b></div></div>
+                </div>
+                <div class="card">
+                  <div class="ct"><span class="pill">৳</span>Order Profitability &amp; Unit Economics Breakdown <span class="pill">Unit Math</span></div>
+                  <div class="formula">Selling Price + Shipping Revenue − Purchase Cost (COGS) = <b>Gross Profit</b> − Other Operating Costs − Courier Return Charges = <span class="g">Net Profit</span></div>
+                  <div class="chips">
+                    <div class="chip"><small>TOTAL SOLD QTY</small><b><n data-k="qty">37</n> pcs</b></div>
+                    <div class="chip g"><small>AVG. PROFIT / ORDER</small><b>৳ <n data-k="apo" data-f="tk">586.56</n></b></div>
+                    <div class="chip g"><small>AVG. PROFIT / UNIT</small><b>৳ <n data-k="apu" data-f="tk">507.30</n></b></div>
+                    <div class="chip gg"><small>NET ORDER MARGIN</small><b><n data-k="mg" data-f="p1">31.8</n>%</b></div>
+                  </div>
+                  <div class="prof">
+                    <div class="chart"><div class="h"><span>Unit Economics Flow Breakdown</span><span>Values in BDT (৳)</span></div><div class="bars" id="bars"></div></div>
+                    <div class="lines" id="lines"></div>
+                  </div>
+                </div>
+                <div class="row2">
+                  <div class="card"><div class="ct">Sales vs Purchase vs Profit</div><div class="sub2">Last 7 months</div>
+                    <svg viewBox="0 0 560 200" width="100%" height="200" style="margin-top:10px">
+                      <g stroke="#eef0f3"><line x1="30" y1="20" x2="560" y2="20"/><line x1="30" y1="65" x2="560" y2="65"/><line x1="30" y1="110" x2="560" y2="110"/><line x1="30" y1="155" x2="560" y2="155"/></g>
+                      <path d="M40 150 C110 140 150 120 200 115 S300 70 360 80 S460 40 540 30" fill="none" stroke="#13525a" stroke-width="3"/>
+                      <path d="M40 160 C110 155 150 150 200 140 S300 120 360 118 S460 100 540 95" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                      <path d="M40 168 C110 165 150 160 200 156 S300 140 360 142 S460 120 540 112" fill="none" stroke="#10b981" stroke-width="3"/>
+                      <g fill="#9ca3af" font-size="11"><text x="40" y="192">May</text><text x="120" y="192">Jun</text><text x="200" y="192">Jul</text><text x="280" y="192">Aug</text><text x="360" y="192">Sep</text><text x="440" y="192">Oct</text><text x="520" y="192">Nov</text></g>
+                    </svg></div>
+                  <div class="card"><div class="ct">Financial Snapshot</div><div class="sub2">Period summary</div>
+                    <div class="snap">
+                      <div><small>Total Revenue</small><b>৳ <n data-k="rev" data-f="tk">58,360.00</n></b></div>
+                      <div><small>Total Purchase</small><b>৳ 0.00</b></div>
+                      <div><small>Net Profit</small><b style="color:#059669">৳ <n data-k="np" data-f="tk">58,360.00</n></b></div>
+                      <div><small>Total Due</small><b style="color:#dc2626">৳ <n data-k="due" data-f="tk">58,360.00</n></b></div>
+                    </div></div>
+                </div>
+                <div class="row3">
+                  <div class="card"><div class="ct">Top 5 Trending Products</div><div class="sub2">By units sold this period</div>
+                    <div style="margin-top:12px">
+                      <div class="lrow"><span class="n">1</span><span class="x"><b>Yn Cooker &amp; Silver Crest Blender Combo</b><small>15 units</small></span><span class="amt">৳ 23,250.00</span></div>
+                      <div class="lrow"><span class="n">2</span><span class="x"><b>Prestige Electric Multicooker 6.5L – 1200W</b><small>9 units</small></span><span class="amt">৳ 15,750.00</span></div>
+                      <div class="lrow"><span class="n">3</span><span class="x"><b>Prestige 7.5L Multifunction Electric Cooker</b><small>9 units</small></span><span class="amt">৳ 14,850.00</span></div>
+                      <div class="lrow"><span class="n">4</span><span class="x"><b>YN Multifunctional Mini Rice Cooker 18-20cm</b><small>3 units</small></span><span class="amt">৳ 2,550.00</span></div>
+                    </div></div>
+                  <div class="card"><div class="ct">Latest 5 Sales</div><div class="sub2">Most recent orders</div>
+                    <div style="margin-top:12px">
+                      <div class="lrow"><span class="n">F</span><span class="x"><b>BBINV-148</b><small>Farzana Akter · 24 Nov 26</small></span><span class="amt">৳ 1,459.00</span></div>
+                      <div class="lrow"><span class="n">A</span><span class="x"><b>BBINV-147</b><small>Arif Hossain · 23 Nov 26</small></span><span class="amt">৳ 1,650.00</span></div>
+                      <div class="lrow"><span class="n">N</span><span class="x"><b>BBDraft-106</b><small>Nusrat Jahan · 19 Nov 26</small></span><span class="amt">৳ 929.00</span></div>
+                      <div class="lrow"><span class="n">T</span><span class="x"><b>BBINV-136</b><small>Tanvir Ahmed · 18 Nov 26</small></span><span class="amt">৳ 3,100.00</span></div>
+                    </div></div>
+                </div>
+              </div></div><i class="sbar"></i></section>
+
+              <!-- ============ ORDERS (exact markup) ============ -->
+              <section class="page" id="pOrders"><div class="inner"><main class="p-3">
+                <div class="flex flex-row flex-wrap items-center gap-2 mb-2">
+                  <div class="flex flex-wrap items-center gap-2"><button class="shrink-0 flex items-center justify-center gap-2 border bg-white text-gray-700 border-gray-300 rounded px-2 py-2"><i data-lucide="settings" class="w-5 h-5"></i></button></div>
+                  <div class="flex flex-row flex-wrap gap-2 items-center">
+                    <input placeholder="Search by order number, customer name or phone" class="border bg-white border-gray-300 rounded px-2 py-2 w-80" type="text" tabindex="-1">
+                    <select class="text-gray-700 bg-white shrink-0 border border-gray-300 rounded px-2.5 py-2 text-sm" tabindex="-1"><option>All Time</option></select>
+                    <button type="button" class="shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded border bg-white text-gray-700 border-gray-300"><i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Duplicate Orders</span></button>
+                  </div>
+                  <div class="ml-auto"><div class="flex flex-col gap-1 flex-shrink-0 min-w-[140px] rounded-[10px] border border-gray-200 bg-white px-3 py-2">
+                    <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500 capitalize">order<span class="text-[10px] text-gray-400 ml-1">(this month)</span></span><span class="text-[11px] font-medium text-gray-800">439 / 2500</span></div>
+                    <div class="h-[3px] w-full rounded-full bg-gray-100 overflow-hidden"><div class="h-[3px] rounded-full bg-[#13565e]" style="width:17.5%"></div></div>
+                  </div></div>
+                </div>
+                <div class="border border-gray-300 border-b-0 p-2 pb-0 bg-white rounded-tl-[5px] rounded-tr-[70px] flex items-center flex-nowrap overflow-hidden" id="ordTabs"></div>
+                <div class="border border-gray-300 rounded-lg overflow-hidden bg-white"><div class="overflow-hidden">
+                  <table class="w-full">
+                    <thead class="bg-gray-100 border-b border-gray-300"><tr><th class="px-3 py-3 w-12"><input class="w-4 h-4" type="checkbox" tabindex="-1"></th><th class="px-4 py-2 text-center w-4">SL</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Order Info</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Amount</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Customer</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Notes</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Status / Courier</th><th class="px-3 py-3 text-left text-sm font-medium text-gray-700">Actions</th></tr></thead>
+                    <tbody id="ordBody"></tbody>
+                  </table>
+                </div></div>
+              </main></div><i class="sbar"></i></section>
+
+              <!-- ============ POS (exact markup) ============ -->
+              <section class="page" id="pPos"><div class="inner h-full">
+                <div class="h-full flex flex-col bg-white">
+                  <div class="bg-white border-b border-gray-200">
+                    <div class="px-4 py-2 flex items-center gap-3">
+                      <h1 class="text-xl font-bold text-[#078e9a] shrink-0 flex items-center gap-1.5">POS<i data-lucide="info" class="w-4 h-4 text-gray-400"></i></h1>
+                      <div class="flex items-center gap-3 ml-auto">
+                        <div class="relative"><div class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded flex items-center justify-between gap-6 bg-gray-50 opacity-50"><i data-lucide="lasso-select" class="absolute left-3 w-4 h-4 text-gray-400"></i><span class="text-gray-900">Default Warehouse</span><i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i></div></div>
+                        <button class="relative shrink-0 px-3 py-2 bg-yellow-500 text-white rounded flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i><span class="text-sm">Hold</span></button>
+                      </div>
+                    </div>
+                    <div class="px-4 pb-2 flex items-center gap-1.5 overflow-hidden" id="posCats"></div>
+                  </div>
+                  <div class="flex-1 flex overflow-hidden relative">
+                    <div class="flex-1 flex flex-col p-4 overflow-hidden">
+                      <div class="mb-4"><div class="relative"><i data-lucide="search" class="absolute left-3 top-2.5 w-5 h-5 text-gray-400"></i><input placeholder="Search or Scan Barcode [F3]" class="w-full pl-10 pr-4 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:border-[#13565e]" type="text" tabindex="-1"></div></div>
+                      <div class="flex-1 overflow-hidden"><div class="grid grid-cols-5 gap-3 pb-4" id="posGrid"></div></div>
+                    </div>
+                    <div class="flex w-96 bg-white border-l border-gray-200 flex-col">
+                      <div class="p-4 border-b border-gray-200">
+                        <div class="flex items-center gap-2 mb-2"><i data-lucide="user" class="w-5 h-5 text-gray-400"></i><span class="font-medium text-base">Customer</span></div>
+                        <div class="flex gap-2 mb-2"><button class="flex-1 py-2 text-sm rounded bg-[#13565e] text-white">Walk-in</button><button class="flex-1 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200 text-gray-700">Customer</button></div>
+                        <div class="flex flex-col gap-2">
+                          <input id="fName" placeholder="Customer Name (optional) [F4]" class="w-full px-3 py-2 text-sm border border-gray-300 rounded" type="text" tabindex="-1" readonly>
+                          <input id="fPhone" placeholder="Phone (optional)" class="w-full px-3 py-2 text-sm border border-gray-300 rounded" type="text" tabindex="-1" readonly>
+                        </div>
+                        <div class="mt-3"><select class="w-full px-3 py-2 text-sm border border-gray-300 rounded bg-white outline-none" tabindex="-1"><option>Direct Pos</option></select></div>
+                      </div>
+                      <div class="flex-1 overflow-hidden relative" id="cartList">
+                        <div id="cartEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 transition-opacity duration-300"><i data-lucide="shopping-cart" class="w-12 h-12 mb-2"></i><p class="text-sm">Cart is empty</p></div>
+                      </div>
+                      <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-1.5 text-sm">
+                        <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>৳&nbsp;<span id="cSub">0.00</span></span></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Other Charges</span><input class="w-24 text-right border border-gray-300 rounded px-2 py-1 text-xs bg-white" type="number" value="0" tabindex="-1" readonly></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Discount</span><input placeholder="[F9]" class="w-24 text-right border border-gray-300 rounded px-2 py-1 text-xs bg-white" type="number" value="0" tabindex="-1" readonly></div>
+                        <div class="flex justify-between text-lg font-bold border-t border-gray-300 pt-2 mt-1"><span>Total</span><span class="text-[#078e9a]">৳&nbsp;<span id="cTot">0.00</span></span></div>
+                      </div>
+                      <div class="p-4 border-t border-gray-200 grid grid-cols-3 gap-2">
+                        <button class="py-3 text-xs bg-yellow-500 text-white rounded-lg flex items-center justify-center gap-2"><i data-lucide="clock" class="w-5 h-5"></i>Hold [F8]</button>
+                        <button id="payBtn" class="btn-pay py-3 text-xs bg-[#13565e] text-white rounded-lg flex items-center justify-center gap-2 transition-colors"><i data-lucide="banknote-arrow-up" class="w-5 h-5"></i>Pay</button>
+                        <button class="py-3 text-xs bg-blue-500 text-white rounded-lg flex items-center justify-center gap-2"><i data-lucide="banknote-x" class="w-5 h-5"></i>Quick Sale</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Complete Payment modal (exact markup) -->
+              <div class="modal" id="payModal"><div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div class="box bg-white rounded-lg p-6 w-full max-w-5xl max-h-[95%] overflow-hidden flex flex-col">
+                  <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200"><h2 class="text-xl font-semibold">Complete Payment</h2><button class="text-gray-500"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+                  <div class="grid grid-cols-2 gap-6 overflow-hidden pr-2 pb-4">
+                    <div class="space-y-4">
+                      <div class="border border-gray-200 rounded bg-gray-50 p-3"><h3 class="font-semibold text-gray-700 mb-2">Cart Summary (2 items)</h3><div class="space-y-2" id="mCart"></div></div>
+                      <div class="p-4 bg-gray-50 rounded space-y-2 border border-gray-200">
+                        <div class="flex justify-between text-sm"><span>Subtotal (before tax):</span><span>৳&nbsp;1,798.00</span></div>
+                        <div class="flex justify-between text-sm font-medium border-t pt-1 border-gray-200"><span>Subtotal (incl. tax):</span><span>৳&nbsp;1,798.00</span></div>
+                        <div class="flex justify-between text-lg font-bold border-t pt-2 border-gray-300"><span>Total Amount:</span><span class="text-[#078e9a]">৳&nbsp;1,798.00</span></div>
+                      </div>
+                    </div>
+                    <div class="space-y-4">
+                      <div class="p-4 bg-blue-50 rounded border border-blue-100"><div class="flex items-center gap-2 mb-2"><i data-lucide="tag" class="w-4 h-4 text-blue-600"></i><span class="font-medium text-sm">Have a coupon?</span></div>
+                        <div class="flex gap-2"><input placeholder="Enter coupon code" class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white" type="text" tabindex="-1" readonly><button class="px-4 py-2 bg-[#13565e] text-white text-sm rounded">Apply</button></div></div>
+                      <div class="space-y-4"><h3 class="font-semibold text-gray-700 border-b border-gray-200 pb-1">Status Update</h3>
+                        <div class="space-y-3"><select id="mStatus" class="w-1/2 border border-gray-300 rounded px-3 py-2 bg-white" tabindex="-1"><option>Select Status</option></select></div></div>
+                      <div class="space-y-4"><h3 class="font-semibold text-gray-700 border-b border-gray-200 pb-1">Payment Methods</h3>
+                        <div class="flex flex-col gap-1 p-3 bg-gray-50 border border-gray-200 rounded"><div class="flex gap-2 items-start">
+                          <div class="flex flex-col gap-1 w-32 shrink-0"><input id="mAmount" placeholder="Amount" class="w-full px-3 py-2 text-sm border border-gray-300 rounded bg-white" type="text" tabindex="-1" readonly>
+                            <div class="flex gap-1 justify-between"><button class="flex-1 px-1 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-700 font-medium">+100</button><button class="flex-1 px-1 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-700 font-medium">+200</button><button class="flex-1 px-1 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-700 font-medium">+500</button><button class="flex-1 px-1 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-700 font-medium">+1000</button></div></div>
+                          <select class="w-auto px-3 py-2 text-sm border border-gray-300 rounded bg-white" tabindex="-1"><option>Cash</option></select>
+                          <input placeholder="Reference" class="w-[100px] px-3 py-2 text-sm border border-gray-300 rounded bg-white" type="text" tabindex="-1" readonly>
+                        </div></div>
+                        <button class="text-sm text-[#078e9a] flex items-center gap-1 font-medium"><i data-lucide="plus" class="w-4 h-4"></i> Add Payment Method</button></div>
+                      <div class="p-3 bg-indigo-50 border border-indigo-100 rounded text-base space-y-1">
+                        <div class="flex justify-between"><span>Total Paid:</span><span class="font-semibold">৳&nbsp;<span id="mPaid">0.00</span></span></div>
+                        <div class="flex justify-between"><span>Change:</span><span id="mChangeWrap" class="font-semibold text-red-600">৳&nbsp;<span id="mChange">-1,798.00</span></span></div>
+                      </div>
+                      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200"><button class="px-6 py-2 border border-gray-300 rounded font-medium text-gray-700">Cancel</button><button id="mComplete" class="btn-complete px-6 py-2 bg-[#13565e] text-white rounded font-medium transition-colors">Complete Order</button></div>
+                    </div>
+                  </div>
+                </div>
+              </div></div>
+              <i class="sbar"></i></section>
+
+              <!-- ============ ORDER DETAILS (exact markup) ============ -->
+              <section class="page" id="pDetails"><div class="inner"><main class="p-3">
+                <div class="grid grid-cols-4 gap-6 pb-12">
+                  <div class="col-span-1"><div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 bg-gray-50 space-y-2.5">
+                      <div class="flex items-center justify-between"><h3 class="font-semibold text-gray-900 text-sm">Recent Orders</h3><a class="text-xs text-[#078e9a] font-medium">View All</a></div>
+                      <div><select class="w-full text-xs bg-white border border-gray-300 rounded-md px-2.5 py-1.5 text-gray-700" tabindex="-1"><option>All Statuses</option></select></div>
+                    </div>
+                    <div class="divide-y divide-gray-200 overflow-hidden" id="recentList"></div>
+                  </div></div>
+                  <div class="col-span-3 space-y-4">
+                    <div class="bg-white flex flex-row justify-between items-center border border-gray-200 rounded-lg p-6 py-3 gap-4">
+                      <div class="flex items-center gap-1"><a class="flex items-center rounded-lg shrink-0">Orders</a><h1 class="text-lg flex font-normal items-center text-gray-900 whitespace-nowrap"><i data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i> #BBINV-149</h1></div>
+                      <div class="flex flex-wrap items-center gap-3">
+                        <button class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700"><i data-lucide="send" class="w-4 h-4"></i>Courier</button>
+                        <button class="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700"><i data-lucide="printer" class="w-4 h-4"></i>Print</button>
+                        <button class="inline-flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700"><i data-lucide="wallet" class="w-4 h-4"></i>Payment</button>
+                        <a class="inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-700"><i data-lucide="pencil" class="w-4 h-4"></i>Edit</a>
+                        <div class="flex overflow-hidden rounded-lg border border-slate-300"><select class="min-w-[170px] bg-white px-3 py-2 text-sm outline-none border-r border-slate-300" tabindex="-1"><option>Delivered</option></select><button class="inline-flex items-center gap-2 bg-indigo-600 px-4 py-2 text-sm font-medium text-white"><i data-lucide="refresh-cw" class="w-4 h-4"></i>Update</button></div>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="rounded-xl border border-gray-200 p-5 bg-white"><h3 class="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5"><i data-lucide="file-text" class="w-5 h-5 text-indigo-600"></i>Order Information</h3>
+                        <div class="space-y-4">
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="hash" class="w-4 h-4"></i><span>Order No</span></div><span class="font-mono font-semibold text-gray-900">BBINV-149</span></div>
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="calendar-days" class="w-4 h-4"></i><span>Order Date</span></div><span class="font-medium text-gray-900">24 Nov 2026 <span class="inline-flex items-center bg-purple-100 border border-purple-200 text-purple-600 text-sm font-medium leading-none px-2 py-1 rounded"><i data-lucide="clock" class="w-3.5 h-3.5 me-1.5"></i>Just now</span></span></div>
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="boxes" class="w-4 h-4"></i><span>Source</span></div><span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">POS</span></div>
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="globe" class="w-4 h-4 text-emerald-600"></i><span>Customer IP</span></div><span class="font-mono text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded">—</span></div>
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="warehouse" class="w-4 h-4"></i><span>Warehouse</span></div><span class="font-medium text-gray-900">Default Warehouse</span></div>
+                          <div class="flex items-center justify-between"><div class="flex items-center gap-2 text-gray-500"><i data-lucide="warehouse" class="w-4 h-4"></i><span>Status</span></div><span class="font-medium text-gray-900 flex gap-2"><span class="inline-flex items-center gap-2 p-2 py-0 rounded-lg border text-sm font-medium bg-green-100 text-green-700"><i data-lucide="package" class="w-4 h-4"></i>Delivered</span><span class="inline-flex items-center gap-2 p-2 py-0 rounded-lg border text-sm font-medium bg-green-100 text-green-700"><i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>Paid</span></span></div>
+                        </div></div>
+                      <div class="rounded-xl border border-gray-200 p-5 bg-white"><h3 class="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5"><i data-lucide="user" class="w-5 h-5 text-purple-600"></i>Customer Details</h3>
+                        <div class="space-y-4"><div class="flex justify-between items-start gap-2">
+                          <div class="space-y-4">
+                            <div class="flex items-center gap-3"><div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 text-white font-semibold">R</div><div><a class="font-semibold text-gray-900 capitalize flex items-center gap-1"><span>Rahima Khatun</span></a><p class="text-xs text-gray-500">1 Total Orders</p></div></div>
+                            <div class="flex items-center gap-3 text-gray-700"><i data-lucide="phone" class="w-4 h-4 text-emerald-600"></i><span>01798-XXXXXX</span></div>
+                            <div class="flex items-start gap-3 text-gray-700"><i data-lucide="map-pin" class="w-4 h-4 text-red-500 mt-0.5 shrink-0"></i><span class="text-sm leading-6">Walk-in customer</span></div>
+                          </div>
+                          <div class="rounded-xl border border-gray-200 bg-white p-6 flex items-center justify-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i><span class="text-gray-600 text-sm">No courier history</span></div>
+                        </div>
+                        <div class="mt-3 flex items-center gap-2">
+                          <a class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 flex items-center justify-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> Call</a>
+                          <a class="w-full px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i> Omni WA</a>
+                          <a class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 flex items-center justify-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i> MSG</a>
+                        </div></div></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                      <div class="col-span-2 space-y-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                          <div class="mb-8"><h3 class="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5"><i data-lucide="shopping-bag" class="w-5 h-5 text-indigo-600"></i>Product Information</h3>
+                            <table class="w-full text-sm"><thead><tr class="border-b-2 border-t border-gray-200"><th class="text-left font-semibold text-gray-700 py-3 px-2">#</th><th class="text-left font-semibold text-gray-700 py-3 px-2">Item Name</th><th class="text-center font-semibold text-gray-700 py-3 px-2">Qty</th><th class="text-right font-semibold text-gray-700 py-3 px-2">Unit Price</th><th class="text-right font-semibold text-gray-700 py-3 px-2">Discount</th><th class="text-right font-semibold text-gray-700 py-3 px-2">Tax</th><th class="text-right font-semibold text-gray-700 py-3 px-2">Total</th></tr></thead>
+                              <tbody id="detItems"></tbody></table></div>
+                          <div class="space-y-3 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span class="font-semibold text-gray-900">৳&nbsp;1,798.00</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">Shipping &amp; Other Charges</span><span class="font-semibold text-gray-900">৳&nbsp;0.00</span></div>
+                            <div class="flex justify-between text-red-600"><span>Discount</span><span class="font-semibold">-৳&nbsp;0.00</span></div>
+                            <div class="flex justify-between pt-3 border-t border-gray-200 text-base font-bold"><span class="text-gray-900">Grand Total</span><span class="text-[#078e9a]">৳&nbsp;1,798.00</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-600">Paid Amount</span><span class="font-semibold text-green-600">৳&nbsp;1,798.00</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-600">Due Amount</span><span class="font-semibold text-red-600">৳&nbsp;0.00</span></div>
+                          </div>
+                        </div>
+                        <div class="bg-white border border-gray-300 rounded-lg p-6"><div class="flex items-center justify-between mb-4"><h3 class="flex items-center gap-2 font-semibold text-gray-900"><i data-lucide="receipt" class="w-5 h-5 text-emerald-600"></i>Transaction History</h3></div>
+                          <div class="flex items-center justify-between text-sm border border-gray-200 rounded-lg px-4 py-3"><span class="flex items-center gap-2"><i data-lucide="banknote" class="w-4 h-4 text-emerald-600"></i>Cash</span><span class="text-gray-500">24 Nov 2026</span><span class="font-semibold text-green-600">৳&nbsp;1,798.00</span></div></div>
+                        <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-6">
+                          <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-gray-700"></i>Timeline<span class="text-xs font-normal text-gray-400">(2 updates)</span></h3>
+                          <div class="pt-2"><div class="space-y-3"><div class="text-xs font-semibold text-gray-500 pl-8">Today</div>
+                            <div class="relative border-l-2 border-gray-200 ml-3.5 space-y-4">
+                              <div class="relative pl-6"><div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center bg-gray-800 ring-2 ring-gray-100"><span class="w-1.5 h-1.5 bg-white rounded-full"></span></div><div class="flex items-start justify-between gap-4"><div class="text-xs text-gray-700"><span class="font-medium text-gray-900">Payment received ৳1798.00 via Cash</span><span class="text-gray-500 ml-1.5">by Bindu Bazar</span><span class="text-2xs text-gray-400 ml-1.5">(just now)</span></div><div class="text-2xs text-gray-400 whitespace-nowrap font-mono">2:15 PM</div></div></div>
+                              <div class="relative pl-6"><div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center bg-gray-800 ring-2 ring-gray-100"><span class="w-1.5 h-1.5 bg-white rounded-full"></span></div><div class="flex items-start justify-between gap-4"><div class="text-xs text-gray-700"><span class="font-medium text-gray-900">Order was created (total amount 1798.00)</span><span class="text-gray-500 ml-1.5">by Bindu Bazar</span><span class="text-2xs text-gray-400 ml-1.5">(just now)</span></div><div class="text-2xs text-gray-400 whitespace-nowrap font-mono">2:15 PM</div></div></div>
+                            </div></div></div>
+                        </div>
+                      </div>
+                      <div class="space-y-6">
+                        <div class="rounded-xl border border-gray-200 bg-white p-4"><p class="text-sm font-semibold text-gray-900 mb-3">Customer Order History</p>
+                          <div class="grid grid-cols-4 gap-2 text-xs text-center"><div><p class="text-gray-500">Total</p><p class="font-bold text-gray-900">1</p></div><div><p class="text-gray-500">Delivered</p><p class="font-bold text-green-600">1</p></div><div><p class="text-gray-500">Returned</p><p class="font-bold text-amber-600">0</p></div><div><p class="text-gray-500">Cancelled</p><p class="font-bold text-red-600">0</p></div></div>
+                          <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between"><span class="text-xs text-gray-500">Success Ratio</span><span class="text-xs font-bold text-indigo-600">100%</span></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </main></div><i class="sbar"></i></section>
+            </div>
+          </div>
+
+          <div class="toast" id="toast"><div class="flex items-center gap-2 bg-white border border-gray-200 shadow-lg rounded-lg px-4 py-3 text-sm font-medium text-gray-800"><i data-lucide="circle-check" class="w-5 h-5 text-green-600"></i>Order BBINV-149 created successfully</div></div>
+          <div class="cursor" id="cursor"><svg width="28" height="28" viewBox="0 0 26 26"><path d="M4 2.5l16.5 11.2-7.2 1.4 4.3 8.2-3.3 1.7-4.3-8.3-5.9 4.7z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <div class="tip" id="tip"></div>
+          <div class="reset" id="reset"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <button class="cbtn" id="playBtn" aria-label="Pause"></button>
+    <span class="step" data-s="0">Dashboard</span>
+    <span class="step" data-s="1">Today / This Month</span>
+    <span class="step" data-s="2">POS order</span>
+    <span class="step" data-s="3">Orders / Invoice</span>
+    <span class="step" data-s="4">Order details</span>
+    <button class="cbtn" id="replayBtn" aria-label="Replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+  </div>
+</section>
+
+<script>
+(() => {
+const $ = (s) => document.querySelector(s);
+const tk = (n) => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const IMG = 'https://pub-a17d46c849f84ef782ddae78162e6197.r2.dev/bindubazar_43/products/thumbnails/';
+
+/* ---------------- sidebar ---------------- */
+const NAV = [['layout-dashboard','Dashboard','navDash'],['users','Parties'],['shopping-cart','Purchase'],['calendar','Reservations'],['file-text','Orders / Sales','navOrders','|'],
+  ['box','Products'],['warehouse','Warehouses'],['tag','Inventory',null,'|'],['factory','Production'],['briefcase','Projects'],['file','Landing Page'],['message-circle','Omni chanel'],['megaphone','Marketing'],['hard-drive','CMS / Content',null,'|'],['credit-card','Accounting'],['user-check','HRM & Payroll'],['chart-column','Reports',null,'|'],['bell','Support Desk']];
+const SUB = [['Orders / Invoice','navInvoice'],['Incomplete Orders'],['POS Sales','navPos'],['POS Dashboard'],['Sales Returns'],['Quotations']];
+$('#sideNav').innerHTML = NAV.map(([ic, label, id, sep]) => {
+  const dash = label === 'Dashboard';
+  const btn = dash
+    ? `<a ${id?`id="${id}"`:''} class="sb flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 transition-colors"><i data-lucide="${ic}" class="w-5 h-5 shrink-0"></i><span class="truncate">${label}</span></a>`
+    : `<button ${id?`id="${id}"`:''} class="sb flex items-center gap-3 px-3 py-2 w-full text-left rounded-lg text-sm transition-colors text-gray-700"><i data-lucide="${ic}" class="w-5 h-5 shrink-0"></i><span class="flex-1 truncate">${label}</span><span class="chev inline-flex transition-transform duration-200"><i data-lucide="chevron-down" class="w-4 h-4 shrink-0"></i></span></button>`;
+  const sub = id === 'navOrders' ? `<div class="sub" id="subOrders"><div class="ml-7 mt-0.5 space-y-0.5">${SUB.map(([s, sid]) => `<a ${sid?`id="${sid}"`:''} class="sl flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg transition-colors text-gray-500"><span class="dot w-1.5 h-1.5 rounded-full shrink-0 bg-gray-300"></span>${s}</a>`).join('')}</div></div>` : '';
+  return `<div class="relative">${btn}${sub}${sep?'<div class="mt-1 mb-1 border-b"></div>':''}</div>`;
+}).join('');
+
+/* ---------------- data (demo customers, masked phones) ---------------- */
+const ST = {
+  Pending:'bg-amber-50 text-amber-700 border border-amber-200', Confirmed:'bg-violet-50 text-violet-700 border border-violet-200',
+  Shipped:'bg-sky-50 text-sky-700 border border-sky-200', Delivered:'bg-green-50 text-green-700 border border-green-200',
+  Cancelled:'bg-red-50 text-red-700 border border-red-200'
+};
+const ORDERS = [
+  {id:'BBINV-149', date:'24/11/2026, 2:15 pm,', ago:'Just now', src:'POS', st:'Delivered', paid:true, items:2, ip:null, sub:1798, ship:0, name:'Rahima Khatun', phone:'01798-XXXXXX', addr:'Walk-in customer'},
+  {id:'BBINV-148', date:'24/11/2026, 12:00 am,', ago:'2 hours ago', src:'Fb, Website', st:'Pending', paid:false, items:1, ip:'103.70.XXX.XXX', sub:1399, ship:60, name:'Farzana Akter', phone:'01712-XXXXXX', addr:'Naikhongchhari Bazar, Bandarban'},
+  {id:'BBINV-147', date:'23/11/2026, 12:00 am,', ago:'1 day ago', src:'Website', st:'Cancelled', paid:false, items:1, ip:'2404:1c40:XXXX', sub:1590, ship:60, name:'Arif Hossain', phone:'01864-XXXXXX', addr:'Dhaka'},
+  {id:'BBINV-136', date:'18/11/2026, 12:00 am,', ago:'6 days ago', src:'An, Website', st:'Shipped', paid:false, items:1, ip:'138.252.XXX.XXX', sub:3100, ship:0, name:'Tanvir Ahmed', phone:'01811-XXXXXX', addr:'Rajshahi'},
+  {id:'BBINV-137', date:'17/11/2026, 12:00 am,', ago:'6 days ago', src:'Website', st:'Delivered', paid:true, items:2, ip:'103.106.XXX.XXX', sub:7249, ship:130, name:'Sabina Yasmin', phone:'01555-XXXXXX', addr:'Chattogram'}
+];
+const row = (o, i) => `
+<tr ${i===0?'id="rowNew"':''} class="trow border-b border-gray-200 transition-colors bg-white">
+  <td class="px-3 py-2"><input class="w-4 h-4" type="checkbox" tabindex="-1"></td>
+  <td class="px-4 py-2 text-center">${i+1}</td>
+  <td class="px-3 py-2 space-y-1 min-w-[290px] max-w-[290px]"><div class="flex gap-2 items-center">
+    <button class="p-2 border border-gray-200 rounded flex items-center justify-center"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+    <div><div class="flex items-center gap-1"><a ${i===0?'id="oidNew"':''} class="oid font-semibold text-[15px] text-cyan-700">${o.id}</a><button class="rounded p-1 text-gray-400"><i data-lucide="copy" class="h-3.5 w-3.5"></i></button><button class="rounded p-1 text-gray-400"><i data-lucide="printer" class="h-3.5 w-3.5"></i></button></div>
+      <div class="flex flex-wrap items-center gap-2 text-sm mt-1"><span class="inline-flex items-center gap-1 rounded-md text-gray-600"><i data-lucide="calendar-days" class="h-3.5 w-3.5"></i>${o.date}</span><span>${o.ago}</span></div>
+      <div class="flex gap-1"><div class="flex flex-wrap items-center gap-2 text-sm"><span class="inline-flex items-center gap-1 rounded-md text-gray-600"><i data-lucide="credit-card" class="h-3.5 w-3.5"></i>Cash</span><span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200"><i data-lucide="package" class="h-3 w-3"></i>${o.src}</span></div>${i===0?'':'<button class="ml-1 text-sm text-[#078e9a]">Old(1)</button>'}</div>
+      <div class="flex flex-wrap gap-2 mt-1"><span class="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold ${ST[o.st]}">${o.st}<i data-lucide="chevron-down" class="w-3 h-3"></i></span><span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${o.paid?'bg-green-50 text-green-700 border border-green-200':'bg-red-50 text-red-700 border border-red-200'}">${o.paid?'Paid':'Unpaid'}</span><span class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs border border-indigo-200 font-semibold text-indigo-700"><i data-lucide="package-2" class="h-3.5 w-3.5"></i>Item: ${o.items}</span></div>
+      ${o.ip?`<div><button class="inline-flex items-center gap-1 text-xs text-indigo-600 font-mono mt-1"><span>${o.ip}</span><span class="font-sans font-semibold text-gray-700">(1)</span></button></div>`:''}
+    </div></div></td>
+  <td class="px-3 py-2 text-sm text-gray-600"><p class="flex justify-between gap-3 whitespace-nowrap"><span>Sub Total </span><span>৳&nbsp;${tk(o.sub)}</span></p><p class="flex justify-between"><span>Shipping</span><span>+৳&nbsp;${tk(o.ship)}</span></p><p class="flex justify-between"><span>Discount</span><span>-৳&nbsp;0.00</span></p><p class="flex font-medium border-t justify-between"><span>Total Amount</span><span>৳&nbsp;${tk(o.sub+o.ship)}</span></p><p class="flex justify-between"><span>Paid Amount</span><span>৳&nbsp;${o.paid?tk(o.sub+o.ship):'0.00'}</span></p><p class="flex justify-between border-t font-medium border-gray-300 pt-1"><span>Due</span><span class="${o.paid?'text-green-600':'text-red-600'}">৳&nbsp;${o.paid?'0.00':tk(o.sub+o.ship)}</span></p></td>
+  <td class="px-3 py-2 text-[16px] min-w-[230px] max-w-[230px]"><div class="space-y-1">
+    <div class="flex items-center gap-1"><div class="flex items-center justify-center text-[#078e9a]"><i data-lucide="user" class="h-4 w-4"></i></div><a class="font-medium text-[#078e9a]">${o.name}</a><button class="ml-2 text-gray-500"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button></div>
+    <div class="flex items-center gap-1.5 text-gray-600"><i data-lucide="phone" class="h-4 w-4 text-gray-600"></i><a class="text-[14px] text-gray-600">${o.phone}</a><a class="inline-flex items-center justify-center p-1 rounded-full bg-emerald-50 text-emerald-600 ml-1"><i data-lucide="message-circle" class="h-3.5 w-3.5"></i></a></div>
+    <div class="flex items-center gap-1 text-gray-600"><i data-lucide="map-pin" class="h-4 w-4 shrink-0"></i><a class="flex-1 text-[14px] text-gray-600">${o.addr}</a></div>
+    <div><button class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs border border-indigo-200 font-semibold text-indigo-700 mt-1"><i data-lucide="shield-check" class="w-3 h-3"></i>Fraud Check</button></div>
+  </div></td>
+  <td class="px-3 py-2 text-sm text-gray-500 min-w-[150px]"><button class="text-xs text-[#078e9a] flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3"></i>Add Note</button></td>
+  <td class="px-3 py-2 min-w-[170px]"><button class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700"><i data-lucide="send" class="w-4 h-4"></i>Book Courier</button></td>
+  <td class="px-3 py-2"><button class="p-2 border border-gray-200 rounded hover:bg-gray-50"><i data-lucide="ellipsis-vertical" class="w-4 h-4 text-gray-600"></i></button></td>
+</tr>`;
+$('#ordBody').innerHTML = ORDERS.map(row).join('');
+$('#ordTabs').innerHTML = [['All',125,1],['Pending',1],['Confirmed',0],['Ready to Shipped',0],['Shipped',1],['Delivered',33],['Cancelled',34],['More Statuses',59]].map(([t,n,on]) =>
+  `<div class="relative shrink-0"><button class="px-2.5 py-1.5 rounded whitespace-nowrap text-sm flex items-center gap-1.5 ${on?'bg-[#13565e] text-white shadow-xs':'text-gray-700'}"><span>${t}</span><span class="px-2 py-0.5 text-xs rounded-full font-medium ${on?'bg-white text-[#13565e]':'bg-gray-200 text-gray-700'}">${n}</span>${t==='More Statuses'?'<i data-lucide="chevron-down" class="w-4 h-4"></i>':''}</button></div>`).join('');
+
+const RECENT = [['Rahima Khatun','Delivered','BBINV-149','1,798.00','Just now'],['Farzana Akter','Pending','BBINV-148','1,459.00','2 hours ago'],['Arif Hossain','Cancelled','BBINV-147','1,650.00','1 day ago'],
+  ['Tanvir Ahmed','Shipped','BBINV-136','3,100.00','6 days ago'],['Sabina Yasmin','Delivered','BBINV-137','7,379.00','6 days ago'],['Mehedi Hasan','Pending','BBINV-138','3,100.00','6 days ago'],
+  ['01810-XXXXXX','Pending','BBDraft-98','3,100.00','6 days ago'],['Nusrat Jahan','Delivered','BBDraft-97','1,550.00','6 days ago'],['01821-XXXXXX','Pending','BBDraft-96','3,100.00','6 days ago'],['Jahangir Alam','Pending','BBDraft-93','1,550.00','6 days ago']];
+$('#recentList').innerHTML = RECENT.map((r,i) => `<div class="px-4 py-3 border-l-4 ${i===0?'bg-blue-50 border-l-[#13565e]':'border-l-transparent'}"><div class="flex justify-between items-start mb-1"><span class="font-medium text-gray-900 text-sm">${r[0]}</span><span class="text-xs px-2 py-1 rounded ${r[1]==='Delivered'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700'}">${r[1]}</span></div><div class="text-xs text-gray-600">${r[2]}</div><div class="flex justify-between items-center mt-2"><span class="font-semibold text-gray-900 text-sm">৳&nbsp;${r[3]}</span><span class="text-xs text-gray-500">${r[4]}</span></div></div>`).join('');
+
+const PRODUCTS = [
+  ['1.6M Inflatable Boxing Punching Bag – Freestanding Boxing Training Stand',999,'Stock: 200','16m-inflatable-boxing-punching-bag-freestanding-boxing-training-stand-1793905859.webp'],
+  ['2-in-1 Oil Sprayer & Dispenser Bottle 500ml',620,'In Stock','2-in-1-oil-sprayer-dispenser-bottle-500ml-1794340146.webp'],
+  ['2L High Pressure Car Wash Foam Sprayer – Hand Pump Snow Foam Spray Bottle',1590,'In Stock','2l-high-pressure-car-wash-foam-sprayer-hand-pump-snow-foam-spray-bottle-for-car-bike-cleaning-1795339990.webp'],
+  ['3 Tier Thermal Lunch Box with Insulated Aluminum Foil Bag',1150,'In Stock','3-tier-thermal-lunch-box-with-insulated-aluminum-foil-bag-1793171878.webp'],
+  ['3-in-1 Bluetooth Speaker Phone Stand with Power Bank',799,'Stock: 503','3-in-1-bluetooth-speaker-phone-stand-with-power-bank-1793910857.webp'],
+  ['4-in-1 Multifunctional Seasoning Box with Spoons',220,'In Stock','4-in-1-multifunctional-seasoning-box-with-spoons-1794336745.webp'],
+  ['500ml Smart LED Temperature Display Vacuum Flask',850,'In Stock','500ml-smart-led-temperature-display-vacuum-flask-1794338009.webp'],
+  ['Baby Anti-Lost Wrist Link / Toddler Leash',600,'Stock: 100','baby-anti-lost-wrist-link-toddler-leash-1793824100.webp'],
+  ['Baby Bouncer',799,'Stock: 100','baby-bouncer-1793817094.webp'],
+  ['Baby Car BMW কিডস রাইড -পুশ কার',2501,'Stock: 500','baby-car-bmw-kids-raid-pus-kar-1793826437.webp'],
+  ['Baby Caring Foldable Flexible Trolley',5500,'Stock: 601','baby-caring-foldable-flexible-trolley-1793824842.webp'],
+  ['Baby Feeding Chair with Tray for Kids',850,'In Stock','baby-feeding-chair-with-tray-for-kids-durable-plastic-high-chair-for-feeding-and-playtime-1793109458.webp'],
+  ['Baby Food Masher Bowl for Fruits and Vegetables',200,'In Stock','baby-food-masher-bowl-for-fruits-and-vegetables-bpa-free-manual-baby-food-grinder-1793105846.webp'],
+  ['Baby fruit Pacifier',150,'Stock: 1000','baby-fruit-pacifier-1793821178.webp'],
+  ['Baby Nail trimmer',500,'Stock: 400','baby-nail-trimmer-1793822201.webp']
+];
+const esc = (s) => s.replace(/&/g,'&amp;');
+$('#posGrid').innerHTML = PRODUCTS.map((p,i) => `
+  <div id="prod${i}" class="pc bg-white rounded-lg p-3 border border-gray-200 hover:border-[#13565e] flex flex-col min-w-0 relative transition-all cursor-pointer">
+    <div class="aspect-square bg-gray-50 rounded mb-2 flex items-center justify-center overflow-hidden flex-shrink-0"><img class="w-full h-full object-cover" src="${IMG+p[3]}" alt=""></div>
+    <div class="flex-1 flex flex-col justify-between min-w-0"><h3 class="text-sm font-medium line-clamp-2 mb-1 break-words text-gray-800">${esc(p[0])}</h3>
+      <div class="min-w-0"><div class="flex items-center justify-between gap-1 mb-1"><span class="text-base font-bold text-[#078e9a] truncate">৳&nbsp;${tk(p[1])}</span></div>
+      <div class="text-xs text-gray-500 truncate">${p[2]==='In Stock'?'<span class="text-green-600 font-medium">In Stock</span>':`<span>${p[2]}</span>`}</div></div></div>
+  </div>`).join('');
+$('#posCats').innerHTML = ['All Items','Baby Items','Car Accessories','Electronics & Gadgets','Home Decor','Kitchen Item','Skin care','Trending product','Wooden product'].map((c,i) =>
+  `<button class="px-3 py-1.5 rounded whitespace-nowrap text-[14px] font-medium shrink-0 border transition-colors ${i===0?'bg-[#13565e] text-white border-[#13565e]':'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700'}">${esc(c)}</button>`).join('');
+const PICK = [0, 4];
+$('#detItems').innerHTML = PICK.map((pi,i) => { const p = PRODUCTS[pi]; return `<tr class="border-b border-gray-200"><td class="text-gray-600 py-4 px-2">${i+1}</td><td class="text-gray-900 py-4 px-2"><div class="flex gap-3 items-center"><img class="w-12 h-12 rounded object-cover border border-gray-200 flex-shrink-0" src="${IMG+p[3]}" alt=""><div class="min-w-0"><div class="font-medium truncate max-w-[190px]">${esc(p[0])}</div><div class="text-xs text-gray-500 font-mono">SKU: </div></div></div></td><td class="text-center text-gray-900 py-4 px-2">1</td><td class="text-right text-gray-900 py-4 px-2 whitespace-nowrap">৳&nbsp;${tk(p[1])}</td><td class="text-right text-red-600 py-4 px-2">-</td><td class="text-right text-red-600 py-4 px-2">-</td><td class="text-right font-semibold text-gray-900 py-4 px-2 whitespace-nowrap">৳&nbsp;${tk(p[1])}</td></tr>`; }).join('');
+$('#mCart').innerHTML = PICK.map(pi => { const p = PRODUCTS[pi]; return `<div class="flex justify-between items-center text-sm bg-white p-2 border border-gray-200 rounded"><div class="flex gap-2 items-center"><img class="w-10 h-10 object-contain" src="${IMG+p[3]}" alt=""><span class="font-medium text-gray-800 line-clamp-1">${esc(p[0])}</span></div><div class="text-right ml-2 shrink-0"><div class="text-gray-600">1 x ৳&nbsp;${tk(p[1])}</div><div class="font-bold">৳&nbsp;${tk(p[1])}</div></div></div>`; }).join('');
+
+/* dashboard chart data */
+const BARS = [['Selling','#13525a'],['Shipping','#1a8a95'],['Purchase','#f59e0b'],['Courier','#3b82f6'],['Return','#8b5cf6'],['Other','#94a3b8'],['Net','#10b981']];
+$('#bars').innerHTML = ['60.0k','45.0k','30.0k','15.0k','0'].map((t,i)=>`<span class="ax" style="top:${i*48.5}px">৳${t}</span>`).join('') + BARS.map(b=>`<div class="bar"><i style="background:${b[1]}"></i><s>${b[0]}</s></div>`).join('');
+const barEls = [...document.querySelectorAll('#bars .bar i')];
+const LINES = [['+','Selling Price','Total 32 Orders, 37 Items Sold','#13525a','sel'],['+','Shipping Charge','Delivery fee from 32 Orders','#1a8a95','shp'],['−','Purchase Cost / COGS','Buy cost for 37 Items Sold','#f59e0b','pur'],['−','Return / Courier Loss','Loss from returned/cancelled orders','#8b5cf6','ret'],['=','Net Order Profit','Final net profit after all deductions','#10b981','net']];
+$('#lines').innerHTML = LINES.map(l=>`<div class="li ${l[4]==='net'?'net':''}"><span class="dt" style="background:${l[3]}">${l[0]}</span><span class="t"><b>${l[1]}</b><small>${l[2]}</small></span><span class="v">${l[0]==='−'?'- ':'+ '}৳ <n data-k="${l[4]}" data-f="tk">0</n></span></div>`).join('');
+const MONTH = {pc:0,pa:0,sc:4,sa:6910,dc:32,da:58360,cc:33,ca:410744,qty:37,apo:586.56,apu:507.30,mg:31.8,rev:58360,np:58360,due:58360,sel:57490,shp:1570,pur:36600,ret:3690,net:18770};
+const TODAY = Object.fromEntries(Object.keys(MONTH).map(k=>[k,0]));
+let cur = {...MONTH};
+
+if (window.lucide) lucide.createIcons();
+
+/* ---------------- virtual clock / pause ---------------- */
+let paused = false, runId = 0, vt = 0, last = performance.now();
+const tick = (t) => { if (!paused) vt += t - last; last = t; requestAnimationFrame(tick); };
+requestAnimationFrame(tick);
+const ABORT = Symbol('abort');
+const frame = () => new Promise(r => requestAnimationFrame(r));
+async function sleep(ms, id) { const end = vt + ms; while (vt < end) { if (id !== runId) throw ABORT; await frame(); } if (id !== runId) throw ABORT; }
+async function tween(ms, fn, id) { const s = vt; let p = 0; while (p < 1) { if (id !== runId) throw ABORT; p = Math.min(1, (vt - s) / ms); fn(e3(p)); await frame(); } }
+function e3(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+/* ---------------- stage helpers ---------------- */
+const W = 1440, H = 900;
+const vp = $('#vp'), cursor = $('#cursor'), tip = $('#tip'), browser = $('#browser');
+const pages = { dash: $('#pDash'), orders: $('#pOrders'), pos: $('#pPos'), details: $('#pDetails') };
+let scale = 1, cx = 1100, cy = 700; const scrollY = {dash:0,orders:0,pos:0,details:0};
+function fit() {
+  const w = $('#wrap').clientWidth;
+  scale = w / W;
+  browser.style.transform = `scale(${scale})`;
+  $('#wrap').style.height = (H * scale) + 'px';
+  sendHeight();
+}
+function sendHeight() {
+  try {
+    const h = document.getElementById('stage').offsetHeight;
+    if (window.parent) {
+      window.parent.postMessage({ type: 'dorja-demo-resize', height: h }, '*');
+    }
+  } catch(e) {}
+}
+addEventListener('resize', fit);
+setTimeout(fit, 50);
+setTimeout(fit, 300);
+function setCursor(x, y) { cx = x; cy = y; cursor.style.transform = `translate(${x - 4}px,${y - 2}px)`; }
+function pt(el, ox = .5, oy = .5) { const r = el.getBoundingClientRect(), v = vp.getBoundingClientRect(); return [(r.left - v.left + r.width * ox) / scale, (r.top - v.top + r.height * oy) / scale]; }
+async function moveTo(el, id, ox, oy) {
+  const [tx, ty] = pt(el, ox, oy), sx = cx, sy = cy;
+  const d = Math.hypot(tx - sx, ty - sy), ms = Math.min(1150, 380 + d * .85), bend = Math.min(80, d * .15);
+  const mx = (sx + tx) / 2 + (ty - sy) / (d || 1) * bend, my = (sy + ty) / 2 - (tx - sx) / (d || 1) * bend;
+  await tween(ms, p => { const a = (1-p)*(1-p), b = 2*(1-p)*p, c = p*p; setCursor(a*sx + b*mx + c*tx, a*sy + b*my + c*ty); }, id);
+}
+async function click(id) {
+  cursor.classList.add('down');
+  const r = document.createElement('i'); r.className = 'ripple'; r.style.left = cx + 'px'; r.style.top = cy + 'px'; vp.appendChild(r);
+  setTimeout(() => r.remove(), 700);
+  await sleep(140, id); cursor.classList.remove('down'); await sleep(80, id);
+}
+function showTip(text, el) {
+  if (!text) { tip.classList.remove('vis'); return; }
+  tip.textContent = text; const [x, y] = pt(el, .5, 0);
+  tip.style.left = Math.max(8, Math.min(W - tip.offsetWidth - 8, x - tip.offsetWidth / 2)) + 'px';
+  tip.style.top = Math.max(8, y - 44) + 'px'; tip.classList.add('vis');
+}
+const hov = (el, on) => el.classList.toggle('hov', on);
+function setStep(n) { document.querySelectorAll('.step').forEach(s => { const i = +s.dataset.s; s.classList.toggle('on', i === n); s.classList.toggle('done', i < n); }); }
+function applyScroll(name, y) {
+  scrollY[name] = y; const pg = pages[name], inner = pg.querySelector('.inner'), bar = pg.querySelector(':scope > .sbar');
+  inner.style.transform = `translateY(${-y}px)`;
+  const Hh = inner.scrollHeight, V = pg.clientHeight; if (!bar || !V) return;
+  const th = Math.max(40, V * V / Math.max(Hh, 1)); bar.style.height = th + 'px';
+  bar.style.top = (4 + (V - th - 8) * (y / Math.max(1, Hh - V))) + 'px';
+}
+async function scrollTo(name, y, id, ms = 1200) {
+  const pg = pages[name], inner = pg.querySelector('.inner');
+  y = Math.max(0, Math.min(y, inner.scrollHeight - pg.clientHeight));
+  const s = scrollY[name], bar = pg.querySelector(':scope > .sbar'); bar.classList.add('vis');
+  await tween(ms, p => applyScroll(name, s + (y - s) * p), id);
+  setTimeout(() => bar.classList.remove('vis'), 700);
+}
+async function typeUrl(text, id) {
+  const u = $('#url'), t = $('#urlText'); u.classList.add('typing'); t.textContent = '';
+  for (const ch of text) { t.textContent += ch; await sleep(28, id); }
+  await sleep(200, id); u.classList.remove('typing');
+}
+async function go(name, path, crumb, id) {
+  const p = $('#progress'); p.style.opacity = 1; p.style.width = '70%';
+  $('#urlText').textContent = 'app.dorja.io' + path;
+  await sleep(380, id);
+  Object.values(pages).forEach(pg => pg.classList.remove('show'));
+  vp.classList.toggle('nohdr', name === 'pos');
+  applyScroll(name, 0); pages[name].classList.add('show');
+  if (crumb) $('#crumbB').textContent = crumb;
+  p.style.width = '100%'; await sleep(250, id); p.style.opacity = 0; await sleep(300, id); p.style.width = '0';
+}
+async function typeInto(el, text, id) {
+  el.classList.add('fx'); el.value = '';
+  for (const ch of text) { el.value += ch; await sleep(55, id); }
+  await sleep(250, id); el.classList.remove('fx');
+}
+function renderNums(vals) {
+  document.querySelectorAll('n[data-k]').forEach(el => { const v = vals[el.dataset.k], f = el.dataset.f; el.textContent = f === 'tk' ? tk(v) : f === 'p1' ? v.toFixed(1) : Math.round(v).toString(); });
+  barEls.forEach((b, i) => { const k = ['sel','shp','pur',null,'ret',null,'net'][i]; b.style.height = ((k ? vals[k] : 0) / 60000 * 194) + 'px'; });
+}
+async function setRange(target, id) {
+  const from = {...cur};
+  $('#dRange').textContent = target === TODAY ? '2026-11-24 → 2026-11-24' : '2026-11-01 → 2026-11-24';
+  await tween(900, p => { const v = {}; for (const k in from) v[k] = from[k] + (target[k] - from[k]) * p; cur = v; renderNums(v); }, id);
+  cur = {...target};
+}
+
+/* POS helpers */
+let cartSub = 0;
+async function addToCart(i, id) {
+  const p = PRODUCTS[i], card = $('#prod' + i); card.classList.add('added');
+  const [sx, sy] = pt(card.querySelector('img'), .5, .5), [tx, ty] = pt($('#cartList'), .2, .1);
+  const d = document.createElement('i'); d.className = 'fly'; d.style.backgroundImage = `url(${IMG + p[3]})`; vp.appendChild(d);
+  try { await tween(650, q => { const x = sx + (tx - sx) * q, y = sy + (ty - sy) * q - Math.sin(q * Math.PI) * 140; d.style.left = (x - 21) + 'px'; d.style.top = (y - 21) + 'px'; d.style.transform = `scale(${1 - q * .35})`; }, id); }
+  finally { d.remove(); }
+  $('#cartEmpty').style.opacity = 0;
+  $('#cartList').insertAdjacentHTML('beforeend', `
+    <div class="ci border-b border-gray-200 p-3"><div class="flex justify-between items-start mb-2 gap-2"><img class="w-12 h-12 object-cover" src="${IMG+p[3]}" alt=""><div class="flex-1 min-w-0 pr-2"><h4 class="text-[14px] font-medium line-clamp-1">${esc(p[0])}</h4><p class="text-sm text-gray-500 mt-0.5">৳&nbsp;${tk(p[1])}</p></div><button class="text-red-400 p-1 rounded"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+    <div class="flex items-center justify-between gap-2"><div class="mt-1"><select class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded-md text-gray-600 bg-white" tabindex="-1"><option>Default</option></select></div>
+    <div class="inline-flex items-center rounded-lg border border-gray-200 bg-white overflow-hidden"><button class="flex h-7 w-7 items-center justify-center border-r border-gray-200 text-gray-600"><i data-lucide="minus" class="h-4 w-4"></i></button><input class="h-7 w-12 border-0 bg-transparent text-center text-sm font-semibold outline-none" type="text" value="1" tabindex="-1" readonly><button class="flex h-7 w-7 items-center justify-center border-l border-gray-200 bg-[#078e9a] text-white"><i data-lucide="plus" class="h-4 w-4"></i></button></div>
+    <span class="text-sm font-bold text-gray-800">৳&nbsp;${tk(p[1])}</span></div></div>`);
+  if (window.lucide) lucide.createIcons();
+  const from = cartSub, to = cartSub + p[1]; cartSub = to;
+  await tween(500, q => { const v = tk(from + (to - from) * q); $('#cSub').textContent = v; $('#cTot').textContent = v; }, id);
+}
+function resetAll() {
+  Object.values(pages).forEach(pg => pg.classList.remove('show'));
+  Object.keys(pages).forEach(n => applyScroll(n, 0));
+  pages.dash.classList.add('show'); vp.classList.remove('nohdr');
+  cur = {...MONTH}; renderNums(cur);
+  $('#bToday').classList.remove('on'); $('#bMonth').classList.add('on');
+  $('#navDash').classList.add('on'); $('#navOrders').classList.remove('on','open'); $('#subOrders').classList.remove('open');
+  ['#navInvoice','#navPos'].forEach(s => $(s).classList.remove('on'));
+  document.querySelectorAll('.hov,.added,.new,.fx').forEach(e => e.classList.remove('hov','added','new','fx'));
+  document.querySelectorAll('#cartList .ci').forEach(e => e.remove());
+  $('#cartEmpty').style.opacity = 1; cartSub = 0; $('#cSub').textContent = '0.00'; $('#cTot').textContent = '0.00';
+  $('#fName').value = ''; $('#fPhone').value = '';
+  $('#payModal').classList.remove('vis'); $('#mStatus').innerHTML = '<option>Select Status</option>'; $('#mAmount').value = '';
+  $('#mPaid').textContent = '0.00'; $('#mChange').textContent = '-1,798.00'; $('#mChangeWrap').className = 'font-semibold text-red-600';
+  $('#toast').classList.remove('vis');
+  $('#crumbB').textContent = 'Dashboard'; $('#urlText').textContent = '';
+  showTip(null); setCursor(1150, 700); setStep(0);
+}
+
+/* ---------------- the journey ---------------- */
+async function run(id) {
+  resetAll(); $('#reset').classList.remove('vis');
+  await sleep(500, id);
+  await typeUrl('app.dorja.io/dashboard', id); await sleep(500, id);
+
+  // 1. Dashboard: scroll down and back up
+  await moveTo(pages.dash, id, .6, .55);
+  showTip('Scroll through your business dashboard', pages.dash.querySelector('.hero-card'));
+  await sleep(900, id); showTip(null);
+  await scrollTo('dash', 720, id, 1600); await sleep(900, id);
+  await scrollTo('dash', 0, id, 1300); await sleep(500, id);
+
+  // 2. Today / This Month
+  setStep(1);
+  const bT = $('#bToday'), bM = $('#bMonth');
+  await moveTo(bT, id); hov(bT, true); showTip("Check today's numbers", bT); await sleep(500, id);
+  await click(id); hov(bT, false); bT.classList.add('on'); bM.classList.remove('on');
+  await setRange(TODAY, id); await sleep(1100, id); showTip(null);
+  await moveTo(bM, id); hov(bM, true); showTip('Switch to the whole month', bM); await sleep(450, id);
+  await click(id); hov(bM, false); bM.classList.add('on'); bT.classList.remove('on');
+  await setRange(MONTH, id); await sleep(1100, id); showTip(null);
+
+  // 3. Orders / Sales -> POS Sales -> create an order
+  setStep(2);
+  const nO = $('#navOrders'), nP = $('#navPos'), nI = $('#navInvoice');
+  await moveTo(nO, id, .3); hov(nO, true); await sleep(300, id);
+  await click(id); hov(nO, false); nO.classList.add('open','on'); $('#subOrders').classList.add('open'); $('#navDash').classList.remove('on');
+  await sleep(600, id);
+  await moveTo(nP, id, .3); hov(nP, true); showTip('Create a new sale from POS', nP); await sleep(450, id);
+  await click(id); hov(nP, false); showTip(null); nP.classList.add('on');
+  await go('pos', '/pos', null, id); await sleep(700, id);
+
+  for (const [k, pi] of PICK.entries()) {
+    const card = $('#prod' + pi);
+    await moveTo(card, id, .5, .4); hov(card, true);
+    if (k === 0) showTip('Tap a product to add it to the cart', card);
+    await sleep(450, id); await click(id); hov(card, false); showTip(null);
+    await addToCart(pi, id); await sleep(350, id);
+  }
+  const fN = $('#fName'), fP = $('#fPhone');
+  await moveTo(fN, id, .25); await click(id); await typeInto(fN, 'Rahima Khatun', id);
+  await moveTo(fP, id, .25); await click(id); await typeInto(fP, '01798-XXXXXX', id);
+  await sleep(250, id);
+  const pay = $('#payBtn');
+  await moveTo(pay, id); hov(pay, true); showTip('Take payment', pay); await sleep(450, id);
+  await click(id); hov(pay, false); showTip(null);
+  $('#payModal').classList.add('vis'); await sleep(900, id);
+  const ms = $('#mStatus');
+  await moveTo(ms, id, .35); await click(id); ms.classList.add('fx'); await sleep(300, id);
+  ms.innerHTML = '<option>Delivered</option>'; await sleep(300, id); ms.classList.remove('fx');
+  const ma = $('#mAmount');
+  await moveTo(ma, id, .4); await click(id); await typeInto(ma, '1798', id);
+  await tween(450, q => { const paid = 1798 * q; $('#mPaid').textContent = tk(paid); $('#mChange').textContent = tk(paid - 1798); }, id);
+  $('#mChangeWrap').className = 'font-semibold text-green-600'; $('#mChange').textContent = '0.00';
+  await sleep(400, id);
+  const mc = $('#mComplete');
+  await moveTo(mc, id); hov(mc, true); showTip('Complete the order', mc); await sleep(450, id);
+  await click(id); hov(mc, false); showTip(null);
+  $('#payModal').classList.remove('vis'); $('#toast').classList.add('vis');
+  document.querySelectorAll('#cartList .ci').forEach(e => e.remove()); $('#cartEmpty').style.opacity = 1;
+  $('#cSub').textContent = '0.00'; $('#cTot').textContent = '0.00'; $('#fName').value = ''; $('#fPhone').value = '';
+  document.querySelectorAll('.pc.added').forEach(e => e.classList.remove('added'));
+  await sleep(1500, id);
+
+  // 4. Orders / Invoice: new order on top
+  setStep(3);
+  await moveTo(nI, id, .3); hov(nI, true); showTip('See it in your order list', nI); await sleep(450, id);
+  await click(id); hov(nI, false); showTip(null); $('#toast').classList.remove('vis');
+  nP.classList.remove('on'); nI.classList.add('on'); $('#rowNew').classList.add('new');
+  await go('orders', '/orders', 'All Orders', id); await sleep(1100, id);
+
+  // 5. Order details
+  setStep(4);
+  const oid = $('#oidNew');
+  await moveTo(oid, id); hov(oid, true); showTip('Your new POS order is right on top', oid); await sleep(1500, id);
+  await click(id); hov(oid, false); showTip(null);
+  await go('details', '/orders/details/656', 'Order Details', id); await sleep(1300, id);
+  await moveTo(pages.details, id, .6, .6);
+  await scrollTo('details', 420, id, 1500); await sleep(1500, id);
+  await scrollTo('details', 0, id, 1100); await sleep(1800, id);
+  setStep(5);
+  $('#reset').classList.add('vis'); await sleep(600, id);
+}
+async function loop() { const id = ++runId; try { while (true) await run(id); } catch (e) { if (e !== ABORT) console.error(e); } }
+
+/* ---------------- controls + mouse effects ---------------- */
+const playBtn = $('#playBtn');
+const ICONS = { pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>', play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>' };
+let userPaused = false, offscreen = false;
+const syncBtn = () => { playBtn.innerHTML = userPaused ? ICONS.play : ICONS.pause; playBtn.setAttribute('aria-label', userPaused ? 'Play' : 'Pause'); };
+playBtn.onclick = () => { userPaused = !userPaused; paused = userPaused || offscreen; syncBtn(); };
+$('#replayBtn').onclick = () => { userPaused = false; paused = offscreen; syncBtn(); loop(); };
+syncBtn();
+
+// Make step buttons clickable
+document.querySelectorAll('.step').forEach(btn => {
+  btn.onclick = () => {
+    const s = parseInt(btn.dataset.s, 10);
+    jumpToStep(s);
+  };
+});
+
+async function jumpToStep(targetStep) {
+  const id = ++runId;
+  userPaused = false;
+  paused = false;
+  syncBtn();
+  try {
+    resetAll();
+    $('#reset').classList.remove('vis');
+    
+    if (targetStep === 0) {
+      setStep(0);
+      await go('dash', '/dashboard', 'Dashboard', id);
+      await scrollTo('dash', 400, id, 1000);
+      await sleep(800, id);
+      await scrollTo('dash', 0, id, 900);
+    } else if (targetStep === 1) {
+      setStep(1);
+      await go('dash', '/dashboard', 'Dashboard', id);
+      const bT = $('#bToday'), bM = $('#bMonth');
+      bT.classList.add('on'); bM.classList.remove('on');
+      await setRange(TODAY, id);
+      await sleep(1000, id);
+      bM.classList.add('on'); bT.classList.remove('on');
+      await setRange(MONTH, id);
+    } else if (targetStep === 2) {
+      setStep(2);
+      $('#navOrders').classList.add('on');
+      $('#navPos').classList.add('on');
+      await go('pos', '/pos', null, id);
+      await addToCart(0, id);
+      await sleep(500, id);
+      await addToCart(4, id);
+    } else if (targetStep === 3) {
+      setStep(3);
+      $('#navOrders').classList.add('on');
+      $('#navInvoice').classList.add('on');
+      $('#rowNew').classList.add('new');
+      await go('orders', '/orders', 'All Orders', id);
+    } else if (targetStep === 4) {
+      setStep(4);
+      await go('details', '/orders/details/656', 'Order Details', id);
+      await scrollTo('details', 350, id, 1100);
+      await sleep(1000, id);
+      await scrollTo('details', 0, id, 900);
+    }
+  } catch (e) {
+    if (e !== ABORT) console.error(e);
+  }
+}
+const stage = $('#stage'), tilt = $('#tilt');
+stage.addEventListener('mousemove', (e) => {
+  const w = $('#wrap').getBoundingClientRect();
+  const nx = (e.clientX - (w.left + w.width / 2)) / w.width, ny = (e.clientY - (w.top + w.height / 2)) / w.height;
+  tilt.style.transform = `rotateY(${nx * 5}deg) rotateX(${-ny * 4}deg)`;
+});
+stage.addEventListener('mouseleave', () => { tilt.style.transform = ''; });
+let started = false;
+new IntersectionObserver((ents) => {
+  const vis = ents[0].isIntersecting;
+  if (vis && !started) { started = true; setTimeout(loop, 300); }
+  offscreen = !vis; paused = userPaused || offscreen;
+}, { threshold: .25 }).observe($('#wrap'));
+})();
+</script>
+</body>
+</html>
