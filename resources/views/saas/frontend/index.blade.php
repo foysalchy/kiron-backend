@@ -970,7 +970,7 @@
     @endphp
 
     <!-- HERO SECTION (EduManager Inspired Single Static Showcase) -->
-    <section id="top" class="hero-bg relative pt-24 md:pt-36 pb-20 overflow-hidden">
+    <section id="top" class="hero-bg relative pt-8 md:pt-36 pb-10 md:pb-20 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
             <!-- Top Pill Badge -->
             <div class="inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
@@ -1021,7 +1021,7 @@
     </section>
 
     <!-- HERO PREVIEW SHOWCASE SECTION (Separate clean section without grid background) -->
-    <section class="relative pb-20 overflow-hidden">
+    <section class="relative pb-6 md:pb-12 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
             <!-- 3D Perspective Showcase (Exact EduManager Reference) -->
             <div class="relative mt-4 md:mt-8 mx-auto max-w-[1080px] perspective-container">
@@ -1091,7 +1091,7 @@
             </div>
         </section>
     @endif
-    <section id="features" class="py-16 px-4 md:px-10">
+    <section id="features" class="py-8 md:py-14 px-4 md:px-10">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
@@ -1180,7 +1180,7 @@
     </section>
 
     <!-- INTEGRATION SECTION -->
-    <section class="py-20 px-4 md:px-10 overflow-hidden relative" id="intergation">
+    <section class="py-8 md:py-14 px-4 md:px-10 overflow-hidden relative" id="intergation">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Section Header -->
@@ -1198,239 +1198,314 @@
             </div>
 
             <div class="pt-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Top 2 Feature Showcase Cards (Professional Online Store & Accurate Ad Tracking) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
-                    <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- 4 Input Paths -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                                <!-- Pulse Animation (4 Paths) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
-
-                                <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- Output Path -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
-                            </svg>
-
-                            <!-- 4 Payment Source Logos -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
-
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/ssl.png') }}" alt="Rocket"></div>
-
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                    <!-- Left Card: Professional online store -->
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                        <div class="relative bg-gradient-to-br from-[#EEF2FF]/80 via-[#F5F8FF]/70 to-[#E6F4F1]/80 p-5 md:p-7 min-h-[300px] sm:min-h-[330px] flex items-center justify-center overflow-hidden">
+                            <!-- Mini Interactive Product Details Browser Window -->
+                            <div class="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-gray-200/80 shadow-lg overflow-hidden relative z-10">
+                                <div class="h-7 bg-gray-50 border-b border-gray-100 flex items-center gap-1.5 px-3">
+                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <span class="ml-auto mr-auto text-[10px] text-gray-400 font-mono">yourbrand.com/product/cotton-tee</span>
+                                </div>
+                                <div class="p-4" style="display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: start;">
+                                    <!-- Product Image & Color Thumbnails -->
+                                    <div class="space-y-2">
+                                        <div class="bg-gray-50 rounded-xl p-2.5 flex items-center justify-center border border-gray-100" style="height: 118px;">
+                                            <svg id="miniStoreTee" viewBox="0 0 64 64" class="w-16 h-16 drop-shadow-sm transition-colors duration-200">
+                                                <path id="miniStoreTeePath" d="M20 12 L26 10 Q32 15 38 10 L44 12 L54 22 L47 29 L43 25 L43 54 L21 54 L21 25 L17 29 L10 22 Z" fill="#00555C"/>
+                                            </svg>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#00555C')" class="h-6 rounded-md bg-[#00555C]/15 border border-[#00555C] flex items-center justify-center cursor-pointer" title="Teal">
+                                                <span class="w-3 h-3 rounded-full bg-[#00555C]"></span>
+                                            </button>
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1D4ED8')" class="h-6 rounded-md bg-blue-50 border border-gray-200 hover:border-blue-500 flex items-center justify-center cursor-pointer" title="Royal Blue">
+                                                <span class="w-3 h-3 rounded-full bg-[#1D4ED8]"></span>
+                                            </button>
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1F2937')" class="h-6 rounded-md bg-gray-100 border border-gray-200 hover:border-gray-600 flex items-center justify-center cursor-pointer" title="Charcoal">
+                                                <span class="w-3 h-3 rounded-full bg-[#1F2937]"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Product Details Info -->
+                                    <div class="space-y-2 text-left">
+                                        <div class="text-sm font-bold text-[#0A1F22] leading-snug">Premium Cotton Tee</div>
+                                        <div class="flex items-center gap-1 text-[10px] text-amber-500 font-semibold">
+                                            <span>★★★★★</span>
+                                            <span class="text-gray-400 font-normal">4.9 (128)</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base font-extrabold text-[#00555C]">৳850</span>
+                                            <span class="text-[11px] text-gray-400 line-through">৳1,200</span>
+                                            <span class="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">-29%</span>
+                                        </div>
+                                        <div class="flex gap-1.5" id="miniSizeGroup">
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">S</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">M</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer">L</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">XL</button>
+                                        </div>
+                                        <button id="miniOrderBtn" type="button" onclick="this.textContent='✓ Order placed';this.classList.remove('bg-[#00555C]');this.classList.add('bg-emerald-600');" class="w-full py-2 rounded-lg bg-[#00555C] hover:bg-[#003A3F] text-white text-[11px] font-semibold text-center transition-colors cursor-pointer">
+                                            Order Now • ৳850
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
-                            Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept
-                            secure online payments, automate payment confirmation, and manage every transaction from a
-                            single platform.
+                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Professional online store</h3>
+                            Pick a theme, add your products and publish your store and landing pages, with no code. Shoppers who come from Facebook can see the product and order in a few taps.
+                        </div>
+                    </div>
+                    <script>
+                        (function () {
+                            const colors = ['#00555C', '#1D4ED8', '#1F2937'];
+                            const teePath = document.getElementById('miniStoreTeePath');
+                            const sizeGroup = document.getElementById('miniSizeGroup');
+                            const orderBtn = document.getElementById('miniOrderBtn');
+                            if (!teePath || !sizeGroup || !orderBtn) return;
+
+                            let step = 0;
+                            let paused = false;
+                            const card = orderBtn.closest('.glass');
+                            if (card) {
+                                card.addEventListener('mouseenter', () => paused = true);
+                                card.addEventListener('mouseleave', () => paused = false);
+                            }
+
+                            setInterval(() => {
+                                if (paused) return;
+                                const sizeBtns = sizeGroup.querySelectorAll('button');
+                                const phase = step % 4;
+                                if (phase === 0) {
+                                    orderBtn.textContent = 'Order Now • ৳850';
+                                    orderBtn.classList.remove('bg-emerald-600');
+                                    orderBtn.classList.add('bg-[#00555C]');
+                                    teePath.setAttribute('fill', colors[Math.floor(step / 4) % colors.length]);
+                                } else if (phase === 1) {
+                                    const idx = Math.floor(step / 4) % sizeBtns.length;
+                                    sizeBtns.forEach(b => b.className = 'px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600');
+                                    sizeBtns[idx].className = 'px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer';
+                                } else if (phase === 2) {
+                                    orderBtn.textContent = '✓ Order placed';
+                                    orderBtn.classList.remove('bg-[#00555C]');
+                                    orderBtn.classList.add('bg-emerald-600');
+                                }
+                                step++;
+                            }, 1100);
+                        })();
+                    </script>
+
+                    <!-- Right Card: Accurate ad tracking -->
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                        <div class="relative bg-gradient-to-br from-[#F0F4FF]/80 via-[#F7F9FC]/70 to-[#E6F4F1]/80 p-5 md:p-6 min-h-[300px] sm:min-h-[330px] flex flex-col justify-center gap-3">
+                            <!-- Top Row: Live Events + ROAS -->
+                            <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px;">
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Live Events</span>
+                                        <span class="text-[8px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">• LIVE</span>
+                                    </div>
+                                    <div class="mt-2.5 space-y-1.5 text-[10px] text-gray-600">
+                                        <div class="flex justify-between gap-2"><span>Purchase • ৳850</span><span class="text-emerald-600 font-semibold whitespace-nowrap">2s ago</span></div>
+                                        <div class="flex justify-between gap-2"><span>InitiateCheckout</span><span class="text-gray-400 whitespace-nowrap">14s ago</span></div>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3 flex flex-col justify-between">
+                                    <div class="text-[9px] font-bold text-gray-400 uppercase">ROAS</div>
+                                    <div class="text-xl font-extrabold text-[#0A1F22]">5.0x</div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Box: Pixels & Tracking -->
+                            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
+                                <div class="flex items-center justify-between text-[9px] font-bold text-gray-400 uppercase pb-2 border-b border-gray-100">
+                                    <span>Pixels &amp; Tracking</span>
+                                    <span>Last Event</span>
+                                </div>
+                                <div class="divide-y divide-gray-100 text-[11px]">
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Meta Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Conversions API <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">TikTok Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Google Tag Manager <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Accurate ad tracking</h3>
+                            Meta Pixel, Conversions API, TikTok Pixel and Google Tag Manager are built in. Every order reaches Meta and TikTok through server-side tracking, so they can show your ads to more people who buy.
                         </div>
                     </div>
 
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- নতুন কার্ড: Smart Order & Inventory Management -->
                     <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
-
-                                <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
-                            </svg>
-
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/carrybee.png') }}" alt="carrybee"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
-
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
+                        <div class="relative bg-gradient-to-br from-[#E6F4F1]/80 via-[#F4F9F8]/70 to-[#EEF2FF]/80 p-4 md:p-6 min-h-[260px] flex flex-col justify-center gap-3">
+                            <!-- Order Pipeline Card -->
+                            <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-3.5 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Order Pipeline</span>
+                                    <span class="text-[10px] font-bold text-[#00555C] bg-[#DDEEEA] px-2 py-0.5 rounded-full">Auto Sync</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1048 • ৳1,450</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-bold">Pending</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1047 • ৳850</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[9px] font-bold">Shipped</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1046 • ৳2,100</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold">Delivered</span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
+                            <!-- Live Stock & Invoice Mini Bar -->
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
+                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Live Stock</div>
+                                    <div class="text-sm font-extrabold text-[#00555C] mt-0.5">1,284 pcs</div>
+                                </div>
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
+                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Auto Invoice</div>
+                                    <div class="text-sm font-extrabold text-emerald-600 mt-0.5">✓ Ready</div>
+                                </div>
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
-                            </h3>
-                            Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create
-                            shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Smart Order &amp; Inventory</h3>
+                            Process orders from pending to delivery in one click, sync stock levels in real time across warehouses, and generate automated invoices effortlessly.
                         </div>
                     </div>
+
+                    <!-- গ্রাফ ১: পেমেন্ট ও কুরিয়ার মেথড (বামে Payment, মাঝে Dorja, ডানে Courier) -->
                     <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+                            <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
+                                <!-- Left 4 Input Paths (Payment) -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 230 150" />
 
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
+                                <!-- Left Pulse Animation -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 230 150" style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 230 150" style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 230 150" style="animation-delay:1.2s" />
+
+                                <!-- Right 4 Input Paths (Courier) -->
+                                <path class="flow-line" d="M400 40 C 310 40, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 113 C 310 113, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 186 C 310 186, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 260 C 310 260, 290 150, 230 150" />
+
+                                <!-- Right Pulse Animation -->
+                                <path class="flow-pulse" d="M400 40 C 310 40, 290 150, 230 150" style="animation-delay:.2s" />
+                                <path class="flow-pulse" d="M400 113 C 310 113, 290 150, 230 150" style="animation-delay:.6s" />
+                                <path class="flow-pulse" d="M400 186 C 310 186, 290 150, 230 150" style="animation-delay:1.0s" />
+                                <path class="flow-pulse" d="M400 260 C 310 260, 290 150, 230 150" style="animation-delay:1.4s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
+                                <circle class="ring-pulse" cx="230" cy="150" r="45" fill="none" stroke="#00555c" stroke-width="1.5" />
                             </svg>
 
-                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
+                            <!-- Left: 4 Payment Source Logos -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img src="{{ asset('./images/saas/rocket.png') }}" alt="Rocket"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img src="{{ asset('./images/saas/ssl.png') }}" alt="SSLCommerz"></div>
 
+                            <!-- Right: 4 Courier Partner Logos -->
+                            <div class="node-circle small" style="left:87%; top:13.3%;"><img src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
+                            <div class="node-circle small" style="left:87%; top:37.6%;"><img src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
+                            <div class="node-circle small" style="left:87%; top:62.1%;"><img src="{{ asset('./images/saas/redx.svg') }}" alt="RedX"></div>
+                            <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/carrybee.png') }}" alt="CarryBee"></div>
 
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            <!-- Center Node: Dorja Icon -->
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
-                                Channel </h3>
-                            Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified
-                            inbox. Respond faster, manage conversations efficiently, and deliver a better customer
-                            experience.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Multiple Payment Gateways &amp; Courier Partners</h3>
+                            Integrate leading payment gateways (bKash, Nagad, Rocket, SSLCommerz) and trusted courier services (Pathao, SteadFast, CarryBee, RedX) in one place. Accept secure payments, create shipments, and track deliveries seamlessly from dorja.io.
                         </div>
                     </div>
+                    <!-- গ্রাফ ২: ওমনিচ্যানেল মেসেজিং ও সেলস চ্যানেল (বামে Messaging, মাঝে Dorja, ডানে Sales Channels) -->
                     <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+                            <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
+                                <!-- Left 4 Input Paths (Messaging) -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 230 150" />
 
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
+                                <!-- Left Pulse Animation -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 230 150" style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 230 150" style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 230 150" style="animation-delay:1.2s" />
+
+                                <!-- Right 4 Input Paths (Sales Channels) -->
+                                <path class="flow-line" d="M400 40 C 310 40, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 113 C 310 113, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 186 C 310 186, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 260 C 310 260, 290 150, 230 150" />
+
+                                <!-- Right Pulse Animation -->
+                                <path class="flow-pulse" d="M400 40 C 310 40, 290 150, 230 150" style="animation-delay:.2s" />
+                                <path class="flow-pulse" d="M400 113 C 310 113, 290 150, 230 150" style="animation-delay:.6s" />
+                                <path class="flow-pulse" d="M400 186 C 310 186, 290 150, 230 150" style="animation-delay:1.0s" />
+                                <path class="flow-pulse" d="M400 260 C 310 260, 290 150, 230 150" style="animation-delay:1.4s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
+                                <circle class="ring-pulse" cx="230" cy="150" r="45" fill="none" stroke="#00555c" stroke-width="1.5" />
                             </svg>
 
-                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
+                            <!-- Left: 4 Messaging Channel Logos -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
 
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
+                            <!-- Right: 4 Sales Channel Logos -->
+                            <div class="node-circle small" style="left:87%; top:13.3%;"><img src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
+                            <div class="node-circle small" style="left:87%; top:37.6%;"><img src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
+                            <div class="node-circle small" style="left:87%; top:62.1%;"><img src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
+                            <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
 
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            <!-- Center Node: Dorja Icon -->
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
-                            </h3>
-                            Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other
-                            connected sales channels through a single dashboard. Process, fulfill, and track every order
-                            from one centralized platform.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Omnichannel Messaging &amp; Sales Channels</h3>
+                            Handle customer inquiries from WhatsApp, Facebook, Instagram, and Live Chat while managing orders from your Website, Landing Pages, WooCommerce, and Daraz in one unified dashboard.
                         </div>
                     </div>
 
@@ -1807,11 +1882,11 @@
                         <div id="demo-glider" class="absolute bg-[#00555C] rounded-full pointer-events-none z-0 shadow-sm" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
 
                         <button type="button" role="tab" onclick="filterDemos(1, this)"
-                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-white">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm whitespace-nowrap transition-colors duration-200 text-white">
                             Landing Page Template
                         </button>
                         <button type="button" role="tab" onclick="filterDemos(2, this)"
-                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm whitespace-nowrap transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
                             E-Commerce Template
                         </button>
                     </div>
@@ -1819,11 +1894,26 @@
 
                 <!-- Templates Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch" id="demo-grid">
+                    @php $ecomThemeIdx = 0; @endphp
                     @forelse($displayDemos as $demo)
+                        @php
+                            $demoHref = $demo->link ?? '#';
+                            if ((int) ($demo->type ?? 0) === 2 && $demoHref !== '#') {
+                                $ecomThemeIdx++;
+                                $themeNum = preg_match('/Theme\s*(\d+)/i', $demo->title ?? '', $m) ? (int) $m[1] : $ecomThemeIdx;
+                                $parsed = parse_url($demoHref);
+                                if (!empty($parsed['scheme']) && !empty($parsed['host'])) {
+                                    $port = !empty($parsed['port']) ? ':' . $parsed['port'] : '';
+                                    $demoHref = $parsed['scheme'] . '://' . $parsed['host'] . $port . '/?preview_theme=' . $themeNum;
+                                } else {
+                                    $demoHref = '/?preview_theme=' . $themeNum;
+                                }
+                            }
+                        @endphp
                         <div class="demo-card group overflow-hidden flex flex-col h-full"
                             data-type="{{ $demo->type }}">
                             <!-- Image Frame with Padding & Rounded Corners matching redesign -->
-                            <a href="{{ $demo->link ?? '#' }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
+                            <a href="{{ $demoHref }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
                                 <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
                                     alt="{{ $demo->title ?? 'Theme Preview' }}"
                                     loading="lazy"
@@ -1837,7 +1927,7 @@
                                     </h3>
                                     <span class="text-xs text-[#6F8789] font-medium">Interactive Demo</span>
                                 </div>
-                                <a href="{{ $demo->link ?? '#' }}" target="_blank"
+                                <a href="{{ $demoHref }}" target="_blank"
                                     class="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-sm transition shadow-sm hover:shadow whitespace-nowrap">
                                     <span>Live Preview</span>
                                     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -1944,7 +2034,7 @@
                             <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                                 @foreach ($row['data'] as $item)
                                     <span
-                                        class="px-10 py-4 rounded-full font-bold whitespace-nowrap text-xl shadow-sm border" style="color: #C6DDDA; border-color: #234B4D; background: transparent;">
+                                        class="px-5 py-2.5 md:px-10 md:py-4 rounded-full font-bold whitespace-nowrap text-sm md:text-xl shadow-sm border" style="color: #C6DDDA; border-color: #234B4D; background: transparent;">
                                         {{ $item }}
                                     </span>
                                 @endforeach
@@ -1966,7 +2056,7 @@
                     🚀 Business Made Simple
                 </span>
 
-                <h2 class="text-3xl md:text-5xl font-extrabold text-[#0A1F22] tracking-tight max-w-4xl whitespace-nowrap">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-[#0A1F22] tracking-tight max-w-4xl md:whitespace-nowrap">
                     Ready to Grow Your Business?
                 </h2>
 
@@ -2014,7 +2104,7 @@
     </section>
 
     @if ($pricingPlans->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="pricing">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="pricing">
             <div class="container mx-auto max-w-[1240px]">
 
                 <div class="text-center mb-10">
@@ -2036,14 +2126,14 @@
                         <div id="pricing-glider" class="absolute bg-[#00555C] rounded-full shadow-sm pointer-events-none z-0" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
 
                         <button type="button" id="home-monthly-btn" onclick="switchHomePricingCycle('monthly')"
-                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-white cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm whitespace-nowrap font-semibold transition-colors duration-200 text-white cursor-pointer">
                             Monthly Billing
                         </button>
                         <button type="button" id="home-yearly-btn" onclick="switchHomePricingCycle('yearly')"
-                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] flex items-center gap-2 cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm whitespace-nowrap font-semibold transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] flex items-center gap-1.5 sm:gap-2 cursor-pointer">
                             <span>Yearly Billing</span>
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-[#7CE0C3] text-[#00555C] shadow-sm">
+                                class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] whitespace-nowrap font-extrabold bg-[#7CE0C3] text-[#00555C] shadow-sm">
                                 Save 20%
                             </span>
                         </button>
@@ -2240,7 +2330,7 @@
         </section>
     @endif
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
-    @if ($whyChooseUs->isNotEmpty())
+    {{-- @if ($whyChooseUs->isNotEmpty())
         <section class="py-20 px-4 md:px-10 relative">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-20">
@@ -2303,11 +2393,11 @@
                 </div>
             </div>
         </section>
-    @endif
+    @endif --}}
 
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="blog-section">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="blog-section">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
@@ -2367,7 +2457,7 @@
     @endif
     <!-- Review SECTION -->
     @if ($allReviews->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="reviews-section">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="reviews-section">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-16">
                     <span
@@ -2417,7 +2507,7 @@
             </div>
         </section>
     @endif
-    <section class="py-20 px-4 md:px-10 relative" id="faq-section">
+    <section class="py-8 md:py-14 px-4 md:px-10 relative" id="faq-section">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
