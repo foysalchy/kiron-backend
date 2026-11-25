@@ -973,24 +973,24 @@
     <section id="top" class="hero-bg relative pt-8 md:pt-36 pb-10 md:pb-20 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
             <!-- Top Pill Badge -->
-            <div class="inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+            <div class="hero-reveal inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                 <i class="w-2.5 h-2.5 rounded-full bg-[#00A08A] pulse"></i>
                 <span>All-in-One Business Management & ERP</span>
             </div>
 
             <!-- Display H1 (EduManager Scale & Dual Brand Colors - Clean 2-Line Layout) -->
-            <h1 class="hero-display-heading max-w-5xl mx-auto">
+            <h1 class="hero-reveal hero-display-heading max-w-5xl mx-auto" style="transition-delay: 100ms;">
                 <span class="block lg:whitespace-nowrap">Launch Your Complete eCommerce</span>
                 <span class="hero-gradient-text block">Business in Minutes.</span>
             </h1>
 
             <!-- Subtitle Description -->
-            <p class="text-base sm:text-lg lg:text-xl text-[#4B6366] max-w-3xl mx-auto mt-6 leading-relaxed">
+            <p class="hero-reveal text-base sm:text-lg lg:text-xl text-[#4B6366] max-w-3xl mx-auto mt-6 leading-relaxed" style="transition-delay: 200ms;">
                 Dorja is the complete cloud ERP & POS platform for retail, wholesale, eCommerce and multi-branch businesses. Manage sales, inventory, accounting and delivery seamlessly.
             </p>
 
             <!-- Dual Action CTAs -->
-            <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <div class="hero-reveal mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5" style="transition-delay: 300ms;">
                 <a href="https://app.dorja.io/register"
                     class="inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-all duration-200 active:scale-[0.98] bg-[#00555C] text-white hover:bg-[#003A3F] h-[52px] px-8 text-[17px] shadow-[0_12px_30px_-6px_rgba(0,85,92,0.45)]">
                     <span>Start Free Trial</span>
@@ -1003,7 +1003,7 @@
             </div>
 
             <!-- 3-point Checklist Row -->
-            <ul class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[15px] sm:text-[16px] text-[#2C4346] font-medium">
+            <ul class="hero-reveal mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[15px] sm:text-[16px] text-[#2C4346] font-medium" style="transition-delay: 400ms;">
                 <li class="inline-flex items-center gap-2">
                     <span class="w-5 h-5 rounded-full bg-[#00555C] text-white grid place-items-center text-[12px] font-bold">✓</span>
                     <span>Setup in minutes, start free</span>
@@ -1025,11 +1025,11 @@
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
             <!-- Section Badge & Title -->
             <div class="text-center mb-6 md:mb-8">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Interactive Product Tour
                 </span>
-                <h2 class="move-up text-2xl md:text-4xl font-extrabold text-[#0A1F22]" data-speed="0.05">
+                <h2 class="hero-reveal text-2xl md:text-4xl font-extrabold text-[#0A1F22]" style="transition-delay: 100ms;">
                     Explore How Your Daily Operations Work
                 </h2>
             </div>
@@ -1131,12 +1131,12 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                    class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     All-in-One Solution
                 </span>
 
-                <h2 class="move-up text-2xl md:text-4xl font-extrabold text-[#0A1F22] mb-4" data-speed="0.05">
+                <h2 class="hero-reveal text-2xl md:text-4xl font-extrabold text-[#0A1F22] mb-4" style="transition-delay: 100ms;">
                     From Start to Growth — Everything in One System
                 </h2>
 
@@ -1158,8 +1158,8 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center relative z-10">
 
                     <!-- Left Content -->
-                    <div class="lg:col-span-5 relative flex flex-col justify-between min-h-[480px]">
-                        <div class="div space-y-4 h-[700px] overflow-y-auto">
+                    <div class="lg:col-span-5 relative flex flex-col justify-between lg:min-h-[480px]">
+                        <div>
                             <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-[#0A1F22] mb-5 relative z-10"></h3>
 
                             <p id="sol-desc" class="text-[#4B6366] text-base md:text-lg leading-relaxed mb-8 max-w-md relative z-10"></p>
@@ -1219,11 +1219,11 @@
 
             <!-- Section Header -->
             <div class="text-center mb-12">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Smart Integration
                 </span>
-                <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
+                <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight" style="transition-delay: 100ms;">
                     Track and automate your entire business
                 </h2>
                 <p class="text-base md:text-lg text-[#4B6366] max-w-2xl mx-auto">
@@ -1236,7 +1236,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
                     <!-- Left Card: Professional online store -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
                         <div class="relative bg-gradient-to-br from-[#EEF2FF]/80 via-[#F5F8FF]/70 to-[#E6F4F1]/80 p-5 md:p-7 min-h-[300px] sm:min-h-[330px] flex items-center justify-center overflow-hidden">
                             <!-- Mini Interactive Product Details Browser Window -->
                             <div class="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-gray-200/80 shadow-lg overflow-hidden relative z-10">
@@ -1336,7 +1336,7 @@
                     </script>
 
                     <!-- Right Card: Accurate ad tracking -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
                         <div class="relative bg-gradient-to-br from-[#F0F4FF]/80 via-[#F7F9FC]/70 to-[#E6F4F1]/80 p-5 md:p-6 min-h-[300px] sm:min-h-[330px] flex flex-col justify-center gap-3">
                             <!-- Top Row: Live Events + ROAS -->
                             <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px;">
@@ -1393,7 +1393,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     <!-- নতুন কার্ড: Smart Order & Inventory Management -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-gradient-to-br from-[#E6F4F1]/80 via-[#F4F9F8]/70 to-[#EEF2FF]/80 p-4 md:p-6 min-h-[260px] flex flex-col justify-center gap-3">
                             <!-- Order Pipeline Card -->
                             <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-3.5 space-y-2.5">
@@ -1435,7 +1435,7 @@
                     </div>
 
                     <!-- গ্রাফ ১: পেমেন্ট ও কুরিয়ার মেথড (বামে Payment, মাঝে Dorja, ডানে Courier) -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
                                 <!-- Left 4 Input Paths (Payment) -->
@@ -1489,7 +1489,7 @@
                         </div>
                     </div>
                     <!-- গ্রাফ ২: ওমনিচ্যানেল মেসেজিং ও সেলস চ্যানেল (বামে Messaging, মাঝে Dorja, ডানে Sales Channels) -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-white/40 p-4 md:p-6">
                             <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
                                 <!-- Left 4 Input Paths (Messaging) -->
@@ -1769,11 +1769,11 @@
             <div class="container mx-auto max-w-[1240px]">
                 <!-- Section Header -->
                 <div class="text-center mb-14">
-                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                    <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                         <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Features
                     </span>
-                    <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
+                    <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight" style="transition-delay: 100ms;">
                         Everything you need for your business <br class="hidden md:block" />
                         now in one place
                     </h2>
@@ -1781,39 +1781,41 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach ($topFeatures as $feature)
-                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                            class="glass flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
+                        <div class="hero-reveal" style="transition-delay: {{ ($loop->index % 4) * 80 }}ms;">
+                            <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                                class="glass shine flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
 
-                            <!-- Left Icon -->
-                            <div class="flex-shrink-0">
-                                <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
-                                    @if ($feature->image_url)
-                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
-                                            alt="{{ $feature->title }}" />
-                                    @else
-                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Right Content -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between gap-2 mb-1">
-                                    <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
-                                        {{ $feature->title }}
-                                    </span>
-                                    <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
-                                        {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
-                                    </span>
+                                <!-- Left Icon -->
+                                <div class="flex-shrink-0">
+                                    <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
+                                        @if ($feature->image_url)
+                                            <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
+                                                alt="{{ $feature->title }}" />
+                                        @else
+                                            <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
+                                        @endif
+                                    </div>
                                 </div>
 
-                                <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
-                                    <span>Read More</span>
-                                    <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                                </span>
-                            </div>
+                                <!-- Right Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                        <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
+                                            {{ $feature->title }}
+                                        </span>
+                                        <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
+                                            {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    </div>
 
-                        </a>
+                                    <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
+                                        <span>Read More</span>
+                                        <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                    </span>
+                                </div>
+
+                            </a>
+                        </div>
                     @endforeach
                 </div>
 
@@ -1855,7 +1857,7 @@
                 backdrop-filter: blur(8px);
                 border: 1px solid rgba(255, 255, 255, 0.9);
                 box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
                 cursor: pointer;
             }
             .demo-card:hover {
@@ -1901,11 +1903,11 @@
                 <!-- Header with Redesign Alignment (Title on Left, Pill Tabs on Right) -->
                 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
                     <div class="max-w-2xl">
-                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                        <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                             <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                             Demo &amp; Template
                         </span>
-                        <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                        <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight" style="transition-delay: 100ms;">
                             Get a complete system live experience on one platform
                         </h2>
                     </div>
@@ -1944,8 +1946,8 @@
                                 }
                             }
                         @endphp
-                        <div class="demo-card group overflow-hidden flex flex-col h-full"
-                            data-type="{{ $demo->type }}">
+                        <div class="hero-reveal demo-card group overflow-hidden flex flex-col h-full"
+                            data-type="{{ $demo->type }}" style="transition-delay: {{ ($loop->index % 3) * 100 }}ms;">
                             <!-- Image Frame with Padding & Rounded Corners matching redesign -->
                             <a href="{{ $demoHref }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
                                 <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
@@ -2084,7 +2086,7 @@
     <!-- ============ READY TO GROW ============ -->
     <section class="py-16 px-4 md:px-10 relative">
         <div class="container mx-auto max-w-[1240px]">
-            <div class="glass border border-white/85 rounded-[32px] p-8 md:p-16 flex flex-col items-center text-center gap-6 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)]">
+            <div class="glass shine border border-white/85 rounded-[32px] p-8 md:p-16 flex flex-col items-center text-center gap-6 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)]">
 
                 <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#7CE0C3]/35 text-[#00555C] font-semibold text-sm">
                     🚀 Business Made Simple
@@ -2143,11 +2145,11 @@
 
                 <div class="text-center mb-10">
                     <span
-                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                        class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                         <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Choose Best Plan for Your Business
                     </span>
-                    <h2 class="move-up text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-6" data-speed="0.05">
+                    <h2 class="hero-reveal text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-6" style="transition-delay: 100ms;">
                         Here are the best packages for your business below.
                     </h2>
                 </div>
@@ -2211,6 +2213,7 @@
                         @endphp
 
                         <!-- Card Container -->
+                        <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 4) * 100 }}ms;">
                         <div class="{{ $mode === 'popular' ? 'rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative text-white shadow-2xl border border-white/20' : 'glass rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative shadow-sm hover:shadow-xl' }}"
                             @if ($mode === 'popular') style="background-color: #1c696f !important;" @endif>
 
@@ -2350,6 +2353,7 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
                     @endforeach
 
                 </div>
@@ -2369,12 +2373,11 @@
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-20">
                     <span
-                        class="inline-block px-5 py-1.5 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
+                        class="hero-reveal inline-block px-5 py-1.5 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6" style="transition-delay: 0ms;">
                         Why Businesses Choose Dorja.io
                     </span>
 
-                    <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
-                        data-speed="0.05">
+                    <h2 class="hero-reveal text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" style="transition-delay: 100ms;">
                         From Operations to Growth — Everything in One System
                     </h2>
                 </div>
@@ -2434,7 +2437,7 @@
         <section class="py-8 md:py-14 px-4 md:px-10 relative" id="blog-section">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
-                    <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
+                    <h2 class="hero-reveal text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
                         class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
                         <span>View All</span>
@@ -2444,8 +2447,9 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach ($blogs as $blog)
+                        <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 3) * 100 }}ms;">
                         <a href="{{ route('saas.blog.details', $blog->slug) }}"
-                            class="glass border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                            class="glass shine border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
                             <div class="group block overflow-hidden rounded-xl">
                                 <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
@@ -2484,6 +2488,7 @@
                                 </div>
                             </div>
                         </a>
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -2495,10 +2500,10 @@
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
+                        class="hero-reveal inline-block px-5 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6" style="transition-delay: 0ms;">
                         Customer Reviews
                     </span>
-                    <h2 class="move-up text-3xl md:text-5xl font-black text-gray-900" data-speed="0.05">
+                    <h2 class="hero-reveal text-3xl md:text-5xl font-black text-gray-900" style="transition-delay: 100ms;">
                         What our customers say
                     </h2>
                 </div>
@@ -2509,7 +2514,7 @@
                         <div
                             class="review-card break-inside-avoid bg-white border border-white/80 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
-                                <div class="div space-y-4 h-[700px] overflow-y-auto">
+                                <div>
                                     <h3 class="text-[#00555c] font-bold text-lg">
                                         @ {{ $review->name }}
                                     </h3>
@@ -2546,13 +2551,12 @@
 
             <!-- Header -->
             <div class="text-center mb-10">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Frequently Asked Questions
                 </span>
 
-                <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
-                    data-speed="0.05">
+                <h2 class="hero-reveal text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" style="transition-delay: 100ms;">
                     Better Understanding of Dorja.io and its Features
                 </h2>
 
@@ -2605,7 +2609,7 @@
 
 
 
-            <div class="rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl" style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
+            <div class="hero-reveal rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl" style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
 
                 <h3 class="text-3xl md:text-4xl font-bold">
                     Start Managing Your Business Smarter Today
