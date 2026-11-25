@@ -41,8 +41,8 @@
         <div class="container mx-auto max-w-[1240px]">
 
             <div class="text-center mb-8 md:mb-10">
-                <h1 class="move-up text-2xl sm:text-3xl md:text-5xl font-black text-[#0A1F22] mb-3 md:mb-4 tracking-tight">Choose the Right Plan</h1>
-                <p class="text-[#425B5F] text-sm sm:text-base md:text-lg">The best packages for your business are listed below.</p>
+                <h1 class="hero-reveal text-2xl sm:text-3xl md:text-5xl font-black text-[#0A1F22] mb-3 md:mb-4 tracking-tight">Choose the Right Plan</h1>
+                <p class="hero-reveal text-[#425B5F] text-sm sm:text-base md:text-lg" style="transition-delay: 100ms;">The best packages for your business are listed below.</p>
             </div>
 
             <!-- Billing Cycle Toggle Switch -->
@@ -104,6 +104,7 @@
                     @endphp
 
                     <!-- Card Container -->
+                    <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 4) * 100 }}ms;">
                     <div class="{{ $mode === 'popular' ? 'rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative text-white shadow-2xl border border-white/20' : 'glass rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative shadow-sm hover:shadow-xl' }}"
                         @if ($mode === 'popular') style="background-color: #1c696f !important;" @endif>
 
@@ -242,12 +243,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 @endforeach
 
             </div>
             <!-- Corporate / Custom Plan CTA Card -->
 <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-10">
-    <div class="relative rounded-3xl p-10 md:p-14 text-white border border-[#00555c]/40 shadow-2xl overflow-hidden"
+    <div class="hero-reveal relative rounded-3xl p-10 md:p-14 text-white border border-[#00555c]/40 shadow-2xl overflow-hidden"
         style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
 
         <div class="relative flex flex-col lg:flex-row items-center justify-between gap-6">

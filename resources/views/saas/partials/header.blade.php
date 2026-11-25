@@ -70,6 +70,7 @@
             </button>
         </div>
     </div>
+</header>
 
     <!-- MOBILE MENU SIDEBAR (Hidden by default) -->
     <div id="mobile-menu" class="fixed inset-0 z-[60] lg:hidden translate-x-full pointer-events-auto">
@@ -77,7 +78,7 @@
         <div id="menu-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
         <!-- Sidebar Content -->
-        <div class="absolute right-0 top-0 h-full w-[280px] shadow-2xl p-6" style="background-color: #EEF5F3;">
+        <div class="absolute right-0 top-0 h-full w-[280px] shadow-2xl p-6" style="background-color: #ffffff;">
             <div class="flex items-center justify-between mb-8">
                 <span class="font-bold text-xl">Menu</span>
                 <button id="menu-close" class="text-gray-700 text-2xl" aria-label="sidebar menu">
@@ -187,4 +188,3 @@
             });
         });
     </script>
-</header>

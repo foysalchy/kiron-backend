@@ -102,7 +102,7 @@
           </div>
 
           <button type="submit"
-            class="w-full bg-[#00555c] text-white font-black py-5 rounded-md shadow-xl shadow-[#00555c]/20 hover:bg-[#2c8a71] hover:-translate-y-1 transition-all uppercase tracking-[0.2em] text-sm cursor-pointer">
+            class="w-full bg-[#00555c] text-white font-black py-5 rounded-full shadow-xl shadow-[#00555c]/20 hover:bg-[#2c8a71] hover:-translate-y-1 transition-all uppercase tracking-[0.2em] text-[17px] cursor-pointer">
             Submit
           </button>
         </form>

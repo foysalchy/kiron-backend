@@ -23,20 +23,20 @@
 <section class="hero-bg relative pt-28 md:pt-36 pb-12 md:pb-20 overflow-hidden">
     <div class="container mx-auto px-4 md:px-10 relative z-10 max-w-7xl">
         <div class="text-center max-w-3xl mx-auto mb-12">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#13565e]/10 border border-[#13565e]/20 text-[#00555c] font-bold text-sm mb-6 shadow-sm">
+            <div class="hero-reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#13565e]/10 border border-[#13565e]/20 text-[#00555c] font-bold text-sm mb-6 shadow-sm" style="transition-delay: 0ms;">
                 <i class="fa-solid fa-handshake-angle text-[#078e9a]"></i> Official Dorja Partner & Affiliate Program
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-6">
+            <h1 class="hero-reveal text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-[1.15] mb-6" style="transition-delay: 100ms;">
                 Grow Your Income with <br class="hidden sm:inline">
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00555c] via-[#078e9a] to-emerald-600">
                     Up to 35% Commission
                 </span>
             </h1>
-            <p class="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
+            <p class="hero-reveal text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8" style="transition-delay: 200ms;">
                 Partner with Bangladesh's leading cloud-based POS, ERP, Inventory & Ecommerce platform. Refer businesses, give them exclusive discounts, and earn monthly recurring revenue with milestone rank bonuses.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div class="hero-reveal flex flex-col sm:flex-row items-center justify-center gap-4" style="transition-delay: 300ms;">
                 <a href="{{ route('partner.register') }}"
                     class="w-full sm:w-auto bg-[#00555c] hover:bg-[#078e9a] text-white px-8 py-4 rounded-full font-bold text-lg transition duration-200 shadow-lg shadow-[#00555c]/25 flex items-center justify-center gap-2">
                     <span>Become a Partner</span>
@@ -99,14 +99,14 @@
 <section class="py-14 md:py-20">
     <div class="container mx-auto px-4 md:px-10 max-w-7xl">
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">How the Program Works</h2>
+            <h2 class="hero-reveal text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">How the Program Works</h2>
             <div class="w-16 h-1.5 bg-[#00555c] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-600 font-medium text-lg">Start earning in 3 simple steps without any upfront fee or complex approval.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             <!-- Step 1 -->
-            <div class="relative glass rounded-3xl border border-white/80 p-8 shadow-sm lift transition duration-200">
+            <div class="hero-reveal relative glass shine rounded-3xl border border-white/80 p-8 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-[#00555c] text-white flex items-center justify-center text-xl font-bold mb-6 shadow-md shadow-[#00555c]/20">
                     1
                 </div>
@@ -120,7 +120,7 @@
             </div>
 
             <!-- Step 2 -->
-            <div class="relative glass rounded-3xl border border-white/80 p-8 shadow-sm lift transition duration-200">
+            <div class="hero-reveal relative glass shine rounded-3xl border border-white/80 p-8 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-[#078e9a] text-white flex items-center justify-center text-xl font-bold mb-6 shadow-md shadow-[#078e9a]/20">
                     2
                 </div>
@@ -134,7 +134,7 @@
             </div>
 
             <!-- Step 3 -->
-            <div class="relative glass rounded-3xl border border-white/80 p-8 shadow-sm lift transition duration-200">
+            <div class="hero-reveal relative glass shine rounded-3xl border border-white/80 p-8 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl font-bold mb-6 shadow-md shadow-emerald-600/20">
                     3
                 </div>
@@ -154,7 +154,7 @@
 <section class="py-14 md:py-20">
     <div class="container mx-auto px-4 md:px-10 max-w-7xl">
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Partner Categories & Earning Rates</h2>
+            <h2 class="hero-reveal text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Partner Categories & Earning Rates</h2>
             <div class="w-16 h-1.5 bg-[#00555c] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-600 font-medium text-lg">We offer tailored partner groups for standard affiliates, accounting consultants, and sales professionals.</p>
         </div>
@@ -162,7 +162,7 @@
         @if(isset($groups) && count($groups) > 0)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach($groups as $grp)
-            <div class="glass rounded-3xl border border-white/80 p-8 flex flex-col justify-between shadow-sm lift transition-all duration-200 relative overflow-hidden">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-8 flex flex-col justify-between shadow-sm lift relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-teal-500/10 to-transparent rounded-bl-full pointer-events-none"></div>
 
                 <div>
@@ -208,7 +208,7 @@
         @else
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Default Fallback Cards if DB empty -->
-            <div class="glass rounded-3xl border border-white/80 p-8 shadow-sm lift transition-all">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-8 shadow-sm lift">
                 <h3 class="text-xl font-bold text-gray-900 mb-2">Standard Affiliate</h3>
                 <div class="text-4xl font-extrabold text-[#00555c] mb-2">20% <span class="text-sm font-medium text-gray-500">Base</span></div>
                 <p class="text-sm text-gray-600 mb-6">For influencers, bloggers, and tech content creators.</p>
@@ -233,7 +233,7 @@
                 <a href="{{ route('partner.register') }}" class="block text-center bg-[#00555c] hover:bg-[#078e9a] text-white py-3.5 rounded-full font-bold text-base shadow-md">Join as Consultant</a>
             </div>
 
-            <div class="glass rounded-3xl border border-white/80 p-8 shadow-sm lift transition-all">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-8 shadow-sm lift">
                 <h3 class="text-xl font-bold text-gray-900 mb-2">Agency & Sales Team</h3>
                 <div class="text-4xl font-extrabold text-[#00555c] mb-2">15% - 35%</div>
                 <p class="text-sm text-gray-600 mb-6">For digital agencies, ERP integrators & field marketing teams.</p>
@@ -253,13 +253,13 @@
 <section class="py-14 md:py-20">
     <div class="container mx-auto px-4 md:px-10 max-w-7xl">
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Everything You Need to Succeed</h2>
+            <h2 class="hero-reveal text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Everything You Need to Succeed</h2>
             <div class="w-16 h-1.5 bg-[#00555c] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-600 font-medium text-lg">We provide world-class software, high conversion rates, and partner support so you can maximize revenue.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-teal-100 text-[#00555c] flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
@@ -269,7 +269,7 @@
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-gift"></i>
                 </div>
@@ -279,7 +279,7 @@
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
@@ -289,7 +289,7 @@
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                 </div>
@@ -299,7 +299,7 @@
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-bullhorn"></i>
                 </div>
@@ -309,7 +309,7 @@
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl border border-white/80 shadow-sm lift transition">
+            <div class="hero-reveal glass shine p-6 rounded-3xl border border-white/80 shadow-sm lift">
                 <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-4">
                     <i class="fa-solid fa-headset"></i>
                 </div>
@@ -326,34 +326,34 @@
 <section class="py-14 md:py-20">
     <div class="container mx-auto px-4 md:px-10 max-w-4xl">
         <div class="text-center mb-14">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Frequently Asked Questions</h2>
+            <h2 class="hero-reveal text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Frequently Asked Questions</h2>
             <div class="w-16 h-1.5 bg-[#00555c] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-600 font-medium">Everything you need to know about joining and earning as a partner.</p>
         </div>
 
         <div class="space-y-4">
-            <div class="glass rounded-3xl border border-white/80 p-6 shadow-sm lift">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-6 shadow-sm lift">
                 <h4 class="text-base font-bold text-gray-900 mb-2">Is there any fee or cost to join the Dorja Partner Program?</h4>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     No, the partner program is 100% free to join. You can register in under 1 minute and start sharing your link immediately.
                 </p>
             </div>
 
-            <div class="glass rounded-3xl border border-white/80 p-6 shadow-sm lift">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-6 shadow-sm lift">
                 <h4 class="text-base font-bold text-gray-900 mb-2">How does referral tracking work?</h4>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     When someone clicks your referral link, a secure 30-day tracking cookie is placed on their browser. If they register or subscribe at any point within 30 days, you will receive full credit and commission for the sale.
                 </p>
             </div>
 
-            <div class="glass rounded-3xl border border-white/80 p-6 shadow-sm lift">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-6 shadow-sm lift">
                 <h4 class="text-base font-bold text-gray-900 mb-2">How and when do I receive payouts?</h4>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     Whenever your wallet reaches the minimum payout threshold, you can submit a withdrawal request directly from your Partner Portal. Payouts are processed via bKash, Nagad, or Bank Transfer within 2 to 3 business days.
                 </p>
             </div>
 
-            <div class="glass rounded-3xl border border-white/80 p-6 shadow-sm lift">
+            <div class="hero-reveal glass shine rounded-3xl border border-white/80 p-6 shadow-sm lift">
                 <h4 class="text-base font-bold text-gray-900 mb-2">Do my referred buyers get a discount?</h4>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     Yes! Depending on your partner group, your referred clients receive an instant 5% to 10% discount on their subscription plans, making it very attractive for them to register through your link.
@@ -367,7 +367,7 @@
 <section class="py-16 md:py-20 text-white text-center relative overflow-hidden"
     style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
     <div class="container mx-auto px-4 md:px-10 max-w-4xl relative z-10">
-        <h2 class="text-3xl md:text-5xl font-black mb-4 tracking-tight">Ready to Become a Dorja Partner?</h2>
+        <h2 class="hero-reveal text-3xl md:text-5xl font-black mb-4 tracking-tight">Ready to Become a Dorja Partner?</h2>
         <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-8">
             Join hundreds of consultants, content creators, and agencies already earning recurring monthly commissions.
         </p>

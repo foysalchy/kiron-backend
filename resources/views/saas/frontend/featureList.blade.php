@@ -50,39 +50,41 @@
         <div class="container mx-auto max-w-[1240px]">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($allFeatures as $feature)
-                    <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                        class="glass flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
+                    <div class="hero-reveal" style="transition-delay: {{ ($loop->index % 4) * 80 }}ms;">
+                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                            class="glass shine flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
 
-                        <!-- Left Icon -->
-                        <div class="flex-shrink-0">
-                            <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
-                                @if ($feature->image_url)
-                                    <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
-                                        alt="{{ $feature->title }}" />
-                                @else
-                                    <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Right Content -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between gap-2 mb-1">
-                                <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
-                                    {{ $feature->title }}
-                                </span>
-                                <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
-                                    {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
-                                </span>
+                            <!-- Left Icon -->
+                            <div class="flex-shrink-0">
+                                <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
+                                    @if ($feature->image_url)
+                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
+                                            alt="{{ $feature->title }}" />
+                                    @else
+                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
+                                    @endif
+                                </div>
                             </div>
 
-                            <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
-                                <span>Read More</span>
-                                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                            </span>
-                        </div>
+                            <!-- Right Content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
+                                        {{ $feature->title }}
+                                    </span>
+                                    <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
+                                        {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </div>
 
-                    </a>
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
+                                    <span>Read More</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
+
+                        </a>
+                    </div>
                 @endforeach
             </div>
 

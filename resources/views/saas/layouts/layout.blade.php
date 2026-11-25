@@ -92,6 +92,37 @@
             border: 1px solid rgba(255, 255, 255, 0.85);
             box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 18px 40px -24px rgba(0, 58, 63, 0.35);
         }
+
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%);
+            transform: translateX(-130%);
+            transition: transform 1.8s ease;
+            pointer-events: none;
+        }
+
+        .shine:hover::after {
+            transform: translateX(130%);
+        }
+
+        .hero-reveal {
+            opacity: 0;
+            transform: translateY(48px);
+            transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+
+        .hero-reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -145,6 +176,24 @@
         }, { passive: true });
 
         document.addEventListener('DOMContentLoaded', () => {
+            const revealItems = document.querySelectorAll('.hero-reveal');
+            if (revealItems.length) {
+                if ('IntersectionObserver' in window) {
+                    const revealObserver = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                            } else {
+                                entry.target.classList.remove('is-visible');
+                            }
+                        });
+                    }, { threshold: 0.08 });
+                    revealItems.forEach((el) => revealObserver.observe(el));
+                } else {
+                    revealItems.forEach((el) => el.classList.add('is-visible'));
+                }
+            }
+
             window.lenisReady.then((lenis) => {
                 lenis.on('scroll', () => {
                     const vh = window.innerHeight;
