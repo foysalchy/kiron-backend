@@ -111,7 +111,8 @@ class IndexController extends Controller
 
         // ১০. এফএকিউ ক্যাশ
         $faqs = Cache::remember('saas_home_faqs', $this->ttl, function () {
-            return KnowledgeBase::where('status', 1)
+            return KnowledgeBase::withoutGlobalScope('company')
+                ->where('status', 1)
                 ->whereNull('company_id')
                 ->orderBy('id', 'asc')
                 ->get();
@@ -140,7 +141,7 @@ class IndexController extends Controller
         $allFeatures = Cache::remember("saas_features_page_{$page}", $this->ttl, function () {
             return MasterFeature::where('status', Status::Active->value)
                 ->where('placement', 1)
-                ->select('id', 'slug', 'title', 'icon')
+                ->select('id', 'slug', 'title', 'icon', 'image')
                 ->paginate(40);
         });
 
@@ -206,7 +207,8 @@ class IndexController extends Controller
     public function faqList()
     {
         $faqs = Cache::remember('saas_faqs_list', $this->ttl, function () {
-            return KnowledgeBase::where('status', Status::Active->value)
+            return KnowledgeBase::withoutGlobalScope('company')
+                ->where('status', Status::Active->value)
                 ->whereNull('company_id')
                 ->latest()
                 ->get();

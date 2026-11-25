@@ -1021,8 +1021,19 @@
     </section>
 
     <!-- HERO PREVIEW SHOWCASE SECTION (Separate clean section without grid background) -->
-    <section class="relative pb-6 md:pb-12 overflow-hidden">
+    <section class="relative py-8 md:py-14 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
+            <!-- Section Badge & Title -->
+            <div class="text-center mb-6 md:mb-8">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
+                    Interactive Product Tour
+                </span>
+                <h2 class="move-up text-2xl md:text-4xl font-extrabold text-[#0A1F22]" data-speed="0.05">
+                    Explore How Your Daily Operations Work
+                </h2>
+            </div>
+
             <!-- 3D Perspective Showcase (Exact EduManager Reference) -->
             <div class="relative mt-4 md:mt-8 mx-auto max-w-[1080px] perspective-container">
                 <!-- Glowing blur blob beneath -->
@@ -1036,6 +1047,29 @@
                         <div id="dorjaDemoContainer" class="w-full relative overflow-visible bg-transparent">
                             <iframe id="dorjaDemoIframe" src="{{ asset('dorja-demo.html') }}" class="w-full border-0 block bg-transparent" style="height: 680px;" title="Dorja Interactive Walkthrough" loading="lazy"></iframe>
                         </div>
+                        <script>
+                            (function () {
+                                const iframe = document.getElementById('dorjaDemoIframe');
+                                if (!iframe) return;
+                                const moveCtrlToTop = () => {
+                                    try {
+                                        const doc = iframe.contentDocument || iframe.contentWindow.document;
+                                        const stage = doc && doc.getElementById('stage');
+                                        const wrap = doc && doc.getElementById('wrap');
+                                        const ctrl = doc && doc.querySelector('.ctrl');
+                                        if (stage && wrap && ctrl && ctrl.previousElementSibling !== null) {
+                                            ctrl.style.marginTop = '0';
+                                            ctrl.style.marginBottom = '20px';
+                                            stage.insertBefore(ctrl, wrap);
+                                        }
+                                    } catch (e) {}
+                                };
+                                iframe.addEventListener('load', moveCtrlToTop);
+                                if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                                    moveCtrlToTop();
+                                }
+                            })();
+                        </script>
 
                     </div>
 
@@ -1125,7 +1159,7 @@
 
                     <!-- Left Content -->
                     <div class="lg:col-span-5 relative flex flex-col justify-between min-h-[480px]">
-                        <div>
+                        <div class="div space-y-4 h-[700px] overflow-y-auto">
                             <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-[#0A1F22] mb-5 relative z-10"></h3>
 
                             <p id="sol-desc" class="text-[#4B6366] text-base md:text-lg leading-relaxed mb-8 max-w-md relative z-10"></p>
@@ -1157,7 +1191,7 @@
                                     <span id="solBwUrl" class="font-mono text-[11.5px]">app.dorja.io/dashboard</span>
                                 </div>
                             </div>
-                            <div class="bw-body relative w-full aspect-[16/10.5] min-h-[380px] md:min-h-[480px] bg-[#f6f6f6] overflow-hidden" id="solBwBody">
+                            <div class="bw-body relative w-full aspect-[16/10.5] min-h-[240px] sm:min-h-[300px] md:min-h-[480px] bg-[#f6f6f6] overflow-hidden" id="solBwBody">
                                 <div class="ld absolute inset-0 grid place-items-center text-xs text-[#5d6f75]">Loading preview…</div>
                             </div>
                         </div>
@@ -1171,8 +1205,8 @@
 
                 <!-- Watermark Outline Text — absolute bottom of glass card, clipped by overflow-hidden -->
                 <span id="sol-watermark" aria-hidden="true"
-                    class="absolute left-6 md:left-12 bottom-[28px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
-                    style="font-size: clamp(65px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
+                    class="absolute left-6 md:left-12 bottom-[8px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
+                    style="font-size: clamp(52px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
 
             </div>
 
@@ -1210,9 +1244,9 @@
                                     <span class="w-2 h-2 rounded-full bg-red-400"></span>
                                     <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                    <span class="ml-auto mr-auto text-[10px] text-gray-400 font-mono">yourbrand.com/product/cotton-tee</span>
+                                    <span class="ml-auto mr-auto text-[10px] text-gray-400 font-mono">dorja.io/product/cotton-tee</span>
                                 </div>
-                                <div class="p-4" style="display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: start;">
+                                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
                                     <!-- Product Image & Color Thumbnails -->
                                     <div class="space-y-2">
                                         <div class="bg-gray-50 rounded-xl p-2.5 flex items-center justify-center border border-gray-100" style="height: 118px;">
@@ -1225,15 +1259,15 @@
                                                 <span class="w-3 h-3 rounded-full bg-[#00555C]"></span>
                                             </button>
                                             <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1D4ED8')" class="h-6 rounded-md bg-blue-50 border border-gray-200 hover:border-blue-500 flex items-center justify-center cursor-pointer" title="Royal Blue">
-                                                <span class="w-3 h-3 rounded-full bg-[#1D4ED8]"></span>
+                                                <span class="w-3 h-3 rounded-full" style="background-color: #1D4ED8;"></span>
                                             </button>
                                             <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1F2937')" class="h-6 rounded-md bg-gray-100 border border-gray-200 hover:border-gray-600 flex items-center justify-center cursor-pointer" title="Charcoal">
-                                                <span class="w-3 h-3 rounded-full bg-[#1F2937]"></span>
+                                                <span class="w-3 h-3 rounded-full" style="background-color: #1F2937;"></span>
                                             </button>
                                         </div>
                                     </div>
                                     <!-- Product Details Info -->
-                                    <div class="space-y-2 text-left">
+                                    <div class="space-y-2 text-left min-w-0">
                                         <div class="text-sm font-bold text-[#0A1F22] leading-snug">Premium Cotton Tee</div>
                                         <div class="flex items-center gap-1 text-[10px] text-amber-500 font-semibold">
                                             <span>★★★★★</span>
@@ -1785,7 +1819,7 @@
 
                 <div class="mt-12 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold transition shadow-lg shadow-teal-900/20">
+                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition shadow-lg shadow-teal-900/20">
                         Start Free Trial
                     </a>
                 </div>
@@ -1882,11 +1916,11 @@
                         <div id="demo-glider" class="absolute bg-[#00555C] rounded-full pointer-events-none z-0 shadow-sm" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
 
                         <button type="button" role="tab" onclick="filterDemos(1, this)"
-                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm whitespace-nowrap transition-colors duration-200 text-white">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap transition-colors duration-200 text-white">
                             Landing Page Template
                         </button>
                         <button type="button" role="tab" onclick="filterDemos(2, this)"
-                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm whitespace-nowrap transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
                             E-Commerce Template
                         </button>
                     </div>
@@ -2069,12 +2103,12 @@
                 <!-- Buttons -->
                 <div class="flex flex-wrap gap-3 justify-center mt-2">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-base px-8 py-3.5 rounded-full transition shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-[17px] px-8 py-3.5 rounded-full transition shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>Start Free Trial</span>
                     </a>
 
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#0A1F22] border border-[#BFD6D1] font-semibold text-base px-8 py-3.5 rounded-full transition">
+                        class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#0A1F22] border border-[#BFD6D1] font-semibold text-[17px] px-8 py-3.5 rounded-full transition">
                         <span>View Pricing</span>
                     </a>
                 </div>
@@ -2321,7 +2355,7 @@
                 </div>
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.package.list') }}"
-                        class="group inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="group inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>More Packages</span>
                         <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -2387,7 +2421,7 @@
 
                 <div class="mt-4 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-flex items-center justify-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="btnp inline-flex items-center justify-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>Start Free Trial</span>
                     </a>
                 </div>
@@ -2402,7 +2436,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
-                        class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
+                        class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
                         <span>View All</span>
                         <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -2475,7 +2509,7 @@
                         <div
                             class="review-card break-inside-avoid bg-white border border-white/80 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
-                                <div>
+                                <div class="div space-y-4 h-[700px] overflow-y-auto">
                                     <h3 class="text-[#00555c] font-bold text-lg">
                                         @ {{ $review->name }}
                                     </h3>
@@ -2531,18 +2565,17 @@
 
 
 
-            <div class="div space-y-4 h-[700px] overflow-y-auto">
-                <!-- FAQ List -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
+            <!-- FAQ List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="faq-container">
 
-                    @foreach ($faqs as $faq)
-                        <div class="faq-item glass border border-white/80 rounded-2xl">
+                    @foreach ($faqs as $index => $faq)
+                        <div class="faq-item glass border border-white/80 rounded-2xl {{ $index >= 10 ? 'faq-hidden' : '' }}"
+                             style="{{ $index >= 10 ? 'display:none;' : '' }}">
 
                             <!-- Question -->
                             <button
                                 class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
                                 <span class="faq-question">{{ $faq->title }}</span>
-
                                 <i class="fa-solid fa-plus faq-icon text-[#00555C] text-lg transition-transform duration-200"></i>
                             </button>
 
@@ -2555,7 +2588,14 @@
                     @endforeach
 
                 </div>
-            </div>
+
+                <!-- Load More Button -->
+                <div class="text-center mt-8" id="faq-load-more-wrap">
+                    <button id="faq-load-more"
+                        class="px-8 py-3.5 rounded-full font-bold text-[17px] border-2 text-[#00555C] border-[#00555C] hover:bg-[#00555C] hover:text-white transition-all duration-300">
+                        Load More
+                    </button>
+                </div>
         </div>
     </section>
     <section class="py-10 px-4 md:px-10">
@@ -2579,12 +2619,12 @@
                 <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
 
                     <a href="https://app.dorja.io/register"
-                        class="bg-white text-[#00555c] font-bold px-8 py-3.5 rounded-xl hover:bg-gray-100 transition shadow-md">
+                        class="bg-white text-[#00555c] font-bold text-[17px] px-8 py-3.5 rounded-full hover:bg-gray-100 transition shadow-md">
                         Start Free Trial
                     </a>
 
                     <a href="{{ route('saas.package.list') }}"
-                        class="border border-white/80 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-white hover:text-[#00555c] transition">
+                        class="border border-white/80 text-white font-semibold text-[17px] px-8 py-3.5 rounded-full hover:bg-white hover:text-[#00555c] transition">
                         View Pricing
                     </a>
 
@@ -2596,44 +2636,87 @@
     </section>
 @endsection
 @push('scripts')
-    <!-- Accordion + Search Script -->
+    <!-- Accordion + Search + Load More Script -->
     <script>
         // Accordion
-        document.querySelectorAll('.faq-toggle').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const content = btn.nextElementSibling;
-                const icon = btn.querySelector('.faq-icon') || btn.querySelector('i');
-
-                const isHidden = content.classList.contains('hidden');
-                if (isHidden) {
-                    content.classList.remove('hidden');
-                    if (icon) {
-                        icon.classList.remove('fa-plus');
-                        icon.classList.add('fa-minus');
+        function initFaqAccordion() {
+            document.querySelectorAll('.faq-toggle').forEach((btn) => {
+                if (btn._faqBound) return;
+                btn._faqBound = true;
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('.faq-icon') || btn.querySelector('i');
+                    const isHidden = content.classList.contains('hidden');
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        if (icon) { icon.classList.remove('fa-plus'); icon.classList.add('fa-minus'); }
+                    } else {
+                        content.classList.add('hidden');
+                        if (icon) { icon.classList.remove('fa-minus'); icon.classList.add('fa-plus'); }
                     }
-                } else {
-                    content.classList.add('hidden');
-                    if (icon) {
-                        icon.classList.remove('fa-minus');
-                        icon.classList.add('fa-plus');
-                    }
-                }
+                });
             });
-        });
+        }
+        initFaqAccordion();
 
-        // Search Filter
-        document.getElementById('faqSearch').addEventListener('input', function () {
-            let value = this.value.toLowerCase();
-            let items = document.querySelectorAll('.faq-item');
-
-            items.forEach(item => {
-                let text = item.querySelector('.faq-question').innerText.toLowerCase();
-
-                if (text.includes(value)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+        // Load More
+        const loadMoreBtn = document.getElementById('faq-load-more');
+        const loadMoreWrap = document.getElementById('faq-load-more-wrap');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function () {
+                const hidden = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                let shown = 0;
+                hidden.forEach(function (item) {
+                    if (shown < 10) {
+                        item.style.display = '';
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(16px)';
+                        setTimeout(function () {
+                            item.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 20);
+                        shown++;
+                    }
+                });
+                // Hide button if no more hidden items
+                const remaining = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                if (remaining.length === 0) {
+                    loadMoreWrap.style.display = 'none';
                 }
+                initFaqAccordion();
+            });
+
+            // Hide button if total faqs <= 10
+            const allHidden = document.querySelectorAll('.faq-hidden');
+            if (allHidden.length === 0) {
+                loadMoreWrap.style.display = 'none';
+            }
+        }
+
+        // Search Filter (shows all matching, hides load more while searching)
+        document.getElementById('faqSearch').addEventListener('input', function () {
+            let value = this.value.toLowerCase().trim();
+            let items = document.querySelectorAll('.faq-item');
+            if (value === '') {
+                // Reset to initial state
+                items.forEach(function (item, i) {
+                    if (item.classList.contains('faq-hidden')) {
+                        item.style.display = 'none';
+                    } else {
+                        item.style.display = '';
+                    }
+                });
+                if (loadMoreWrap) {
+                    const remaining = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                    loadMoreWrap.style.display = remaining.length > 0 ? '' : 'none';
+                }
+                return;
+            }
+            if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+            items.forEach(function (item) {
+                let text = item.querySelector('.faq-question').innerText.toLowerCase();
+                item.style.display = text.includes(value) ? '' : 'none';
             });
         });
     </script>
