@@ -65,7 +65,7 @@ return [
 </style>
 @endpush
 @section('content')
-<div class="bg-white min-h-screen font-sans pb-20">
+<div class="min-h-screen font-sans pb-20">
     <div class="container mx-auto pt-20 pb-10">
         <h1 class="text-center text-2xl md:text-3xl font-bold text-black mb-10">Question/Answer</h1>
 

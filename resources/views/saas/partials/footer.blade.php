@@ -33,8 +33,9 @@
             <div style="display: flex; flex-direction: column; gap: 16px; grid-column: span 1;">
                 <a href="{{ route('saas.index') }}" style="display: flex; align-items: center; gap: 10px; color: #fff;"
                     title="{{ $setup->shop_name ?? 'Dorja.io' }}">
-                    @if ($setup && $setup->logo_url)
-                        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Dorja' }} Logo"
+                    @php $saasFooterLogo = $setup->footer_logo_url ?? null; @endphp
+                    @if ($setup && $saasFooterLogo)
+                        <img src="{{ $saasFooterLogo }}" alt="{{ $setup->shop_name ?? 'Dorja' }} Logo"
                             class="h-8 w-auto object-contain"
                             onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
                     @else
