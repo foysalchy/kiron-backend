@@ -46,7 +46,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-24">
 
       <!-- Left Side: Minimalist Form -->
-      <div class="bg-white/80 backdrop-blur-sm p-2 rounded-xl">
+      <div class="glass border border-white/80 rounded-3xl p-6 md:p-10 shadow-sm">
         <div class="mb-12">
           <h2 class="text-4xl font-extrabold text-gray-800 mb-3 tracking-tight">Contact us</h2>
           <div class="w-14 h-1.5 bg-[#00555c] rounded-full mb-6"></div>
@@ -173,9 +173,11 @@
       </div>
 
     </div>
-  <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
-            {!! $pageData->description!!}
-        </div>
+        @if($pageData?->description)
+            <div class="mt-5 glass border border-white/80 px-8 py-8 rounded-3xl prose prose-slate w-full min-w-full">
+                {!! $pageData->description !!}
+            </div>
+        @endif
   </div>
 </section>
 @endsection

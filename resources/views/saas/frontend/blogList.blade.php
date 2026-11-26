@@ -10,7 +10,7 @@ $pageData = \App\Services\Saas\SystemPageService::get(
 'type' => 'CollectionPage',
 'title' => $pageData->meta_title ?? ('Blog | ' . $setup->shop_name),
 'description' => $pageData->meta_description ?? ('Read the latest articles...'),
-'keywords' => $pageData->meta_keywords ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords) : 'blog, business blog, inventory management, POS, ERP, CRM',
+'keywords' => $pageData?->meta_keywords ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords) : 'blog, business blog, inventory management, POS, ERP, CRM',
 'image' => $setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('storage/' . $setup->logo),
 'canonical' => route('saas.blog.list'),
 'breadcrumb' => [
@@ -20,24 +20,24 @@ $pageData = \App\Services\Saas\SystemPageService::get(
 ])
 @section('content')
 <!-- HEADER SECTION -->
-<section class="bg-[#00555c] pt-32 pb-20 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full"></div>
+<section class="hero-bg pt-32 pb-16 relative overflow-hidden">
     <div class="container mx-auto px-6 text-center relative z-10">
-        <h1 class="text-white text-4xl md:text-6xl font-black mb-6">Our Blogs and Articles</h1>
-        <p class="text-gray-800 text-lg md:text-xl max-w-2xl mx-auto">
+        <h1 class="hero-reveal text-[#0A1F22] text-3xl md:text-5xl font-bold mb-4 tracking-tight" style="transition-delay: 0ms;">Our Blogs and Articles</h1>
+        <p class="hero-reveal text-[#4B6366] text-base md:text-lg max-w-2xl mx-auto" style="transition-delay: 100ms;">
             Stay updated with the latest trends, tips, and guides on business growth, modern technology, and e-commerce solutions.
         </p>
     </div>
 </section>
 
 <!-- FEATURES GRID SECTION -->
-<section class="bg-white py-10">
+<section class="py-10">
     <div class="container mx-auto px-6 md:px-10">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach ($blogPosts as $blog)
+            <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 3) * 100 }}ms;">
             <a
                 href="{{ route('saas.blog.details', $blog->slug) }}"
-                class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                class="glass shine border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
                 <div class="group block overflow-hidden rounded-xl">
                     <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
@@ -76,15 +76,18 @@ $pageData = \App\Services\Saas\SystemPageService::get(
                     </div>
                 </div>
             </a>
+            </div>
             @endforeach
         </div>
 
         <div class="mt-16">
             {{ $blogPosts->links() }}
         </div>
-        <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
-            {!! $pageData->description!!}
-        </div>
+        @if($pageData?->description)
+            <div class="mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
+                {!! $pageData->description !!}
+            </div>
+        @endif
     </div>
 </section>
 @endsection

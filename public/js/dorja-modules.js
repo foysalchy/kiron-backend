@@ -60,7 +60,8 @@ function moduleDoc(key) {
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"><\/script>
 <script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"><\/script>
 <style type="text/tailwindcss">@theme{--text-2xs:.625rem;--font-sans:Geist,sans-serif}</style>
-<style>html,body{margin:0;background:#f6f6f6;font-family:Geist,sans-serif;scrollbar-width:none}body::-webkit-scrollbar{display:none}#v{width:1280px}
+<style>html,body{margin:0;background:#f6f6f6;font-family:Geist,sans-serif;scrollbar-width:none}body::-webkit-scrollbar{display:none}
+.recharts-responsive-container{overflow:hidden!important}.recharts-responsive-container>div{width:100%!important}.recharts-wrapper{width:100%!important;max-width:100%!important}.recharts-wrapper svg.recharts-surface{width:100%!important;height:100%!important}#v{width:1280px}
 *, ::before, ::after { border-color: #e5e7eb; }
 .rv2{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}.rv2.in{opacity:1;transform:none}@keyframes si{from{opacity:0;transform:translateX(20px)}}</style></head>
 <body><div id="v">${content}</div>
@@ -178,6 +179,7 @@ function flowDoc(key) {
 <style>
 *, ::before, ::after { border-color: #e5e7eb; }
 html,body{margin:0;background:#f6f6f6;font-family:Geist,sans-serif;scrollbar-width:none}body::-webkit-scrollbar{display:none}
+.recharts-responsive-container{overflow:hidden!important}.recharts-responsive-container>div{width:100%!important}.recharts-wrapper{width:100%!important;max-width:100%!important}.recharts-wrapper svg.recharts-surface{width:100%!important;height:100%!important}
 .pg{display:none}.pg.on{display:block;animation:fadeIn .35s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}}@keyframes pop{from{opacity:0;transform:scale(.96)}}
 .sb.hov,.sb.on{background:#e5f7f4!important;color:#078e9a!important}.sb.open .chev{transform:rotate(180deg)}
