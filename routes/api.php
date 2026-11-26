@@ -242,6 +242,7 @@ Route::prefix('v1')->group(function () {
         });
         //auth
         Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post('auth/hidden-modules', [AuthController::class, 'updateHiddenModules']);
         Route::get('auth/login-history', [AuthController::class, 'historyLoginAll']);
         Route::get('auth/profile', [AuthController::class, 'profile']);
         Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
@@ -768,6 +769,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/parties/{id}/pay-order-from-wallet', [OrderController::class, 'payOrderFromWallet']);
 
                 Route::prefix('fetch-orders')->group(function () {
+                    Route::get('/quick-status-counts', [OrderController::class, 'statusCounts']);
                     Route::get('/select/order-list-option', [OrderController::class, 'getSelectListOrder']);
                     Route::get('/', [OrderController::class, 'index']);
                     Route::get('/by-ip', [OrderController::class, 'ordersByIp']);

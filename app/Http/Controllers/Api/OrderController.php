@@ -28,6 +28,38 @@ class OrderController extends Controller
     ) {}
 
     /**
+     * Get quick status counts for sidebar badges (Pending & Incomplete/Draft)
+     *
+     * @return JsonResponse
+     */
+    public function statusCounts(): JsonResponse
+    {
+        try {
+            $pendingCount = \App\Models\Order::query()
+                ->where('status', \App\Enums\Status::Pending->value)
+                ->count();
+
+            $incompleteCount = \App\Models\Order::query()
+                ->where('status', \App\Enums\Status::Draft->value)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'pending' => $pendingCount,
+                    'incomplete' => $incompleteCount,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve order counts',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Get all orders with filters
      * 
      * @param Request $request

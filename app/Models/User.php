@@ -30,6 +30,7 @@ class User extends Authenticatable
         'is_primary',
         'password',
         'setup_complete',
+        'hidden_modules',
     ];
 
     /**
@@ -55,7 +56,7 @@ class User extends Authenticatable
             'is_super_admin' => 'boolean',
             'is_primary' => 'boolean',
             'setup_complete' => 'boolean',
-
+            'hidden_modules' => 'array',
         ];
     }
 

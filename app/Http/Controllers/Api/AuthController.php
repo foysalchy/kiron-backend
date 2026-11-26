@@ -220,6 +220,7 @@ class AuthController extends Controller
                 'company'           => $user->company,
                 'ai_enabled'        => $user->company ? (bool) ($user->company->aiSetting?->openai_status || $user->company->aiSetting?->gemini_status) : false,
                 'billing_required'  => $billingRequired,
+                'hidden_modules'    => $user->hidden_modules ?? [],
             ],
             'permissions' => $effectivePermissions,
         ]);
@@ -272,6 +273,25 @@ class AuthController extends Controller
 
         return $effectivePermissions;
     }
+
+    public function updateHiddenModules(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'hidden_modules' => 'present|array',
+            'hidden_modules.*' => 'string',
+        ]);
+
+        $user = $request->user();
+        $user->hidden_modules = $validated['hidden_modules'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Module preferences updated successfully',
+            'hidden_modules' => $user->hidden_modules,
+        ]);
+    }
+
     /**
      * Refactored login handler
      */
