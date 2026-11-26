@@ -120,8 +120,8 @@
 
     <!-- ১. Breadcrumb Section (Same design as your blog) -->
     <section class="">
-        <div class="container mx-auto px-6 md:px-10">
-            <div class="flex gap-2 text-sm  px-4 py-3 ">
+        <div class="container mx-auto px-6 md:px-10" style="max-width: 1240px;">
+            <div class="flex gap-2 text-sm py-3">
                 <a href="{{ route('saas.index') }}" class="text-gray-600 hover:text-black transition">Home</a>
                 <span class="text-gray-300"></span>
                 <a href="{{ route('saas.blog.list') }}" class="text-gray-600 hover:text-black transition">Blog</a>
@@ -132,12 +132,13 @@
     </section>
 
     <!-- ২. Main Content Section -->
-    <section class="bg-white pb-20" style="padding-top: 40px;">
-        <div class="container mx-auto px-6 md:px-10">
+    <section class="pb-20" style="padding-top: 40px;">
+        <div class="container mx-auto px-6 md:px-10" style="max-width: 1240px;">
 
-            <div class="grid grid-cols-12 gap-8 lg:gap-16">
+            <div class="grid grid-cols-12 gap-8 lg:gap-10">
 
                 <!-- Left Sidebar: Social (Sticky) -->
+                @if (isset($socialLinks) && count($socialLinks) > 0)
                 <div class="hidden lg:flex lg:col-span-1 justify-center">
                     <div class="sticky top-52 flex flex-col gap-6 h-fit pt-2">
                         @if (isset($socialLinks))
@@ -156,9 +157,10 @@
                         @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- Middle: Feature Content (Col 7) -->
-                <div class="col-span-12 lg:col-span-7">
+                <div class="col-span-12 {{ (isset($socialLinks) && count($socialLinks) > 0) ? 'lg:col-span-7' : 'lg:col-span-8' }}">
                     <div class="flex flex-wrap justify-between items-center pb-6 gap-4">
                         <span
                             class="bg-[#1A1A1A] text-white px-5 py-1.5 text-xs font-bold uppercase tracking-[0.2em] rounded-sm">
@@ -240,7 +242,7 @@
     @include('components.meta-info.pixel-events', [
         'event' => 'ViewBlog',
         'data' => [
-            'blog' => $blog
+            'blog' => $blogPost
         ]
     ])
 @endpush

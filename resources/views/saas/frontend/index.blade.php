@@ -1036,9 +1036,6 @@
 
             <!-- 3D Perspective Showcase (Exact EduManager Reference) -->
             <div class="relative mt-4 md:mt-8 mx-auto max-w-[1080px] perspective-container">
-                <!-- Glowing blur blob beneath -->
-                <div class="absolute -inset-x-10 -bottom-10 top-1/3 bg-gradient-to-r from-[#00555C]/20 via-[#7CE0C3]/15 to-[#00A08A]/20 blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
-
                 <!-- Product Demo Showcase Card with EduManager 3D Tilt -->
                 <div class="relative">
                     <div id="heroDeviceMockup" class="tilted-device-card relative group" style="transform-origin: center top; will-change: transform;">
@@ -1154,7 +1151,7 @@
             </div>
 
             <!-- Content Card (Glass Card) -->
-            <div class="glass border border-white/85 rounded-[28px] p-6 md:p-12 pb-16 md:pb-24 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)] relative overflow-hidden">
+            <div class="glass border border-white/85 rounded-[28px] p-6 md:p-12 pb-8 md:pb-12 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)] relative overflow-hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center relative z-10">
 
                     <!-- Left Content -->
@@ -1205,8 +1202,8 @@
 
                 <!-- Watermark Outline Text — absolute bottom of glass card, clipped by overflow-hidden -->
                 <span id="sol-watermark" aria-hidden="true"
-                    class="absolute left-6 md:left-12 bottom-[8px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
-                    style="font-size: clamp(52px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
+                    class="absolute left-6 md:left-12 font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
+                    style="bottom: 48px; font-size: clamp(52px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
 
             </div>
 
@@ -1235,158 +1232,308 @@
                 <!-- Top 2 Feature Showcase Cards (Professional Online Store & Accurate Ad Tracking) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
-                    <!-- Left Card: Professional online store -->
-                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
-                        <div class="relative bg-gradient-to-br from-[#EEF2FF]/80 via-[#F5F8FF]/70 to-[#E6F4F1]/80 p-5 md:p-7 min-h-[300px] sm:min-h-[330px] flex items-center justify-center overflow-hidden">
-                            <!-- Mini Interactive Product Details Browser Window -->
-                            <div class="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-gray-200/80 shadow-lg overflow-hidden relative z-10">
-                                <div class="h-7 bg-gray-50 border-b border-gray-100 flex items-center gap-1.5 px-3">
-                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
-                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                    <span class="ml-auto mr-auto text-[10px] text-gray-400 font-mono">dorja.io/product/cotton-tee</span>
-                                </div>
-                                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
-                                    <!-- Product Image & Color Thumbnails -->
-                                    <div class="space-y-2">
-                                        <div class="bg-gray-50 rounded-xl p-2.5 flex items-center justify-center border border-gray-100" style="height: 118px;">
-                                            <svg id="miniStoreTee" viewBox="0 0 64 64" class="w-16 h-16 drop-shadow-sm transition-colors duration-200">
-                                                <path id="miniStoreTeePath" d="M20 12 L26 10 Q32 15 38 10 L44 12 L54 22 L47 29 L43 25 L43 54 L21 54 L21 25 L17 29 L10 22 Z" fill="#00555C"/>
-                                            </svg>
+                    <!-- Left Card: Dorja Business OS -->
+                    <article class="hero-reveal glass rounded-3xl flex flex-col justify-between relative overflow-hidden border border-white/80 lift">
+                        <div class="p-6 sm:p-8 flex flex-col justify-between" style="min-height: 425px;">
+                        <header class="flex items-center justify-between w-full mb-6">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full inline-block" style="background:#00555C;"></span>
+                                <span class="text-xs font-extrabold tracking-wider uppercase" style="color:#0c2e35;">Dorja Business OS</span>
+                            </div>
+                            <div class="text-xs font-semibold px-3 py-1 rounded-full shadow-xs" style="background:#EEF5F3; border:1px solid rgba(0,85,92,0.2); color:#00555C;">
+                                All-in-One Platform
+                            </div>
+                        </header>
+
+                        <section class="relative my-auto py-4 sm:py-6">
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none z-0" fill="none" preserveAspectRatio="none" viewBox="0 0 540 240">
+                                <path d="M 120 38 C 205 38, 225 106, 246 116" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" repeatCount="indefinite" path="M 120 38 C 205 38, 225 106, 246 116"/></circle>
+
+                                <path d="M 120 120 C 205 120, 225 120, 246 120" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" begin="0.5s" repeatCount="indefinite" path="M 120 120 C 205 120, 225 120, 246 120"/></circle>
+
+                                <path d="M 120 202 C 205 202, 225 134, 246 124" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" begin="1s" repeatCount="indefinite" path="M 120 202 C 205 202, 225 134, 246 124"/></circle>
+
+                                <path d="M 420 38 C 335 38, 315 106, 294 116" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" begin="0.25s" repeatCount="indefinite" path="M 420 38 C 335 38, 315 106, 294 116"/></circle>
+
+                                <path d="M 420 120 C 335 120, 315 120, 294 120" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" begin="0.75s" repeatCount="indefinite" path="M 420 120 C 335 120, 315 120, 294 120"/></circle>
+
+                                <path d="M 420 202 C 335 202, 315 134, 294 124" fill="none" stroke="#99C2C4" stroke-width="1.75"></path>
+                                <circle r="3.5" fill="#00555C"><animateMotion dur="2.4s" begin="1.25s" repeatCount="indefinite" path="M 420 202 C 335 202, 315 134, 294 124"/></circle>
+                            </svg>
+
+                            <div class="relative z-10" style="display: grid; grid-template-columns: 182px 1fr 182px; gap: 0.5rem; align-items: center;">
+                                <div class="space-y-4">
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                                                <circle cx="9" cy="20" r="1"></circle>
+                                                <circle cx="20" cy="20" r="1"></circle>
+                                                <path d="M1 1h4l2.68 12.42a2 2 0 0 0 2 1.58h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
                                         </div>
-                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#00555C')" class="h-6 rounded-md bg-[#00555C]/15 border border-[#00555C] flex items-center justify-center cursor-pointer" title="Teal">
-                                                <span class="w-3 h-3 rounded-full bg-[#00555C]"></span>
-                                            </button>
-                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1D4ED8')" class="h-6 rounded-md bg-blue-50 border border-gray-200 hover:border-blue-500 flex items-center justify-center cursor-pointer" title="Royal Blue">
-                                                <span class="w-3 h-3 rounded-full" style="background-color: #1D4ED8;"></span>
-                                            </button>
-                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1F2937')" class="h-6 rounded-md bg-gray-100 border border-gray-200 hover:border-gray-600 flex items-center justify-center cursor-pointer" title="Charcoal">
-                                                <span class="w-3 h-3 rounded-full" style="background-color: #1F2937;"></span>
-                                            </button>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Ecommerce</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Online Store</div>
                                         </div>
                                     </div>
-                                    <!-- Product Details Info -->
-                                    <div class="space-y-2 text-left min-w-0">
-                                        <div class="text-sm font-bold text-[#0A1F22] leading-snug">Premium Cotton Tee</div>
-                                        <div class="flex items-center gap-1 text-[10px] text-amber-500 font-semibold">
-                                            <span>★★★★★</span>
-                                            <span class="text-gray-400 font-normal">4.9 (128)</span>
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                                                <rect height="13" rx="2" width="20" x="2" y="3"></rect>
+                                                <path d="M8 21h8"></path>
+                                                <path d="M12 16v5"></path>
+                            </svg>
                                         </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="text-base font-extrabold text-[#00555C]">৳850</span>
-                                            <span class="text-[11px] text-gray-400 line-through">৳1,200</span>
-                                            <span class="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">-29%</span>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">POS</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Retail Sales</div>
                                         </div>
-                                        <div class="flex gap-1.5" id="miniSizeGroup">
-                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">S</button>
-                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">M</button>
-                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer">L</button>
-                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">XL</button>
+                                    </div>
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="currentColor" stroke="none" viewBox="0 0 24 24">
+                                                <rect height="6" rx="1" width="3.2" x="3" y="14"></rect>
+                                                <rect height="10" rx="1" width="3.2" x="8.4" y="10"></rect>
+                                                <rect height="14" rx="1" width="3.2" x="13.8" y="6"></rect>
+                                                <path d="M15.5 3h5.5v5.5l-2.1-2.1-4.7 4.7-2.6-2.6-6.4 6.4-1.4-1.4 7.8-7.8 2.6 2.6 3.3-3.3z"></path>
+                            </svg>
                                         </div>
-                                        <button id="miniOrderBtn" type="button" onclick="this.textContent='✓ Order placed';this.classList.remove('bg-[#00555C]');this.classList.add('bg-emerald-600');" class="w-full py-2 rounded-lg bg-[#00555C] hover:bg-[#003A3F] text-white text-[11px] font-semibold text-center transition-colors cursor-pointer">
-                                            Order Now • ৳850
-                                        </button>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">CRM</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Customer Relations</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-center">
+                                    <div class="bg-white rounded-3xl flex flex-col items-center justify-center p-2 transition hover:scale-105 duration-200" style="width: 112px; height: 112px; border: 1px solid rgba(0, 85, 92, 0.22); box-shadow: 0 4px 24px -2px rgba(0, 85, 92, 0.16);">
+                                        <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-12 h-12 object-contain">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+                                                <rect height="18" rx="2.5" stroke-width="2" width="14" x="5" y="3"></rect>
+                                                <rect fill="currentColor" fill-opacity="0.15" height="3" rx="0.5" stroke-width="1.5" width="8" x="8" y="6"></rect>
+                                                <circle cx="8.5" cy="12.5" fill="currentColor" r="0.9"></circle>
+                                                <circle cx="12" cy="12.5" fill="currentColor" r="0.9"></circle>
+                                                <circle cx="15.5" cy="12.5" fill="currentColor" r="0.9"></circle>
+                                                <circle cx="8.5" cy="16.5" fill="currentColor" r="0.9"></circle>
+                                                <circle cx="12" cy="16.5" fill="currentColor" r="0.9"></circle>
+                                                <circle cx="15.5" cy="16.5" fill="currentColor" r="0.9"></circle>
+                            </svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Accounting</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Finance &amp; Reports</div>
+                                        </div>
+                                    </div>
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="7" r="3"></circle>
+                                                <path d="M12 12c-2.8 0-6 1.4-6 4v1h12v-1c0-2.6-3.2-4-6-4z"></path>
+                                                <circle cx="6" cy="9" r="2.2"></circle>
+                                                <path d="M6 13c-1.8 0-4 .9-4 2.5V17h3v-1.5c0-.9.4-1.7 1-2.5z"></path>
+                                                <circle cx="18" cy="9" r="2.2"></circle>
+                                                <path d="M18 13c.6.8 1 1.6 1 2.5V17h3v-1.5c0-1.6-2.2-2.5-4-2.5z"></path>
+                            </svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">HR &amp; Payroll</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Team Management</div>
+                                        </div>
+                                    </div>
+                                    <div class="rounded-2xl px-3 py-4 flex items-center space-x-2.5 bg-white border border-gray-100 shadow-sm" style="min-height: 74px;">
+                                        <div class="flex-shrink-0" style="color:#00555C;">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+                                                <path d="M12 2.5 L20.5 7.4 V16.6 L12 21.5 L3.5 16.6 V7.4 Z"></path>
+                                                <path d="M12 2.5 V12 L20.5 7.4"></path>
+                                                <path d="M12 12 L3.5 7.4"></path>
+                                                <path d="M12 12 V21.5"></path>
+                                                <path d="M7.75 4.95 L16.25 9.85" stroke-dasharray="2 2" stroke-width="1.4"></path>
+                            </svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Inventory</div>
+                                            <div class="text-slate-400 font-normal mt-0.5" style="font-size: 11px; white-space: nowrap;">Stock &amp; Warehouse</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </section>
+
                         </div>
-                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Professional online store</h3>
-                            Pick a theme, add your products and publish your store and landing pages, with no code. Shoppers who come from Facebook can see the product and order in a few taps.
-                        </div>
-                    </div>
-                    <script>
-                        (function () {
-                            const colors = ['#00555C', '#1D4ED8', '#1F2937'];
-                            const teePath = document.getElementById('miniStoreTeePath');
-                            const sizeGroup = document.getElementById('miniSizeGroup');
-                            const orderBtn = document.getElementById('miniOrderBtn');
-                            if (!teePath || !sizeGroup || !orderBtn) return;
+                        <footer class="bg-white/80 p-6 text-left border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">
+                                Manage your entire business in one place
+                            </h3>
+                            <p class="text-[#3E5759] text-sm md:text-base leading-relaxed">
+                                Run your online store, POS, accounting, HR &amp; payroll, CRM, and multi-warehouse inventory from a single unified platform — with orders, stock, and financial reports synced automatically in real time.
+                            </p>
+                        </footer>
+                    </article>
 
-                            let step = 0;
-                            let paused = false;
-                            const card = orderBtn.closest('.glass');
-                            if (card) {
-                                card.addEventListener('mouseenter', () => paused = true);
-                                card.addEventListener('mouseleave', () => paused = false);
-                            }
+                    <!-- Right Card: Ad Tracking & Analytics -->
+                    <article class="hero-reveal glass rounded-3xl flex flex-col justify-between relative overflow-hidden border border-white/80 lift">
+                        <div class="p-6 sm:p-8 flex flex-col justify-between" style="min-height: 425px;">
+                        <header class="flex items-center justify-between w-full mb-5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#00555C;"></span>
+                                <span class="text-xs font-extrabold tracking-wider uppercase" style="color:#0e3b43;">Ad Tracking &amp; Analytics</span>
+                            </div>
+                            <div class="text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm" style="background:#EEF5F3; border:1px solid rgba(0,85,92,0.2); color:#00555C;">
+                                <span class="w-2 h-2 rounded-full" style="background:#00555C;"></span>
+                                <span>Live</span>
+                            </div>
+                        </header>
 
-                            setInterval(() => {
-                                if (paused) return;
-                                const sizeBtns = sizeGroup.querySelectorAll('button');
-                                const phase = step % 4;
-                                if (phase === 0) {
-                                    orderBtn.textContent = 'Order Now • ৳850';
-                                    orderBtn.classList.remove('bg-emerald-600');
-                                    orderBtn.classList.add('bg-[#00555C]');
-                                    teePath.setAttribute('fill', colors[Math.floor(step / 4) % colors.length]);
-                                } else if (phase === 1) {
-                                    const idx = Math.floor(step / 4) % sizeBtns.length;
-                                    sizeBtns.forEach(b => b.className = 'px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600');
-                                    sizeBtns[idx].className = 'px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer';
-                                } else if (phase === 2) {
-                                    orderBtn.textContent = '✓ Order placed';
-                                    orderBtn.classList.remove('bg-[#00555C]');
-                                    orderBtn.classList.add('bg-emerald-600');
-                                }
-                                step++;
-                            }, 1100);
-                        })();
-                    </script>
-
-                    <!-- Right Card: Accurate ad tracking -->
-                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
-                        <div class="relative bg-gradient-to-br from-[#F0F4FF]/80 via-[#F7F9FC]/70 to-[#E6F4F1]/80 p-5 md:p-6 min-h-[300px] sm:min-h-[330px] flex flex-col justify-center gap-3">
-                            <!-- Top Row: Live Events + ROAS -->
-                            <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px;">
-                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Live Events</span>
-                                        <span class="text-[8px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">• LIVE</span>
+                        <section class="space-y-3 mb-4">
+                            <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
+                                <div class="rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 bg-white border border-gray-100 shadow-sm">
+                                    <div class="flex-shrink-0" style="color:#0668E1;">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16.996 4C14.707 4 12.82 5.584 12 7.697 11.18 5.584 9.293 4 7.004 4 3.738 4 1 6.81 1 10.168c0 3.256 1.83 5.922 4.194 7.653 1.94 1.42 4.298 2.179 6.806 2.179 2.508 0 4.866-.759 6.806-2.179C21.17 16.09 23 13.424 23 10.168 23 6.81 20.262 4 16.996 4zm-4.996 11.832c-2.316 0-4.478-.838-6.108-2.031C4.195 12.553 3 10.74 3 8.877c0-2.35 1.79-4.254 4.004-4.254 1.944 0 3.58 1.455 3.94 3.453l.235 1.306.945-.929C12.87 7.7 13.9 7 15.004 7c2.214 0 4.004 1.904 4.004 4.254 0 1.863-1.195 3.676-2.892 4.924-1.63 1.193-3.792 2.031-6.108 2.031z"></path></svg>
                                     </div>
-                                    <div class="mt-2.5 space-y-1.5 text-[10px] text-gray-600">
-                                        <div class="flex justify-between gap-2"><span>Purchase • ৳850</span><span class="text-emerald-600 font-semibold whitespace-nowrap">2s ago</span></div>
-                                        <div class="flex justify-between gap-2"><span>InitiateCheckout</span><span class="text-gray-400 whitespace-nowrap">14s ago</span></div>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Meta Pixel</div>
+                                        <div class="font-normal mt-0.5" style="font-size: 11px; color:#00555C;">Setup Ready</div>
                                     </div>
                                 </div>
-                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3 flex flex-col justify-between">
-                                    <div class="text-[9px] font-bold text-gray-400 uppercase">ROAS</div>
-                                    <div class="text-xl font-extrabold text-[#0A1F22]">5.0x</div>
+                                <div class="rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 bg-white border border-gray-100 shadow-sm">
+                                    <div class="text-slate-900 flex-shrink-0">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v7.7c-.01 1.76-.66 3.52-1.85 4.84-1.44 1.6-3.56 2.49-5.69 2.42-2.35-.06-4.57-1.24-5.9-3.15-1.57-2.22-1.74-5.22-.44-7.6 1.16-2.14 3.38-3.55 5.81-3.69v4.06c-.95.1-1.87.58-2.45 1.34-.73.94-.8 2.25-.19 3.27.56.96 1.64 1.55 2.75 1.53 1.25-.01 2.37-.87 2.66-2.09.11-.47.16-.96.16-1.44V.02z"></path></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">TikTok Pixel</div>
+                                        <div class="font-normal mt-0.5" style="font-size: 11px; color:#00555C;">Setup Ready</div>
+                                    </div>
+                                </div>
+                                <div class="rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 bg-white border border-gray-100 shadow-sm">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z" fill="#4285F4"></path><path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.14C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path><path d="M5.28 14.27a7.2 7.2 0 010-4.54V6.59H1.24a11.96 11.96 0 000 10.82l4.04-3.14z" fill="#FBBC05"></path><path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.59l4.04 3.14c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Google Tag Manager</div>
+                                        <div class="font-normal mt-0.5" style="font-size: 11px; color:#00555C;">Setup Ready</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Bottom Box: Pixels & Tracking -->
-                            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
-                                <div class="flex items-center justify-between text-[9px] font-bold text-gray-400 uppercase pb-2 border-b border-gray-100">
-                                    <span>Pixels &amp; Tracking</span>
-                                    <span>Last Event</span>
+                            <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
+                                <div class="rounded-2xl p-2 sm:p-2.5 flex items-center justify-between bg-white border border-gray-100 shadow-sm">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span style="color:#0668E1;">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0022 12.06C22 6.53 17.5 2.04 12 2.04Z"></path></svg>
+                                        </span>
+                                        <span class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Facebook Catalog</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 shrink-0">
+                                        <button type="button" aria-label="Download Facebook Catalog" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                                        <button type="button" aria-label="Copy Facebook Catalog" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                                    </div>
                                 </div>
-                                <div class="divide-y divide-gray-100 text-[11px]">
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-800">Meta Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
-                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                <div class="rounded-2xl p-2 sm:p-2.5 flex items-center justify-between bg-white border border-gray-100 shadow-sm">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-slate-900">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v7.7c-.01 1.76-.66 3.52-1.85 4.84-1.44 1.6-3.56 2.49-5.69 2.42-2.35-.06-4.57-1.24-5.9-3.15-1.57-2.22-1.74-5.22-.44-7.6 1.16-2.14 3.38-3.55 5.81-3.69v4.06c-.95.1-1.87.58-2.45 1.34-.73.94-.8 2.25-.19 3.27.56.96 1.64 1.55 2.75 1.53 1.25-.01 2.37-.87 2.66-2.09.11-.47.16-.96.16-1.44V.02z"></path></svg>
+                                        </span>
+                                        <span class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">TikTok Catalog</span>
                                     </div>
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-800">Conversions API <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
-                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    <div class="flex items-center space-x-1 shrink-0">
+                                        <button type="button" aria-label="Download TikTok Catalog" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                                        <button type="button" aria-label="Copy TikTok Catalog" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
                                     </div>
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-800">TikTok Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
-                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                </div>
+                                <div class="rounded-2xl p-2 sm:p-2.5 flex items-center justify-between bg-white border border-gray-100 shadow-sm">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z" fill="#4285F4"></path><path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.14C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path><path d="M5.28 14.27a7.2 7.2 0 010-4.54V6.59H1.24a11.96 11.96 0 000 10.82l4.04-3.14z" fill="#FBBC05"></path><path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.59l4.04 3.14c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path></svg>
+                                        <span class="font-semibold text-slate-800 leading-tight" style="font-size: 15px;">Google Merchant</span>
                                     </div>
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-800">Google Tag Manager <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
-                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    <div class="flex items-center space-x-1 shrink-0">
+                                        <button type="button" aria-label="Download Google Merchant feed" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                                        <button type="button" aria-label="Copy Google Merchant URL" class="p-1 text-slate-400 hover:text-slate-600 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
                                     </div>
                                 </div>
                             </div>
+                        </section>
+
+                        <section class="rounded-2xl pt-4 pb-0 px-4 bg-white border border-slate-200 overflow-hidden shadow-xs">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-slate-800">Tracking Performance</span>
+                                <div class="bg-slate-100 text-slate-600 text-[11px] font-medium px-2.5 py-0.5 rounded-md flex items-center space-x-1">
+                                    <span>Last 30 Days</span>
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 py-2 border-b border-slate-100 mb-2">
+                                <div class="flex items-start space-x-2">
+                                    <div class="text-teal-600 mt-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                                    <div>
+                                        <div class="flex items-baseline space-x-1">
+                                            <span class="text-sm sm:text-base font-extrabold text-slate-800">487K</span>
+                                            <span class="text-[11px] font-bold flex items-center" style="color:#00555C;"><svg class="w-2.5 h-2.5 mr-0.5 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"></path></svg>12.5%</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">Impressions</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <div class="text-teal-600 mt-0.5"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M6.672 1.911a1 1 0 011.058.152l8 7a1 1 0 01.047 1.496l-4.5 4.5a1 1 0 01-1.414 0l-1.975-1.975-3.129 4.172a1 1 0 11-1.6-1.2l3.12-4.16-1.892-1.892a1 1 0 010-1.414l4.5-4.5a1 1 0 01.785-.278z" fill-rule="evenodd"></path></svg></div>
+                                    <div>
+                                        <div class="flex items-baseline space-x-1">
+                                            <span class="text-sm sm:text-base font-extrabold text-slate-800">18.4K</span>
+                                            <span class="text-[11px] font-bold flex items-center" style="color:#00555C;"><svg class="w-2.5 h-2.5 mr-0.5 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"></path></svg>21.3%</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">Clicks</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <div class="text-teal-600 mt-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                                    <div>
+                                        <div class="flex items-baseline space-x-1">
+                                            <span class="text-sm sm:text-base font-extrabold text-slate-800">2.1K</span>
+                                            <span class="text-[11px] font-bold flex items-center" style="color:#00555C;"><svg class="w-2.5 h-2.5 mr-0.5 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"></path></svg>26.7%</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">Purchases</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="relative w-full h-16 sm:h-20">
+                                <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 500 80">
+                                    <defs>
+                                        <linearGradient id="cyanGradient" x1="0" x2="0" y1="0" y2="1">
+                                            <stop offset="0%" stop-color="#028090" stop-opacity="0.25"></stop>
+                                            <stop offset="100%" stop-color="#028090" stop-opacity="0.01"></stop>
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M 0,60 C 30,58 50,48 80,48 C 110,48 130,52 160,42 C 190,32 210,46 250,50 C 280,54 300,38 330,30 C 360,22 380,38 410,42 C 440,46 470,30 500,22 L 500,80 L 0,80 Z" fill="url(#cyanGradient)"></path>
+                                    <path d="M 0,60 C 30,58 50,48 80,48 C 110,48 130,52 160,42 C 190,32 210,46 250,50 C 280,54 300,38 330,30 C 360,22 380,38 410,42 C 440,46 470,30 500,22" fill="none" stroke="#028090" stroke-width="2"></path>
+                                    <circle cx="80" cy="48" fill="#028090" r="3" stroke="#ffffff" stroke-width="1.5"></circle>
+                                    <circle cx="160" cy="42" fill="#028090" r="3" stroke="#ffffff" stroke-width="1.5"></circle>
+                                    <circle cx="250" cy="50" fill="#028090" r="3" stroke="#ffffff" stroke-width="1.5"></circle>
+                                    <circle cx="330" cy="30" fill="#028090" r="3" stroke="#ffffff" stroke-width="1.5"></circle>
+                                    <circle cx="410" cy="42" fill="#028090" r="3" stroke="#ffffff" stroke-width="1.5"></circle>
+                                    <circle cx="500" cy="22" fill="#028090" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+                            </svg>
+                            </div>
+                        </section>
+
                         </div>
-                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Accurate ad tracking</h3>
-                            Meta Pixel, Conversions API, TikTok Pixel and Google Tag Manager are built in. Every order reaches Meta and TikTok through server-side tracking, so they can show your ads to more people who buy.
-                        </div>
-                    </div>
+                        <footer class="bg-white/80 p-6 text-left border-t border-white/80 flex-grow">
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">
+                                Accurate ad tracking
+                            </h3>
+                            <p class="text-[#3E5759] text-sm md:text-base leading-relaxed">
+                                Track every customer event, measure ROAS, and optimize your ad campaigns with built-in Meta Pixel, Conversions API, TikTok Pixel, Google Tag Manager, and auto-synced product catalogs in real time.
+                            </p>
+                        </footer>
+                    </article>
 
                 </div>
 
@@ -1394,49 +1541,201 @@
 
                     <!-- নতুন কার্ড: Smart Order & Inventory Management -->
                     <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-gradient-to-br from-[#E6F4F1]/80 via-[#F4F9F8]/70 to-[#EEF2FF]/80 p-4 md:p-6 min-h-[260px] flex flex-col justify-center gap-3">
-                            <!-- Order Pipeline Card -->
-                            <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-3.5 space-y-2.5">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Order Pipeline</span>
-                                    <span class="text-[10px] font-bold text-[#00555C] bg-[#DDEEEA] px-2 py-0.5 rounded-full">Auto Sync</span>
+                        <div class="relative bg-white/40 p-3.5 md:p-4 flex flex-col justify-between gap-2" style="min-height: 350px;">
+                            <!-- Top Header -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full inline-block" style="background:#00555C;"></span>
+                                    <span class="font-extrabold tracking-wider uppercase" style="font-size: 10.5px; color:#0c2e35;">SMART BUSINESS HUB</span>
                                 </div>
-                                <div class="space-y-2 text-[11px]">
-                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
-                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1048 • ৳1,450</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-bold">Pending</span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
-                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1047 • ৳850</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[9px] font-bold">Shipped</span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
-                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1046 • ৳2,100</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold">Delivered</span>
-                                    </div>
-                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1" style="font-size: 10px; background:#EEF5F3; border:1px solid rgba(0,85,92,0.2); color:#00555C;">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background:#00555C;"></span> All-in-One
+                                </span>
                             </div>
-                            <!-- Live Stock & Invoice Mini Bar -->
-                            <div class="grid grid-cols-2 gap-2.5">
-                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
-                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Live Stock</div>
-                                    <div class="text-sm font-extrabold text-[#00555C] mt-0.5">1,284 pcs</div>
-                                </div>
-                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
-                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Auto Invoice</div>
-                                    <div class="text-sm font-extrabold text-emerald-600 mt-0.5">✓ Ready</div>
-                                </div>
+
+                            <!-- 2-Column 3-Row Aligned Grid (Smart Business Hub) -->
+                            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px;">
+                                <!-- Row 1 Left: Product Analytics -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2 2 7.5 12 13l10-5.5L12 2Zm-10 8v7l9 5V15l-9-5Zm11 5v7l9-5v-7l-9 5Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Product Analytics</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center gap-1.5 min-w-0">
+                                        <div class="flex items-center justify-center rounded-lg bg-slate-100 shrink-0" style="width: 28px; height: 26px; font-size: 14px;">👟</div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-baseline justify-between gap-1">
+                                                <span class="font-bold text-slate-900" style="font-size: 12px;">12.5K</span>
+                                                <span class="font-semibold shrink-0" style="font-size: 8.5px; color:#00555C;">↑ 24%</span>
+                                            </div>
+                                            <p class="text-slate-500 truncate" style="font-size: 8px;">Total Orders</p>
+                                        </div>
+                                    </div>
+                                    <svg class="mt-1 w-full h-3 overflow-visible" viewBox="0 0 500 55" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="hubChartGrad1" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#00555C" stop-opacity="0.22"/>
+                                                <stop offset="100%" stop-color="#00555C" stop-opacity="0.02"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path fill="url(#hubChartGrad1)" d="M0 45 C55 48 65 20 120 29 S200 43 250 21 S320 28 370 15 S440 20 500 0 L500 55 L0 55 Z"/>
+                                        <path fill="none" stroke="#00555C" stroke-width="5" stroke-linecap="round" d="M0 45 C55 48 65 20 120 29 S200 43 250 21 S320 28 370 15 S440 20 500 0"/>
+                                        <circle cx="500" cy="0" r="8" fill="#00555C"/>
+                                        <circle cx="0" cy="45" r="7" fill="#00555C"/>
+                                    </svg>
+                                </article>
+
+                                <!-- Row 1 Right: Fraud Detection -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.58L18 9l-8 8Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Fraud Detection</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center gap-2 min-w-0">
+                                        <div class="flex items-center justify-center rounded-full bg-red-100 shrink-0" style="width: 28px; height: 28px;">
+                                            <div class="flex items-center justify-center rounded-full bg-red-500 font-bold text-white" style="width: 20px; height: 20px; font-size: 11px;">!</div>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-red-500 leading-none" style="font-size: 14px;">12</p>
+                                            <p class="text-slate-500 truncate mt-0.5" style="font-size: 8px;">Suspicious Orders</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1.5 flex justify-end">
+                                        <span class="rounded-full font-semibold" style="font-size: 7.5px; padding: 2px 8px; background:#EEF5F3; color:#00555C;">View Details →</span>
+                                    </div>
+                                </article>
+
+                                <!-- Row 2 Left: Customer Insights -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3ZM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Customer Insights</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between gap-1">
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-slate-900" style="font-size: 12px;">8.4K</p>
+                                            <p class="text-slate-500 truncate" style="font-size: 8px;">Total Customers</p>
+                                        </div>
+                                        <p class="font-semibold shrink-0" style="font-size: 8.5px; color:#00555C;">↑ 32%</p>
+                                    </div>
+                                    <svg class="mt-1 w-full h-3 overflow-visible" viewBox="0 0 500 55" preserveAspectRatio="none">
+                                        <path fill="url(#hubChartGrad1)" d="M0 48 C50 53 70 32 120 38 S200 45 250 20 S320 42 370 27 S440 18 500 0 L500 55 L0 55 Z"/>
+                                        <path fill="none" stroke="#00555C" stroke-width="5" stroke-linecap="round" d="M0 48 C50 53 70 32 120 38 S200 45 250 20 S320 42 370 27 S440 18 500 0"/>
+                                        <circle cx="500" cy="0" r="8" fill="#00555C"/>
+                                        <circle cx="0" cy="48" r="7" fill="#00555C"/>
+                                    </svg>
+                                </article>
+
+                                <!-- Row 2 Right: Top Products -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M3 13h4v8H3v-8Zm7-5h4v13h-4V8Zm7-7h4v20h-4V1Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Top Products</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center gap-1.5 min-w-0">
+                                        <div class="flex items-center justify-center rounded-lg bg-slate-100 shrink-0" style="width: 28px; height: 28px; font-size: 14px;">🎧</div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="truncate font-medium text-slate-900" style="font-size: 9px;">Wireless Headphone</p>
+                                            <div class="mt-0.5 flex items-center justify-between gap-1">
+                                                <p class="text-slate-800 truncate" style="font-size: 8.5px;"><strong>4.8K</strong> Orders</p>
+                                                <p class="font-semibold shrink-0" style="font-size: 8px; color:#00555C;">↑ 18%</p>
+                                            </div>
+                                            <div class="mt-1 h-1 overflow-hidden rounded-full bg-slate-100">
+                                                <div class="h-full rounded-full" style="width: 55%; background:#00555C;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <!-- Row 3 Left: Order Status -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2ZM1 2v2h2l3.6 7.59-1.35 2.45C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03L21 4H5.21L4.27 2H1Zm17 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Order Status</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px;">
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-slate-900" style="font-size: 10px;">1,248</p>
+                                            <p class="mt-0.5 flex items-center gap-0.5 text-slate-500 truncate" style="font-size: 7px;">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span>
+                                                <span class="truncate">Completed</span>
+                                            </p>
+                                        </div>
+                                        <div class="min-w-0 pl-1 border-l border-slate-100">
+                                            <p class="font-bold text-slate-900" style="font-size: 10px;">126</p>
+                                            <p class="mt-0.5 flex items-center gap-0.5 text-slate-500 truncate" style="font-size: 7px;">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                                                <span class="truncate">Pending</span>
+                                            </p>
+                                        </div>
+                                        <div class="min-w-0 pl-1 border-l border-slate-100">
+                                            <p class="font-bold text-slate-900" style="font-size: 10px;">48</p>
+                                            <p class="mt-0.5 flex items-center gap-0.5 text-slate-500 truncate" style="font-size: 7px;">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
+                                                <span class="truncate">Cancelled</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <!-- Row 3 Right: Sales Overview -->
+                                <article class="rounded-2xl p-2.5 flex flex-col justify-between min-w-0 overflow-hidden" style="background: rgba(255,255,255,0.94); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 4px 14px rgba(0,85,92,0.06);">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 shrink-0" style="color:#00555C;" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 16H5V9h14v11ZM7 11h4v4H7v-4Z"/>
+                                            </svg>
+                                            <span class="font-bold text-slate-900 truncate" style="font-size: 9.5px;">Sales Overview</span>
+                                        </div>
+                                        <span class="text-slate-400 shrink-0" style="font-size: 11px; line-height: 1;">›</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between gap-1">
+                                        <p class="font-bold text-slate-900 truncate" style="font-size: 11px;">৳8,50,000</p>
+                                        <p class="font-semibold shrink-0" style="font-size: 8.5px; color:#00555C;">↑ 28%</p>
+                                    </div>
+                                    <svg class="mt-1 w-full h-3 overflow-visible" viewBox="0 0 500 60" preserveAspectRatio="none">
+                                        <path fill="url(#hubChartGrad1)" d="M0 48 C50 52 70 30 120 36 S200 50 250 25 S320 17 370 30 S440 20 500 0 L500 60 L0 60 Z"/>
+                                        <path fill="none" stroke="#00555C" stroke-width="5" stroke-linecap="round" d="M0 48 C50 52 70 30 120 36 S200 50 250 25 S320 17 370 30 S440 20 500 0"/>
+                                        <circle cx="500" cy="0" r="8" fill="#00555C"/>
+                                        <circle cx="0" cy="48" r="7" fill="#00555C"/>
+                                    </svg>
+                                </article>
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Smart Order &amp; Inventory</h3>
-                            Process orders from pending to delivery in one click, sync stock levels in real time across warehouses, and generate automated invoices effortlessly.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Smart Order &amp; Inventory Management</h3>
+                            Manage orders, stock and your business insights in one place. Track sales, monitor inventory, analyze product performance, and detect fake orders with advanced analytics.
                         </div>
                     </div>
 
                     <!-- গ্রাফ ১: পেমেন্ট ও কুরিয়ার মেথড (বামে Payment, মাঝে Dorja, ডানে Courier) -->
                     <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
+                        <div class="relative bg-white/40 p-4 md:p-6 flex flex-col justify-center" style="min-height: 350px;">
                             <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
                                 <!-- Left 4 Input Paths (Payment) -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
@@ -1479,8 +1778,8 @@
                             <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/carrybee.png') }}" alt="CarryBee"></div>
 
                             <!-- Center Node: Dorja Icon -->
-                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px; margin-left: 6px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain ml-1">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
@@ -1490,7 +1789,7 @@
                     </div>
                     <!-- গ্রাফ ২: ওমনিচ্যানেল মেসেজিং ও সেলস চ্যানেল (বামে Messaging, মাঝে Dorja, ডানে Sales Channels) -->
                     <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
+                        <div class="relative bg-white/40 p-4 md:p-6 flex flex-col justify-center" style="min-height: 350px;">
                             <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
                                 <!-- Left 4 Input Paths (Messaging) -->
                                 <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
@@ -1533,8 +1832,8 @@
                             <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
 
                             <!-- Center Node: Dorja Icon -->
-                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px; margin-left: 6px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain ml-1">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
@@ -1780,7 +2079,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach ($topFeatures as $feature)
+                    @foreach ($topFeatures->take(16) as $feature)
                         <div class="hero-reveal" style="transition-delay: {{ ($loop->index % 4) * 80 }}ms;">
                             <a href="{{ route('saas.feature.details', $feature->slug) }}"
                                 class="glass shine flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
@@ -1820,9 +2119,10 @@
                 </div>
 
                 <div class="mt-12 text-center">
-                    <a href="https://app.dorja.io/register"
-                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition shadow-lg shadow-teal-900/20">
-                        Start Free Trial
+                    <a href="{{ route('saas.feature.list') }}"
+                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition shadow-lg shadow-teal-900/20">
+                        <span>View More</span>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
             </div>
@@ -2048,11 +2348,11 @@
         ];
 
         $rows = [
-            ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
+            ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '60s'],
 
-            ['class' => 'animate-marquee-right', 'data' => collect($badges2)->reverse()->all(), 'duration' => '35s'],
+            ['class' => 'animate-marquee-right', 'data' => collect($badges2)->reverse()->all(), 'duration' => '70s'],
 
-            ['class' => 'animate-marquee-left', 'data' => collect($badges3)->shuffle()->all(), 'duration' => '40s'],
+            ['class' => 'animate-marquee-left', 'data' => collect($badges3)->shuffle()->all(), 'duration' => '80s'],
         ];
     @endphp
 
@@ -3115,5 +3415,6 @@
                 }
             </script>
             <script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+            <script src="{{ asset('js/dorja-flow.js') }}"></script>
             <script src="{{ asset('js/dorja-modules.js') }}"></script>
 @endpush

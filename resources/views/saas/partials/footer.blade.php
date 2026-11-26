@@ -116,28 +116,45 @@
     </div>
 </footer>
 
-<!-- Scroll to Top Button (Brand Styled) -->
+<!-- Scroll to Top Button (Circular Progress Ring) -->
 <button
     id="backToTop"
-    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#00555C] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-[#7CE0C3] hover:text-[#052528] hover:-translate-y-1 focus:outline-none"
+    type="button"
+    class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[100] w-12 h-12 rounded-full glass text-[#00555C] flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 hover:scale-110 hover:-translate-y-1 active:scale-95 focus:outline-none group"
+    style="border: 1px solid rgba(0, 85, 92, 0.12);"
     aria-label="Scroll to Top"
 >
-    <i class="fa-solid fa-chevron-up text-xl"></i>
+    <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none p-0.5" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#E2ECE9" stroke-width="6"></circle>
+        <circle id="backToTopProgress" cx="50" cy="50" r="44" fill="none" stroke="#00555C" stroke-width="6" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46" style="transition: stroke-dashoffset 0.1s linear;"></circle>
+    </svg>
+    <i class="fa-solid fa-chevron-up text-lg relative z-10 transition-transform duration-200 group-hover:-translate-y-0.5" style="color:#00555C;"></i>
 </button>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const backToTop = document.getElementById('backToTop');
+        const progressCircle = document.getElementById('backToTopProgress');
         if (!backToTop) return;
+        const circumference = 276.46;
 
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
+        const updateScrollBtn = () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            if (scrollTop > 300) {
                 backToTop.classList.remove('opacity-0', 'invisible');
                 backToTop.classList.add('opacity-100', 'visible');
             } else {
                 backToTop.classList.add('opacity-0', 'invisible');
                 backToTop.classList.remove('opacity-100', 'visible');
             }
-        });
+            if (progressCircle && docHeight > 0) {
+                const progress = Math.min(Math.max(scrollTop / docHeight, 0), 1);
+                progressCircle.style.strokeDashoffset = circumference - (progress * circumference);
+            }
+        };
+
+        window.addEventListener('scroll', updateScrollBtn, { passive: true });
+        updateScrollBtn();
 
         backToTop.addEventListener('click', () => {
             window.scrollTo({
