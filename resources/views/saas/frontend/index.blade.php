@@ -970,27 +970,27 @@
     @endphp
 
     <!-- HERO SECTION (EduManager Inspired Single Static Showcase) -->
-    <section id="top" class="hero-bg relative pt-24 md:pt-36 pb-20 overflow-hidden">
+    <section id="top" class="hero-bg relative pt-8 md:pt-36 pb-10 md:pb-20 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
             <!-- Top Pill Badge -->
-            <div class="inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+            <div class="hero-reveal inline-flex items-center gap-2.5 h-9 pl-3.5 pr-4 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                 <i class="w-2.5 h-2.5 rounded-full bg-[#00A08A] pulse"></i>
                 <span>All-in-One Business Management & ERP</span>
             </div>
 
             <!-- Display H1 (EduManager Scale & Dual Brand Colors - Clean 2-Line Layout) -->
-            <h1 class="hero-display-heading max-w-5xl mx-auto">
+            <h1 class="hero-reveal hero-display-heading max-w-5xl mx-auto" style="transition-delay: 100ms;">
                 <span class="block lg:whitespace-nowrap">Launch Your Complete eCommerce</span>
                 <span class="hero-gradient-text block">Business in Minutes.</span>
             </h1>
 
             <!-- Subtitle Description -->
-            <p class="text-base sm:text-lg lg:text-xl text-[#4B6366] max-w-3xl mx-auto mt-6 leading-relaxed">
+            <p class="hero-reveal text-base sm:text-lg lg:text-xl text-[#4B6366] max-w-3xl mx-auto mt-6 leading-relaxed" style="transition-delay: 200ms;">
                 Dorja is the complete cloud ERP & POS platform for retail, wholesale, eCommerce and multi-branch businesses. Manage sales, inventory, accounting and delivery seamlessly.
             </p>
 
             <!-- Dual Action CTAs -->
-            <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <div class="hero-reveal mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5" style="transition-delay: 300ms;">
                 <a href="https://app.dorja.io/register"
                     class="inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-all duration-200 active:scale-[0.98] bg-[#00555C] text-white hover:bg-[#003A3F] h-[52px] px-8 text-[17px] shadow-[0_12px_30px_-6px_rgba(0,85,92,0.45)]">
                     <span>Start Free Trial</span>
@@ -1003,7 +1003,7 @@
             </div>
 
             <!-- 3-point Checklist Row -->
-            <ul class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[15px] sm:text-[16px] text-[#2C4346] font-medium">
+            <ul class="hero-reveal mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[15px] sm:text-[16px] text-[#2C4346] font-medium" style="transition-delay: 400ms;">
                 <li class="inline-flex items-center gap-2">
                     <span class="w-5 h-5 rounded-full bg-[#00555C] text-white grid place-items-center text-[12px] font-bold">✓</span>
                     <span>Setup in minutes, start free</span>
@@ -1021,8 +1021,19 @@
     </section>
 
     <!-- HERO PREVIEW SHOWCASE SECTION (Separate clean section without grid background) -->
-    <section class="relative pb-20 overflow-hidden">
+    <section class="relative py-8 md:py-14 overflow-hidden">
         <div class="mx-auto px-5 sm:px-8 max-w-[1280px] relative text-center z-10">
+            <!-- Section Badge & Title -->
+            <div class="text-center mb-6 md:mb-8">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
+                    <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
+                    Interactive Product Tour
+                </span>
+                <h2 class="hero-reveal text-2xl md:text-4xl font-extrabold text-[#0A1F22]" style="transition-delay: 100ms;">
+                    Explore How Your Daily Operations Work
+                </h2>
+            </div>
+
             <!-- 3D Perspective Showcase (Exact EduManager Reference) -->
             <div class="relative mt-4 md:mt-8 mx-auto max-w-[1080px] perspective-container">
                 <!-- Glowing blur blob beneath -->
@@ -1036,6 +1047,29 @@
                         <div id="dorjaDemoContainer" class="w-full relative overflow-visible bg-transparent">
                             <iframe id="dorjaDemoIframe" src="{{ asset('dorja-demo.html') }}" class="w-full border-0 block bg-transparent" style="height: 680px;" title="Dorja Interactive Walkthrough" loading="lazy"></iframe>
                         </div>
+                        <script>
+                            (function () {
+                                const iframe = document.getElementById('dorjaDemoIframe');
+                                if (!iframe) return;
+                                const moveCtrlToTop = () => {
+                                    try {
+                                        const doc = iframe.contentDocument || iframe.contentWindow.document;
+                                        const stage = doc && doc.getElementById('stage');
+                                        const wrap = doc && doc.getElementById('wrap');
+                                        const ctrl = doc && doc.querySelector('.ctrl');
+                                        if (stage && wrap && ctrl && ctrl.previousElementSibling !== null) {
+                                            ctrl.style.marginTop = '0';
+                                            ctrl.style.marginBottom = '20px';
+                                            stage.insertBefore(ctrl, wrap);
+                                        }
+                                    } catch (e) {}
+                                };
+                                iframe.addEventListener('load', moveCtrlToTop);
+                                if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                                    moveCtrlToTop();
+                                }
+                            })();
+                        </script>
 
                     </div>
 
@@ -1091,18 +1125,18 @@
             </div>
         </section>
     @endif
-    <section id="features" class="py-16 px-4 md:px-10">
+    <section id="features" class="py-8 md:py-14 px-4 md:px-10">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                    class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     All-in-One Solution
                 </span>
 
-                <h2 class="move-up text-2xl md:text-4xl font-extrabold text-[#0A1F22] mb-4" data-speed="0.05">
+                <h2 class="hero-reveal text-2xl md:text-4xl font-extrabold text-[#0A1F22] mb-4" style="transition-delay: 100ms;">
                     From Start to Growth — Everything in One System
                 </h2>
 
@@ -1124,7 +1158,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center relative z-10">
 
                     <!-- Left Content -->
-                    <div class="lg:col-span-5 relative flex flex-col justify-between min-h-[480px]">
+                    <div class="lg:col-span-5 relative flex flex-col justify-between lg:min-h-[480px]">
                         <div>
                             <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-[#0A1F22] mb-5 relative z-10"></h3>
 
@@ -1157,7 +1191,7 @@
                                     <span id="solBwUrl" class="font-mono text-[11.5px]">app.dorja.io/dashboard</span>
                                 </div>
                             </div>
-                            <div class="bw-body relative w-full aspect-[16/10.5] min-h-[380px] md:min-h-[480px] bg-[#f6f6f6] overflow-hidden" id="solBwBody">
+                            <div class="bw-body relative w-full aspect-[16/10.5] min-h-[240px] sm:min-h-[300px] md:min-h-[480px] bg-[#f6f6f6] overflow-hidden" id="solBwBody">
                                 <div class="ld absolute inset-0 grid place-items-center text-xs text-[#5d6f75]">Loading preview…</div>
                             </div>
                         </div>
@@ -1171,8 +1205,8 @@
 
                 <!-- Watermark Outline Text — absolute bottom of glass card, clipped by overflow-hidden -->
                 <span id="sol-watermark" aria-hidden="true"
-                    class="absolute left-6 md:left-12 bottom-[28px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
-                    style="font-size: clamp(65px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
+                    class="absolute left-6 md:left-12 bottom-[8px] md:bottom-[36px] font-black leading-none whitespace-nowrap pointer-events-none select-none transition-all duration-300 z-0"
+                    style="font-size: clamp(52px, 8.5vw, 115px); color: transparent; -webkit-text-stroke: 2px rgba(0, 85, 92, 0.22); letter-spacing: -0.05em;">Ecommerce</span>
 
             </div>
 
@@ -1180,16 +1214,16 @@
     </section>
 
     <!-- INTEGRATION SECTION -->
-    <section class="py-20 px-4 md:px-10 overflow-hidden relative" id="intergation">
+    <section class="py-8 md:py-14 px-4 md:px-10 overflow-hidden relative" id="intergation">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Section Header -->
             <div class="text-center mb-12">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Smart Integration
                 </span>
-                <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
+                <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight" style="transition-delay: 100ms;">
                     Track and automate your entire business
                 </h2>
                 <p class="text-base md:text-lg text-[#4B6366] max-w-2xl mx-auto">
@@ -1198,239 +1232,314 @@
             </div>
 
             <div class="pt-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Top 2 Feature Showcase Cards (Professional Online Store & Accurate Ad Tracking) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
-                    <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- 4 Input Paths -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                                <!-- Pulse Animation (4 Paths) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
-
-                                <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- Output Path -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
-                            </svg>
-
-                            <!-- 4 Payment Source Logos -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
-
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/ssl.png') }}" alt="Rocket"></div>
-
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                    <!-- Left Card: Professional online store -->
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                        <div class="relative bg-gradient-to-br from-[#EEF2FF]/80 via-[#F5F8FF]/70 to-[#E6F4F1]/80 p-5 md:p-7 min-h-[300px] sm:min-h-[330px] flex items-center justify-center overflow-hidden">
+                            <!-- Mini Interactive Product Details Browser Window -->
+                            <div class="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-gray-200/80 shadow-lg overflow-hidden relative z-10">
+                                <div class="h-7 bg-gray-50 border-b border-gray-100 flex items-center gap-1.5 px-3">
+                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <span class="ml-auto mr-auto text-[10px] text-gray-400 font-mono">dorja.io/product/cotton-tee</span>
+                                </div>
+                                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
+                                    <!-- Product Image & Color Thumbnails -->
+                                    <div class="space-y-2">
+                                        <div class="bg-gray-50 rounded-xl p-2.5 flex items-center justify-center border border-gray-100" style="height: 118px;">
+                                            <svg id="miniStoreTee" viewBox="0 0 64 64" class="w-16 h-16 drop-shadow-sm transition-colors duration-200">
+                                                <path id="miniStoreTeePath" d="M20 12 L26 10 Q32 15 38 10 L44 12 L54 22 L47 29 L43 25 L43 54 L21 54 L21 25 L17 29 L10 22 Z" fill="#00555C"/>
+                                            </svg>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#00555C')" class="h-6 rounded-md bg-[#00555C]/15 border border-[#00555C] flex items-center justify-center cursor-pointer" title="Teal">
+                                                <span class="w-3 h-3 rounded-full bg-[#00555C]"></span>
+                                            </button>
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1D4ED8')" class="h-6 rounded-md bg-blue-50 border border-gray-200 hover:border-blue-500 flex items-center justify-center cursor-pointer" title="Royal Blue">
+                                                <span class="w-3 h-3 rounded-full" style="background-color: #1D4ED8;"></span>
+                                            </button>
+                                            <button type="button" onclick="document.getElementById('miniStoreTeePath').setAttribute('fill','#1F2937')" class="h-6 rounded-md bg-gray-100 border border-gray-200 hover:border-gray-600 flex items-center justify-center cursor-pointer" title="Charcoal">
+                                                <span class="w-3 h-3 rounded-full" style="background-color: #1F2937;"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Product Details Info -->
+                                    <div class="space-y-2 text-left min-w-0">
+                                        <div class="text-sm font-bold text-[#0A1F22] leading-snug">Premium Cotton Tee</div>
+                                        <div class="flex items-center gap-1 text-[10px] text-amber-500 font-semibold">
+                                            <span>★★★★★</span>
+                                            <span class="text-gray-400 font-normal">4.9 (128)</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base font-extrabold text-[#00555C]">৳850</span>
+                                            <span class="text-[11px] text-gray-400 line-through">৳1,200</span>
+                                            <span class="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">-29%</span>
+                                        </div>
+                                        <div class="flex gap-1.5" id="miniSizeGroup">
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">S</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">M</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer">L</button>
+                                            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.className='px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600'});this.className='px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer'" class="px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600">XL</button>
+                                        </div>
+                                        <button id="miniOrderBtn" type="button" onclick="this.textContent='✓ Order placed';this.classList.remove('bg-[#00555C]');this.classList.add('bg-emerald-600');" class="w-full py-2 rounded-lg bg-[#00555C] hover:bg-[#003A3F] text-white text-[11px] font-semibold text-center transition-colors cursor-pointer">
+                                            Order Now • ৳850
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
-                            Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept
-                            secure online payments, automate payment confirmation, and manage every transaction from a
-                            single platform.
+                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Professional online store</h3>
+                            Pick a theme, add your products and publish your store and landing pages, with no code. Shoppers who come from Facebook can see the product and order in a few taps.
+                        </div>
+                    </div>
+                    <script>
+                        (function () {
+                            const colors = ['#00555C', '#1D4ED8', '#1F2937'];
+                            const teePath = document.getElementById('miniStoreTeePath');
+                            const sizeGroup = document.getElementById('miniSizeGroup');
+                            const orderBtn = document.getElementById('miniOrderBtn');
+                            if (!teePath || !sizeGroup || !orderBtn) return;
+
+                            let step = 0;
+                            let paused = false;
+                            const card = orderBtn.closest('.glass');
+                            if (card) {
+                                card.addEventListener('mouseenter', () => paused = true);
+                                card.addEventListener('mouseleave', () => paused = false);
+                            }
+
+                            setInterval(() => {
+                                if (paused) return;
+                                const sizeBtns = sizeGroup.querySelectorAll('button');
+                                const phase = step % 4;
+                                if (phase === 0) {
+                                    orderBtn.textContent = 'Order Now • ৳850';
+                                    orderBtn.classList.remove('bg-emerald-600');
+                                    orderBtn.classList.add('bg-[#00555C]');
+                                    teePath.setAttribute('fill', colors[Math.floor(step / 4) % colors.length]);
+                                } else if (phase === 1) {
+                                    const idx = Math.floor(step / 4) % sizeBtns.length;
+                                    sizeBtns.forEach(b => b.className = 'px-2 py-0.5 text-[10px] border border-gray-200 rounded cursor-pointer text-gray-600');
+                                    sizeBtns[idx].className = 'px-2 py-0.5 text-[10px] bg-[#0A1F22] text-white rounded font-semibold cursor-pointer';
+                                } else if (phase === 2) {
+                                    orderBtn.textContent = '✓ Order placed';
+                                    orderBtn.classList.remove('bg-[#00555C]');
+                                    orderBtn.classList.add('bg-emerald-600');
+                                }
+                                step++;
+                            }, 1100);
+                        })();
+                    </script>
+
+                    <!-- Right Card: Accurate ad tracking -->
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative border border-white/80 lift flex flex-col">
+                        <div class="relative bg-gradient-to-br from-[#F0F4FF]/80 via-[#F7F9FC]/70 to-[#E6F4F1]/80 p-5 md:p-6 min-h-[300px] sm:min-h-[330px] flex flex-col justify-center gap-3">
+                            <!-- Top Row: Live Events + ROAS -->
+                            <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px;">
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Live Events</span>
+                                        <span class="text-[8px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">• LIVE</span>
+                                    </div>
+                                    <div class="mt-2.5 space-y-1.5 text-[10px] text-gray-600">
+                                        <div class="flex justify-between gap-2"><span>Purchase • ৳850</span><span class="text-emerald-600 font-semibold whitespace-nowrap">2s ago</span></div>
+                                        <div class="flex justify-between gap-2"><span>InitiateCheckout</span><span class="text-gray-400 whitespace-nowrap">14s ago</span></div>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3 flex flex-col justify-between">
+                                    <div class="text-[9px] font-bold text-gray-400 uppercase">ROAS</div>
+                                    <div class="text-xl font-extrabold text-[#0A1F22]">5.0x</div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Box: Pixels & Tracking -->
+                            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-3">
+                                <div class="flex items-center justify-between text-[9px] font-bold text-gray-400 uppercase pb-2 border-b border-gray-100">
+                                    <span>Pixels &amp; Tracking</span>
+                                    <span>Last Event</span>
+                                </div>
+                                <div class="divide-y divide-gray-100 text-[11px]">
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Meta Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Conversions API <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">TikTok Pixel <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                    <div class="py-1.5 flex items-center justify-between">
+                                        <span class="font-semibold text-gray-800">Google Tag Manager <span class="ml-1 text-[8px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Ready</span></span>
+                                        <span class="text-emerald-600 text-[10px]">✓</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
+                            <h3 class="text-[#0A1F22] text-xl md:text-2xl font-bold mb-2">Accurate ad tracking</h3>
+                            Meta Pixel, Conversions API, TikTok Pixel and Google Tag Manager are built in. Every order reaches Meta and TikTok through server-side tracking, so they can show your ads to more people who buy.
                         </div>
                     </div>
 
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+                </div>
 
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                                <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
-                            </svg>
-
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/carrybee.png') }}" alt="carrybee"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
-
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
+                    <!-- নতুন কার্ড: Smart Order & Inventory Management -->
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-gradient-to-br from-[#E6F4F1]/80 via-[#F4F9F8]/70 to-[#EEF2FF]/80 p-4 md:p-6 min-h-[260px] flex flex-col justify-center gap-3">
+                            <!-- Order Pipeline Card -->
+                            <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-3.5 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Order Pipeline</span>
+                                    <span class="text-[10px] font-bold text-[#00555C] bg-[#DDEEEA] px-2 py-0.5 rounded-full">Auto Sync</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1048 • ৳1,450</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-bold">Pending</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1047 • ৳850</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[9px] font-bold">Shipped</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-2.5 py-1.5">
+                                        <span class="font-semibold text-[#0A1F22]">#DRJ-1046 • ৳2,100</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold">Delivered</span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
+                            <!-- Live Stock & Invoice Mini Bar -->
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
+                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Live Stock</div>
+                                    <div class="text-sm font-extrabold text-[#00555C] mt-0.5">1,284 pcs</div>
+                                </div>
+                                <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm p-2.5">
+                                    <div class="text-[9px] text-gray-400 font-semibold uppercase">Auto Invoice</div>
+                                    <div class="text-sm font-extrabold text-emerald-600 mt-0.5">✓ Ready</div>
+                                </div>
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
-                            </h3>
-                            Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create
-                            shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Smart Order &amp; Inventory</h3>
+                            Process orders from pending to delivery in one click, sync stock levels in real time across warehouses, and generate automated invoices effortlessly.
                         </div>
                     </div>
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
-                        <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
+                    <!-- গ্রাফ ১: পেমেন্ট ও কুরিয়ার মেথড (বামে Payment, মাঝে Dorja, ডানে Courier) -->
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                        <div class="relative bg-white/40 p-4 md:p-6">
+                            <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
+                                <!-- Left 4 Input Paths (Payment) -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 230 150" />
+
+                                <!-- Left Pulse Animation -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 230 150" style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 230 150" style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 230 150" style="animation-delay:1.2s" />
+
+                                <!-- Right 4 Input Paths (Courier) -->
+                                <path class="flow-line" d="M400 40 C 310 40, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 113 C 310 113, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 186 C 310 186, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 260 C 310 260, 290 150, 230 150" />
+
+                                <!-- Right Pulse Animation -->
+                                <path class="flow-pulse" d="M400 40 C 310 40, 290 150, 230 150" style="animation-delay:.2s" />
+                                <path class="flow-pulse" d="M400 113 C 310 113, 290 150, 230 150" style="animation-delay:.6s" />
+                                <path class="flow-pulse" d="M400 186 C 310 186, 290 150, 230 150" style="animation-delay:1.0s" />
+                                <path class="flow-pulse" d="M400 260 C 310 260, 290 150, 230 150" style="animation-delay:1.4s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
+                                <circle class="ring-pulse" cx="230" cy="150" r="45" fill="none" stroke="#00555c" stroke-width="1.5" />
                             </svg>
 
-                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
+                            <!-- Left: 4 Payment Source Logos -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img src="{{ asset('./images/saas/rocket.png') }}" alt="Rocket"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img src="{{ asset('./images/saas/ssl.png') }}" alt="SSLCommerz"></div>
 
+                            <!-- Right: 4 Courier Partner Logos -->
+                            <div class="node-circle small" style="left:87%; top:13.3%;"><img src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
+                            <div class="node-circle small" style="left:87%; top:37.6%;"><img src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
+                            <div class="node-circle small" style="left:87%; top:62.1%;"><img src="{{ asset('./images/saas/redx.svg') }}" alt="RedX"></div>
+                            <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/carrybee.png') }}" alt="CarryBee"></div>
 
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
-
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            <!-- Center Node: Dorja Icon -->
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
-                                Channel </h3>
-                            Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified
-                            inbox. Respond faster, manage conversations efficiently, and deliver a better customer
-                            experience.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Multiple Payment Gateways &amp; Courier Partners</h3>
+                            Integrate leading payment gateways (bKash, Nagad, Rocket, SSLCommerz) and trusted courier services (Pathao, SteadFast, CarryBee, RedX) in one place. Accept secure payments, create shipments, and track deliveries seamlessly from dorja.io.
                         </div>
                     </div>
-                    <div class="glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
+                    <!-- গ্রাফ ২: ওমনিচ্যানেল মেসেজিং ও সেলস চ্যানেল (বামে Messaging, মাঝে Dorja, ডানে Sales Channels) -->
+                    <div class="hero-reveal glass rounded-3xl overflow-hidden shadow-sm relative group border border-white/80 lift flex flex-col">
                         <div class="relative bg-white/40 p-4 md:p-6">
-                            <svg viewBox="0 0 460 300" class="w-full h-auto">
-                                <!-- ৪টি ইনপুট পাথ -->
-                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+                            <svg viewBox="0 0 460 300" class="w-full h-auto max-h-[340px]">
+                                <!-- Left 4 Input Paths (Messaging) -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 230 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 230 150" />
 
-                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                    style="animation-delay:.4s" />
-                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                    style="animation-delay:.8s" />
-                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                    style="animation-delay:1.2s" />
+                                <!-- Left Pulse Animation -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 230 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 230 150" style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 230 150" style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 230 150" style="animation-delay:1.2s" />
+
+                                <!-- Right 4 Input Paths (Sales Channels) -->
+                                <path class="flow-line" d="M400 40 C 310 40, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 113 C 310 113, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 186 C 310 186, 290 150, 230 150" />
+                                <path class="flow-line" d="M400 260 C 310 260, 290 150, 230 150" />
+
+                                <!-- Right Pulse Animation -->
+                                <path class="flow-pulse" d="M400 40 C 310 40, 290 150, 230 150" style="animation-delay:.2s" />
+                                <path class="flow-pulse" d="M400 113 C 310 113, 290 150, 230 150" style="animation-delay:.6s" />
+                                <path class="flow-pulse" d="M400 186 C 310 186, 290 150, 230 150" style="animation-delay:1.0s" />
+                                <path class="flow-pulse" d="M400 260 C 310 260, 290 150, 230 150" style="animation-delay:1.4s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
-                                    stroke-width="1.5" />
-
-                                <!-- আউটপুট পাথ -->
-                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                    style="animation-delay:.6s" />
+                                <circle class="ring-pulse" cx="230" cy="150" r="45" fill="none" stroke="#00555c" stroke-width="1.5" />
                             </svg>
 
-                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                    src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
-                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                    src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
-                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                    src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
-                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                    src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
+                            <!-- Left: 4 Messaging Channel Logos -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
 
-                            <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
-                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja"
-                                    class="w-7 h-7 object-contain">
-                            </div>
+                            <!-- Right: 4 Sales Channel Logos -->
+                            <div class="node-circle small" style="left:87%; top:13.3%;"><img src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
+                            <div class="node-circle small" style="left:87%; top:37.6%;"><img src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
+                            <div class="node-circle small" style="left:87%; top:62.1%;"><img src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
+                            <div class="node-circle small" style="left:87%; top:86.7%;"><img src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
 
-                            <!-- Main Center Node -->
-                            <div class="center-node">
-                                <span
-                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            <!-- Center Node: Dorja Icon -->
+                            <div class="center-node" style="background: #ffffff; border: 2px solid #00555C; width: 60px; height: 60px; padding: 0; border-radius: 16px;">
+                                <img src="{{ asset('images/saas/dorja-favicon.png') }}" alt="Dorja" class="w-8 h-8 object-contain">
                             </div>
                         </div>
                         <div class="bg-white/80 text-[#3E5759] p-6 text-left text-sm md:text-base border-t border-white/80 flex-grow">
-                            <h3 class="text-[#00555C] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
-                            </h3>
-                            Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other
-                            connected sales channels through a single dashboard. Process, fulfill, and track every order
-                            from one centralized platform.
+                            <h3 class="text-[#00555C] text-2xl font-bold mb-2">Omnichannel Messaging &amp; Sales Channels</h3>
+                            Handle customer inquiries from WhatsApp, Facebook, Instagram, and Live Chat while managing orders from your Website, Landing Pages, WooCommerce, and Daraz in one unified dashboard.
                         </div>
                     </div>
 
@@ -1660,11 +1769,11 @@
             <div class="container mx-auto max-w-[1240px]">
                 <!-- Section Header -->
                 <div class="text-center mb-14">
-                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                    <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                         <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Features
                     </span>
-                    <h2 class="text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight">
+                    <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-[#0A1F22] mb-4 tracking-tight" style="transition-delay: 100ms;">
                         Everything you need for your business <br class="hidden md:block" />
                         now in one place
                     </h2>
@@ -1672,45 +1781,47 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach ($topFeatures as $feature)
-                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                            class="glass flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
+                        <div class="hero-reveal" style="transition-delay: {{ ($loop->index % 4) * 80 }}ms;">
+                            <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                                class="glass shine flex items-center gap-4 p-5 group rounded-2xl border border-white/80 lift transition-all duration-300">
 
-                            <!-- Left Icon -->
-                            <div class="flex-shrink-0">
-                                <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
-                                    @if ($feature->image_url)
-                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
-                                            alt="{{ $feature->title }}" />
-                                    @else
-                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Right Content -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between gap-2 mb-1">
-                                    <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
-                                        {{ $feature->title }}
-                                    </span>
-                                    <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
-                                        {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
-                                    </span>
+                                <!-- Left Icon -->
+                                <div class="flex-shrink-0">
+                                    <div class="w-14 h-14 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center text-[#00555C]">
+                                        @if ($feature->image_url)
+                                            <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-10 h-10 object-contain"
+                                                alt="{{ $feature->title }}" />
+                                        @else
+                                            <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-xl text-[#00555C]"></i>
+                                        @endif
+                                    </div>
                                 </div>
 
-                                <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
-                                    <span>Read More</span>
-                                    <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                                </span>
-                            </div>
+                                <!-- Right Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                        <span class="block truncate text-lg font-semibold text-[#0A1F22] group-hover:text-[#00555C] transition-colors">
+                                            {{ $feature->title }}
+                                        </span>
+                                        <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8AA3A0;" class="shrink-0 font-medium">
+                                            {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    </div>
 
-                        </a>
+                                    <span class="inline-flex items-center gap-1.5 font-semibold text-xs text-[#00555C]">
+                                        <span>Read More</span>
+                                        <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                                    </span>
+                                </div>
+
+                            </a>
+                        </div>
                     @endforeach
                 </div>
 
                 <div class="mt-12 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold transition shadow-lg shadow-teal-900/20">
+                        class="btnp inline-block bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition shadow-lg shadow-teal-900/20">
                         Start Free Trial
                     </a>
                 </div>
@@ -1746,7 +1857,7 @@
                 backdrop-filter: blur(8px);
                 border: 1px solid rgba(255, 255, 255, 0.9);
                 box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
                 cursor: pointer;
             }
             .demo-card:hover {
@@ -1792,11 +1903,11 @@
                 <!-- Header with Redesign Alignment (Title on Left, Pill Tabs on Right) -->
                 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
                     <div class="max-w-2xl">
-                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                        <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                             <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                             Demo &amp; Template
                         </span>
-                        <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                        <h2 class="hero-reveal text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight" style="transition-delay: 100ms;">
                             Get a complete system live experience on one platform
                         </h2>
                     </div>
@@ -1807,11 +1918,11 @@
                         <div id="demo-glider" class="absolute bg-[#00555C] rounded-full pointer-events-none z-0 shadow-sm" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
 
                         <button type="button" role="tab" onclick="filterDemos(1, this)"
-                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-white">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap transition-colors duration-200 text-white">
                             Landing Page Template
                         </button>
                         <button type="button" role="tab" onclick="filterDemos(2, this)"
-                            class="demo-tab-btn relative z-10 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
+                            class="demo-tab-btn relative z-10 px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap transition-colors duration-200 text-[#2C4346] hover:text-[#00555C]">
                             E-Commerce Template
                         </button>
                     </div>
@@ -1819,11 +1930,26 @@
 
                 <!-- Templates Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch" id="demo-grid">
+                    @php $ecomThemeIdx = 0; @endphp
                     @forelse($displayDemos as $demo)
-                        <div class="demo-card group overflow-hidden flex flex-col h-full"
-                            data-type="{{ $demo->type }}">
+                        @php
+                            $demoHref = $demo->link ?? '#';
+                            if ((int) ($demo->type ?? 0) === 2 && $demoHref !== '#') {
+                                $ecomThemeIdx++;
+                                $themeNum = preg_match('/Theme\s*(\d+)/i', $demo->title ?? '', $m) ? (int) $m[1] : $ecomThemeIdx;
+                                $parsed = parse_url($demoHref);
+                                if (!empty($parsed['scheme']) && !empty($parsed['host'])) {
+                                    $port = !empty($parsed['port']) ? ':' . $parsed['port'] : '';
+                                    $demoHref = $parsed['scheme'] . '://' . $parsed['host'] . $port . '/?preview_theme=' . $themeNum;
+                                } else {
+                                    $demoHref = '/?preview_theme=' . $themeNum;
+                                }
+                            }
+                        @endphp
+                        <div class="hero-reveal demo-card group overflow-hidden flex flex-col h-full"
+                            data-type="{{ $demo->type }}" style="transition-delay: {{ ($loop->index % 3) * 100 }}ms;">
                             <!-- Image Frame with Padding & Rounded Corners matching redesign -->
-                            <a href="{{ $demo->link ?? '#' }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
+                            <a href="{{ $demoHref }}" target="_blank" class="demo-image-frame" style="height: 340px; max-height: 340px; min-height: 340px; overflow: hidden;">
                                 <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
                                     alt="{{ $demo->title ?? 'Theme Preview' }}"
                                     loading="lazy"
@@ -1837,7 +1963,7 @@
                                     </h3>
                                     <span class="text-xs text-[#6F8789] font-medium">Interactive Demo</span>
                                 </div>
-                                <a href="{{ $demo->link ?? '#' }}" target="_blank"
+                                <a href="{{ $demoHref }}" target="_blank"
                                     class="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-sm transition shadow-sm hover:shadow whitespace-nowrap">
                                     <span>Live Preview</span>
                                     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -1944,7 +2070,7 @@
                             <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                                 @foreach ($row['data'] as $item)
                                     <span
-                                        class="px-10 py-4 rounded-full font-bold whitespace-nowrap text-xl shadow-sm border" style="color: #C6DDDA; border-color: #234B4D; background: transparent;">
+                                        class="px-5 py-2.5 md:px-10 md:py-4 rounded-full font-bold whitespace-nowrap text-sm md:text-xl shadow-sm border" style="color: #C6DDDA; border-color: #234B4D; background: transparent;">
                                         {{ $item }}
                                     </span>
                                 @endforeach
@@ -1960,13 +2086,13 @@
     <!-- ============ READY TO GROW ============ -->
     <section class="py-16 px-4 md:px-10 relative">
         <div class="container mx-auto max-w-[1240px]">
-            <div class="glass border border-white/85 rounded-[32px] p-8 md:p-16 flex flex-col items-center text-center gap-6 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)]">
+            <div class="glass shine border border-white/85 rounded-[32px] p-8 md:p-16 flex flex-col items-center text-center gap-6 shadow-[0_18px_40px_-24px_rgba(0,58,63,0.35)]">
 
                 <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#7CE0C3]/35 text-[#00555C] font-semibold text-sm">
                     🚀 Business Made Simple
                 </span>
 
-                <h2 class="text-3xl md:text-5xl font-extrabold text-[#0A1F22] tracking-tight max-w-4xl whitespace-nowrap">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-[#0A1F22] tracking-tight max-w-4xl md:whitespace-nowrap">
                     Ready to Grow Your Business?
                 </h2>
 
@@ -1979,12 +2105,12 @@
                 <!-- Buttons -->
                 <div class="flex flex-wrap gap-3 justify-center mt-2">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-base px-8 py-3.5 rounded-full transition shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="btnp inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white font-semibold text-[17px] px-8 py-3.5 rounded-full transition shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>Start Free Trial</span>
                     </a>
 
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#0A1F22] border border-[#BFD6D1] font-semibold text-base px-8 py-3.5 rounded-full transition">
+                        class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#0A1F22] border border-[#BFD6D1] font-semibold text-[17px] px-8 py-3.5 rounded-full transition">
                         <span>View Pricing</span>
                     </a>
                 </div>
@@ -2014,16 +2140,16 @@
     </section>
 
     @if ($pricingPlans->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="pricing">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="pricing">
             <div class="container mx-auto max-w-[1240px]">
 
                 <div class="text-center mb-10">
                     <span
-                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6">
+                        class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-6" style="transition-delay: 0ms;">
                         <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                         Choose Best Plan for Your Business
                     </span>
-                    <h2 class="move-up text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-6" data-speed="0.05">
+                    <h2 class="hero-reveal text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-6" style="transition-delay: 100ms;">
                         Here are the best packages for your business below.
                     </h2>
                 </div>
@@ -2036,14 +2162,14 @@
                         <div id="pricing-glider" class="absolute bg-[#00555C] rounded-full shadow-sm pointer-events-none z-0" style="transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);"></div>
 
                         <button type="button" id="home-monthly-btn" onclick="switchHomePricingCycle('monthly')"
-                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-white cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm whitespace-nowrap font-semibold transition-colors duration-200 text-white cursor-pointer">
                             Monthly Billing
                         </button>
                         <button type="button" id="home-yearly-btn" onclick="switchHomePricingCycle('yearly')"
-                            class="home-cycle-btn relative z-10 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] flex items-center gap-2 cursor-pointer">
+                            class="home-cycle-btn relative z-10 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm whitespace-nowrap font-semibold transition-colors duration-200 text-[#2C4346] hover:text-[#00555C] flex items-center gap-1.5 sm:gap-2 cursor-pointer">
                             <span>Yearly Billing</span>
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-[#7CE0C3] text-[#00555C] shadow-sm">
+                                class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] whitespace-nowrap font-extrabold bg-[#7CE0C3] text-[#00555C] shadow-sm">
                                 Save 20%
                             </span>
                         </button>
@@ -2087,6 +2213,7 @@
                         @endphp
 
                         <!-- Card Container -->
+                        <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 4) * 100 }}ms;">
                         <div class="{{ $mode === 'popular' ? 'rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative text-white shadow-2xl border border-white/20' : 'glass rounded-2xl flex flex-col h-full p-7 transition-all duration-300 relative shadow-sm hover:shadow-xl' }}"
                             @if ($mode === 'popular') style="background-color: #1c696f !important;" @endif>
 
@@ -2226,12 +2353,13 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
                     @endforeach
 
                 </div>
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.package.list') }}"
-                        class="group inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="group inline-flex items-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>More Packages</span>
                         <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -2240,17 +2368,16 @@
         </section>
     @endif
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
-    @if ($whyChooseUs->isNotEmpty())
+    {{-- @if ($whyChooseUs->isNotEmpty())
         <section class="py-20 px-4 md:px-10 relative">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-20">
                     <span
-                        class="inline-block px-5 py-1.5 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
+                        class="hero-reveal inline-block px-5 py-1.5 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6" style="transition-delay: 0ms;">
                         Why Businesses Choose Dorja.io
                     </span>
 
-                    <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
-                        data-speed="0.05">
+                    <h2 class="hero-reveal text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" style="transition-delay: 100ms;">
                         From Operations to Growth — Everything in One System
                     </h2>
                 </div>
@@ -2297,22 +2424,22 @@
 
                 <div class="mt-4 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="btnp inline-flex items-center justify-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-base transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
+                        class="btnp inline-flex items-center justify-center gap-2.5 bg-[#00555C] hover:bg-[#003A3F] text-white px-8 py-3.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-[0_14px_30px_-14px_rgba(0,85,92,0.7)]">
                         <span>Start Free Trial</span>
                     </a>
                 </div>
             </div>
         </section>
-    @endif
+    @endif --}}
 
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="blog-section">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="blog-section">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
-                    <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
+                    <h2 class="hero-reveal text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
-                        class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
+                        class="group inline-flex items-center gap-2 bg-[#00555C] hover:bg-[#003A3F] text-white px-6 py-2.5 rounded-full font-semibold text-[17px] transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow whitespace-nowrap">
                         <span>View All</span>
                         <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -2320,8 +2447,9 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach ($blogs as $blog)
+                        <div class="hero-reveal h-full" style="transition-delay: {{ ($loop->index % 3) * 100 }}ms;">
                         <a href="{{ route('saas.blog.details', $blog->slug) }}"
-                            class="glass border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                            class="glass shine border border-white/80 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
                             <div class="group block overflow-hidden rounded-xl">
                                 <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
@@ -2360,6 +2488,7 @@
                                 </div>
                             </div>
                         </a>
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -2367,14 +2496,14 @@
     @endif
     <!-- Review SECTION -->
     @if ($allReviews->isNotEmpty())
-        <section class="py-20 px-4 md:px-10 relative" id="reviews-section">
+        <section class="py-8 md:py-14 px-4 md:px-10 relative" id="reviews-section">
             <div class="container mx-auto max-w-[1240px]">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6">
+                        class="hero-reveal inline-block px-5 py-2 rounded-full border border-[#00555C]/20 bg-[#DDEEEA] text-[#00555C] font-semibold text-sm md:text-lg mb-6" style="transition-delay: 0ms;">
                         Customer Reviews
                     </span>
-                    <h2 class="move-up text-3xl md:text-5xl font-black text-gray-900" data-speed="0.05">
+                    <h2 class="hero-reveal text-3xl md:text-5xl font-black text-gray-900" style="transition-delay: 100ms;">
                         What our customers say
                     </h2>
                 </div>
@@ -2417,18 +2546,17 @@
             </div>
         </section>
     @endif
-    <section class="py-20 px-4 md:px-10 relative" id="faq-section">
+    <section class="py-8 md:py-14 px-4 md:px-10 relative" id="faq-section">
         <div class="container mx-auto max-w-[1240px]">
 
             <!-- Header -->
             <div class="text-center mb-10">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4">
+                <span class="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur ring-1 ring-black/[0.06] shadow-sm text-[14px] font-medium text-[#0A1F22] mb-4" style="transition-delay: 0ms;">
                     <span class="w-2 h-2 rounded-full bg-[#00A08A]"></span>
                     Frequently Asked Questions
                 </span>
 
-                <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
-                    data-speed="0.05">
+                <h2 class="hero-reveal text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" style="transition-delay: 100ms;">
                     Better Understanding of Dorja.io and its Features
                 </h2>
 
@@ -2441,18 +2569,17 @@
 
 
 
-            <div class="div space-y-4 h-[700px] overflow-y-auto">
-                <!-- FAQ List -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
+            <!-- FAQ List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="faq-container">
 
-                    @foreach ($faqs as $faq)
-                        <div class="faq-item glass border border-white/80 rounded-2xl">
+                    @foreach ($faqs as $index => $faq)
+                        <div class="faq-item glass border border-white/80 rounded-2xl {{ $index >= 10 ? 'faq-hidden' : '' }}"
+                             style="{{ $index >= 10 ? 'display:none;' : '' }}">
 
                             <!-- Question -->
                             <button
                                 class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
                                 <span class="faq-question">{{ $faq->title }}</span>
-
                                 <i class="fa-solid fa-plus faq-icon text-[#00555C] text-lg transition-transform duration-200"></i>
                             </button>
 
@@ -2465,7 +2592,14 @@
                     @endforeach
 
                 </div>
-            </div>
+
+                <!-- Load More Button -->
+                <div class="text-center mt-8" id="faq-load-more-wrap">
+                    <button id="faq-load-more"
+                        class="px-8 py-3.5 rounded-full font-bold text-[17px] border-2 text-[#00555C] border-[#00555C] hover:bg-[#00555C] hover:text-white transition-all duration-300">
+                        Load More
+                    </button>
+                </div>
         </div>
     </section>
     <section class="py-10 px-4 md:px-10">
@@ -2475,7 +2609,7 @@
 
 
 
-            <div class="rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl" style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
+            <div class="hero-reveal rounded-3xl p-10 md:p-14 text-center text-white border border-[#00555c]/40 shadow-2xl" style="background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);">
 
                 <h3 class="text-3xl md:text-4xl font-bold">
                     Start Managing Your Business Smarter Today
@@ -2489,12 +2623,12 @@
                 <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
 
                     <a href="https://app.dorja.io/register"
-                        class="bg-white text-[#00555c] font-bold px-8 py-3.5 rounded-xl hover:bg-gray-100 transition shadow-md">
+                        class="bg-white text-[#00555c] font-bold text-[17px] px-8 py-3.5 rounded-full hover:bg-gray-100 transition shadow-md">
                         Start Free Trial
                     </a>
 
                     <a href="{{ route('saas.package.list') }}"
-                        class="border border-white/80 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-white hover:text-[#00555c] transition">
+                        class="border border-white/80 text-white font-semibold text-[17px] px-8 py-3.5 rounded-full hover:bg-white hover:text-[#00555c] transition">
                         View Pricing
                     </a>
 
@@ -2506,44 +2640,87 @@
     </section>
 @endsection
 @push('scripts')
-    <!-- Accordion + Search Script -->
+    <!-- Accordion + Search + Load More Script -->
     <script>
         // Accordion
-        document.querySelectorAll('.faq-toggle').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const content = btn.nextElementSibling;
-                const icon = btn.querySelector('.faq-icon') || btn.querySelector('i');
-
-                const isHidden = content.classList.contains('hidden');
-                if (isHidden) {
-                    content.classList.remove('hidden');
-                    if (icon) {
-                        icon.classList.remove('fa-plus');
-                        icon.classList.add('fa-minus');
+        function initFaqAccordion() {
+            document.querySelectorAll('.faq-toggle').forEach((btn) => {
+                if (btn._faqBound) return;
+                btn._faqBound = true;
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('.faq-icon') || btn.querySelector('i');
+                    const isHidden = content.classList.contains('hidden');
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        if (icon) { icon.classList.remove('fa-plus'); icon.classList.add('fa-minus'); }
+                    } else {
+                        content.classList.add('hidden');
+                        if (icon) { icon.classList.remove('fa-minus'); icon.classList.add('fa-plus'); }
                     }
-                } else {
-                    content.classList.add('hidden');
-                    if (icon) {
-                        icon.classList.remove('fa-minus');
-                        icon.classList.add('fa-plus');
-                    }
-                }
+                });
             });
-        });
+        }
+        initFaqAccordion();
 
-        // Search Filter
-        document.getElementById('faqSearch').addEventListener('input', function () {
-            let value = this.value.toLowerCase();
-            let items = document.querySelectorAll('.faq-item');
-
-            items.forEach(item => {
-                let text = item.querySelector('.faq-question').innerText.toLowerCase();
-
-                if (text.includes(value)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+        // Load More
+        const loadMoreBtn = document.getElementById('faq-load-more');
+        const loadMoreWrap = document.getElementById('faq-load-more-wrap');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function () {
+                const hidden = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                let shown = 0;
+                hidden.forEach(function (item) {
+                    if (shown < 10) {
+                        item.style.display = '';
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(16px)';
+                        setTimeout(function () {
+                            item.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 20);
+                        shown++;
+                    }
+                });
+                // Hide button if no more hidden items
+                const remaining = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                if (remaining.length === 0) {
+                    loadMoreWrap.style.display = 'none';
                 }
+                initFaqAccordion();
+            });
+
+            // Hide button if total faqs <= 10
+            const allHidden = document.querySelectorAll('.faq-hidden');
+            if (allHidden.length === 0) {
+                loadMoreWrap.style.display = 'none';
+            }
+        }
+
+        // Search Filter (shows all matching, hides load more while searching)
+        document.getElementById('faqSearch').addEventListener('input', function () {
+            let value = this.value.toLowerCase().trim();
+            let items = document.querySelectorAll('.faq-item');
+            if (value === '') {
+                // Reset to initial state
+                items.forEach(function (item, i) {
+                    if (item.classList.contains('faq-hidden')) {
+                        item.style.display = 'none';
+                    } else {
+                        item.style.display = '';
+                    }
+                });
+                if (loadMoreWrap) {
+                    const remaining = document.querySelectorAll('.faq-hidden[style*="display:none"]');
+                    loadMoreWrap.style.display = remaining.length > 0 ? '' : 'none';
+                }
+                return;
+            }
+            if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+            items.forEach(function (item) {
+                let text = item.querySelector('.faq-question').innerText.toLowerCase();
+                item.style.display = text.includes(value) ? '' : 'none';
             });
         });
     </script>

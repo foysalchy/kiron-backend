@@ -1,7 +1,7 @@
-<header class="sticky top-0 z-50 w-full pt-3 px-4 md:px-6 pointer-events-none">
-    <div class="glass container mx-auto max-w-[1240px] rounded-full px-5 md:px-8 py-2 md:py-2.5 flex items-center justify-between pointer-events-auto">
+<header id="saas-header" class="sticky top-0 z-50 w-full pt-3 px-4 md:px-6 pointer-events-none transition-transform duration-300 ease-in-out">
+    <div class="glass container mx-auto max-w-[1240px] rounded-full px-4 md:pl-4 md:pr-2.5 py-2 md:py-2.5 flex items-center justify-between pointer-events-auto">
         <!-- Logo Section -->
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 md:px-6">
             <a href="{{ route('saas.index') }}" class="flex items-center gap-2"
                 aria-label="{{ $setup->shop_name ?? 'Home' }}">
                 @if ($setup && $setup->logo_url)
@@ -70,14 +70,15 @@
             </button>
         </div>
     </div>
+</header>
 
     <!-- MOBILE MENU SIDEBAR (Hidden by default) -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] lg:hidden translate-x-full">
+    <div id="mobile-menu" class="fixed inset-0 z-[60] lg:hidden translate-x-full pointer-events-auto">
         <!-- Overlay -->
         <div id="menu-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
         <!-- Sidebar Content -->
-        <div class="absolute right-0 top-0 h-full w-[280px] bg-white shadow-2xl p-6">
+        <div class="absolute right-0 top-0 h-full w-[280px] shadow-2xl p-6" style="background-color: #ffffff;">
             <div class="flex items-center justify-between mb-8">
                 <span class="font-bold text-xl">Menu</span>
                 <button id="menu-close" class="text-gray-700 text-2xl" aria-label="sidebar menu">
@@ -95,13 +96,28 @@
                 <a href="{{ route('saas.contact') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Contact</a>
                 <div class="pt-4">
                     <a href="https://app.dorja.io"
-                        class="block text-center bg-gray-100 text-gray-900 py-3 rounded-xl font-bold">Login</a>
+                        class="block text-center bg-[#00555C] hover:bg-[#003A3F] text-white py-3 rounded-full font-bold transition shadow-lg shadow-teal-900/20">Login</a>
                 </div>
             </nav>
         </div>
     </div>
 
     <script>
+        (function () {
+            const header = document.getElementById("saas-header");
+            if (!header) return;
+            let lastScrollY = window.scrollY;
+            window.addEventListener("scroll", function () {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY <= 80 || currentScrollY < lastScrollY) {
+                    header.style.transform = "translateY(0)";
+                } else if (currentScrollY > lastScrollY) {
+                    header.style.transform = "translateY(-100%)";
+                }
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+        })();
+
         document.addEventListener("DOMContentLoaded", function () {
             const nav = document.getElementById("desktop-nav");
             const glider = document.getElementById("nav-glider");
@@ -172,4 +188,3 @@
             });
         });
     </script>
-</header>

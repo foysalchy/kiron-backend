@@ -39,7 +39,7 @@
 @section('content')
 <!-- CONTACT US SECTION WITH DOT GRID BACKGROUND -->
 <section class="relative py-24 px-6 md:px-10 font-manrope overflow-hidden"
-  style="background-color: #ffffff; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1px); background-size: 30px 30px;">
+  style="background-image: radial-gradient(rgba(0, 85, 92, 0.12) 1.5px, transparent 1px); background-size: 30px 30px;">
 
   <div class="container mx-auto max-w-6xl relative z-10">
 
@@ -102,7 +102,7 @@
           </div>
 
           <button type="submit"
-            class="w-full bg-[#00555c] text-white font-black py-5 rounded-md shadow-xl shadow-[#00555c]/20 hover:bg-[#2c8a71] hover:-translate-y-1 transition-all uppercase tracking-[0.2em] text-sm cursor-pointer">
+            class="w-full bg-[#00555c] text-white font-black py-5 rounded-full shadow-xl shadow-[#00555c]/20 hover:bg-[#2c8a71] hover:-translate-y-1 transition-all uppercase tracking-[0.2em] text-[17px] cursor-pointer">
             Submit
           </button>
         </form>
